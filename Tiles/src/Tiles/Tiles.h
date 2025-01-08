@@ -1,24 +1,26 @@
 #include <vector>
 #include <iostream>
 
-#include "imgui.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "Lumina/Layer.h"
+
 #include "Lumina/Utils/Timer.h"
+#include "Lumina/Utils/FileReader.h"
+
+#include "Lumina/Renderer/ShaderProgram.h"
+#include "Lumina/Renderer/FrameBuffer.h"
+#include "Lumina/Renderer/Texture.h"
+#include "Lumina/Renderer/VertexArray.h"
+
+// Client
+#include "TileEditor.h"
+// #include "TileRenderer.h"
 
 class Tiles : public Lumina::Layer
 {
 public:
-    virtual void OnAttach() override
-    {
-
-    }
-
-    virtual void OnDetach() override
-    {
-
-    }
-
     virtual void OnUpdate(float timestep) override
     {
         float elapsedTime = m_FrameTimer.Elapsed();
@@ -28,16 +30,24 @@ public:
 
     virtual void OnUIRender() override
     {
-        ImGui::Begin("Example Window");
-        ImGui::Text("Hello World!");
-        ImGui::End();
+        m_TileEditor.Render(); 
 
         ImGui::Begin("FPS Counter");
         ImGui::Text("FPS: %.1f", m_FPS);
-        ImGui::End();
+        ImGui::End(); 
     }
 
+    virtual void OnAttach() override
+    {
+    }
+
+    virtual void OnDetach() override
+    {
+        m_TileEditor.Shutdown(); 
+    }
 private:
+    TileEditor m_TileEditor; 
+
     Lumina::Timer m_FrameTimer;
-    float m_FPS = 0.0f;
+    float m_FPS = 0;
 };
