@@ -21,9 +21,9 @@ void TileEditor::Init(int width, int height)
     m_TileLayer.Init(width, height);
     m_TileLayer.LoadLayers("tiles.json");
 
-    LoadTextures();
+    m_ActiveLayer = m_TileLayer.Size() - 1; 
 
-    UpdateMatrices();
+    LoadTextures(); 
 }
 
 void TileEditor::Shutdown()
@@ -66,7 +66,7 @@ void TileEditor::Render()
         else {
             m_NumLayers = (int)m_TileLayers.size();
         }
-        UpdateMatrices();
+        
     }
 
     ImGui::SameLine();
@@ -196,11 +196,24 @@ void TileEditor::Render()
 
     ImGui::Separator();
 
-    // Render tiles
-    float childWidth = m_TileLayer.GetWidth() * (m_TileSize + m_Padding) + 15;
-    float childHeight = m_TileLayer.GetHeight() * (m_TileSize + m_Padding) + 15;
-    ImGui::BeginChild("RenderTiles", ImVec2(childWidth, childHeight), true, 0);
+    ImGui::End(); 
+
+    ImGui::Begin("Editor Layer");
     
+    for (int layer = 0; layer < m_ActiveLayer; ++layer)
+    {
+        for (int y = 0; y < m_TileLayer.GetHeight(); y++)
+        {
+            for (int x = 0; x < m_TileLayer.GetWidth(); x++)
+            {
+                RenderTile(layer, y, x);
+            }
+        }
+    }
+
+    glm::vec3 hovered = { 0, 0, 0 };
+
+    // Render tiles
     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
     for (int y = 0; y < m_TileLayer.GetHeight(); y++)
     {
@@ -238,67 +251,65 @@ void TileEditor::Render()
                 }
 
                 m_TileLayer.RecordAction(m_ActiveLayer, y, x);
-                UpdateMatrices();
+                
             }
 
-            // Draw the tile
-            if (tile.UseTexture && tile.TextureIndex >= 0)
+            RenderTile(m_ActiveLayer, y, x); 
+
+            if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
             {
-                intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
-
-                glm::vec4 texCoords = m_Atlas.GetTexCoords(tile.TextureIndex);
-                ImVec2 xy = ImVec2(texCoords.x, texCoords.y);
-                ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
-
-                const int r = static_cast<int>(tile.Opacity * 255);
-                const int g = static_cast<int>(tile.Opacity * 255);
-                const int b = static_cast<int>(tile.Opacity * 255);
-                const int a = 255;
-
-                const ImU32 color = IM_COL32(r, g, b, a); 
-
-                ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, xy, zw, color);
-            }
-            else
-            {
-                const float r = tile.Color.r;
-                const float g = tile.Color.g;
-                const float b = tile.Color.b;
-                const float a = tile.Color.a;
-
-				const ImU32 color = ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, a));
-
-                ImGui::GetWindowDrawList()->AddRectFilled(tileMin, tileMax, color);
+                hovered = { m_ActiveLayer, y, x };
+                ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, IM_COL32(169, 169, 169, 255));
             }
 
-            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, IM_COL32(169, 169, 169, 255));
             ImGui::PopID();
         }
     }
-    ImGui::EndChild();
+
+    ImGui::End();
+
+    ImGui::Begin("Tile Attributes");
+
+    TileData& hoveredTile = m_TileLayer.GetTileData(hovered.x, hovered.y, hovered.z);
+
+    ImGui::Text("Active Layer: %d", m_ActiveLayer);
+    ImGui::Text("Tile Position: (%d, %d)", hovered.y, hovered.z);
+    ImGui::Text("Texture Index: %d", hoveredTile.TextureIndex);
+    ImGui::Text("Opacity: %.2f", hoveredTile.Opacity);
 
     ImGui::End();
 }
 
-void TileEditor::UpdateMatrices()
+void TileEditor::RenderTile(int index, int y, int x)
 {
-    m_Matrices.clear();
-    m_Offsets.clear();
+    ImVec2 cursorPos = ImGui::GetCursorScreenPos();
 
-    for (int layer = 0; layer < m_TileLayer.Size(); ++layer)
+    ImGui::PushID(index * m_TileLayer.GetWidth() * m_TileLayer.GetHeight() + y * m_TileLayer.GetWidth() + x);
+
+    TileData& tile = m_TileLayer.GetTileData(index, y, x);
+    float offset = m_TileSize + m_Padding;
+    ImVec2 tileMin = ImVec2(cursorPos.x + x * offset, cursorPos.y + y * offset);
+    ImVec2 tileMax = ImVec2(tileMin.x + m_TileSize, tileMin.y + m_TileSize);
+
+    // Draw the tile
+    if (tile.UseTexture && tile.TextureIndex >= 0)
     {
-        for (int y = 0; y < m_TileLayer.GetHeight(); ++y)
-        {
-            for (int x = 0; x < m_TileLayer.GetWidth(); ++x)
-            {
-                TileData& tile = m_TileLayer.GetTileData(layer, x, y);
-                if (tile.UseTexture)
-                {
-                    glm::mat4 translation = glm::translate(glm::mat4(1.0f),  glm::vec3(x, y, layer * 0.01f));
-                    m_Matrices.push_back(translation);
-                    m_Offsets.push_back(m_Atlas.GetOffset(tile.TextureIndex));
-                }
-            }
-        }
+        intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
+
+        glm::vec4 texCoords = m_Atlas.GetTexCoords(tile.TextureIndex);
+        ImVec2 xy = ImVec2(texCoords.x, texCoords.y);
+        ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
+
+        const int r = static_cast<int>(tile.Opacity * 255);
+        const int g = static_cast<int>(tile.Opacity * 255);
+        const int b = static_cast<int>(tile.Opacity * 255);
+        const int a = 255;
+
+        const ImU32 color = IM_COL32(r, g, b, a);
+
+        ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, xy, zw, color);
     }
+
+    ImGui::PopID();
+
 }

@@ -19,9 +19,14 @@ void TileLayer::AddLayer(std::string& name)
     LayerData layer;
     layer.Name = name;
 
-    if (!m_Layers.empty()) 
+    layer.Layer.resize(m_LayerWidth, std::vector<TileData>(m_LayerHeight));
+
+    for (int y = 0; y < m_LayerHeight; ++y)
     {
-        layer.Layer.resize(m_LayerWidth, std::vector<TileData>(m_LayerHeight));
+        for (int x = 0; x < m_LayerWidth; ++x)
+        {
+            layer.Layer[y][x] = TileData();
+        }
     }
 
     m_Layers.push_back(layer);
@@ -49,6 +54,8 @@ void TileLayer::ClearLayer(uint32_t index)
         }
     }
 }
+
+#include <iostream>
 
 TileData& TileLayer::GetTileData(uint32_t index, uint32_t x, uint32_t y)
 {

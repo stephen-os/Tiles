@@ -8,7 +8,7 @@
 
 struct TileData
 {
-    glm::vec4 Color = {1.0f, 1.0f, 1.0f, 1.0f};
+    glm::vec4 Color = {0.3f, 0.3f, 0.3f, 1.0f};
     float Opacity = 1.0f;
 
     bool UseTexture = false;

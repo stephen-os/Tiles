@@ -19,12 +19,9 @@ public:
     void Shutdown(); 
 
     void Render();
-    std::vector<glm::mat4>& GetMatrices() { return m_Matrices; }
-    std::vector<glm::vec2>& GetOffsets() { return m_Offsets; }
 private:
+    void RenderTile(int index, int y, int x);
     void LoadTextures();
-
-    void UpdateMatrices();
 private:
     Lumina::TextureAtlas m_Atlas;
 
@@ -45,8 +42,4 @@ private:
     bool m_FillMode;
     float m_Opacity;
     int m_SelectedTextureIndex;
-
-    // Render Data
-    std::vector<glm::mat4> m_Matrices;
-    std::vector<glm::vec2> m_Offsets;
 };
