@@ -39,11 +39,12 @@ public:
 
     virtual void OnAttach() override
     {
+        m_TileEditor.Init(20, 20);
     }
 
     virtual void OnDetach() override
     {
-        m_TileEditor.Shutdown(); 
+        m_TileEditor.Shutdown();
     }
 private:
     TileEditor m_TileEditor; 

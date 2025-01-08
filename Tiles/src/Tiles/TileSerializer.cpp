@@ -1,16 +1,17 @@
 #include "TileSerializer.h"
+
 #include <fstream>
 #include <iostream>
 
-void TileSerializer::Serialize(const std::vector<TileLayer>& layers, const std::string& filePath)
+void TileSerializer::Serialize(const std::vector<LayerData>& layers, const std::string& path)
 {
-    if (!std::filesystem::exists(filePath))
+    if (!std::filesystem::exists(path))
     {
-        std::cout << "File not found: " << filePath << ". Creating a new file." << std::endl;
-        std::ofstream newFile(filePath);
+        std::cout << "File not found: " << path << ". Creating a new file." << std::endl;
+        std::ofstream newFile(path);
         if (!newFile.is_open())
         {
-            std::cerr << "Failed to create file: " << filePath << std::endl;
+            std::cerr << "Failed to create file: " << path << std::endl;
             return;
         }
         newFile.close();
@@ -21,18 +22,19 @@ void TileSerializer::Serialize(const std::vector<TileLayer>& layers, const std::
     for (const auto& layer : layers)
     {
         nlohmann::json jsonLayer;
-        jsonLayer["name"] = layer.m_Name;
+        jsonLayer["name"] = layer.Name;
 
-        for (const auto& row : layer.m_Tiles)
+        for (const auto& row : layer.Layer)
         {
             nlohmann::json jsonRow;
             for (const auto& tile : row)
             {
                 nlohmann::json jsonTile;
-                jsonTile["color"] = { tile.m_Color.r, tile.m_Color.g, tile.m_Color.b, tile.m_Color.a };
-                jsonTile["use_texture"] = tile.m_UseTexture;
-                jsonTile["opacity"] = tile.m_Opacity;
-                jsonTile["texture_index"] = tile.m_TextureIndex;
+                jsonTile["color"] = { tile.Color.r, tile.Color.g, tile.Color.b, tile.Color.a };
+                jsonTile["opacity"] = tile.Opacity;
+
+                jsonTile["use_texture"] = tile.UseTexture;
+                jsonTile["texture_index"] = tile.TextureIndex;
 
                 jsonRow.push_back(jsonTile);
             }
@@ -41,26 +43,26 @@ void TileSerializer::Serialize(const std::vector<TileLayer>& layers, const std::
         jsonLayers.push_back(jsonLayer);
     }
 
-    std::ofstream file(filePath);
+    std::ofstream file(path);
     if (file.is_open())
     {
-        file << jsonLayers.dump(4); // Pretty print with 4 spaces
+        file << jsonLayers.dump(4);
         file.close();
     }
     else
     {
-        std::cerr << "Failed to open file for writing: " << filePath << std::endl;
+        std::cerr << "Failed to open file for writing: " << path << std::endl;
     }
 }
 
-std::vector<TileLayer> TileSerializer::Deserialize(const std::string& filePath)
+std::vector<LayerData> TileSerializer::Deserialize(const std::string& path)
 {
-    std::vector<TileLayer> layers;
-    std::ifstream file(filePath);
+    std::vector<LayerData> layers;
+    std::ifstream file(path);
 
     if (!file.is_open())
     {
-        std::cerr << "Failed to open file for reading: " << filePath << std::endl;
+        std::cerr << "Failed to open file for reading: " << path << std::endl;
         return layers;
     }
 
@@ -69,24 +71,24 @@ std::vector<TileLayer> TileSerializer::Deserialize(const std::string& filePath)
 
     for (const auto& jsonLayer : jsonLayers)
     {
-        TileLayer layer;
-        layer.m_Name = jsonLayer.at("name").get<std::string>();
+        LayerData layer;
+        layer.Name = jsonLayer.at("name").get<std::string>();
 
         for (const auto& jsonRow : jsonLayer.at("tiles"))
         {
-            std::vector<Tile> row;
+            std::vector<TileData> row;
             for (const auto& jsonTile : jsonRow)
             {
-                Tile tile;
+                TileData tile;
                 auto color = jsonTile.at("color").get<std::vector<float>>();
-                tile.m_Color = glm::vec4(color[0], color[1], color[2], color[3]);
-                tile.m_UseTexture = jsonTile.at("use_texture").get<bool>();
-                tile.m_Opacity = jsonTile.at("opacity").get<float>();
-                tile.m_TextureIndex = jsonTile.at("texture_index").get<int>();
+                tile.Color = glm::vec4(color[0], color[1], color[2], color[3]);
+                tile.UseTexture = jsonTile.at("use_texture").get<bool>();
+                tile.Opacity = jsonTile.at("opacity").get<float>();
+                tile.TextureIndex = jsonTile.at("texture_index").get<int>();
 
                 row.push_back(tile);
             }
-            layer.m_Tiles.push_back(row);
+            layer.Layer.push_back(row);
         }
         layers.push_back(layer);
     }
