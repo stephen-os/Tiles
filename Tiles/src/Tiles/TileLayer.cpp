@@ -113,15 +113,27 @@ void TileLayer::FillLayer(uint32_t newTextureIndex, uint32_t index, uint32_t x, 
     }
 }
 
-void TileLayer::RecordAction(uint32_t layer, uint32_t x, uint32_t y)
+void TileLayer::RecordAction(uint32_t index, uint32_t x, uint32_t y)
 {
-    if (m_Layers.empty() || layer >= m_Layers.size())
+    if (m_Layers.empty() || index >= m_Layers.size())
         throw std::out_of_range("No active layer.");
 
+    if (!m_UndoStack.empty())
+    {
+        TileAction curr = m_UndoStack.top();
+
+        if (curr.Index == index && curr.X == x && curr.Y == y &&
+            curr.Tile.TextureIndex == m_Layers[index].Layer[x][y].TextureIndex)
+        { 
+            return;
+        }
+    }
+ 
     TileAction action;
     action.X = x;
     action.Y = y;
-    action.Prev = m_Layers[layer].Layer[x][y];
+    action.Index = index;
+    action.Tile = m_Layers[index].Layer[x][y];
     m_UndoStack.push(action);
 
     while (!m_RedoStack.empty()) 
@@ -139,7 +151,8 @@ void TileLayer::UndoAction()
     m_UndoStack.pop();
 
     m_RedoStack.push(action);
-    m_Layers[action.Index].Layer[action.X][action.Y] = action.Prev;
+    m_Layers[action.Index].Layer[action.X][action.Y] = action.Tile;
+
 }
 
 void TileLayer::RedoAction() 
@@ -151,7 +164,7 @@ void TileLayer::RedoAction()
     m_RedoStack.pop();
 
     m_UndoStack.push(action);
-    m_Layers[action.Index].Layer[action.X][action.Y] = action.Next;
+    m_Layers[action.Index].Layer[action.X][action.Y] = action.Tile;
 }
 
 void TileLayer::LoadLayers(const std::string& filename)

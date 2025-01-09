@@ -27,8 +27,7 @@ struct TileAction
     uint32_t X;
     uint32_t Y;
 
-    TileData Prev;
-    TileData Next;
+    TileData Tile;
 };
 
 class TileLayer
@@ -49,7 +48,7 @@ public:
 
     void FillLayer(uint32_t newTextureIndex, uint32_t layer, uint32_t x, uint32_t y);
 
-    void RecordAction(uint32_t layer, uint32_t x, uint32_t y);
+    void RecordAction(uint32_t index, uint32_t x, uint32_t y);
     void UndoAction();
     void RedoAction();
 
