@@ -9,6 +9,20 @@
 
 #include "TileLayer.h"
 
+struct EditorSpecification
+{
+    uint32_t Width = 40;
+    uint32_t Height = 40;
+
+    float TileSize = 40.0f;
+};
+
+struct EditorModes
+{
+    bool Erase = false;
+    bool Fill = false;
+};
+
 class TileEditor
 {
 public:
@@ -21,25 +35,18 @@ public:
     void Render();
 private:
     void RenderTile(int index, int y, int x);
-    void LoadTextures();
 private:
     Lumina::TextureAtlas m_Atlas;
+    EditorSpecification m_Spec; 
+    EditorModes m_Modes; 
 
     // Tile Layer
     TileLayer m_TileLayer;
     int m_ActiveLayer;
 
-    // Tile Settings
-    float m_Padding;
-    float m_TileSize;
-
-    // File 
-    std::string m_CurrentScenePath;
-    std::string m_TileAtlasPath;
+    std::vector<bool> m_ActiveLayers;
 
     // Flags/Attributes
-    bool m_EraserMode;
-    bool m_FillMode;
     float m_Opacity;
     int m_SelectedTextureIndex;
 };
