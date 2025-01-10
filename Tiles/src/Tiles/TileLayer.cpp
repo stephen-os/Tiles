@@ -113,28 +113,20 @@ void TileLayer::FillLayer(uint32_t newTextureIndex, uint32_t index, uint32_t x, 
     }
 }
 
-void TileLayer::RecordAction(uint32_t index, uint32_t x, uint32_t y)
+void TileLayer::RecordAction(TileAction action) 
 {
-    if (m_Layers.empty() || index >= m_Layers.size())
-        throw std::out_of_range("No active layer.");
-
-    if (!m_UndoStack.empty())
+    if (!m_UndoStack.empty()) 
     {
-        TileAction curr = m_UndoStack.top();
-
-        if (curr.Index == index && curr.X == x && curr.Y == y &&
-            curr.Tile.TextureIndex == m_Layers[index].Layer[x][y].TextureIndex)
-        { 
+        const TileAction& top = m_UndoStack.top();
+        if (top.L == action.L && top.X == action.X && top.Y == action.Y &&
+            top.Curr.TextureIndex == action.Curr.TextureIndex &&
+            top.Curr.UseTexture == action.Curr.UseTexture)
+        {
             return;
         }
     }
- 
-    TileAction action;
-    action.X = x;
-    action.Y = y;
-    action.Index = index;
-    action.Tile = m_Layers[index].Layer[x][y];
-    m_UndoStack.push(action);
+
+    m_UndoStack.push(action); 
 
     while (!m_RedoStack.empty()) 
     {
@@ -144,35 +136,54 @@ void TileLayer::RecordAction(uint32_t index, uint32_t x, uint32_t y)
 
 void TileLayer::UndoAction() 
 {
-    if (m_UndoStack.empty())
+    if (m_UndoStack.empty()) {
+        std::cerr << "No actions to undo!" << std::endl;
         return;
+    }
 
     TileAction action = m_UndoStack.top();
     m_UndoStack.pop();
 
+    m_Layers[action.L].Layer[action.Y][action.X] = action.Prev;
+
     m_RedoStack.push(action);
-    m_Layers[action.Index].Layer[action.X][action.Y] = action.Tile;
 
 }
 
 void TileLayer::RedoAction() 
 {
-    if (m_RedoStack.empty())
+    if (m_RedoStack.empty()) 
+    {
+        std::cerr << "No actions to redo!" << std::endl;
         return;
+    }
 
     TileAction action = m_RedoStack.top();
     m_RedoStack.pop();
 
+    m_Layers[action.L].Layer[action.Y][action.X] = action.Curr;
+
     m_UndoStack.push(action);
-    m_Layers[action.Index].Layer[action.X][action.Y] = action.Tile;
 }
 
 void TileLayer::LoadLayers(const std::string& filename)
 {
-    m_Layers = TileSerializer::Deserialize("res/maps/" + filename);
+    m_Layers = TileSerializer::Deserialize(filename);
+    m_LayerWidth = m_Layers[0].Layer.size();
+    m_LayerHeight = m_Layers[0].Layer[0].size();
+
+    while (!m_UndoStack.empty())
+    {
+        m_UndoStack.pop();
+    }
+
+    while (!m_RedoStack.empty())
+    {
+        m_RedoStack.pop();
+    }
 }
 
 void TileLayer::SaveLayers(const std::string& filename)
 {
-    TileSerializer::Serialize(m_Layers, "res/maps/" + filename); 
+    TileSerializer::Serialize(m_Layers, filename); 
 }

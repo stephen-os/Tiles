@@ -15,6 +15,7 @@ struct EditorSpecification
     uint32_t Height = 40;
 
     float TileSize = 40.0f;
+    float Zoom = 1.0f; 
 };
 
 struct EditorModes
@@ -26,15 +27,17 @@ struct EditorModes
 class TileEditor
 {
 public:
-    TileEditor();
-    ~TileEditor() = default;
-
-    void Init(int width, int height);
+    void Init();
     void Shutdown(); 
 
     void Render();
 private:
+    void RenderHeader();
+    void RenderTools();
+    void RenderLayerSelction(); 
     void RenderTiles();
+    void RenderAttributes();
+    void RenderTextureSelection();
 private:
     Lumina::TextureAtlas m_Atlas;
     EditorSpecification m_Spec; 
@@ -42,9 +45,13 @@ private:
 
     // Tile Layer
     TileLayer m_TileLayer;
-    int m_ActiveLayer;
+    uint32_t m_ActiveLayer;
+    glm::vec3 m_TileHovered; 
 
     std::vector<bool> m_ActiveLayers;
+
+    std::string m_SavePath;
+    std::string m_LoadPath;
 
     // Flags/Attributes
     int m_SelectedTextureIndex;

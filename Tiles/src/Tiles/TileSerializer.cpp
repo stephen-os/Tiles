@@ -30,9 +30,6 @@ void TileSerializer::Serialize(const std::vector<LayerData>& layers, const std::
             for (const auto& tile : row)
             {
                 nlohmann::json jsonTile;
-                jsonTile["color"] = { tile.Color.r, tile.Color.g, tile.Color.b, tile.Color.a };
-                jsonTile["opacity"] = tile.Opacity;
-
                 jsonTile["use_texture"] = tile.UseTexture;
                 jsonTile["texture_index"] = tile.TextureIndex;
 
@@ -80,10 +77,7 @@ std::vector<LayerData> TileSerializer::Deserialize(const std::string& path)
             for (const auto& jsonTile : jsonRow)
             {
                 TileData tile;
-                auto color = jsonTile.at("color").get<std::vector<float>>();
-                tile.Color = glm::vec4(color[0], color[1], color[2], color[3]);
                 tile.UseTexture = jsonTile.at("use_texture").get<bool>();
-                tile.Opacity = jsonTile.at("opacity").get<float>();
                 tile.TextureIndex = jsonTile.at("texture_index").get<int>();
 
                 row.push_back(tile);

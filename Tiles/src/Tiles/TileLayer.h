@@ -8,9 +8,6 @@
 
 struct TileData
 {
-    glm::vec4 Color = {0.3f, 0.3f, 0.3f, 1.0f};
-    float Opacity = 1.0f;
-
     bool UseTexture = false;
     uint32_t TextureIndex = 0;
 };
@@ -23,11 +20,12 @@ struct LayerData
 
 struct TileAction
 {
-    uint32_t Index;
+    uint32_t L;
     uint32_t X;
     uint32_t Y;
 
-    TileData Tile;
+    TileData Prev;
+    TileData Curr; 
 };
 
 class TileLayer
@@ -48,7 +46,7 @@ public:
 
     void FillLayer(uint32_t newTextureIndex, uint32_t layer, uint32_t x, uint32_t y);
 
-    void RecordAction(uint32_t index, uint32_t x, uint32_t y);
+    void RecordAction(TileAction action);
     void UndoAction();
     void RedoAction();
 

@@ -39,7 +39,7 @@ public:
 
     virtual void OnAttach() override
     {
-        m_TileEditor.Init(20, 20);
+        m_TileEditor.Init();
     }
 
     virtual void OnDetach() override
