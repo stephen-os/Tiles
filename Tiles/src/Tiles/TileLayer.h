@@ -58,14 +58,6 @@ public:
     uint32_t GetWidth() { return m_LayerWidth; }
     uint32_t GetHeight() { return m_LayerHeight; }
     uint32_t Size() { return m_Layers.size(); }
-
-    using iterator = std::vector<LayerData>::iterator;
-    using const_iterator = std::vector<LayerData>::const_iterator;
-
-    iterator begin() { return m_Layers.begin(); }
-    iterator end() { return m_Layers.end(); }
-    const_iterator begin() const { return m_Layers.begin(); }
-    const_iterator end() const { return m_Layers.end(); }
 private:
     uint32_t m_LayerWidth;
     uint32_t m_LayerHeight; 
