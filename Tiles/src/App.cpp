@@ -7,8 +7,8 @@ Lumina::Application* Lumina::CreateApplication(int argc, char** argv)
 {
     Lumina::ApplicationSpecification spec;
     spec.Name = "Tiles";
-    spec.Width = 900;
-    spec.Height = 900;
+    spec.Width = 1920;
+    spec.Height = 1080;
     spec.Fullscreen = false;
 
     Lumina::Application* app = new Lumina::Application(spec);
