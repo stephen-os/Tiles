@@ -11,6 +11,7 @@ void TileLayer::Init(uint32_t width, uint32_t height)
 {
     m_LayerWidth = width;
     m_LayerHeight = height;
+    m_Layers.clear(); 
     AddLayer("Layer " + std::to_string(m_Layers.size() + 1));
 }
 

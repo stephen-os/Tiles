@@ -21,7 +21,7 @@ void TileEditor::Init()
     m_TileLayer.Init(m_Spec.Width, m_Spec.Height);
 
     m_ActiveLayer = 0;
-    m_SelectedTextureIndex = 0; 
+    m_SelectedTextureIndex = -1; 
 
     m_ActiveLayers.resize(m_TileLayer.Size(), true);
     m_TileHovered = { 0.0, 0.0, 0.0 }; 
@@ -46,6 +46,43 @@ void TileEditor::RenderHeader()
 {
     ImGui::Begin("Header");
 
+    if (ImGui::Button("New"))
+    {
+        m_TileLayer.Init(m_Spec.Width, m_Spec.Height);
+
+        m_ActiveLayer = 0;
+        m_SelectedTextureIndex = -1;
+
+        m_ActiveLayers.resize(m_TileLayer.Size(), true);
+        m_TileHovered = { 0.0, 0.0, 0.0 };
+    }
+
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(100.0f);
+
+    ImGui::Text("Width:");
+    ImGui::SameLine();
+    int width = m_Spec.Width;
+    if (ImGui::InputInt("##Width",  &width))
+    {
+        m_Spec.Width = max(1, width);
+    }
+
+    ImGui::SameLine();
+
+    ImGui::Text("Height:");
+    ImGui::SameLine();
+    int height = m_Spec.Height;
+    if (ImGui::InputInt("##Height", &height))
+    {
+        m_Spec.Height = max(1, height);
+    }
+
+    ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+
     if (ImGui::Button("Save"))
     {
         m_TileLayer.SaveLayers(m_SavePath);
@@ -58,7 +95,7 @@ void TileEditor::RenderHeader()
         
         char buffer[256];
         strncpy(buffer, m_SavePath.c_str(), sizeof(buffer));
-        if (ImGui::InputText("##FilePath", buffer, sizeof(buffer)))
+        if (ImGui::InputText("##SavePath", buffer, sizeof(buffer)))
         {
             m_SavePath = buffer;
         }
@@ -75,7 +112,7 @@ void TileEditor::RenderHeader()
             m_TileLayer.LoadLayers(m_LoadPath);
 
             m_ActiveLayer = 0;
-            m_SelectedTextureIndex = 0;
+            m_SelectedTextureIndex = -1;
 
             m_ActiveLayers.resize(m_TileLayer.Size(), true);
             m_TileHovered = { 0.0, 0.0, 0.0 };
@@ -92,8 +129,8 @@ void TileEditor::RenderHeader()
         ImGui::PushItemWidth(300.0f);
 
         char buffer[256];
-        strncpy(buffer, m_SavePath.c_str(), sizeof(buffer));
-        if (ImGui::InputText("##FilePath", buffer, sizeof(buffer)))
+        strncpy(buffer, m_LoadPath.c_str(), sizeof(buffer));
+        if (ImGui::InputText("##LoadPath", buffer, sizeof(buffer)))
         {
             m_LoadPath = buffer;
         }
@@ -102,14 +139,6 @@ void TileEditor::RenderHeader()
     }
     
     ImGui::SameLine(); 
-
-    if (ImGui::Button("New"))
-    {
-        int temp = 20;
-        m_TileLayer.Init(temp, temp);
-    }
-
-    ImGui::SameLine();
 
     if (ImGui::Button("Undo"))
         m_TileLayer.UndoAction();
@@ -344,16 +373,24 @@ void TileEditor::RenderTextureSelection()
             ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
 
             intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
-            if (ImGui::ImageButton((void*)textureID, buttonSize, xy, zw))
-            {
-                m_SelectedTextureIndex = index; 
-            }
-
+            ImGui::ImageButton((void*)textureID, buttonSize, xy, zw);
+            
             if (index == m_SelectedTextureIndex)
             {
                 ImVec2 min = ImGui::GetItemRectMin();
                 ImVec2 max = ImGui::GetItemRectMax();
                 ImGui::GetWindowDrawList()->AddRect(min, max, IM_COL32(169, 169, 169, 255), 3.0f, 0, 1.5f);
+            }
+
+            if (ImGui::IsItemClicked())
+            {
+                if (m_SelectedTextureIndex >= 0)
+                {
+                    m_SelectedTextureIndex = -1;
+                }
+                {
+                    m_SelectedTextureIndex = index;
+                }
             }
 
             if ((index + 1) % m_Atlas.GetGridWidth() != 0)
