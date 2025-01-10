@@ -14,9 +14,11 @@
 
 void TileEditor::Init()
 {
-    m_Atlas.CreateAtlas("res/texture/world_tileset.png", 16, 16);
+    m_AtlasPath = "res/texture/world_tileset.png";
     m_SavePath = "res/maps/tiles.json";
-    m_LoadPath = "res/maps/tiles.json"; 
+    m_LoadPath = "res/maps/tiles.json";
+
+    m_Atlas.CreateAtlas(m_AtlasPath, 16, 16);
 
     m_TileLayer.Init(m_Spec.Width, m_Spec.Height);
 
@@ -137,7 +139,7 @@ void TileEditor::RenderHeader()
 
         ImGui::PopItemWidth();
     }
-    
+
     ImGui::SameLine(); 
 
     if (ImGui::Button("Undo"))
@@ -354,6 +356,54 @@ void TileEditor::RenderTiles()
 void TileEditor::RenderTextureSelection()
 {
     ImGui::Begin("Texture Selection");
+
+    ImGui::Text("Atlas Path:");
+
+    ImGui::SameLine();
+
+    {
+        ImGui::PushItemWidth(300.0f);
+
+        char buffer[256];
+        strncpy(buffer, m_AtlasPath.c_str(), sizeof(buffer));
+        if (ImGui::InputText("##AtlasPath", buffer, sizeof(buffer)))
+        {
+            m_AtlasPath = buffer;
+        }
+
+        ImGui::PopItemWidth();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Load"))
+    {
+        m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
+    }
+
+    ImGui::Text("Atlas Dimensions");
+
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(100.0f);
+
+    ImGui::Text("Width:");
+    ImGui::SameLine();
+    if (ImGui::InputInt("##aWidth", &m_AtlasWidth))
+    {
+        m_AtlasWidth = max(1, m_AtlasWidth);
+    }
+
+    ImGui::SameLine();
+
+    ImGui::Text("Height:");
+    ImGui::SameLine();
+    if (ImGui::InputInt("##aHeight", &m_AtlasHeight))
+    {
+        m_AtlasHeight = max(1, m_AtlasHeight);
+    }
+
+    ImGui::PopItemWidth();
 
     ImVec2 availableSize = ImGui::GetContentRegionAvail();
     ImGui::BeginChild("TextureSelectionChild", availableSize,true,

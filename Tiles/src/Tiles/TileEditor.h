@@ -52,6 +52,10 @@ private:
 
     std::string m_SavePath;
     std::string m_LoadPath;
+    std::string m_AtlasPath;
+
+    int m_AtlasWidth;
+    int m_AtlasHeight; 
 
     // Flags/Attributes
     int m_SelectedTextureIndex;
