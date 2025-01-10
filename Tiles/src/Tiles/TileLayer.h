@@ -12,7 +12,7 @@ struct TileData
     float Opacity = 1.0f;
 
     bool UseTexture = false;
-    int TextureIndex = 0;
+    uint32_t TextureIndex = 0;
 };
 
 struct LayerData

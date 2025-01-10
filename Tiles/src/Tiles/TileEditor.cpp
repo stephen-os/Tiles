@@ -10,7 +10,7 @@
 
 #include "TileSerializer.h"
 
-TileEditor::TileEditor() : m_ActiveLayer(0), m_SelectedTextureIndex(-1) {}
+TileEditor::TileEditor() : m_ActiveLayer(0), m_SelectedTextureIndex(0) {}
 
 void TileEditor::Init(int width, int height)
 {
@@ -157,7 +157,6 @@ void TileEditor::Render()
                 m_SelectedTextureIndex = index;
             }
 
-            // 4 buttons per row
             if ((index + 1) % m_Atlas.GetGridWidth() != 0)
             {
                 ImGui::SameLine();
@@ -167,80 +166,9 @@ void TileEditor::Render()
 
     ImGui::End();
 
+    RenderTiles(); 
 
-    ImGui::Begin("Editor Layer");
-    
-    for (int layer = 0; layer < m_ActiveLayer; ++layer)
-    {
-        if (!m_ActiveLayers[layer]) continue;
-        for (int y = 0; y < m_TileLayer.GetHeight(); y++)
-        {
-            for (int x = 0; x < m_TileLayer.GetWidth(); x++)
-            {
-                RenderTile(layer, y, x);
-            }
-        }
-    }
-
-    glm::vec3 hovered = { 0, 0, 0 };
-
-    // Render tiles
-    if (m_ActiveLayers[m_ActiveLayer])
-    { 
-        ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-        for (int y = 0; y < m_TileLayer.GetHeight(); y++)
-        {
-            for (int x = 0; x < m_TileLayer.GetWidth(); x++)
-            {
-                ImGui::PushID(y * m_TileLayer.GetWidth() + x);
-
-                // Note should Flip in TileLayer Class
-                TileData& tile = m_TileLayer.GetTileData(m_ActiveLayer, y, x);
-                float offset = m_Spec.TileSize;
-                ImVec2 tileMin = ImVec2(cursorPos.x + x * offset, cursorPos.y + y * offset);
-                ImVec2 tileMax = ImVec2(tileMin.x + m_Spec.TileSize, tileMin.y + m_Spec.TileSize);
-
-                // Mouse interaction for painting
-                if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0)) {
-                    TileData previousTile = tile;
-                    tile.Opacity = 1.0f;
-
-                    if (m_SelectedTextureIndex >= 0) 
-                    {
-                        if (m_Modes.Fill) 
-                        {
-                            m_TileLayer.FillLayer(m_SelectedTextureIndex, m_ActiveLayer, y, x);
-                        }
-                        else
-                        {
-                            tile.UseTexture = true;
-                            tile.TextureIndex = m_SelectedTextureIndex;
-                        }
-                    }
-
-                    if (m_Modes.Erase) 
-                    {
-                        m_TileLayer.ClearTile(m_ActiveLayer, y, x);
-                    }
-
-                    m_TileLayer.RecordAction(m_ActiveLayer, y, x);
-                }
-
-                RenderTile(m_ActiveLayer, y, x); 
-
-                if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
-                {
-                    hovered = { m_ActiveLayer, y, x };
-                    ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, IM_COL32(169, 169, 169, 255));
-                }
-
-                ImGui::PopID();
-            }
-        }
-    }
-
-    ImGui::End();
-
+#if 0
     ImGui::Begin("Tile Attributes");
 
     TileData& hoveredTile = m_TileLayer.GetTileData(hovered.x, hovered.y, hovered.z);
@@ -251,38 +179,74 @@ void TileEditor::Render()
     ImGui::Text("Opacity: %.2f", hoveredTile.Opacity);
 
     ImGui::End();
+#endif
 }
 
-void TileEditor::RenderTile(int index, int y, int x)
+void TileEditor::RenderTiles()
 {
-    ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-
-    ImGui::PushID(index * m_TileLayer.GetWidth() * m_TileLayer.GetHeight() + y * m_TileLayer.GetWidth() + x);
-
-    TileData& tile = m_TileLayer.GetTileData(index, y, x);
-    float offset = m_Spec.TileSize;
-    ImVec2 tileMin = ImVec2(cursorPos.x + x * offset, cursorPos.y + y * offset);
-    ImVec2 tileMax = ImVec2(tileMin.x + m_Spec.TileSize, tileMin.y + m_Spec.TileSize);
-
-    // Draw the tile
-    if (tile.UseTexture && tile.TextureIndex >= 0)
+    ImGui::Begin("Scene");
+    for (size_t layer = 0; layer < m_TileLayer.Size(); layer++)
     {
-        intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
+        for (size_t y = 0; y < m_TileLayer.GetHeight(); y++)
+        {
+            for (size_t x = 0; x < m_TileLayer.GetWidth(); x++)
+            {
+                if (!m_ActiveLayers[layer]) continue;
 
-        glm::vec4 texCoords = m_Atlas.GetTexCoords(tile.TextureIndex);
-        ImVec2 xy = ImVec2(texCoords.x, texCoords.y);
-        ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
+                ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+                ImGui::PushID("Tile:" + layer + y + x);
 
-        const int r = static_cast<int>(tile.Opacity * 255);
-        const int g = static_cast<int>(tile.Opacity * 255);
-        const int b = static_cast<int>(tile.Opacity * 255);
-        const int a = 255;
+                TileData& tile = m_TileLayer.GetTileData(layer, y, x);
+                float offset = m_Spec.TileSize;
+                ImVec2 tileMin = ImVec2(cursorPos.x + x * offset, cursorPos.y + y * offset);
+                ImVec2 tileMax = ImVec2(tileMin.x + m_Spec.TileSize, tileMin.y + m_Spec.TileSize);
 
-        const ImU32 color = IM_COL32(r, g, b, a);
+                if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0)) {
+                    TileData previousTile = tile;
+                    tile.Opacity = 1.0f;
 
-        ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, xy, zw, color);
+                    if (layer == m_ActiveLayer)
+                    {
+                        if (m_Modes.Fill)
+                        {
+                            m_TileLayer.FillLayer(m_SelectedTextureIndex, m_ActiveLayer, y, x);
+                        }
+                        else
+                        {
+                            tile.UseTexture = true;
+                            tile.TextureIndex = m_SelectedTextureIndex;
+                        }
+                    }
+
+                    if (m_Modes.Erase)
+                    {
+                        m_TileLayer.ClearTile(m_ActiveLayer, y, x);
+                    }
+
+                    m_TileLayer.RecordAction(m_ActiveLayer, y, x);
+                }
+
+                if (tile.UseTexture)
+                {
+                    intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
+
+                    glm::vec4 texCoords = m_Atlas.GetTexCoords(tile.TextureIndex);
+                    ImVec2 xy = ImVec2(texCoords.x, texCoords.y);
+                    ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
+
+                    const ImU32 color = IM_COL32(255, 255, 255, 255);
+
+                    ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, xy, zw, color);
+                }
+
+                if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
+                {
+                    ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, IM_COL32(169, 169, 169, 255));
+                }
+
+                ImGui::PopID();
+            }
+        }
     }
-
-    ImGui::PopID();
-
+    ImGui::End(); 
 }

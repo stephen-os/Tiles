@@ -34,7 +34,7 @@ public:
 
     void Render();
 private:
-    void RenderTile(int index, int y, int x);
+    void RenderTiles();
 private:
     Lumina::TextureAtlas m_Atlas;
     EditorSpecification m_Spec; 
@@ -47,6 +47,5 @@ private:
     std::vector<bool> m_ActiveLayers;
 
     // Flags/Attributes
-    float m_Opacity;
     int m_SelectedTextureIndex;
 };
