@@ -44,6 +44,7 @@ private:
     void RenderAttributes();
     void RenderTextureSelection();
     void RenderExport(); 
+    void RenderConsol(); 
 private:
     Lumina::TextureAtlas m_Atlas;
     EditorSpecification m_Spec; 
@@ -61,6 +62,8 @@ private:
     std::string m_LoadPath;
     std::string m_AtlasPath;
     std::string m_ExportPath;
+
+    std::vector<std::string> m_ConsolOutputs;
 
     int m_AtlasWidth;
     int m_AtlasHeight; 

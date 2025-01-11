@@ -32,6 +32,8 @@ void TileEditor::Init()
     m_ActiveLayer = 0;
     m_SelectedTextureIndex = -1; 
 
+    m_ConsolOutputs.clear();
+
     m_ActiveLayers.resize(m_TileLayer.Size(), true);
     m_TileHovered = { 0.0, 0.0, 0.0 }; 
 }
@@ -50,6 +52,7 @@ void TileEditor::Render()
     RenderTiles();
     RenderAttributes();
     RenderExport();
+    RenderConsol(); 
 }
 
 void TileEditor::RenderHeader()
@@ -65,6 +68,8 @@ void TileEditor::RenderHeader()
 
         m_ActiveLayers.resize(m_TileLayer.Size(), true);
         m_TileHovered = { 0.0, 0.0, 0.0 };
+
+        m_ConsolOutputs.push_back("New project initialized.");
     }
 
     ImGui::SameLine();
@@ -77,6 +82,7 @@ void TileEditor::RenderHeader()
     if (ImGui::InputInt("##Width",  &width))
     {
         m_Spec.Width = max(1, width);
+        m_ConsolOutputs.push_back("Width updated to " + std::to_string(m_Spec.Width));
     }
 
     ImGui::SameLine();
@@ -87,6 +93,7 @@ void TileEditor::RenderHeader()
     if (ImGui::InputInt("##Height", &height))
     {
         m_Spec.Height = max(1, height);
+        m_ConsolOutputs.push_back("Height updated to " + std::to_string(m_Spec.Height));
     }
 
     ImGui::PopItemWidth();
@@ -96,6 +103,7 @@ void TileEditor::RenderHeader()
     if (ImGui::Button("Save"))
     {
         m_TileLayer.SaveLayers(m_SavePath);
+        m_ConsolOutputs.push_back("Project saved to " + m_SavePath);
     }
 
     ImGui::SameLine();
@@ -126,10 +134,12 @@ void TileEditor::RenderHeader()
 
             m_ActiveLayers.resize(m_TileLayer.Size(), true);
             m_TileHovered = { 0.0, 0.0, 0.0 };
+
+            m_ConsolOutputs.push_back("Project loaded from " + m_LoadPath);
         }
         else
         {
-            std::cerr << "Error: Load path does not exist: " << m_LoadPath << std::endl;
+            m_ConsolOutputs.push_back("Error: Load path does not exist: " + m_LoadPath);
         }
     }
 
@@ -151,12 +161,18 @@ void TileEditor::RenderHeader()
     ImGui::SameLine(); 
 
     if (ImGui::Button("Undo"))
+    {
         m_TileLayer.UndoAction();
+        m_ConsolOutputs.push_back("Undo action performed.");
+    }
 
     ImGui::SameLine();
 
     if (ImGui::Button("Redo"))
+    {
         m_TileLayer.RedoAction();
+        m_ConsolOutputs.push_back("Redo action performed.");
+    }
 
     ImGui::SameLine();
 
@@ -574,6 +590,25 @@ void TileEditor::RenderExport()
         renderer.End();
         std::string path = "res/output.png";
         renderer.SaveFrameBufferToImage(path);
+    }
+
+    ImGui::End();
+}
+
+void TileEditor::RenderConsol()
+{
+    ImGui::Begin("Console");
+
+    if (ImGui::Button("Clear Console"))
+    {
+        m_ConsolOutputs.clear();
+    }
+
+    ImGui::Separator();
+
+    for (const auto& message : m_ConsolOutputs)
+    {
+        ImGui::TextWrapped("%s", message.c_str());
     }
 
     ImGui::End();
