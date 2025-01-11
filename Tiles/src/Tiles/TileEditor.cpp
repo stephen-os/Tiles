@@ -550,6 +550,8 @@ void TileEditor::RenderExport()
 
     if (ImGui::Button("Export Image"))
     {
+        m_ConsolOutputs.push_back("Exporting to " + m_ExportPath); 
+
         TileObject tileObject; 
 
         Lumina::ShaderProgram shader;
@@ -595,8 +597,7 @@ void TileEditor::RenderExport()
 
         m_Atlas.Unbind();
         renderer.End();
-        std::string path = "res/output.png";
-        renderer.SaveFrameBufferToImage(path);
+        renderer.SaveFrameBufferToImage(m_ExportPath);
     }
 
     ImGui::End();
