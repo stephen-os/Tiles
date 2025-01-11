@@ -299,32 +299,34 @@ void TileEditor::RenderTiles()
                     
                     if (layer == m_ActiveLayer)
                     {
-                        TileAction action;
-
-                        action.L = layer;
-                        action.X = x;
-                        action.Y = y;
-                        action.Prev = tile; 
-
-                        if (m_Modes.Fill)
+                        if (m_SelectedTextureIndex >= 0)
                         {
-                            m_TileLayer.FillLayer(m_SelectedTextureIndex, m_ActiveLayer, y, x);
+                            TileAction action;
+
+                            action.L = layer;
+                            action.X = x;
+                            action.Y = y;
+                            action.Prev = tile; 
+
+                            if (m_Modes.Fill)
+                            {
+                                m_TileLayer.FillLayer(m_SelectedTextureIndex, m_ActiveLayer, y, x);
+                            }
+                            else
+                            {
+                                tile.UseTexture = true;
+                                tile.TextureIndex = m_SelectedTextureIndex;
+                            }
+
+                            if (m_Modes.Erase)
+                            {
+                                m_TileLayer.ClearTile(m_ActiveLayer, y, x);
+                            }
+
+                            action.Curr = tile;
+
+                            m_TileLayer.RecordAction(action);
                         }
-                        else
-                        {
-                            tile.UseTexture = true;
-                            tile.TextureIndex = m_SelectedTextureIndex;
-                        }
-
-                        if (m_Modes.Erase)
-                        {
-                            m_TileLayer.ClearTile(m_ActiveLayer, y, x);
-                        }
-
-                        action.Curr = tile;
-
-                        m_TileLayer.RecordAction(action);
-
                     }
                 }
 
@@ -425,22 +427,23 @@ void TileEditor::RenderTextureSelection()
             intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
             ImGui::ImageButton((void*)textureID, buttonSize, xy, zw);
             
-            if (index == m_SelectedTextureIndex)
-            {
-                ImVec2 min = ImGui::GetItemRectMin();
-                ImVec2 max = ImGui::GetItemRectMax();
-                ImGui::GetWindowDrawList()->AddRect(min, max, IM_COL32(169, 169, 169, 255), 3.0f, 0, 1.5f);
-            }
-
             if (ImGui::IsItemClicked())
             {
                 if (m_SelectedTextureIndex >= 0)
                 {
                     m_SelectedTextureIndex = -1;
                 }
+                else
                 {
                     m_SelectedTextureIndex = index;
                 }
+            }
+
+            if (index == m_SelectedTextureIndex)
+            {
+                ImVec2 min = ImGui::GetItemRectMin();
+                ImVec2 max = ImGui::GetItemRectMax();
+                ImGui::GetWindowDrawList()->AddRect(min, max, IM_COL32(169, 169, 169, 255), 3.0f, 0, 1.5f);
             }
 
             if ((index + 1) % m_Atlas.GetGridWidth() != 0)
