@@ -18,6 +18,11 @@ struct EditorSpecification
     float Zoom = 1.0f; 
 };
 
+struct RenderSpecification
+{
+    uint32_t Resolution = 200; // pixels
+};
+
 struct EditorModes
 {
     bool Erase = false;
@@ -38,9 +43,11 @@ private:
     void RenderTiles();
     void RenderAttributes();
     void RenderTextureSelection();
+    void RenderExport(); 
 private:
     Lumina::TextureAtlas m_Atlas;
     EditorSpecification m_Spec; 
+    RenderSpecification m_RenderSpec; 
     EditorModes m_Modes; 
 
     // Tile Layer
@@ -53,6 +60,7 @@ private:
     std::string m_SavePath;
     std::string m_LoadPath;
     std::string m_AtlasPath;
+    std::string m_ExportPath;
 
     int m_AtlasWidth;
     int m_AtlasHeight; 

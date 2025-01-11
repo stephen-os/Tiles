@@ -11,12 +11,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "TileSerializer.h"
+#include "TileObject.h"
+
+#include "Lumina/Renderer/ShaderProgram.h"
+#include "Lumina/Renderer/FrameBuffer.h"
+#include "Lumina/Renderer/Renderer.h"
+#include "Lumina/Utils/FileReader.h"
 
 void TileEditor::Init()
 {
     m_AtlasPath = "res/texture/world_tileset.png";
     m_SavePath = "res/maps/tiles.json";
     m_LoadPath = "res/maps/tiles.json";
+    m_ExportPath = "res/outputs/output.png"; 
 
     m_Atlas.CreateAtlas(m_AtlasPath, 16, 16);
 
@@ -41,7 +48,8 @@ void TileEditor::Render()
     RenderLayerSelction();
     RenderTextureSelection(); 
     RenderTiles();
-    RenderAttributes(); 
+    RenderAttributes();
+    RenderExport();
 }
 
 void TileEditor::RenderHeader()
@@ -487,6 +495,85 @@ void TileEditor::RenderAttributes()
 
         ImGui::SetCursorPosX(center.x);
         ImGui::Image((void*)textureID, imageSize, uvMin, uvMax);
+    }
+
+    ImGui::End();
+}
+
+void TileEditor::RenderExport()
+{
+    ImGui::Begin("Export");
+
+    ImGui::Text("Export Path");
+
+    ImGui::PushItemWidth(200.0f);
+
+    char exportPathBuffer[256];
+    strncpy(exportPathBuffer, m_ExportPath.c_str(), sizeof(exportPathBuffer));
+    if (ImGui::InputText("##ExportPath", exportPathBuffer, sizeof(exportPathBuffer)))
+    {
+        m_ExportPath = exportPathBuffer;
+    }
+
+    ImGui::Text("Resolution");
+
+    int resolution = m_RenderSpec.Resolution;
+    if (ImGui::InputInt("##Resolution", &resolution))
+    {
+        m_RenderSpec.Resolution = max(1, resolution);
+    }
+
+    ImGui::PopItemWidth();
+
+    if (ImGui::Button("Export Image"))
+    {
+        TileObject tileObject; 
+
+        Lumina::ShaderProgram shader;
+        shader.SetSource(Lumina::ReadFile("res/shaders/save.vert"), Lumina::ReadFile("res/shaders/save.frag"));
+
+        int outputWidth = static_cast<int>(m_TileLayer.GetWidth() * m_RenderSpec.Resolution);
+        int outputHeight = static_cast<int>(m_TileLayer.GetHeight() * m_RenderSpec.Resolution);
+
+        glm::mat4 orthoProjection = glm::ortho(0.0f, float(m_TileLayer.GetWidth()), 0.0f, float(m_TileLayer.GetHeight()), -1.0f, 2.0f);
+
+        Lumina::Renderer renderer;
+
+        renderer.Init(); 
+        renderer.Begin(); 
+        renderer.OnWindowResize(outputWidth, outputHeight);
+        renderer.Clear(); 
+
+        m_Atlas.Bind();
+
+        shader.Bind();
+        shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
+        shader.SetUniform1f("u_NumberOfRows", m_Atlas.GetGridWidth());
+
+        for (int layer = 0; layer < m_TileLayer.Size(); layer++)
+        {
+            for (int y = 0; y < m_TileLayer.GetHeight(); y++)
+            {
+                for (int x = 0; x < m_TileLayer.GetWidth(); x++)
+                {
+                    TileData& tile = m_TileLayer.GetTileData(layer, y, x);
+                    if (tile.UseTexture)
+                    {
+                        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, layer * 0.01f));
+                        glm::vec2 offset = m_Atlas.GetOffset(tile.TextureIndex);
+
+                        shader.SetUniformMatrix4fv("u_Transform", transform);
+                        shader.SetUniform2fv("u_Offset", offset);
+                        tileObject.Draw();
+                    }
+                }
+            }
+        }
+
+        m_Atlas.Unbind();
+        renderer.End();
+        std::string path = "res/output.png";
+        renderer.SaveFrameBufferToImage(path);
     }
 
     ImGui::End();
