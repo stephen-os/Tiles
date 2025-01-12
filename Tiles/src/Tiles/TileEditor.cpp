@@ -25,7 +25,10 @@ void TileEditor::Init()
     m_LoadPath = "res/maps/tiles.json";
     m_ExportPath = "res/outputs/output.png"; 
 
-    m_Atlas.CreateAtlas(m_AtlasPath, 16, 16);
+    m_AtlasWidth = 16; 
+    m_AtlasHeight = 16;
+
+    m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
 
     m_TileLayer.Init(m_Spec.Width, m_Spec.Height);
 
