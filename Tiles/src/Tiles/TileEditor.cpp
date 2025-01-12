@@ -404,7 +404,14 @@ void TileEditor::RenderTextureSelection()
 
     if (ImGui::Button("Load"))
     {
-        m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
+        if (std::filesystem::exists(m_LoadPath))
+        {
+            m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
+        }
+        else
+        {
+            m_ConsolOutputs.push_back("Error: Atlas path does not exist: " + m_LoadPath);
+        }
     }
 
     ImGui::Text("Atlas Dimensions");
