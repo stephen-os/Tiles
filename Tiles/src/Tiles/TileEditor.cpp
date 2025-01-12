@@ -465,7 +465,14 @@ void TileEditor::RenderTextureSelection()
             {
                 if (m_SelectedTextureIndex >= 0)
                 {
-                    m_SelectedTextureIndex = -1;
+                    if (m_SelectedTextureIndex == index)
+                    {
+                        m_SelectedTextureIndex = -1;
+                    }
+                    else
+                    {
+                        m_SelectedTextureIndex = index;
+                    }
                 }
                 else
                 {
