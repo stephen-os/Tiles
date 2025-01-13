@@ -1,8 +1,5 @@
 #include <vector>
-#include <stack>
 #include <glm/glm.hpp>
-
-#include "imgui.h"
 
 #include "Lumina/Renderer/Texture.h"
 #include "Lumina/Renderer/TextureAtlas.h"
@@ -53,10 +50,6 @@ private:
 
     // Tile Layer
     TileLayer m_TileLayer;
-    uint32_t m_ActiveLayer;
-    glm::vec3 m_TileHovered; 
-
-    std::vector<bool> m_ActiveLayers;
 
     std::string m_SavePath;
     std::string m_LoadPath;

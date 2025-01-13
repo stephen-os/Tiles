@@ -30,15 +30,11 @@ void TileEditor::Init()
 
     m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
 
-    m_TileLayer.Init(m_Spec.Width, m_Spec.Height);
+    m_TileLayer.Create(m_Spec.Width, m_Spec.Height);
 
-    m_ActiveLayer = 0;
     m_SelectedTextureIndex = -1; 
 
     m_ConsolOutputs.clear();
-
-    m_ActiveLayers.resize(m_TileLayer.Size(), true);
-    m_TileHovered = { 0.0, 0.0, 0.0 }; 
 }
 
 void TileEditor::Shutdown()
@@ -64,13 +60,9 @@ void TileEditor::RenderHeader()
 
     if (ImGui::Button("New"))
     {
-        m_TileLayer.Init(m_Spec.Width, m_Spec.Height);
+        m_TileLayer.Create(m_Spec.Width, m_Spec.Height);
 
-        m_ActiveLayer = 0;
         m_SelectedTextureIndex = -1;
-
-        m_ActiveLayers.resize(m_TileLayer.Size(), true);
-        m_TileHovered = { 0.0, 0.0, 0.0 };
 
         m_ConsolOutputs.push_back("New project initialized.");
     }
@@ -105,7 +97,7 @@ void TileEditor::RenderHeader()
 
     if (ImGui::Button("Save"))
     {
-        m_TileLayer.SaveLayers(m_SavePath);
+        m_TileLayer.Save(m_SavePath);
         m_ConsolOutputs.push_back("Project saved to " + m_SavePath);
     }
 
@@ -115,7 +107,7 @@ void TileEditor::RenderHeader()
         ImGui::PushItemWidth(300.0f);
         
         char buffer[256];
-        strncpy(buffer, m_SavePath.c_str(), sizeof(buffer));
+        strncpy_s(buffer, m_SavePath.c_str(), sizeof(buffer));
         if (ImGui::InputText("##SavePath", buffer, sizeof(buffer)))
         {
             m_SavePath = buffer;
@@ -130,13 +122,8 @@ void TileEditor::RenderHeader()
     {
         if (std::filesystem::exists(m_LoadPath))
         {
-            m_TileLayer.LoadLayers(m_LoadPath);
-
-            m_ActiveLayer = 0;
+            m_TileLayer.Load(m_LoadPath);
             m_SelectedTextureIndex = -1;
-
-            m_ActiveLayers.resize(m_TileLayer.Size(), true);
-            m_TileHovered = { 0.0, 0.0, 0.0 };
 
             m_ConsolOutputs.push_back("Project loaded from " + m_LoadPath);
         }
@@ -152,7 +139,7 @@ void TileEditor::RenderHeader()
         ImGui::PushItemWidth(300.0f);
 
         char buffer[256];
-        strncpy(buffer, m_LoadPath.c_str(), sizeof(buffer));
+        strncpy_s(buffer, m_LoadPath.c_str(), sizeof(buffer));
         if (ImGui::InputText("##LoadPath", buffer, sizeof(buffer)))
         {
             m_LoadPath = buffer;
@@ -216,22 +203,23 @@ void TileEditor::RenderLayerSelction()
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImGui::GetStyle().Colors[ImGuiCol_FrameBgHovered]);
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImGui::GetStyle().Colors[ImGuiCol_FrameBgActive]);
 
-    for (int i = 0; i < m_TileLayer.Size(); ++i) {
-        LayerData& layer = m_TileLayer.GetLayer(i);
-
+    for (uint32_t i = 0; i < m_TileLayer.LayerSize(); i++) 
+    {
+        
         ImGui::PushID(i);
 
-        bool flag = m_ActiveLayers[i];
+        bool flag = m_TileLayer.IsLayerVisible(i);
 
-        // Toggle visibility with customized checkbox
-        ImGui::Checkbox("##Visible", &flag);
-        ImGui::SameLine();
-        m_ActiveLayers[i] = flag;
-
-        // Layer selection
-        if (ImGui::Selectable(layer.Name.c_str(), i == m_ActiveLayer))
+        if (ImGui::Checkbox("##Visible", &flag))
         {
-            m_ActiveLayer = i;
+            m_TileLayer.ToggleLayerVisibilty(i);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Selectable(m_TileLayer.GetLayerName(i), i == m_TileLayer.GetActiveLayer()))
+        {
+            m_TileLayer.SetActiveLayer(i);
         }
 
         ImGui::PopID();
@@ -244,41 +232,33 @@ void TileEditor::RenderLayerSelction()
 
     ImGui::Separator();
 
-    // Add Layer Button
     if (ImGui::Button("Add Layer"))
     {
-        m_TileLayer.AddLayer("Layer " + std::to_string(m_TileLayer.Size() + 1));
-        m_ActiveLayers.push_back(true);
+        m_TileLayer.AddLayer("Layer " + std::to_string(m_TileLayer.LayerSize() + 1));
     }
 
     ImGui::SameLine();
 
-    // Delete Layer Button
     if (ImGui::Button("Delete Layer"))
     {
-        m_TileLayer.DeleteLayer(m_ActiveLayer);
-        m_ActiveLayers.erase(m_ActiveLayers.begin() + m_ActiveLayer);
-        m_ActiveLayer = m_ActiveLayer - 1;
+        m_TileLayer.DeleteLayer();
     }
 
     ImGui::SameLine();
 
-    // Clear Layer Button
     if (ImGui::Button("Clear Layer"))
-        m_TileLayer.ClearLayer(m_ActiveLayer);
+        m_TileLayer.ClearLayer();
 
     ImGui::Separator();
 
-    // Editable layer name field
-    LayerData& activeLayer = m_TileLayer.GetLayer(m_ActiveLayer);
+    const char* layerName = m_TileLayer.GetLayerName(m_TileLayer.GetActiveLayer());
     char layerNameBuffer[128];
-    strncpy_s(layerNameBuffer, activeLayer.Name.c_str(), sizeof(layerNameBuffer) - 1);
+    strncpy_s(layerNameBuffer, layerName, sizeof(layerNameBuffer) - 1);
     layerNameBuffer[sizeof(layerNameBuffer) - 1] = '\0';
 
-    // ImGui input text for editable layer name
     if (ImGui::InputText("Layer Name", layerNameBuffer, sizeof(layerNameBuffer)))
     {
-        activeLayer.Name = std::string(layerNameBuffer);
+        m_TileLayer.SetLayerName(std::string(layerNameBuffer));
     }
 
     ImGui::Separator();
@@ -290,9 +270,9 @@ void TileEditor::RenderTiles()
 {
     ImGui::Begin("Scene");
 
-    for (size_t y = 0; y < m_TileLayer.GetHeight(); y++)
+    for (size_t y = 0; y < m_TileLayer.LayerWidth(); y++)
     {
-        for (size_t x = 0; x < m_TileLayer.GetWidth(); x++)
+        for (size_t x = 0; x < m_TileLayer.LayerHeight(); x++)
         {
             ImVec2 cursorPos = ImGui::GetCursorScreenPos();
             float offset = m_Spec.TileSize * m_Spec.Zoom;
@@ -306,25 +286,25 @@ void TileEditor::RenderTiles()
         }
     }
 
-
-    for (size_t layer = 0; layer < m_TileLayer.Size(); layer++)
+    for (size_t layer = 0; layer < m_TileLayer.LayerSize(); layer++)
     {
-        for (size_t y = 0; y < m_TileLayer.GetHeight(); y++)
+        for (size_t y = 0; y < m_TileLayer.LayerHeight(); y++)
         {
-            for (size_t x = 0; x < m_TileLayer.GetWidth(); x++)
+            for (size_t x = 0; x < m_TileLayer.LayerWidth(); x++)
             {
-                if (!m_ActiveLayers[layer]) continue;
+                if (!m_TileLayer.IsLayerVisible(layer))
+                    continue; 
 
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();       
-                TileData& tile = m_TileLayer.GetTileData(layer, y, x);
+                TileData& tile = m_TileLayer.GetTile(layer, y, x);
                 float offset = m_Spec.TileSize * m_Spec.Zoom;
                 ImVec2 tileMin = ImVec2(cursorPos.x + x * offset, cursorPos.y + y * offset);
                 ImVec2 tileMax = ImVec2(tileMin.x + offset, tileMin.y + offset);
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0)) {
                     TileData previousTile = tile;
-                    
-                    if (layer == m_ActiveLayer)
+                   
+                    if (m_TileLayer.GetActiveLayer() == layer)
                     {
                         if (m_SelectedTextureIndex >= 0)
                         {
@@ -333,11 +313,11 @@ void TileEditor::RenderTiles()
                             action.L = layer;
                             action.X = x;
                             action.Y = y;
-                            action.Prev = tile; 
+                            action.Prev = tile;
 
                             if (m_Modes.Fill)
                             {
-                                m_TileLayer.FillLayer(m_SelectedTextureIndex, m_ActiveLayer, y, x);
+                                m_TileLayer.FillLayer(m_SelectedTextureIndex, y, x);
                             }
                             else
                             {
@@ -347,7 +327,7 @@ void TileEditor::RenderTiles()
 
                             if (m_Modes.Erase)
                             {
-                                m_TileLayer.ClearTile(m_ActiveLayer, y, x);
+                                m_TileLayer.ResetTile(y, x);
                             }
 
                             action.Curr = tile;
@@ -372,13 +352,14 @@ void TileEditor::RenderTiles()
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
-                    m_TileHovered = { layer, y, x };
+                    m_TileLayer.SetHoveredTile(y, x);
                     ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, IM_COL32(169, 169, 169, 255));
                 }
 
             }
         }
     }
+
     ImGui::End(); 
 }
 
@@ -394,7 +375,7 @@ void TileEditor::RenderTextureSelection()
         ImGui::PushItemWidth(300.0f);
 
         char buffer[256];
-        strncpy(buffer, m_AtlasPath.c_str(), sizeof(buffer));
+        strncpy_s(buffer, m_AtlasPath.c_str(), sizeof(buffer));
         if (ImGui::InputText("##AtlasPath", buffer, sizeof(buffer)))
         {
             m_AtlasPath = buffer;
@@ -494,21 +475,16 @@ void TileEditor::RenderTextureSelection()
         }
     }
 
-    // End the scrollable child window
     ImGui::EndChild();
 
     ImGui::End();
 }
 
-
 void TileEditor::RenderAttributes()
 {
     ImGui::Begin("Tile Attributes");
 
-    TileData& tile = m_TileLayer.GetTileData(m_TileHovered.x, m_TileHovered.y, m_TileHovered.z);
-
-    ImGui::Text("Active Layer: %d", m_ActiveLayer);
-    ImGui::Text("Tile Position: (%d, %d)", m_TileHovered.y, m_TileHovered.z);
+    TileData& tile = m_TileLayer.GetHoveredTile();
     
     if (tile.UseTexture)
         ImGui::Text("Use Texture: Yes");
@@ -567,10 +543,10 @@ void TileEditor::RenderExport()
         Lumina::ShaderProgram shader;
         shader.SetSource(Lumina::ReadFile("res/shaders/save.vert"), Lumina::ReadFile("res/shaders/save.frag"));
 
-        int outputWidth = static_cast<int>(m_TileLayer.GetWidth() * m_RenderSpec.Resolution);
-        int outputHeight = static_cast<int>(m_TileLayer.GetHeight() * m_RenderSpec.Resolution);
+        int outputWidth = static_cast<int>(m_TileLayer.LayerWidth() * m_RenderSpec.Resolution);
+        int outputHeight = static_cast<int>(m_TileLayer.LayerHeight() * m_RenderSpec.Resolution);
 
-        glm::mat4 orthoProjection = glm::ortho(0.0f, float(m_TileLayer.GetWidth()), 0.0f, float(m_TileLayer.GetHeight()), -1.0f, 2.0f);
+        glm::mat4 orthoProjection = glm::ortho(0.0f, float(m_TileLayer.LayerWidth()), 0.0f, float(m_TileLayer.LayerHeight()), -1.0f, 2.0f);
 
         Lumina::Renderer renderer;
 
@@ -584,14 +560,15 @@ void TileEditor::RenderExport()
         shader.Bind();
         shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
         shader.SetUniform1f("u_NumberOfRows", m_Atlas.GetGridWidth());
+        std::cout << "GridWidth: " << m_Atlas.GetGridWidth() << std::endl;
 
-        for (int layer = 0; layer < m_TileLayer.Size(); layer++)
+        for (int layer = 0; layer < m_TileLayer.LayerSize(); layer++)
         {
-            for (int y = 0; y < m_TileLayer.GetHeight(); y++)
+            for (int y = 0; y < m_TileLayer.LayerHeight(); y++)
             {
-                for (int x = 0; x < m_TileLayer.GetWidth(); x++)
+                for (int x = 0; x < m_TileLayer.LayerWidth(); x++)
                 {
-                    TileData& tile = m_TileLayer.GetTileData(layer, y, x);
+                    TileData& tile = m_TileLayer.GetTile(layer, y, x);
                     if (tile.UseTexture)
                     {
                         glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, layer * 0.01f));

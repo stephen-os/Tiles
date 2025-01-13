@@ -4,119 +4,191 @@
 
 #include <stdexcept>
 #include <queue>
+#include <iostream>
 
-TileLayer::TileLayer() : m_LayerWidth(0), m_LayerHeight(0) {}
-
-void TileLayer::Init(uint32_t width, uint32_t height)
+void TileLayer::Create(size_t width, size_t height)
 {
     m_LayerWidth = width;
     m_LayerHeight = height;
-    m_Layers.clear(); 
-    AddLayer("Layer " + std::to_string(m_Layers.size() + 1));
+
+    m_ActiveLayer = 0;
+
+    m_TileLayers.clear();
+    m_LayersVisible.clear();
+
+    ResetHoveredTile();
+
+    while (!m_UndoStack.empty())
+    {
+        m_UndoStack.pop();
+    }
+
+    while (!m_RedoStack.empty())
+    {
+        m_RedoStack.pop();
+    }
+
+    std::string name = "Layer 1";
+    AddLayer(name);
 }
 
-void TileLayer::AddLayer(std::string& name) 
+void TileLayer::AddLayer(std::string& name)
 {
     LayerData layer;
     layer.Name = name;
 
-    layer.Layer.resize(m_LayerWidth, std::vector<TileData>(m_LayerHeight));
+    layer.Layer.resize(m_LayerHeight, std::vector<TileData>(m_LayerWidth));
 
-    for (int y = 0; y < m_LayerHeight; ++y)
+    for (size_t y = 0; y < m_LayerHeight; y++)
     {
-        for (int x = 0; x < m_LayerWidth; ++x)
+        for (size_t x = 0; x < m_LayerWidth; x++)
         {
             layer.Layer[y][x] = TileData();
         }
     }
 
-    m_Layers.push_back(layer);
+    m_TileLayers.push_back(layer);
+
+    m_LayersVisible.resize(LayerSize(), true);
+
+    ResetHoveredTile();
 }
 
-void TileLayer::DeleteLayer(uint32_t index) 
+void TileLayer::DeleteLayer()
 {
-    if (!m_Layers.empty()) 
+    if (!m_TileLayers.empty())
     {
-        m_Layers.erase(m_Layers.begin() + index);
-    }
-}
-
-void TileLayer::ClearLayer(uint32_t index)
-{
-    if (!m_Layers.empty() && index < m_Layers.size())
-    {
-        auto& layer = m_Layers[index].Layer;
-        for (auto& row : layer) 
+        if (LayerSize() == 1)
         {
-            for (auto& tile : row) 
-            {
-                tile = TileData();
-            }
+            ClearLayer();
+            m_TileLayers[0].Name = "Layer 1";
+        }
+        else
+        {
+            m_TileLayers.erase(m_TileLayers.begin() + m_ActiveLayer);
+            m_ActiveLayer = (m_ActiveLayer > 0) ? m_ActiveLayer - 1 : 0;
+        }
+    }
+
+    ResetHoveredTile();
+}
+
+void TileLayer::ClearLayer()
+{
+    auto& layer = m_TileLayers[m_ActiveLayer].Layer;
+    for (auto& row : layer)
+    {
+        for (auto& tile : row)
+        {
+            tile = TileData();
         }
     }
 }
 
-#include <iostream>
-
-TileData& TileLayer::GetTileData(uint32_t index, uint32_t x, uint32_t y)
+TileData& TileLayer::GetTile(size_t layer, size_t y, size_t x)
 {
-    if (m_Layers.empty() || index >= m_Layers.size())
-        throw std::out_of_range("No active layer.");
-
-    return m_Layers[index].Layer[x][y];
+    if (IsTileInBounds(layer, y, x))
+    {
+        return m_TileLayers[layer].Layer[y][x];
+    }
+    else
+    {
+        throw std::out_of_range("Tile is out of bounds.");
+    }
 }
 
-void TileLayer::ClearTile(uint32_t index, uint32_t x, uint32_t y)
+void TileLayer::ResetTile(size_t y, size_t x)
 {
-    if (m_Layers.empty() || index >= m_Layers.size())
-        throw std::out_of_range("No active layer.");
-
-    m_Layers[index].Layer[x][y] = TileData();
+    if (IsTileInBounds(m_ActiveLayer, y, x))
+    {
+        m_TileLayers[m_ActiveLayer].Layer[y][x] = TileData();
+    }
+    else
+    {
+        throw std::out_of_range("Tile is out of bounds.");
+    }
 }
 
-#include <iostream>
-
-void TileLayer::FillLayer(uint32_t newTextureIndex, uint32_t index, uint32_t x, uint32_t y)
+void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
 {
-    if (x < 0 || x >= m_LayerWidth || y < 0 || y >= m_LayerHeight)
+    if (!IsTileInBounds(m_ActiveLayer, y, x))
         return;
 
-    int oldTextureIndex = m_Layers[index].Layer[x][y].TextureIndex;
+    size_t oldTextureIndex = m_TileLayers[m_ActiveLayer].Layer[y][x].TextureIndex;
 
     if (newTextureIndex == oldTextureIndex)
         return;
 
-    std::queue<std::pair<int, int>> tileQueue;
-    tileQueue.push({ x, y });
+    std::queue<std::pair<size_t, size_t>> tileQueue;
+    tileQueue.push({ y, x });
 
     const std::vector<std::pair<int, int>> directions = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
 
     while (!tileQueue.empty())
     {
-        auto [x, y] = tileQueue.front();
+        auto [cy, cx] = tileQueue.front();
         tileQueue.pop();
 
-        if (x < 0 || x >= m_LayerWidth || y < 0 || y >= m_LayerHeight)
+        if (!IsTileInBounds(m_ActiveLayer, cy, cx))
             continue;
 
-        if (m_Layers[index].Layer[x][y].TextureIndex != oldTextureIndex)
+        if (m_TileLayers[m_ActiveLayer].Layer[cy][cx].TextureIndex != oldTextureIndex)
             continue;
 
-        m_Layers[index].Layer[x][y].TextureIndex = newTextureIndex;
-        m_Layers[index].Layer[x][y].UseTexture = true;
+        m_TileLayers[m_ActiveLayer].Layer[cy][cx].TextureIndex = newTextureIndex;
+        m_TileLayers[m_ActiveLayer].Layer[cy][cx].UseTexture = true;
 
         for (const auto& direction : directions)
         {
-            int newX = x + direction.first;
-            int newY = y + direction.second;
-            tileQueue.push({ newX, newY });
+            int nx = cx + direction.first;
+            int ny = cy + direction.second;
+            tileQueue.push({ ny, nx });
         }
     }
 }
 
-void TileLayer::RecordAction(TileAction action) 
+void TileLayer::ToggleLayerVisibilty(size_t layer)
 {
-    if (!m_UndoStack.empty()) 
+    m_LayersVisible[layer] = !m_LayersVisible[layer];
+}
+
+bool TileLayer::IsLayerVisible(size_t layer)
+{
+    return m_LayersVisible[layer];
+}
+
+const char* TileLayer::GetLayerName(size_t layer)
+{
+    if (layer < LayerSize())
+        return m_TileLayers[layer].Name.c_str();
+    return nullptr;
+}
+
+void TileLayer::SetLayerName(std::string& name)
+{
+    m_TileLayers[m_ActiveLayer].Name = name;
+}
+
+void TileLayer::SetHoveredTile(size_t y, size_t x)
+{
+    m_HoveredTile = { m_ActiveLayer, y, x }; 
+}
+
+TileData& TileLayer::GetHoveredTile()
+{
+    std::cout << m_HoveredTile.L << ", " << m_HoveredTile.Y << ", " << m_HoveredTile.X << "\n"; 
+    return m_TileLayers[m_HoveredTile.L].Layer[m_HoveredTile.Y][m_HoveredTile.X];
+}
+
+void TileLayer::SetActiveLayer(size_t layer)
+{
+    if (layer < LayerSize())
+        m_ActiveLayer = layer;
+}
+
+void TileLayer::RecordAction(TileAction action)
+{
+    if (!m_UndoStack.empty())
     {
         const TileAction& top = m_UndoStack.top();
         if (top.L == action.L && top.X == action.X && top.Y == action.Y &&
@@ -127,51 +199,59 @@ void TileLayer::RecordAction(TileAction action)
         }
     }
 
-    m_UndoStack.push(action); 
+    m_UndoStack.push(action);
 
-    while (!m_RedoStack.empty()) 
+    while (!m_RedoStack.empty())
     {
         m_RedoStack.pop();
     }
 }
 
-void TileLayer::UndoAction() 
+void TileLayer::UndoAction()
 {
-    if (m_UndoStack.empty()) {
-        std::cerr << "No actions to undo!" << std::endl;
+    if (m_UndoStack.empty())
+    {
         return;
     }
 
     TileAction action = m_UndoStack.top();
     m_UndoStack.pop();
 
-    m_Layers[action.L].Layer[action.Y][action.X] = action.Prev;
+    m_TileLayers[action.L].Layer[action.Y][action.X] = action.Prev;
 
     m_RedoStack.push(action);
 
 }
 
-void TileLayer::RedoAction() 
+void TileLayer::RedoAction()
 {
-    if (m_RedoStack.empty()) 
+    if (m_RedoStack.empty())
     {
-        std::cerr << "No actions to redo!" << std::endl;
         return;
     }
 
     TileAction action = m_RedoStack.top();
     m_RedoStack.pop();
 
-    m_Layers[action.L].Layer[action.Y][action.X] = action.Curr;
+    m_TileLayers[action.L].Layer[action.Y][action.X] = action.Curr;
 
     m_UndoStack.push(action);
 }
 
-void TileLayer::LoadLayers(const std::string& filename)
+void TileLayer::Load(const std::string& filename)
 {
-    m_Layers = TileSerializer::Deserialize(filename);
-    m_LayerWidth = m_Layers[0].Layer.size();
-    m_LayerHeight = m_Layers[0].Layer[0].size();
+    m_TileLayers.clear();
+    m_TileLayers = TileSerializer::Deserialize(filename);
+
+    m_LayerWidth = m_TileLayers[0].Layer.size();
+    m_LayerHeight = m_TileLayers[0].Layer[0].size();
+
+    m_ActiveLayer = LayerSize() - 1;
+
+    m_LayersVisible.clear();
+    m_LayersVisible.resize(LayerSize(), true);
+
+    ResetHoveredTile();
 
     while (!m_UndoStack.empty())
     {
@@ -184,7 +264,22 @@ void TileLayer::LoadLayers(const std::string& filename)
     }
 }
 
-void TileLayer::SaveLayers(const std::string& filename)
+const void TileLayer::Save(const std::string& filename)
 {
-    TileSerializer::Serialize(m_Layers, filename); 
+    TileSerializer::Serialize(m_TileLayers, filename);
+}
+
+bool TileLayer::IsTileInBounds(size_t layer, size_t y, size_t x)
+{
+    if (!(layer < LayerSize()))
+    {
+        return false;
+    }
+
+    if (!(y < LayerHeight()) || !(x < LayerWidth()))
+    {
+        return false;
+    }
+
+    return true;
 }

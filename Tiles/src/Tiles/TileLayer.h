@@ -9,7 +9,7 @@
 struct TileData
 {
     bool UseTexture = false;
-    uint32_t TextureIndex = 0;
+    size_t TextureIndex = 0;
 };
 
 struct LayerData
@@ -20,46 +20,69 @@ struct LayerData
 
 struct TileAction
 {
-    uint32_t L;
-    uint32_t X;
-    uint32_t Y;
+    size_t L;
+    size_t X;
+    size_t Y;
 
     TileData Prev;
-    TileData Curr; 
+    TileData Curr;
+};
+
+struct HoveredTile
+{
+    size_t L;
+    size_t Y;
+    size_t X;
 };
 
 class TileLayer
 {
 public:
-    TileLayer();
-    ~TileLayer() = default; 
+    void Create(size_t width, size_t height);
 
-    void Init(uint32_t width, uint32_t height);
-
-    LayerData& GetLayer(uint32_t index) { return m_Layers[index]; }
     void AddLayer(std::string& name);
-    void DeleteLayer(uint32_t index);
-    void ClearLayer(uint32_t index);
+    void DeleteLayer();
+    void ClearLayer();
 
-    TileData& GetTileData(uint32_t layer, uint32_t x, uint32_t y);
-    void ClearTile(uint32_t layer, uint32_t x, uint32_t y);
+    TileData& GetTile(size_t layer, size_t y, size_t x);
+    void ResetTile(size_t y, size_t x);
 
-    void FillLayer(uint32_t newTextureIndex, uint32_t layer, uint32_t x, uint32_t y);
+    void FillLayer(size_t newTextureIndex, size_t y, size_t x);
+
+    void ToggleLayerVisibilty(size_t layer);
+    bool IsLayerVisible(size_t layer);
+
+    size_t GetActiveLayer() { return m_ActiveLayer; }
+    void SetActiveLayer(size_t layer);
+
+    const char* GetLayerName(size_t layer);
+    void SetLayerName(std::string& name);
+
+    void SetHoveredTile(size_t y, size_t x);
+    void ResetHoveredTile() { m_HoveredTile = { 0, 0, 0 }; };
+    TileData& GetHoveredTile();
 
     void RecordAction(TileAction action);
     void UndoAction();
     void RedoAction();
 
-    void SaveLayers(const std::string & filename);
-    void LoadLayers(const std::string& filename);
+    const void Save(const std::string& filename);
+    void Load(const std::string& filename);
 
-    uint32_t GetWidth() { return m_LayerWidth; }
-    uint32_t GetHeight() { return m_LayerHeight; }
-    uint32_t Size() { return m_Layers.size(); }
+    const size_t LayerWidth() { return m_LayerWidth; }
+    const size_t LayerHeight() { return m_LayerHeight; }
+    const size_t LayerSize() { return m_TileLayers.size(); }
 private:
-    uint32_t m_LayerWidth;
-    uint32_t m_LayerHeight; 
-    std::vector<LayerData> m_Layers; 
+    bool IsTileInBounds(size_t layer, size_t y, size_t x);
+private:
+    size_t m_LayerWidth;
+    size_t m_LayerHeight;
+    size_t m_ActiveLayer;
+
+    HoveredTile m_HoveredTile;
+
+    std::vector<LayerData> m_TileLayers;
+    std::vector<bool> m_LayersVisible;
 
     std::stack<TileAction> m_UndoStack;
     std::stack<TileAction> m_RedoStack;
