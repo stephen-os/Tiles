@@ -122,7 +122,7 @@ void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
     std::queue<std::pair<size_t, size_t>> tileQueue;
     tileQueue.push({ y, x });
 
-    const std::vector<std::pair<int, int>> directions = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
+    const std::vector<std::pair<size_t, size_t>> directions = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
 
     while (!tileQueue.empty())
     {
@@ -140,8 +140,8 @@ void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
 
         for (const auto& direction : directions)
         {
-            int nx = cx + direction.first;
-            int ny = cy + direction.second;
+            size_t nx = cx + direction.first;
+            size_t ny = cy + direction.second;
             tileQueue.push({ ny, nx });
         }
     }
@@ -176,7 +176,6 @@ void TileLayer::SetHoveredTile(size_t y, size_t x)
 
 TileData& TileLayer::GetHoveredTile()
 {
-    std::cout << m_HoveredTile.L << ", " << m_HoveredTile.Y << ", " << m_HoveredTile.X << "\n"; 
     return m_TileLayers[m_HoveredTile.L].Layer[m_HoveredTile.Y][m_HoveredTile.X];
 }
 
