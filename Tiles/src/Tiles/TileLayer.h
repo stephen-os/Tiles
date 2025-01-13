@@ -9,7 +9,7 @@
 struct TileData
 {
     bool UseTexture = false;
-    size_t TextureIndex = 0;
+    size_t TextureIndex = -1;
 };
 
 struct LayerData
@@ -52,7 +52,7 @@ public:
     void ToggleLayerVisibilty(size_t layer);
     bool IsLayerVisible(size_t layer);
 
-    size_t GetActiveLayer() { return m_ActiveLayer; }
+    size_t GetActiveLayer() const { return m_ActiveLayer; }
     void SetActiveLayer(size_t layer);
 
     const char* GetLayerName(size_t layer);
@@ -66,14 +66,14 @@ public:
     void UndoAction();
     void RedoAction();
 
-    const void Save(const std::string& filename);
+    void Save(const std::string& filename) const;
     void Load(const std::string& filename);
 
-    const size_t LayerWidth() { return m_LayerWidth; }
-    const size_t LayerHeight() { return m_LayerHeight; }
-    const size_t LayerSize() { return m_TileLayers.size(); }
+    size_t LayerWidth() const { return m_LayerWidth; }
+    size_t LayerHeight() const { return m_LayerHeight; }
+    size_t LayerSize() const { return m_TileLayers.size(); }
 private:
-    bool IsTileInBounds(size_t layer, size_t y, size_t x);
+    bool IsTileInBounds(size_t layer, size_t y, size_t x) const;
 private:
     size_t m_LayerWidth;
     size_t m_LayerHeight;

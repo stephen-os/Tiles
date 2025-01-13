@@ -114,8 +114,10 @@ void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
     if (!IsTileInBounds(m_ActiveLayer, y, x))
         return;
 
+
     size_t oldTextureIndex = m_TileLayers[m_ActiveLayer].Layer[y][x].TextureIndex;
 
+    std::cout << "Hello";
     if (newTextureIndex == oldTextureIndex)
         return;
 
@@ -126,7 +128,7 @@ void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
 
     while (!tileQueue.empty())
     {
-        auto [cy, cx] = tileQueue.front();
+        const auto& [cy, cx] = tileQueue.front();
         tileQueue.pop();
 
         if (!IsTileInBounds(m_ActiveLayer, cy, cx))
@@ -140,8 +142,8 @@ void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
 
         for (const auto& direction : directions)
         {
-            size_t nx = cx + direction.first;
-            size_t ny = cy + direction.second;
+            size_t ny = cy + direction.first;
+            size_t nx = cx + direction.second;
             tileQueue.push({ ny, nx });
         }
     }
@@ -263,12 +265,12 @@ void TileLayer::Load(const std::string& filename)
     }
 }
 
-const void TileLayer::Save(const std::string& filename)
+void TileLayer::Save(const std::string& filename) const
 {
     TileSerializer::Serialize(m_TileLayers, filename);
 }
 
-bool TileLayer::IsTileInBounds(size_t layer, size_t y, size_t x)
+bool TileLayer::IsTileInBounds(size_t layer, size_t y, size_t x) const
 {
     if (!(layer < LayerSize()))
     {
