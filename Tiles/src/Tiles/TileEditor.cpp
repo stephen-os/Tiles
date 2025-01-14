@@ -77,7 +77,6 @@ void TileEditor::RenderHeader()
     if (ImGui::InputInt("##Width",  &width))
     {
         m_Spec.Width = max(1, width);
-        m_ConsolOutputs.push_back("Width updated to " + std::to_string(m_Spec.Width));
     }
 
     ImGui::SameLine();
@@ -88,7 +87,6 @@ void TileEditor::RenderHeader()
     if (ImGui::InputInt("##Height", &height))
     {
         m_Spec.Height = max(1, height);
-        m_ConsolOutputs.push_back("Height updated to " + std::to_string(m_Spec.Height));
     }
 
     ImGui::PopItemWidth();
@@ -560,7 +558,6 @@ void TileEditor::RenderExport()
         shader.Bind();
         shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
         shader.SetUniform1f("u_NumberOfRows", m_Atlas.GetGridWidth());
-        std::cout << "GridWidth: " << m_Atlas.GetGridWidth() << std::endl;
 
         for (int layer = 0; layer < m_TileLayer.LayerSize(); layer++)
         {
