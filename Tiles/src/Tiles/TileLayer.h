@@ -20,9 +20,9 @@ struct LayerData
 
 struct TileAction
 {
-    size_t L;
-    size_t X;
-    size_t Y;
+    size_t L = 0;
+    size_t X = 0;
+    size_t Y = 0;
 
     TileData Prev;
     TileData Curr;
@@ -30,9 +30,9 @@ struct TileAction
 
 struct HoveredTile
 {
-    size_t L;
-    size_t Y;
-    size_t X;
+    size_t L = 0;
+    size_t Y = 0;
+    size_t X = 0;
 };
 
 class TileLayer

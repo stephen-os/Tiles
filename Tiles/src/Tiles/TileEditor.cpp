@@ -339,7 +339,7 @@ void TileEditor::RenderTiles()
                 {
                     intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
 
-                    glm::vec4 texCoords = m_Atlas.GetTexCoords(tile.TextureIndex);
+                    glm::vec4 texCoords = m_Atlas.GetTexCoords(static_cast<int>(tile.TextureIndex));
                     ImVec2 xy = ImVec2(texCoords.x, texCoords.y);
                     ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
 
@@ -492,7 +492,7 @@ void TileEditor::RenderAttributes()
     if (tile.UseTexture && tile.TextureIndex >= 0)
     {
         intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
-        glm::vec4 texCoords = m_Atlas.GetTexCoords(tile.TextureIndex);
+        glm::vec4 texCoords = m_Atlas.GetTexCoords(static_cast<int>(tile.TextureIndex));
         ImVec2 uvMin(texCoords.x, texCoords.y);
         ImVec2 uvMax(texCoords.z, texCoords.w);
 
@@ -516,7 +516,7 @@ void TileEditor::RenderExport()
     ImGui::PushItemWidth(200.0f);
 
     char exportPathBuffer[256];
-    strncpy(exportPathBuffer, m_ExportPath.c_str(), sizeof(exportPathBuffer));
+    strncpy_s(exportPathBuffer, m_ExportPath.c_str(), sizeof(exportPathBuffer));
     if (ImGui::InputText("##ExportPath", exportPathBuffer, sizeof(exportPathBuffer)))
     {
         m_ExportPath = exportPathBuffer;
@@ -557,7 +557,7 @@ void TileEditor::RenderExport()
 
         shader.Bind();
         shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
-        shader.SetUniform1f("u_NumberOfRows", m_Atlas.GetGridWidth());
+        shader.SetUniform1f("u_NumberOfRows", static_cast<float>(m_Atlas.GetGridWidth()));
 
         for (int layer = 0; layer < m_TileLayer.LayerSize(); layer++)
         {
@@ -569,7 +569,7 @@ void TileEditor::RenderExport()
                     if (tile.UseTexture)
                     {
                         glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, layer * 0.01f));
-                        glm::vec2 offset = m_Atlas.GetOffset(tile.TextureIndex);
+                        glm::vec2 offset = m_Atlas.GetOffset(static_cast<int>(tile.TextureIndex));
 
                         shader.SetUniformMatrix4fv("u_Transform", transform);
                         shader.SetUniform2fv("u_Offset", offset);
