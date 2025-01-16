@@ -386,13 +386,13 @@ void TileEditor::RenderTextureSelection()
 
     if (ImGui::Button("Load"))
     {
-        if (std::filesystem::exists(m_LoadPath))
+        if (std::filesystem::exists(m_AtlasPath))
         {
             m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
         }
         else
         {
-            m_ConsolOutputs.push_back("Error: Atlas path does not exist: " + m_LoadPath);
+            m_ConsolOutputs.push_back("Error: Atlas path does not exist: " + m_AtlasPath);
         }
     }
 
