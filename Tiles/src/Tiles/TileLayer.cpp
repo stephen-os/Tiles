@@ -117,7 +117,6 @@ void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
 
     size_t oldTextureIndex = m_TileLayers[m_ActiveLayer].Layer[y][x].TextureIndex;
 
-    std::cout << "Hello";
     if (newTextureIndex == oldTextureIndex)
         return;
 
