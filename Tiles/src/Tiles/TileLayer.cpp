@@ -114,7 +114,6 @@ void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
     if (!IsTileInBounds(m_ActiveLayer, y, x))
         return;
 
-
     size_t oldTextureIndex = m_TileLayers[m_ActiveLayer].Layer[y][x].TextureIndex;
 
     if (newTextureIndex == oldTextureIndex)
