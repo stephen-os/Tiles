@@ -33,8 +33,6 @@ void TileEditor::Init()
     m_TileLayer.Create(m_Spec.Width, m_Spec.Height);
 
     m_SelectedTextureIndex = -1; 
-
-    m_ConsolOutputs.clear();
 }
 
 void TileEditor::Shutdown()
@@ -50,8 +48,7 @@ void TileEditor::Render()
     RenderTextureSelection(); 
     RenderTiles();
     RenderAttributes();
-    RenderExport();
-    RenderConsol(); 
+    RenderExport(); 
 }
 
 void TileEditor::RenderHeader()
@@ -63,8 +60,6 @@ void TileEditor::RenderHeader()
         m_TileLayer.Create(m_Spec.Width, m_Spec.Height);
 
         m_SelectedTextureIndex = -1;
-
-        m_ConsolOutputs.push_back("New project initialized.");
     }
 
     ImGui::SameLine();
@@ -96,7 +91,6 @@ void TileEditor::RenderHeader()
     if (ImGui::Button("Save"))
     {
         m_TileLayer.Save(m_SavePath);
-        m_ConsolOutputs.push_back("Project saved to " + m_SavePath);
     }
 
     ImGui::SameLine();
@@ -122,12 +116,6 @@ void TileEditor::RenderHeader()
         {
             m_TileLayer.Load(m_LoadPath);
             m_SelectedTextureIndex = -1;
-
-            m_ConsolOutputs.push_back("Project loaded from " + m_LoadPath);
-        }
-        else
-        {
-            m_ConsolOutputs.push_back("Error: Load path does not exist: " + m_LoadPath);
         }
     }
 
@@ -151,7 +139,6 @@ void TileEditor::RenderHeader()
     if (ImGui::Button("Undo"))
     {
         m_TileLayer.UndoAction();
-        m_ConsolOutputs.push_back("Undo action performed.");
     }
 
     ImGui::SameLine();
@@ -159,7 +146,6 @@ void TileEditor::RenderHeader()
     if (ImGui::Button("Redo"))
     {
         m_TileLayer.RedoAction();
-        m_ConsolOutputs.push_back("Redo action performed.");
     }
 
     ImGui::SameLine();
@@ -390,10 +376,6 @@ void TileEditor::RenderTextureSelection()
         {
             m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
         }
-        else
-        {
-            m_ConsolOutputs.push_back("Error: Atlas path does not exist: " + m_AtlasPath);
-        }
     }
 
     ImGui::Text("Atlas Dimensions");
@@ -530,27 +512,7 @@ void TileEditor::RenderExport()
 
     if (ImGui::Button("Export Image"))
     {
-        m_ConsolOutputs.push_back("Exporting to " + m_ExportPath); 
 		m_TileExporter.Export(m_TileLayer, m_Atlas, m_ExportPath);
-    }
-
-    ImGui::End();
-}
-
-void TileEditor::RenderConsol()
-{
-    ImGui::Begin("Console");
-
-    if (ImGui::Button("Clear Console"))
-    {
-        m_ConsolOutputs.clear();
-    }
-
-    ImGui::Separator();
-
-    for (const auto& message : m_ConsolOutputs)
-    {
-        ImGui::TextWrapped("%s", message.c_str());
     }
 
     ImGui::End();

@@ -52,8 +52,6 @@ private:
     std::string m_AtlasPath;
     std::string m_ExportPath;
 
-    std::vector<std::string> m_ConsolOutputs;
-
     int m_AtlasWidth;
     int m_AtlasHeight; 
 
