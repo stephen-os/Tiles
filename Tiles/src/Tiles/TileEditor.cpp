@@ -524,64 +524,14 @@ void TileEditor::RenderExport()
 
     ImGui::Text("Resolution");
 
-    int resolution = m_RenderSpec.Resolution;
-    if (ImGui::InputInt("##Resolution", &resolution))
-    {
-        m_RenderSpec.Resolution = max(1, resolution);
-    }
-
+    ImGui::InputInt("##Resolution", &m_TileExporter.GetResolution());
+    
     ImGui::PopItemWidth();
 
     if (ImGui::Button("Export Image"))
     {
         m_ConsolOutputs.push_back("Exporting to " + m_ExportPath); 
-
-        TileObject tileObject; 
-
-        Lumina::ShaderProgram shader;
-        shader.SetSource(Lumina::ReadFile("res/shaders/save.vert"), Lumina::ReadFile("res/shaders/save.frag"));
-
-        int outputWidth = static_cast<int>(m_TileLayer.LayerWidth() * m_RenderSpec.Resolution);
-        int outputHeight = static_cast<int>(m_TileLayer.LayerHeight() * m_RenderSpec.Resolution);
-
-        glm::mat4 orthoProjection = glm::ortho(0.0f, float(m_TileLayer.LayerWidth()), 0.0f, float(m_TileLayer.LayerHeight()), -1.0f, 2.0f);
-
-        Lumina::Renderer renderer;
-
-        renderer.Init(); 
-        renderer.Begin(); 
-        renderer.OnWindowResize(outputWidth, outputHeight);
-        renderer.Clear(); 
-
-        m_Atlas.Bind();
-
-        shader.Bind();
-        shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
-        shader.SetUniform1f("u_NumberOfRows", static_cast<float>(m_Atlas.GetGridWidth()));
-
-        for (int layer = 0; layer < m_TileLayer.LayerSize(); layer++)
-        {
-            for (int y = 0; y < m_TileLayer.LayerHeight(); y++)
-            {
-                for (int x = 0; x < m_TileLayer.LayerWidth(); x++)
-                {
-                    TileData& tile = m_TileLayer.GetTile(layer, y, x);
-                    if (tile.UseTexture)
-                    {
-                        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, layer * 0.01f));
-                        glm::vec2 offset = m_Atlas.GetOffset(static_cast<int>(tile.TextureIndex));
-
-                        shader.SetUniformMatrix4fv("u_Transform", transform);
-                        shader.SetUniform2fv("u_Offset", offset);
-                        tileObject.Draw();
-                    }
-                }
-            }
-        }
-
-        m_Atlas.Unbind();
-        renderer.End();
-        renderer.SaveFrameBufferToImage(m_ExportPath);
+		m_TileExporter.Export(m_TileLayer, m_Atlas, m_ExportPath);
     }
 
     ImGui::End();

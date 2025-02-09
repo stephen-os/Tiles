@@ -5,6 +5,7 @@
 #include "Lumina/Renderer/TextureAtlas.h"
 
 #include "TileLayer.h"
+#include "TileExporter.h"
 
 struct EditorSpecification
 {
@@ -13,11 +14,6 @@ struct EditorSpecification
 
     float TileSize = 40.0f;
     float Zoom = 1.0f; 
-};
-
-struct RenderSpecification
-{
-    uint32_t Resolution = 200; // pixels
 };
 
 struct EditorModes
@@ -45,11 +41,11 @@ private:
 private:
     Lumina::TextureAtlas m_Atlas;
     EditorSpecification m_Spec; 
-    RenderSpecification m_RenderSpec; 
     EditorModes m_Modes; 
 
     // Tile Layer
     TileLayer m_TileLayer;
+    TileExporter m_TileExporter;
 
     std::string m_SavePath;
     std::string m_LoadPath;
