@@ -16,7 +16,8 @@ project "Tiles"
       "../Lumina/Dependencies/glfw/include",
       "../Lumina/Dependencies/glm",
       "../Lumina/Dependencies/glad/include",
-      "../Lumina/Dependencies/tinygltf"
+      "../Lumina/Dependencies/tinygltf",
+      "../Lumina/Dependencies/imguifd"
    }
 
     links
