@@ -2,7 +2,7 @@
 
 #include "Lumina/Renderer/TextureAtlas.h"
 #include "../Core/ToolModes.h"
-#include "../TileLayer.h"
+#include "../Core/TileLayer.h"
 
 #include "imgui.h"
 

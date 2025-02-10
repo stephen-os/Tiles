@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../TileLayer.h"
+#include "../Core/TileLayer.h"
 #include "Lumina/Renderer/TextureAtlas.h"
 
 class AttributePanel

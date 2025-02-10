@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../TileLayer.h"
-#include "../TileExporter.h"
+#include "../Core/TileLayer.h"
+#include "../Core/TileExporter.h"
 
 #include "Lumina/Renderer/TextureAtlas.h"
 

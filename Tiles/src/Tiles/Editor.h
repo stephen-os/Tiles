@@ -20,6 +20,7 @@
 #include "Panels/ToolSelectionPanel.h"
 
 #include "Core/ToolModes.h"
+#include "Core/TileLayer.h"
 
 class Editor : public Lumina::Layer
 {

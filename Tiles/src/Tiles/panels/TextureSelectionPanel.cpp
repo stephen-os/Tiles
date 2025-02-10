@@ -1,6 +1,8 @@
 // TextureSelectionPanel.cpp
 #include "TextureSelectionPanel.h"
+
 #include "ImGuiFileDialog.h"
+
 #include <filesystem>
 #include <algorithm>
 
