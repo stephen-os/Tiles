@@ -7,6 +7,9 @@
 #include "TileLayer.h"
 #include "TileExporter.h"
 
+// Panels
+#include "panels/TextureSelectionPanel.h"
+
 struct EditorSpecification
 {
     uint32_t Width = 40;
@@ -35,9 +38,7 @@ private:
     void RenderLayerSelction(); 
     void RenderTiles();
     void RenderAttributes();
-    void RenderTextureSelection();
-    void RenderExport(); 
-    void RenderConsol(); 
+    void RenderExport();
 private:
     Lumina::TextureAtlas m_Atlas;
     EditorSpecification m_Spec; 
@@ -49,12 +50,8 @@ private:
 
     std::string m_SavePath;
     std::string m_LoadPath;
-    std::string m_AtlasPath;
     std::string m_ExportPath;
 
-    int m_AtlasWidth;
-    int m_AtlasHeight; 
-
-    // Flags/Attributes
-    int m_SelectedTextureIndex;
+    // Panels
+    TextureSelectionPanel m_TextureSelectionPanel;
 };
