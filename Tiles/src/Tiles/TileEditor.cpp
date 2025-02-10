@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "imgui.h"
+#include "ImGuiFileDialog.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -349,79 +350,85 @@ void TileEditor::RenderTiles()
 
 void TileEditor::RenderTextureSelection()
 {
+    static bool openFileDialog = false;
+    static ImGuiFileDialog fileDialog;
+
     ImGui::Begin("Texture Selection");
-
-    ImGui::Text("Atlas Path:");
-
+    ImGui::Text("Atlas Path: ");
+    ImGui::SameLine();
+    ImGui::Text(m_AtlasPath.empty() ? "No file selected" : m_AtlasPath.c_str());
     ImGui::SameLine();
 
+    if (ImGui::Button("Browse..."))
     {
-        ImGui::PushItemWidth(300.0f);
+        IGFD::FileDialogConfig config;
+        config.path = ".";
+        config.flags = ImGuiFileDialogFlags_Modal;
+        config.countSelectionMax = 1;
+        config.sidePaneWidth = 250.0f;
 
-        char buffer[256];
-        strncpy_s(buffer, m_AtlasPath.c_str(), sizeof(buffer));
-        if (ImGui::InputText("##AtlasPath", buffer, sizeof(buffer)))
-        {
-            m_AtlasPath = buffer;
-        }
-
-        ImGui::PopItemWidth();
+        ImGuiFileDialog::Instance()->OpenDialog(
+            "ChooseAtlasFileDlg",     // dialog identifier
+            "Choose Atlas File",       // dialog title
+            ".png,.jpg,.jpeg",        // filter for image files
+            config                    // configuration
+        );
     }
 
-    ImGui::SameLine();
-
-    if (ImGui::Button("Load"))
+    // File Dialog Popup
+    if (ImGuiFileDialog::Instance()->Display("ChooseAtlasFileDlg",
+        ImGuiWindowFlags_NoCollapse,
+        ImVec2(600, 400)))  // fixed size of 600x400
     {
-        if (std::filesystem::exists(m_AtlasPath))
+        // When OK is clicked
+        if (ImGuiFileDialog::Instance()->IsOk())
         {
-            m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
+            m_AtlasPath = ImGuiFileDialog::Instance()->GetFilePathName();
+
+            // Load the atlas if the file exists
+            if (std::filesystem::exists(m_AtlasPath))
+            {
+                m_Atlas.CreateAtlas(m_AtlasPath, m_AtlasWidth, m_AtlasHeight);
+            }
         }
+
+        // Close the dialog
+        ImGuiFileDialog::Instance()->Close();
     }
 
     ImGui::Text("Atlas Dimensions");
-
     ImGui::SameLine();
-
     ImGui::PushItemWidth(100.0f);
-
     ImGui::Text("Width:");
     ImGui::SameLine();
     if (ImGui::InputInt("##aWidth", &m_AtlasWidth))
     {
         m_AtlasWidth = max(1, m_AtlasWidth);
     }
-
     ImGui::SameLine();
-
     ImGui::Text("Height:");
     ImGui::SameLine();
     if (ImGui::InputInt("##aHeight", &m_AtlasHeight))
     {
         m_AtlasHeight = max(1, m_AtlasHeight);
     }
-
     ImGui::PopItemWidth();
 
     ImVec2 availableSize = ImGui::GetContentRegionAvail();
-    ImGui::BeginChild("TextureSelectionChild", availableSize,true,
+    ImGui::BeginChild("TextureSelectionChild", availableSize, true,
         ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_AlwaysVerticalScrollbar);
-
     for (int y = 0; y < m_Atlas.GetGridHeight(); ++y)
     {
         for (int x = 0; x < m_Atlas.GetGridWidth(); ++x)
         {
             int index = y * m_Atlas.GetGridWidth() + x;
-
             glm::vec4 texCoords = m_Atlas.GetTexCoords(index);
-
             ImVec2 buttonSize(m_Spec.TileSize, m_Spec.TileSize);
-
             ImVec2 xy = ImVec2(texCoords.x, texCoords.y);
             ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
-
             intptr_t textureID = (intptr_t)m_Atlas.GetTextureID();
             ImGui::ImageButton((void*)textureID, buttonSize, xy, zw);
-            
+
             if (ImGui::IsItemClicked())
             {
                 if (m_SelectedTextureIndex >= 0)
@@ -440,23 +447,19 @@ void TileEditor::RenderTextureSelection()
                     m_SelectedTextureIndex = index;
                 }
             }
-
             if (index == m_SelectedTextureIndex)
             {
                 ImVec2 min = ImGui::GetItemRectMin();
                 ImVec2 max = ImGui::GetItemRectMax();
                 ImGui::GetWindowDrawList()->AddRect(min, max, IM_COL32(169, 169, 169, 255), 3.0f, 0, 1.5f);
             }
-
             if ((index + 1) % m_Atlas.GetGridWidth() != 0)
             {
                 ImGui::SameLine();
             }
         }
     }
-
     ImGui::EndChild();
-
     ImGui::End();
 }
 
