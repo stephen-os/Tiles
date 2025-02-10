@@ -8,8 +8,9 @@
 #include "TileExporter.h"
 
 // Panels
-#include "panels/TextureSelectionPanel.h"
-#include "panels/TileViewportPanel.h"
+#include "Panels/TextureSelectionPanel.h"
+#include "Panels/TileViewportPanel.h"
+#include "Panels/HeaderPanel.h"
 
 class TileEditor
 {
@@ -31,6 +32,7 @@ private:
     std::string m_ExportPath;
 
     // Panels
+    HeaderPanel m_HeaderPanel;
     TextureSelectionPanel m_TextureSelectionPanel;
     TileViewportPanel m_TileViewportPanel;
 };

@@ -33,6 +33,8 @@ void TileEditor::Shutdown()
 
 void TileEditor::Render()
 {
+    m_HeaderPanel.Render(); 
+
     RenderTools();
     RenderLayerSelction();
     
@@ -40,7 +42,7 @@ void TileEditor::Render()
     m_TileViewportPanel.Render(m_TileLayer, m_TextureSelectionPanel.GetTextureAtlas(), m_TextureSelectionPanel.GetSelectedTexture());
 
     RenderAttributes();
-    RenderExport(); 
+    RenderExport();
 }
 
 void TileEditor::RenderTools()

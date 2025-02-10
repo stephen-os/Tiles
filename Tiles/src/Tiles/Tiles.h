@@ -16,7 +16,7 @@
 
 // Client
 #include "TileEditor.h"
-#include "theme/ThemeManager.h"
+#include "Theme/ThemeManager.h"
 
 class Tiles : public Lumina::Layer
 {
