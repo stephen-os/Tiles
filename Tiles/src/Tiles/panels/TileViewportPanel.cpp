@@ -4,13 +4,13 @@
 
 #include "../TileLayer.h"
 
-void TileViewportPanel::Render(TileLayer& layers, Lumina::TextureAtlas& atlas, int selectedTexture)
+void TileViewportPanel::Render(int selectedTexture)
 {
     ImGui::Begin("Scene");
 
-    for (size_t y = 0; y < layers.LayerWidth(); y++)
+    for (size_t y = 0; y < m_Layers->LayerWidth(); y++)
     {
-        for (size_t x = 0; x < layers.LayerHeight(); x++)
+        for (size_t x = 0; x < m_Layers->LayerHeight(); x++)
         {
             ImVec2 cursorPos = ImGui::GetCursorScreenPos();
             float offset = TILE_SIZE * m_Zoom;
@@ -24,17 +24,17 @@ void TileViewportPanel::Render(TileLayer& layers, Lumina::TextureAtlas& atlas, i
         }
     }
 
-    for (size_t layer = 0; layer < layers.LayerSize(); layer++)
+    for (size_t layer = 0; layer < m_Layers->LayerSize(); layer++)
     {
-        for (size_t y = 0; y < layers.LayerHeight(); y++)
+        for (size_t y = 0; y < m_Layers->LayerHeight(); y++)
         {
-            for (size_t x = 0; x < layers.LayerWidth(); x++)
+            for (size_t x = 0; x < m_Layers->LayerWidth(); x++)
             {
-                if (!layers.IsLayerVisible(layer))
+                if (!m_Layers->IsLayerVisible(layer))
                     continue;
 
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-                TileData& tile = layers.GetTile(layer, y, x);
+                TileData& tile = m_Layers->GetTile(layer, y, x);
                 float offset = TILE_SIZE * m_Zoom;
                 ImVec2 tileMin = ImVec2(cursorPos.x + x * offset, cursorPos.y + y * offset);
                 ImVec2 tileMax = ImVec2(tileMin.x + offset, tileMin.y + offset);
@@ -42,7 +42,7 @@ void TileViewportPanel::Render(TileLayer& layers, Lumina::TextureAtlas& atlas, i
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0)) {
                     TileData previousTile = tile;
 
-                    if (layers.GetActiveLayer() == layer)
+                    if (m_Layers->GetActiveLayer() == layer)
                     {
                         if (selectedTexture >= 0)
                         {
@@ -55,7 +55,7 @@ void TileViewportPanel::Render(TileLayer& layers, Lumina::TextureAtlas& atlas, i
 
                             if (m_Fill)
                             {
-                                layers.FillLayer(selectedTexture, y, x);
+                                m_Layers->FillLayer(selectedTexture, y, x);
                             }
                             else
                             {
@@ -65,21 +65,21 @@ void TileViewportPanel::Render(TileLayer& layers, Lumina::TextureAtlas& atlas, i
 
                             if (m_Erase)
                             {
-                                layers.ResetTile(y, x);
+                                m_Layers->ResetTile(y, x);
                             }
 
                             action.Curr = tile;
 
-                            layers.RecordAction(action);
+                            m_Layers->RecordAction(action);
                         }
                     }
                 }
 
                 if (tile.UseTexture && tile.TextureIndex >= 0)
                 {
-                    intptr_t textureID = (intptr_t)atlas.GetTextureID();
+                    intptr_t textureID = (intptr_t)m_TextureAtlas->GetTextureID();
 
-                    glm::vec4 texCoords = atlas.GetTexCoords(static_cast<int>(tile.TextureIndex));
+                    glm::vec4 texCoords = m_TextureAtlas->GetTexCoords(static_cast<int>(tile.TextureIndex));
                     ImVec2 xy = ImVec2(texCoords.x, texCoords.y);
                     ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
 
@@ -90,7 +90,7 @@ void TileViewportPanel::Render(TileLayer& layers, Lumina::TextureAtlas& atlas, i
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
-                    layers.SetHoveredTile(y, x);
+                    m_Layers->SetHoveredTile(y, x);
                     ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, IM_COL32(169, 169, 169, 255));
                 }
 

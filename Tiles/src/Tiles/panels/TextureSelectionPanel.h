@@ -12,7 +12,7 @@ public:
 
     // Accessors
     int GetSelectedTexture() const { return m_SelectedTexture; }
-    Lumina::TextureAtlas& GetTextureAtlas() { return m_TextureAtlas; }
+    void SetTextureAtlas(Lumina::TextureAtlas& atlas) { m_TextureAtlas = &atlas; }
     bool IsAtlasLoaded() const { return m_IsAtlasLoaded; }
 
 private:
@@ -34,7 +34,7 @@ private:
 
 private:
     // Texture Atlas State
-    Lumina::TextureAtlas m_TextureAtlas;
+    Lumina::TextureAtlas* m_TextureAtlas;
     std::string m_TextureAtlasPath;
     int m_TextureAtlasWidth = 16;
     int m_TextureAtlasHeight = 16;

@@ -1,7 +1,7 @@
 #include "Lumina/Application.h"
 #include "Lumina/EntryPoint.h"
 
-#include "Tiles/Tiles.h"
+#include "Tiles/Editor.h"
 
 Lumina::Application* Lumina::CreateApplication(int argc, char** argv)
 {
@@ -12,7 +12,7 @@ Lumina::Application* Lumina::CreateApplication(int argc, char** argv)
     spec.Fullscreen = false;
 
     Lumina::Application* app = new Lumina::Application(spec);
-    app->PushLayer<Tiles>();
+    app->PushLayer<Editor>();
     
     return app;
 }

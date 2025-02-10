@@ -7,9 +7,15 @@
 class TileViewportPanel
 {
 public:
-	void Render(TileLayer& layers, Lumina::TextureAtlas& atlas, int selectedTexture);
+	void Render(int selectedTexture);
+
+	void SetTextureAtlas(Lumina::TextureAtlas& atlas) { m_TextureAtlas = &atlas; }
+	void SetTileLayer(TileLayer& layers) { m_Layers = &layers; }
 private:
 	float m_Zoom = 1.0f;
+
+	TileLayer* m_Layers = nullptr;
+	Lumina::TextureAtlas* m_TextureAtlas = nullptr;
 
 	bool m_Fill = false;
 	bool m_Erase = false;

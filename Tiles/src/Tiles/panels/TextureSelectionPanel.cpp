@@ -81,7 +81,7 @@ void TextureSelectionPanel::LoadTextureAtlas()
 {
     try 
     {
-        m_TextureAtlas.CreateAtlas(m_TextureAtlasPath, m_TextureAtlasWidth, m_TextureAtlasHeight);
+        m_TextureAtlas->CreateAtlas(m_TextureAtlasPath, m_TextureAtlasWidth, m_TextureAtlasHeight);
         m_IsAtlasLoaded = true;
     }
     catch (...) 
@@ -126,8 +126,8 @@ void TextureSelectionPanel::RenderTextureGrid()
     ImVec2 position = ImGui::GetCursorScreenPos();
     
     // Compute the full size based on tile size and grid count
-    float atlasWidthPixels = m_TextureAtlas.GetGridWidth() * TEXTURE_BUTTON_SIZE;
-    float atlasHeightPixels = m_TextureAtlas.GetGridHeight() * TEXTURE_BUTTON_SIZE;
+    float atlasWidthPixels = m_TextureAtlas->GetGridWidth() * TEXTURE_BUTTON_SIZE;
+    float atlasHeightPixels = m_TextureAtlas->GetGridHeight() * TEXTURE_BUTTON_SIZE;
 
     // Render checkerboard
     for (float y = position.y; y < position.y + atlasHeightPixels; y += CHECKERBOARD_SIZE)
@@ -143,14 +143,14 @@ void TextureSelectionPanel::RenderTextureGrid()
     }
 
     // Render texture grid on top of the checkerboard
-    for (int y = 0; y < m_TextureAtlas.GetGridHeight(); ++y)
+    for (int y = 0; y < m_TextureAtlas->GetGridHeight(); ++y)
     {
-        for (int x = 0; x < m_TextureAtlas.GetGridWidth(); ++x)
+        for (int x = 0; x < m_TextureAtlas->GetGridWidth(); ++x)
         {
-            int index = y * m_TextureAtlas.GetGridWidth() + x;
+            int index = y * m_TextureAtlas->GetGridWidth() + x;
             RenderTextureGridItem(index, x, y);
 
-            if ((index + 1) % m_TextureAtlas.GetGridWidth() != 0)
+            if ((index + 1) % m_TextureAtlas->GetGridWidth() != 0)
                 ImGui::SameLine();
         }
     }
@@ -160,11 +160,11 @@ void TextureSelectionPanel::RenderTextureGrid()
 
 void TextureSelectionPanel::RenderTextureGridItem(int index, int x, int y)
 {
-    glm::vec4 texCoords = m_TextureAtlas.GetTexCoords(index);
+    glm::vec4 texCoords = m_TextureAtlas->GetTexCoords(index);
     ImVec2 buttonSize(TEXTURE_BUTTON_SIZE, TEXTURE_BUTTON_SIZE);
     ImVec2 xy(texCoords.x, texCoords.y);
     ImVec2 zw(texCoords.z, texCoords.w);
-    intptr_t textureID = (intptr_t)m_TextureAtlas.GetTextureID();
+    intptr_t textureID = (intptr_t)m_TextureAtlas->GetTextureID();
 
     // Render texture with full transparency support
     ImGui::Image((void*)textureID, buttonSize, xy, zw, ImVec4(1, 1, 1, 1), ImVec4(0, 0, 0, 0));

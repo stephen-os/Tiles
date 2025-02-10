@@ -10,7 +10,13 @@ void HeaderPanel::Render()
         RenderEdit();
         RenderOptions();
     }
+
     ImGui::EndMainMenuBar();
+
+    if(m_ShowNewPopup)
+	{
+		RenderNewPopup();
+	}
 }
 
 void HeaderPanel::RenderFile()
@@ -18,10 +24,9 @@ void HeaderPanel::RenderFile()
     // File Menu
     if (ImGui::BeginMenu("File"))
     {
-        // File Menu Items
         if (ImGui::MenuItem("New"))
         {
-            // Placeholder for New functionality
+            m_ShowNewPopup = true;
         }
         if (ImGui::MenuItem("Save"))
         {
@@ -30,6 +35,11 @@ void HeaderPanel::RenderFile()
         if (ImGui::MenuItem("Load"))
         {
             // Placeholder for Load functionality
+        }
+
+        if (ImGui::MenuItem("Export"))
+        {
+
         }
 
         ImGui::EndMenu();
@@ -67,5 +77,33 @@ void HeaderPanel::RenderOptions()
         }
 
         ImGui::EndMenu();
+    }
+}
+
+void HeaderPanel::RenderNewPopup()
+{
+    ImGui::OpenPopup("New Project");
+
+    if (ImGui::BeginPopupModal("New Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Enter width and height:");
+
+        ImGui::InputInt("Width", &m_NewWidth);
+        ImGui::InputInt("Height", &m_NewHeight);
+
+        if (ImGui::Button("Create"))
+        {
+            m_Layers->Create(m_NewWidth, m_NewHeight);
+            m_ShowNewPopup = false;
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel"))
+        {
+            m_ShowNewPopup = false;
+        }
+
+        ImGui::End();
     }
 }
