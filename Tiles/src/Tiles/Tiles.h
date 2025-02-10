@@ -16,7 +16,7 @@
 
 // Client
 #include "TileEditor.h"
-// #include "TileRenderer.h"
+#include "theme/ThemeManager.h"
 
 class Tiles : public Lumina::Layer
 {
@@ -39,6 +39,7 @@ public:
 
     virtual void OnAttach() override
     {
+        ThemeManager::GetInstance().ApplyDarkTheme();
         m_TileEditor.Init();
     }
 
