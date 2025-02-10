@@ -53,7 +53,7 @@ void TileViewportPanel::Render(int selectedTexture)
                             action.Y = y;
                             action.Prev = tile;
 
-                            if (m_Fill)
+                            if (m_Modes->Fill)
                             {
                                 m_Layers->FillLayer(selectedTexture, y, x);
                             }
@@ -63,7 +63,7 @@ void TileViewportPanel::Render(int selectedTexture)
                                 tile.TextureIndex = selectedTexture;
                             }
 
-                            if (m_Erase)
+                            if (m_Modes->Erase)
                             {
                                 m_Layers->ResetTile(y, x);
                             }

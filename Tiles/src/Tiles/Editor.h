@@ -15,6 +15,11 @@
 #include "Panels/HeaderPanel.h"
 #include "Panels/TextureSelectionPanel.h"
 #include "Panels/TileViewportPanel.h"
+#include "Panels/LayerSelectionPanel.h"
+#include "Panels/AttributePanel.h"
+#include "Panels/ToolSelectionPanel.h"
+
+#include "Core/ToolModes.h"
 
 class Editor : public Lumina::Layer
 {
@@ -35,20 +40,39 @@ public:
         m_HeaderPanel.Render();
         m_TextureSelectionPanel.Render();
         m_TileViewportPanel.Render(m_TextureSelectionPanel.GetSelectedTexture());
+        m_ToolSelectionPanel.Render();
+        m_LayerSelectionPanel.Render();
+        m_AttributePanel.Render(); 
     }
 
     virtual void OnAttach() override
     {
         ThemeManager::GetInstance().ApplyDarkTheme();
 
+        // Default Tile Layer
+        m_TileLayer.Create(25, 25); 
+
+        // Header
         m_HeaderPanel.SetTileLayer(m_TileLayer);
         m_HeaderPanel.SetTextureAtlas(m_TextureAtlas);
 
+        // Viewport
         m_TileViewportPanel.SetTileLayer(m_TileLayer);
-        m_TileViewportPanel.SetTextureAtlas(m_TextureAtlas); 
+        m_TileViewportPanel.SetTextureAtlas(m_TextureAtlas);
+        m_TileViewportPanel.SetToolModes(m_ToolModes);
 
+        // Texture Selection
         m_TextureSelectionPanel.SetTextureAtlas(m_TextureAtlas);
 
+        // Layer Selection
+        m_LayerSelectionPanel.SetTileLayer(m_TileLayer);
+
+        // Tile Attribute
+        m_AttributePanel.SetTileLayer(m_TileLayer);
+        m_AttributePanel.SetTextureAtlas(m_TextureAtlas);
+
+        // Tool Selection
+        m_ToolSelectionPanel.SetToolModes(m_ToolModes);
     }
 
     virtual void OnDetach() override
@@ -60,11 +84,15 @@ private:
     // Common
     TileLayer m_TileLayer;
     Lumina::TextureAtlas m_TextureAtlas;
+    ToolModes m_ToolModes;
 
     // Panels
     HeaderPanel m_HeaderPanel;
     TextureSelectionPanel m_TextureSelectionPanel;
     TileViewportPanel m_TileViewportPanel;
+	LayerSelectionPanel m_LayerSelectionPanel;
+    AttributePanel m_AttributePanel;
+    ToolSelectionPanel m_ToolSelectionPanel;
 
     // Util
     Lumina::Timer m_FrameTimer;

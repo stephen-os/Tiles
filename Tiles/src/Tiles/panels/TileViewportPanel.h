@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../TileLayer.h"
+#include "../Core/ToolModes.h"
 
 #include "Lumina/Renderer/TextureAtlas.h"
 
@@ -11,11 +12,13 @@ public:
 
 	void SetTextureAtlas(Lumina::TextureAtlas& atlas) { m_TextureAtlas = &atlas; }
 	void SetTileLayer(TileLayer& layers) { m_Layers = &layers; }
+	void SetToolModes(ToolModes& modes) { m_Modes = &modes; }
 private:
 	float m_Zoom = 1.0f;
 
 	TileLayer* m_Layers = nullptr;
 	Lumina::TextureAtlas* m_TextureAtlas = nullptr;
+	ToolModes* m_Modes = nullptr; 
 
 	bool m_Fill = false;
 	bool m_Erase = false;
