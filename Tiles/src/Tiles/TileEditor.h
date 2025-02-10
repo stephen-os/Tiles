@@ -9,6 +9,7 @@
 
 // Panels
 #include "panels/TextureSelectionPanel.h"
+#include "panels/TileViewportPanel.h"
 
 struct EditorSpecification
 {
@@ -54,4 +55,5 @@ private:
 
     // Panels
     TextureSelectionPanel m_TextureSelectionPanel;
+    TileViewportPanel m_TileViewportPanel;
 };

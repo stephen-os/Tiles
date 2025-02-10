@@ -40,8 +40,8 @@ void TileEditor::Render()
     RenderLayerSelction();
     
     m_TextureSelectionPanel.Render();
+    m_TileViewportPanel.Render(m_TileLayer, m_TextureSelectionPanel.GetTextureAtlas(), m_TextureSelectionPanel.GetSelectedTexture());
 
-    RenderTiles();
     RenderAttributes();
     RenderExport(); 
 }
@@ -168,106 +168,6 @@ void TileEditor::RenderTools()
     ImGui::Checkbox("Fill Mode", &m_Modes.Fill);
 
     ImGui::End();
-}
-
-
-void TileEditor::RenderTiles()
-{
-    ImGui::Begin("Scene");
-
-    for (size_t y = 0; y < m_TileLayer.LayerWidth(); y++)
-    {
-        for (size_t x = 0; x < m_TileLayer.LayerHeight(); x++)
-        {
-            ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-            float offset = m_Spec.TileSize * m_Spec.Zoom;
-            ImVec2 tileMin = ImVec2(cursorPos.x + x * offset, cursorPos.y + y * offset);
-            ImVec2 tileMax = ImVec2(tileMin.x + offset, tileMin.y + offset);
-
-            const ImU32 color = ImGui::ColorConvertFloat4ToU32(ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-
-            ImGui::GetWindowDrawList()->AddRectFilled(tileMin, tileMax, color);
-            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, IM_COL32(169, 169, 169, 255));
-        }
-    }
-
-    for (size_t layer = 0; layer < m_TileLayer.LayerSize(); layer++)
-    {
-        for (size_t y = 0; y < m_TileLayer.LayerHeight(); y++)
-        {
-            for (size_t x = 0; x < m_TileLayer.LayerWidth(); x++)
-            {
-                if (!m_TileLayer.IsLayerVisible(layer))
-                    continue; 
-
-                ImVec2 cursorPos = ImGui::GetCursorScreenPos();       
-                TileData& tile = m_TileLayer.GetTile(layer, y, x);
-                float offset = m_Spec.TileSize * m_Spec.Zoom;
-                ImVec2 tileMin = ImVec2(cursorPos.x + x * offset, cursorPos.y + y * offset);
-                ImVec2 tileMax = ImVec2(tileMin.x + offset, tileMin.y + offset);
-
-                if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0)) {
-                    TileData previousTile = tile;
-                   
-                    if (m_TileLayer.GetActiveLayer() == layer)
-                    {
-                        int selectedTexture = m_TextureSelectionPanel.GetSelectedTexture(); 
-                        if (selectedTexture >= 0)
-                        {
-                            TileAction action;
-
-                            action.L = layer;
-                            action.X = x;
-                            action.Y = y;
-                            action.Prev = tile;
-
-                            if (m_Modes.Fill)
-                            {
-                                m_TileLayer.FillLayer(selectedTexture, y, x);
-                            }
-                            else
-                            {
-                                tile.UseTexture = true;
-                                tile.TextureIndex = selectedTexture;
-                            }
-
-                            if (m_Modes.Erase)
-                            {
-                                m_TileLayer.ResetTile(y, x);
-                            }
-
-                            action.Curr = tile;
-
-                            m_TileLayer.RecordAction(action);
-                        }
-                    }
-                }
-
-                if (tile.UseTexture && tile.TextureIndex >= 0)
-                {
-                    Lumina::TextureAtlas& atlas = m_TextureSelectionPanel.GetTextureAtlas();
-                    intptr_t textureID = (intptr_t)atlas.GetTextureID();
-
-                    glm::vec4 texCoords = atlas.GetTexCoords(static_cast<int>(tile.TextureIndex));
-                    ImVec2 xy = ImVec2(texCoords.x, texCoords.y);
-                    ImVec2 zw = ImVec2(texCoords.z, texCoords.w);
-
-                    const ImU32 color = IM_COL32(255, 255, 255, 255);
-
-                    ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, xy, zw, color);
-                }
-
-                if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
-                {
-                    m_TileLayer.SetHoveredTile(y, x);
-                    ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, IM_COL32(169, 169, 169, 255));
-                }
-
-            }
-        }
-    }
-
-    ImGui::End(); 
 }
 
 void TileEditor::RenderAttributes()
