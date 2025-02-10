@@ -21,11 +21,9 @@
 
 void TileEditor::Init()
 {
-    m_SavePath = "res/maps/tiles.json";
-    m_LoadPath = "res/maps/tiles.json";
     m_ExportPath = "res/outputs/output.png"; 
 
-    m_TileLayer.Create(m_Spec.Width, m_Spec.Height);
+    m_TileLayer.Create(20, 20);
 }
 
 void TileEditor::Shutdown()
@@ -35,7 +33,6 @@ void TileEditor::Shutdown()
 
 void TileEditor::Render()
 {
-    RenderHeader(); 
     RenderTools();
     RenderLayerSelction();
     
@@ -46,126 +43,13 @@ void TileEditor::Render()
     RenderExport(); 
 }
 
-void TileEditor::RenderHeader()
-{
-    ImGui::Begin("Header");
-
-    if (ImGui::Button("New"))
-    {
-        m_TileLayer.Create(m_Spec.Width, m_Spec.Height);
-
-        m_TextureSelectionPanel.Reset();
-    }
-
-    ImGui::SameLine();
-
-    ImGui::PushItemWidth(100.0f);
-
-    ImGui::Text("Width:");
-    ImGui::SameLine();
-    int width = m_Spec.Width;
-    if (ImGui::InputInt("##Width",  &width))
-    {
-        m_Spec.Width = max(1, width);
-    }
-
-    ImGui::SameLine();
-
-    ImGui::Text("Height:");
-    ImGui::SameLine();
-    int height = m_Spec.Height;
-    if (ImGui::InputInt("##Height", &height))
-    {
-        m_Spec.Height = max(1, height);
-    }
-
-    ImGui::PopItemWidth();
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Save"))
-    {
-        m_TileLayer.Save(m_SavePath);
-    }
-
-    ImGui::SameLine();
-
-    {
-        ImGui::PushItemWidth(300.0f);
-        
-        char buffer[256];
-        strncpy_s(buffer, m_SavePath.c_str(), sizeof(buffer));
-        if (ImGui::InputText("##SavePath", buffer, sizeof(buffer)))
-        {
-            m_SavePath = buffer;
-        }
-
-        ImGui::PopItemWidth();
-    }
-    
-    ImGui::SameLine();
-
-    if (ImGui::Button("Load"))
-    {
-        if (std::filesystem::exists(m_LoadPath))
-        {
-            m_TileLayer.Load(m_LoadPath);
-        }
-    }
-
-    ImGui::SameLine();
-    
-    {
-        ImGui::PushItemWidth(300.0f);
-
-        char buffer[256];
-        strncpy_s(buffer, m_LoadPath.c_str(), sizeof(buffer));
-        if (ImGui::InputText("##LoadPath", buffer, sizeof(buffer)))
-        {
-            m_LoadPath = buffer;
-        }
-
-        ImGui::PopItemWidth();
-    }
-
-    ImGui::SameLine(); 
-
-    if (ImGui::Button("Undo"))
-    {
-        m_TileLayer.UndoAction();
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Redo"))
-    {
-        m_TileLayer.RedoAction();
-    }
-
-    ImGui::SameLine();
-
-    ImGui::Text("Zoom Level:");
-
-    ImGui::SameLine();
-
-    ImGui::PushItemWidth(300.0f);
-    ImGui::SliderFloat("##ZoomSlider", &m_Spec.Zoom, 0.1f, 10.0f, "%.1f");
-    ImGui::PopItemWidth();
-
-    ImGui::SameLine();
-    
-    ImGui::Dummy(ImVec2(10.0f, 0.0f)); 
-
-    ImGui::End();
-}
-
 void TileEditor::RenderTools()
 {
     ImGui::Begin("Tools");
 
-    ImGui::Checkbox("Eraser Mode", &m_Modes.Erase);
+    // ImGui::Checkbox("Eraser Mode", &m_Modes.Erase);
  
-    ImGui::Checkbox("Fill Mode", &m_Modes.Fill);
+    // ImGui::Checkbox("Fill Mode", &m_Modes.Fill);
 
     ImGui::End();
 }
@@ -297,7 +181,7 @@ void TileEditor::RenderExport()
 
     if (ImGui::Button("Export Image"))
     {
-		m_TileExporter.Export(m_TileLayer, m_Atlas, m_ExportPath);
+		m_TileExporter.Export(m_TileLayer, m_TextureSelectionPanel.GetTextureAtlas(), m_ExportPath);
     }
 
     ImGui::End();
