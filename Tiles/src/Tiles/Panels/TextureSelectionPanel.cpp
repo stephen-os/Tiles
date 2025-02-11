@@ -15,8 +15,12 @@ void TextureSelectionPanel::Render()
 
     if (m_TextureAtlas->IsCreated()) 
     {
-        RenderAtlasDimensionsSection();
+        RenderAtlasDimensionsSection(); 
+        ImGui::Separator();
+
+        ImGui::BeginChild("TextureSelection", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
         RenderTextureGrid();
+        ImGui::EndChild();
     }
 
     ImGui::End();
