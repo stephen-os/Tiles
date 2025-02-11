@@ -8,6 +8,7 @@
 
 #include "Lumina/Utils/Timer.h"
 #include "Lumina/Utils/FileReader.h"
+#include "Lumina/Base.h"
 
 // Client
 #include "Theme/ThemeManager.h"
@@ -51,14 +52,16 @@ public:
         ThemeManager::GetInstance().ApplyDarkTheme();
 
         // Default Tile Layer
-        m_TileLayer.Create(25, 25); 
+        Lumina::Ref<TileLayer> layers = Lumina::CreateRef<TileLayer>();
+
+        layers->Create(25, 25); 
 
         // Header
-        m_HeaderPanel.SetTileLayer(m_TileLayer);
+        m_HeaderPanel.SetTileLayer(layers);
         m_HeaderPanel.SetTextureAtlas(m_TextureAtlas);
 
         // Viewport
-        m_TileViewportPanel.SetTileLayer(m_TileLayer);
+        m_TileViewportPanel.SetTileLayer(layers);
         m_TileViewportPanel.SetTextureAtlas(m_TextureAtlas);
         m_TileViewportPanel.SetToolModes(m_ToolModes);
 
@@ -66,10 +69,10 @@ public:
         m_TextureSelectionPanel.SetTextureAtlas(m_TextureAtlas);
 
         // Layer Selection
-        m_LayerSelectionPanel.SetTileLayer(m_TileLayer);
+        m_LayerSelectionPanel.SetTileLayer(layers);
 
         // Tile Attribute
-        m_AttributePanel.SetTileLayer(m_TileLayer);
+        m_AttributePanel.SetTileLayer(layers);
         m_AttributePanel.SetTextureAtlas(m_TextureAtlas);
 
         // Tool Selection
@@ -83,7 +86,6 @@ public:
 
 private:
     // Common
-    TileLayer m_TileLayer;
     Lumina::TextureAtlas m_TextureAtlas;
     ToolModes m_ToolModes;
 

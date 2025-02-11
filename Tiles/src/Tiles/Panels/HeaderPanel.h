@@ -4,6 +4,7 @@
 #include "../Core/TileExporter.h"
 
 #include "Lumina/Renderer/TextureAtlas.h"
+#include "Lumina/Base.h"
 
 class HeaderPanel
 {
@@ -11,7 +12,7 @@ public:
 	void Render();
 
 	void SetTextureAtlas(Lumina::TextureAtlas& atlas) { m_TextureAtlas = &atlas; }
-	void SetTileLayer(TileLayer& layers) { m_Layers = &layers; }
+	void SetTileLayer(const Lumina::Ref<TileLayer>& layers) { m_Layers = layers; }
 private:
 	void RenderFile();
 	void RenderEdit();
@@ -20,7 +21,7 @@ private:
 	void RenderNewPopup();
 
 private:
-	TileLayer* m_Layers = nullptr;
+	Lumina::Ref<TileLayer> m_Layers;
 	Lumina::TextureAtlas* m_TextureAtlas = nullptr;
 
 	// New
