@@ -40,7 +40,6 @@ void TextureSelectionPanel::OpenFileDialog()
     config.path = ".";
     config.flags = ImGuiFileDialogFlags_Modal;
     config.countSelectionMax = 1;
-    config.sidePaneWidth = 250.0f;
 
     ImGuiFileDialog::Instance()->OpenDialog(
         "ChooseAtlasFileDlg",

@@ -1,0 +1,434 @@
+{
+    "atlas_grid_height": 16,
+    "atlas_grid_width": 16,
+    "atlas_path": "C:\\Users\\Stephen\\Dev\\Tiles\\Tiles\\res\\texture\\test_atlas1.png",
+    "layers": [
+        {
+            "name": "Layer 1",
+            "tiles": [
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    },
+                    {
+                        "texture_index": 209,
+                        "use_texture": true
+                    }
+                ]
+            ]
+        }
+    ],
+    "tilelayer_height": 10,
+    "tilelayer_width": 10
+}

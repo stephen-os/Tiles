@@ -51,12 +51,12 @@ void TileViewportPanel::RenderLayerTiles(int selectedTexture)
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0))
                     HandleTileSelection(layer, x, y, selectedTexture);
 
-                if (tile.UseTexture && tile.TextureIndex >= 0)
+                if (tile.TextureIndex >= 0)
                     DrawTileTexture(tile, tileMin, tileMax);
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
-                    m_TileLayers->SetHoveredTile(y, x);
+                    m_TileLayers->SetLastMousePosition({ layer, x, y });
                     ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
                 }
             }
@@ -67,7 +67,6 @@ void TileViewportPanel::RenderLayerTiles(int selectedTexture)
 void TileViewportPanel::HandleTileSelection(int layer, int x, int y, int selectedTexture)
 {
     TileData& tile = m_TileLayers->GetTile(layer, y, x);
-    TileAction action{ layer, x, y, tile };
 
     if (m_TileLayers->GetActiveLayer() == layer) {
         if (selectedTexture >= 0) {
@@ -76,7 +75,6 @@ void TileViewportPanel::HandleTileSelection(int layer, int x, int y, int selecte
                 m_TileLayers->FillLayer(selectedTexture, y, x);
             }
             else {
-                tile.UseTexture = true;
                 tile.TextureIndex = selectedTexture;
             }
 
@@ -84,9 +82,6 @@ void TileViewportPanel::HandleTileSelection(int layer, int x, int y, int selecte
             {
                 m_TileLayers->ResetTile(y, x);
             }
-
-            action.Curr = tile;
-            m_TileLayers->RecordAction(action);
         }
     }
 }

@@ -12,8 +12,7 @@
 class TileObject {
 public:
     TileObject();
-
-    void Draw();
+    const Lumina::Ref<Lumina::VertexArray>& GetVertexArray() { return m_VertexArray; }
 private:
     void InitializeGeometry();
 private:

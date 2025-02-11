@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "TileObject.h"
-void TileExporter::Export(TileLayer& layer, Lumina::TextureAtlas& atlas, std::string& filename)
+void TileExporter::Export(Lumina::Ref<TileLayer>& layers, Lumina::Ref<Lumina::TextureAtlas>& atlas, std::string& filename)
 {
     TileObject tileObject;
 
@@ -67,10 +67,10 @@ void TileExporter::Export(TileLayer& layer, Lumina::TextureAtlas& atlas, std::st
     Lumina::ShaderProgram shader;
     shader.SetSource(vertexShader, fragmetShader);
 
-    int outputWidth = layer.LayerWidth() * m_Resolution;
-    int outputHeight = layer.LayerHeight() * m_Resolution;
+    int outputWidth = layers->LayerWidth() * m_Resolution;
+    int outputHeight = layers->LayerHeight() * m_Resolution;
 
-    glm::mat4 orthoProjection = glm::ortho(0.0f, float(layer.LayerWidth()), 0.0f, float(layer.LayerHeight()), -1.0f, 2.0f);
+    glm::mat4 orthoProjection = glm::ortho(0.0f, float(layers->LayerWidth()), 0.0f, float(layers->LayerHeight()), -1.0f, 2.0f);
 
     Lumina::Renderer renderer;
 
@@ -79,32 +79,33 @@ void TileExporter::Export(TileLayer& layer, Lumina::TextureAtlas& atlas, std::st
     renderer.OnWindowResize(outputWidth, outputHeight);
     renderer.Clear();
 
-    atlas.Bind(); 
+    atlas->Bind();
 
     shader.Bind();
     shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
-    shader.SetUniform1f("u_NumberOfRows", static_cast<float>(atlas.GetGridWidth()));
+    shader.SetUniform1f("u_NumberOfRows", static_cast<float>(atlas->GetGridWidth()));
 
-    for (int l = 0; l < layer.LayerSize(); l++)
+    for (int l = 0; l < layers->LayerSize(); l++)
     {
-        for (int y = 0; y < layer.LayerHeight(); y++)
+        for (int y = 0; y < layers->LayerHeight(); y++)
         {
-            for (int x = 0; x < layer.LayerWidth(); x++)
+            for (int x = 0; x < layers->LayerWidth(); x++)
             {
-                TileData& tile = layer.GetTile(l, y, x);
-                if (tile.UseTexture)
+                TileData& tile = layers->GetTile(l, y, x);
+                if (tile.TextureIndex != -1)
                 {
                     glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, l * 0.01f));
-                    glm::vec2 offset = atlas.GetOffset(static_cast<int>(tile.TextureIndex));
+                    glm::vec2 offset = atlas->GetOffset(static_cast<int>(tile.TextureIndex));
 
                     shader.SetUniformMatrix4fv("u_Transform", transform);
                     shader.SetUniform2fv("u_Offset", offset);
-                    tileObject.Draw();
+                    renderer.Draw(tileObject.GetVertexArray());
                 }
             }
         }
     }
 
     renderer.End();
+
     renderer.SaveFrameBufferToImage(filename);
 }

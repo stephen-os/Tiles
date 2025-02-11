@@ -48,16 +48,3 @@ void TileObject::InitializeGeometry()
     m_VertexArray->AddVertexBuffer(vertexBuffer);
     m_VertexArray->SetIndexBuffer(indexBuffer);
 }
-
-void TileObject::Draw() 
-{
-    m_VertexArray->Bind();
-
-    // OpenGL draw call
-    glDrawElements(GL_TRIANGLES,
-        m_VertexArray->GetAttributes().GetIndexBuffer()->GetCount(),
-        GL_UNSIGNED_INT,
-        nullptr);
-
-    m_VertexArray->Unbind();
-}

@@ -66,14 +66,18 @@ void LayerSelectionPanel::Render()
 
     ImGui::Separator();
 
-    const char* layerName = m_TileLayer->GetLayerName(m_TileLayer->GetActiveLayer());
-    char layerNameBuffer[128];
-    strncpy_s(layerNameBuffer, layerName, sizeof(layerNameBuffer) - 1);
-    layerNameBuffer[sizeof(layerNameBuffer) - 1] = '\0';
 
-    if (ImGui::InputText("Layer Name", layerNameBuffer, sizeof(layerNameBuffer)))
+    if (m_TileLayer->LayerSize() != 0)
     {
-        m_TileLayer->SetLayerName(std::string(layerNameBuffer));
+        const char* layerName = m_TileLayer->GetLayerName(m_TileLayer->GetActiveLayer());
+        char layerNameBuffer[128];
+        strncpy_s(layerNameBuffer, layerName, sizeof(layerNameBuffer) - 1);
+        layerNameBuffer[sizeof(layerNameBuffer) - 1] = '\0';
+
+        if (ImGui::InputText("Layer Name", layerNameBuffer, sizeof(layerNameBuffer)))
+        {
+            m_TileLayer->SetLayerName(std::string(layerNameBuffer));
+        }
     }
 
     ImGui::Separator();

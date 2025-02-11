@@ -1,6 +1,9 @@
 #include "HeaderPanel.h"
 
 #include "imgui.h"
+#include "ImGuiFileDialog.h"
+
+#include "../Core/Project.h"
 
 void HeaderPanel::Render()
 {
@@ -13,15 +16,14 @@ void HeaderPanel::Render()
 
     ImGui::EndMainMenuBar();
 
-    if(m_ShowNewPopup)
-	{
-		RenderNewPopup();
-	}
+    if (m_ShowNewPopup)
+    {
+        RenderNewPopup();
+    }
 }
 
 void HeaderPanel::RenderFile()
 {
-    // File Menu
     if (ImGui::BeginMenu("File"))
     {
         if (ImGui::MenuItem("New"))
@@ -30,52 +32,90 @@ void HeaderPanel::RenderFile()
         }
         if (ImGui::MenuItem("Save"))
         {
-            // Placeholder for Save functionality
+            IGFD::FileDialogConfig config;
+            config.path = ".";
+            config.flags = ImGuiFileDialogFlags_Modal;
+            config.countSelectionMax = 1;
+
+            ImGuiFileDialog::Instance()->OpenDialog("SaveProject", "Save Project", ".json", config);
         }
         if (ImGui::MenuItem("Load"))
         {
-            // Placeholder for Load functionality
-        }
+            IGFD::FileDialogConfig config;
+            config.path = ".";
+            config.flags = ImGuiFileDialogFlags_Modal;
+            config.countSelectionMax = 1;
 
+            ImGuiFileDialog::Instance()->OpenDialog("LoadProject", "Load Project", ".json", config);
+        }
         if (ImGui::MenuItem("Export"))
         {
+            IGFD::FileDialogConfig config;
+            config.path = ".";
+            config.flags = ImGuiFileDialogFlags_Modal;
+            config.countSelectionMax = 1;
 
+            ImGuiFileDialog::Instance()->OpenDialog("ExportProject", "Export Tile Map", ".png", config);
         }
-
         ImGui::EndMenu();
+    }
+
+    // Handle Save Dialog
+    if (ImGuiFileDialog::Instance()->Display("SaveProject", ImGuiWindowFlags_NoCollapse, ImVec2(600, 400)))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+            Project::Save(filePath, m_TileLayers, m_TextureAtlas);
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    // Handle Load Dialog
+    if (ImGuiFileDialog::Instance()->Display("LoadProject", ImGuiWindowFlags_NoCollapse, ImVec2(600, 400)))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+            Project::Load(filePath, m_TileLayers, m_TextureAtlas);
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    // Handle Export Dialog
+    if (ImGuiFileDialog::Instance()->Display("ExportProject", ImGuiWindowFlags_NoCollapse, ImVec2(600, 400)))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            TileExporter exporter; 
+            std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+            exporter.Export(m_TileLayers, m_TextureAtlas, filePath);
+        }
+        ImGuiFileDialog::Instance()->Close();
     }
 }
 
 void HeaderPanel::RenderEdit()
 {
-    // Edit Menu
     if (ImGui::BeginMenu("Edit"))
     {
-        // Edit Menu Items
         if (ImGui::MenuItem("Undo"))
         {
-            // Placeholder for Undo functionality
         }
         if (ImGui::MenuItem("Redo"))
         {
-            // Placeholder for Redo functionality
         }
-
         ImGui::EndMenu();
     }
 }
 
 void HeaderPanel::RenderOptions()
 {
-    // Options Menu
     if (ImGui::BeginMenu("Options"))
     {
-        // Options Menu Item
         if (ImGui::MenuItem("Settings"))
         {
-            // Placeholder for Settings functionality
         }
-
         ImGui::EndMenu();
     }
 }
@@ -87,23 +127,18 @@ void HeaderPanel::RenderNewPopup()
     if (ImGui::BeginPopupModal("New Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::Text("Enter width and height:");
-
         ImGui::InputInt("Width", &m_NewWidth);
         ImGui::InputInt("Height", &m_NewHeight);
-
         if (ImGui::Button("Create"))
         {
             m_TileLayers->Create(m_NewWidth, m_NewHeight);
             m_ShowNewPopup = false;
         }
-
         ImGui::SameLine();
-
         if (ImGui::Button("Cancel"))
         {
             m_ShowNewPopup = false;
         }
-
         ImGui::End();
     }
 }

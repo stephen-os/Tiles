@@ -1,7 +1,5 @@
 #include "TileLayer.h"
 
-#include "TileSerializer.h"
-
 #include <stdexcept>
 #include <queue>
 #include <iostream>
@@ -15,23 +13,9 @@ void TileLayer::Create(size_t width, size_t height)
 
     m_TileLayers.clear();
     m_LayersVisible.clear();
-
-    ResetHoveredTile();
-
-    while (!m_UndoStack.empty())
-    {
-        m_UndoStack.pop();
-    }
-
-    while (!m_RedoStack.empty())
-    {
-        m_RedoStack.pop();
-    }
-
-    std::string name = "Layer 1";
-    AddLayer(name);
 }
 
+// TODO: Add layer by layer copy
 void TileLayer::AddLayer(std::string& name)
 {
     LayerData layer;
@@ -50,8 +34,6 @@ void TileLayer::AddLayer(std::string& name)
     m_TileLayers.push_back(layer);
 
     m_LayersVisible.resize(LayerSize(), true);
-
-    ResetHoveredTile();
 }
 
 void TileLayer::DeleteLayer()
@@ -69,8 +51,6 @@ void TileLayer::DeleteLayer()
             m_ActiveLayer = (m_ActiveLayer > 0) ? m_ActiveLayer - 1 : 0;
         }
     }
-
-    ResetHoveredTile();
 }
 
 void TileLayer::ClearLayer()
@@ -136,7 +116,6 @@ void TileLayer::FillLayer(size_t newTextureIndex, size_t y, size_t x)
             continue;
 
         m_TileLayers[m_ActiveLayer].Layer[cy][cx].TextureIndex = newTextureIndex;
-        m_TileLayers[m_ActiveLayer].Layer[cy][cx].UseTexture = true;
 
         for (const auto& direction : directions)
         {
@@ -169,103 +148,10 @@ void TileLayer::SetLayerName(std::string& name)
     m_TileLayers[m_ActiveLayer].Name = name;
 }
 
-void TileLayer::SetHoveredTile(size_t y, size_t x)
-{
-    m_HoveredTile = { m_ActiveLayer, y, x }; 
-}
-
-TileData& TileLayer::GetHoveredTile()
-{
-    return m_TileLayers[m_HoveredTile.L].Layer[m_HoveredTile.Y][m_HoveredTile.X];
-}
-
 void TileLayer::SetActiveLayer(size_t layer)
 {
     if (layer < LayerSize())
         m_ActiveLayer = layer;
-}
-
-void TileLayer::RecordAction(TileAction action)
-{
-    if (!m_UndoStack.empty())
-    {
-        const TileAction& top = m_UndoStack.top();
-        if (top.L == action.L && top.X == action.X && top.Y == action.Y &&
-            top.Curr.TextureIndex == action.Curr.TextureIndex &&
-            top.Curr.UseTexture == action.Curr.UseTexture)
-        {
-            return;
-        }
-    }
-
-    m_UndoStack.push(action);
-
-    while (!m_RedoStack.empty())
-    {
-        m_RedoStack.pop();
-    }
-}
-
-void TileLayer::UndoAction()
-{
-    if (m_UndoStack.empty())
-    {
-        return;
-    }
-
-    TileAction action = m_UndoStack.top();
-    m_UndoStack.pop();
-
-    m_TileLayers[action.L].Layer[action.Y][action.X] = action.Prev;
-
-    m_RedoStack.push(action);
-
-}
-
-void TileLayer::RedoAction()
-{
-    if (m_RedoStack.empty())
-    {
-        return;
-    }
-
-    TileAction action = m_RedoStack.top();
-    m_RedoStack.pop();
-
-    m_TileLayers[action.L].Layer[action.Y][action.X] = action.Curr;
-
-    m_UndoStack.push(action);
-}
-
-void TileLayer::Load(const std::string& filename)
-{
-    m_TileLayers.clear();
-    m_TileLayers = TileSerializer::Deserialize(filename);
-
-    m_LayerWidth = m_TileLayers[0].Layer.size();
-    m_LayerHeight = m_TileLayers[0].Layer[0].size();
-
-    m_ActiveLayer = LayerSize() - 1;
-
-    m_LayersVisible.clear();
-    m_LayersVisible.resize(LayerSize(), true);
-
-    ResetHoveredTile();
-
-    while (!m_UndoStack.empty())
-    {
-        m_UndoStack.pop();
-    }
-
-    while (!m_RedoStack.empty())
-    {
-        m_RedoStack.pop();
-    }
-}
-
-void TileLayer::Save(const std::string& filename) const
-{
-    TileSerializer::Serialize(m_TileLayers, filename);
 }
 
 bool TileLayer::IsTileInBounds(size_t layer, size_t y, size_t x) const
