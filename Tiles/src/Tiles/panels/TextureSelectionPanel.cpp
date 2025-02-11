@@ -78,7 +78,6 @@ void TextureSelectionPanel::HandleAtlasFileSelection(const std::string& newPath)
     }
 }
 
-// TODO: Texture atlas should have an update function that just updates the offsets
 void TextureSelectionPanel::LoadTextureAtlas() 
 {
     try 
@@ -113,7 +112,7 @@ void TextureSelectionPanel::UpdateAtlasDimensions(int& dimension, const char* la
         dimension = std::max(1, tempDimension);
         if (m_IsAtlasLoaded) 
         {
-            LoadTextureAtlas();
+            m_TextureAtlas->CalculateTexCoords(m_TextureAtlasWidth, m_TextureAtlasHeight);
         }
     }
 }
