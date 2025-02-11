@@ -104,9 +104,13 @@ void TileViewportPanel::DrawTileTexture(const TileData& tile, ImVec2 tileMin, Im
 
 void TileViewportPanel::HandleScrolling()
 {
-    float scroll = ImGui::GetIO().MouseWheel;
-    if (scroll != 0.0f) {
-        float zoomFactor = 0.1f;
-        m_Zoom = std::clamp(m_Zoom + scroll * zoomFactor, 0.5f, 3.0f);
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) 
+    {
+        float scroll = ImGui::GetIO().MouseWheel;
+        if (scroll != 0.0f) 
+        {
+            float zoomFactor = 0.1f;
+            m_Zoom = std::clamp(m_Zoom + scroll * zoomFactor, 0.5f, 3.0f);
+        }
     }
 }
