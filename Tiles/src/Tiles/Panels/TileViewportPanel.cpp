@@ -17,16 +17,37 @@ void TileViewportPanel::Render(int selectedTexture) {
 
 void TileViewportPanel::RenderTileGrid()
 {
+    ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+    float gridWidth = m_TileLayers->LayerWidth() * TILE_SIZE * m_Zoom;
+    float gridHeight = m_TileLayers->LayerHeight() * TILE_SIZE * m_Zoom;
+
+    // Define checkerboard properties
+    float scaledSize = CHECKERBOARD_SIZE * m_Zoom;
+
+    // Render checkerboard background
+    for (float y = cursorPos.y; y < cursorPos.y + gridHeight; y += scaledSize)
+    {
+        for (float x = cursorPos.x; x < cursorPos.x + gridWidth; x += scaledSize)
+        {
+            ImVec2 minPos = ImVec2(x, y);
+            ImVec2 maxPos = ImVec2(x + scaledSize, y + scaledSize);
+
+            ImU32 fillColor = (((int)(x / scaledSize) + (int)(y / scaledSize)) % 2 == 0) ? CHECKERBOARD_COLOR_1 : CHECKERBOARD_COLOR_2;
+
+            ImGui::GetWindowDrawList()->AddRectFilled(minPos, maxPos, fillColor);
+        }
+    }
+
+    // Render tile grid on top of checkerboard
     for (size_t y = 0; y < m_TileLayers->LayerHeight(); y++)
     {
         for (size_t x = 0; x < m_TileLayers->LayerWidth(); x++)
         {
-            ImVec2 cursorPos = ImGui::GetCursorScreenPos();
             float offset = TILE_SIZE * m_Zoom;
             ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
             ImVec2 tileMax(tileMin.x + offset, tileMin.y + offset);
 
-            ImGui::GetWindowDrawList()->AddRectFilled(tileMin, tileMax, BACKGROUND_COLOR);
+            // Only render the grid outline, remove the filled background
             ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, OUTLINE_COLOR);
         }
     }
