@@ -11,8 +11,8 @@ class HeaderPanel
 public:
 	void Render();
 
-	void SetTextureAtlas(Lumina::TextureAtlas& atlas) { m_TextureAtlas = &atlas; }
-	void SetTileLayer(const Lumina::Ref<TileLayer>& layers) { m_Layers = layers; }
+	void SetTextureAtlas(const Lumina::Ref<Lumina::TextureAtlas>& atlas) { m_TextureAtlas = atlas; }
+	void SetTileLayers(const Lumina::Ref<TileLayer>& layers) { m_TileLayers = layers; }
 private:
 	void RenderFile();
 	void RenderEdit();
@@ -21,8 +21,8 @@ private:
 	void RenderNewPopup();
 
 private:
-	Lumina::Ref<TileLayer> m_Layers;
-	Lumina::TextureAtlas* m_TextureAtlas = nullptr;
+	Lumina::Ref<TileLayer> m_TileLayers;
+	Lumina::Ref<Lumina::TextureAtlas> m_TextureAtlas;
 
 	// New
 	bool m_ShowNewPopup = false;

@@ -51,32 +51,35 @@ public:
     {
         ThemeManager::GetInstance().ApplyDarkTheme();
 
-        // Default Tile Layer
+        // References
         Lumina::Ref<TileLayer> layers = Lumina::CreateRef<TileLayer>();
+        Lumina::Ref<Lumina::TextureAtlas> atlas = Lumina::CreateRef<Lumina::TextureAtlas>();
+        Lumina::Ref<ToolModes> modes = Lumina::CreateRef<ToolModes>();
 
-        layers->Create(25, 25); 
+        // TODO: Only init the grid from new or load
+        layers->Create(25, 25);
 
         // Header
-        m_HeaderPanel.SetTileLayer(layers);
-        m_HeaderPanel.SetTextureAtlas(m_TextureAtlas);
+        m_HeaderPanel.SetTileLayers(layers);
+        m_HeaderPanel.SetTextureAtlas(atlas);
 
         // Viewport
-        m_TileViewportPanel.SetTileLayer(layers);
-        m_TileViewportPanel.SetTextureAtlas(m_TextureAtlas);
-        m_TileViewportPanel.SetToolModes(m_ToolModes);
+        m_TileViewportPanel.SetTileLayers(layers);
+        m_TileViewportPanel.SetTextureAtlas(atlas);
+        m_TileViewportPanel.SetToolModes(modes);
 
         // Texture Selection
-        m_TextureSelectionPanel.SetTextureAtlas(m_TextureAtlas);
+        m_TextureSelectionPanel.SetTextureAtlas(atlas);
 
         // Layer Selection
         m_LayerSelectionPanel.SetTileLayer(layers);
 
         // Tile Attribute
-        m_AttributePanel.SetTileLayer(layers);
-        m_AttributePanel.SetTextureAtlas(m_TextureAtlas);
+        m_AttributePanel.SetTileLayers(layers);
+        m_AttributePanel.SetTextureAtlas(atlas);
 
         // Tool Selection
-        m_ToolSelectionPanel.SetToolModes(m_ToolModes);
+        m_ToolSelectionPanel.SetToolModes(modes);
     }
 
     virtual void OnDetach() override
@@ -85,10 +88,6 @@ public:
     }
 
 private:
-    // Common
-    Lumina::TextureAtlas m_TextureAtlas;
-    ToolModes m_ToolModes;
-
     // Panels
     HeaderPanel m_HeaderPanel;
     TextureSelectionPanel m_TextureSelectionPanel;

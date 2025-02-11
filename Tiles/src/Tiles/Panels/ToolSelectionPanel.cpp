@@ -4,12 +4,12 @@
 
 void ToolSelectionPanel::Render()
 {
-    if (!m_Modes) return;
+    if (!m_ToolModes) return;
 
     ImGui::Begin("Tools");
 
-    ImGui::Checkbox("Eraser Mode", &m_Modes->Erase);
-    ImGui::Checkbox("Fill Mode", &m_Modes->Fill);
+    ImGui::Checkbox("Eraser Mode", &m_ToolModes->Erase);
+    ImGui::Checkbox("Fill Mode", &m_ToolModes->Fill);
 
     ImGui::End();
 }

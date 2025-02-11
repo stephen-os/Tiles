@@ -1,18 +1,22 @@
 // TextureSelectionPanel.h
 #pragma once
 
-#include <string>
 #include "Lumina/Renderer/TextureAtlas.h"
+#include "Lumina/Base.h"
+
+#include <string>
+
 #include "imgui.h"
 
-class TextureSelectionPanel {
+class TextureSelectionPanel 
+{
 public:
     void Render();
     void Reset();
 
     // Accessors
     int GetSelectedTexture() const { return m_SelectedTexture; }
-    void SetTextureAtlas(Lumina::TextureAtlas& atlas) { m_TextureAtlas = &atlas; }
+    void SetTextureAtlas(Lumina::Ref<Lumina::TextureAtlas> atlas) { m_TextureAtlas = atlas; }
     bool IsAtlasLoaded() const { return m_IsAtlasLoaded; }
 
 private:
@@ -34,7 +38,8 @@ private:
 
 private:
     // Texture Atlas State
-    Lumina::TextureAtlas* m_TextureAtlas;
+    Lumina::Ref<Lumina::TextureAtlas> m_TextureAtlas;
+
     std::string m_TextureAtlasPath;
     int m_TextureAtlasWidth = 16;
     int m_TextureAtlasHeight = 16;

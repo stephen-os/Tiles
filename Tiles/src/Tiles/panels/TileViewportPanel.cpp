@@ -5,7 +5,7 @@
 void TileViewportPanel::Render(int selectedTexture) {
     ImGui::Begin("Scene");
 
-    if (!m_Layers) return;
+    if (!m_TileLayers) return;
 
     HandleScrolling();
 
@@ -17,9 +17,9 @@ void TileViewportPanel::Render(int selectedTexture) {
 
 void TileViewportPanel::RenderTileGrid()
 {
-    for (size_t y = 0; y < m_Layers->LayerHeight(); y++)
+    for (size_t y = 0; y < m_TileLayers->LayerHeight(); y++)
     {
-        for (size_t x = 0; x < m_Layers->LayerWidth(); x++)
+        for (size_t x = 0; x < m_TileLayers->LayerWidth(); x++)
         {
             ImVec2 cursorPos = ImGui::GetCursorScreenPos();
             float offset = TILE_SIZE * m_Zoom;
@@ -34,15 +34,15 @@ void TileViewportPanel::RenderTileGrid()
 
 void TileViewportPanel::RenderLayerTiles(int selectedTexture)
 {
-    for (size_t layer = 0; layer < m_Layers->LayerSize(); layer++)
+    for (size_t layer = 0; layer < m_TileLayers->LayerSize(); layer++)
     {
-        if (!m_Layers->IsLayerVisible(layer)) continue;
+        if (!m_TileLayers->IsLayerVisible(layer)) continue;
 
-        for (size_t y = 0; y < m_Layers->LayerHeight(); y++)
+        for (size_t y = 0; y < m_TileLayers->LayerHeight(); y++)
         {
-            for (size_t x = 0; x < m_Layers->LayerWidth(); x++)
+            for (size_t x = 0; x < m_TileLayers->LayerWidth(); x++)
             {
-                TileData& tile = m_Layers->GetTile(layer, y, x);
+                TileData& tile = m_TileLayers->GetTile(layer, y, x);
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
                 float offset = TILE_SIZE * m_Zoom;
                 ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
@@ -56,7 +56,7 @@ void TileViewportPanel::RenderLayerTiles(int selectedTexture)
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
-                    m_Layers->SetHoveredTile(y, x);
+                    m_TileLayers->SetHoveredTile(y, x);
                     ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
                 }
             }
@@ -66,27 +66,27 @@ void TileViewportPanel::RenderLayerTiles(int selectedTexture)
 
 void TileViewportPanel::HandleTileSelection(int layer, int x, int y, int selectedTexture)
 {
-    TileData& tile = m_Layers->GetTile(layer, y, x);
+    TileData& tile = m_TileLayers->GetTile(layer, y, x);
     TileAction action{ layer, x, y, tile };
 
-    if (m_Layers->GetActiveLayer() == layer) {
+    if (m_TileLayers->GetActiveLayer() == layer) {
         if (selectedTexture >= 0) {
-            if (m_Modes->Fill)
+            if (m_ToolModes->Fill)
             {
-                m_Layers->FillLayer(selectedTexture, y, x);
+                m_TileLayers->FillLayer(selectedTexture, y, x);
             }
             else {
                 tile.UseTexture = true;
                 tile.TextureIndex = selectedTexture;
             }
 
-            if (m_Modes->Erase)
+            if (m_ToolModes->Erase)
             {
-                m_Layers->ResetTile(y, x);
+                m_TileLayers->ResetTile(y, x);
             }
 
             action.Curr = tile;
-            m_Layers->RecordAction(action);
+            m_TileLayers->RecordAction(action);
         }
     }
 }

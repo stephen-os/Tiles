@@ -93,7 +93,7 @@ void HeaderPanel::RenderNewPopup()
 
         if (ImGui::Button("Create"))
         {
-            m_Layers->Create(m_NewWidth, m_NewHeight);
+            m_TileLayers->Create(m_NewWidth, m_NewHeight);
             m_ShowNewPopup = false;
         }
 

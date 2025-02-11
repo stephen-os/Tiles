@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Lumina/Base.h"
+
 #include "../Core/ToolModes.h"
 
 class ToolSelectionPanel
@@ -7,8 +9,8 @@ class ToolSelectionPanel
 public:
     void Render();
 
-    void SetToolModes(ToolModes& modes) { m_Modes = &modes; }
+    void SetToolModes(const Lumina::Ref<ToolModes>& modes) { m_ToolModes = modes; }
 
 private:
-    ToolModes* m_Modes = nullptr;
+    Lumina::Ref<ToolModes> m_ToolModes;
 };

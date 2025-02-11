@@ -13,9 +13,9 @@ public:
     void Render(int selectedTexture);
 
     // Setters
-    void SetTextureAtlas(Lumina::TextureAtlas& atlas) { m_TextureAtlas = &atlas; }
-    void SetTileLayer(const Lumina::Ref<TileLayer>& layers) { m_Layers = layers; }
-    void SetToolModes(ToolModes& modes) { m_Modes = &modes; }
+    void SetTextureAtlas(const Lumina::Ref<Lumina::TextureAtlas>& atlas) { m_TextureAtlas = atlas; }
+    void SetTileLayers(const Lumina::Ref<TileLayer>& layers) { m_TileLayers = layers; }
+    void SetToolModes(const Lumina::Ref<ToolModes>& modes) { m_ToolModes = modes; }
 
 private:
     // UI Rendering Methods
@@ -28,9 +28,9 @@ private:
 private:
     float m_Zoom = 1.0f;
 
-    Lumina::Ref<TileLayer> m_Layers;
-    Lumina::TextureAtlas* m_TextureAtlas = nullptr;
-    ToolModes* m_Modes = nullptr;
+    Lumina::Ref<TileLayer> m_TileLayers;
+    Lumina::Ref<Lumina::TextureAtlas> m_TextureAtlas;
+    Lumina::Ref<ToolModes> m_ToolModes;
 
     // Constants
     static constexpr float TILE_SIZE = 40.0f;
