@@ -13,7 +13,7 @@ void TextureSelectionPanel::Render()
     RenderAtlasPathSection();
     RenderFileDialog();
 
-    if (m_IsAtlasLoaded) 
+    if (m_TextureAtlas->IsCreated()) 
     {
         RenderAtlasDimensionsSection();
         RenderTextureGrid();
@@ -80,16 +80,7 @@ void TextureSelectionPanel::HandleAtlasFileSelection(const std::string& newPath)
 
 void TextureSelectionPanel::LoadTextureAtlas() 
 {
-    try 
-    {
-        m_TextureAtlas->CreateAtlas(m_TextureAtlasPath, m_TextureAtlasWidth, m_TextureAtlasHeight);
-        m_IsAtlasLoaded = true;
-    }
-    catch (...) 
-    {
-        m_IsAtlasLoaded = false;
-        // You might want to add error handling/logging here
-    }
+    m_TextureAtlas->CreateAtlas(m_TextureAtlasPath, m_TextureAtlasWidth, m_TextureAtlasHeight);
 }
 
 void TextureSelectionPanel::RenderAtlasDimensionsSection() 
@@ -110,7 +101,7 @@ void TextureSelectionPanel::UpdateAtlasDimensions(int& dimension, const char* la
     if (ImGui::InputInt(("##" + std::string(label)).c_str(), &tempDimension)) 
     {
         dimension = std::max(1, tempDimension);
-        if (m_IsAtlasLoaded) 
+        if (m_TextureAtlas->IsCreated())
         {
             m_TextureAtlas->CalculateTexCoords(m_TextureAtlasWidth, m_TextureAtlasHeight);
         }
@@ -191,5 +182,4 @@ void TextureSelectionPanel::Reset()
     m_TextureAtlasPath.clear();
     m_TextureAtlasWidth = 16;
     m_TextureAtlasHeight = 16;
-    m_IsAtlasLoaded = false;
 }
