@@ -15,6 +15,8 @@ void TileViewportPanel::Render(int selectedTexture) {
     ImGui::End();
 }
 
+#include <iostream>
+
 void TileViewportPanel::RenderTileGrid()
 {
     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
@@ -72,12 +74,12 @@ void TileViewportPanel::RenderLayerTiles(int selectedTexture)
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0))
                     HandleTileSelection(layer, x, y, selectedTexture);
 
-                if (tile.TextureIndex >= 0)
+                if (tile.TextureIndex != -1)
                     DrawTileTexture(tile, tileMin, tileMax);
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
-                    m_TileLayers->SetLastMousePosition({ layer, x, y });
+                    m_TileLayers->SetLastMousePosition({ layer, y, x });
                     ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
                 }
             }

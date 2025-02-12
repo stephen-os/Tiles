@@ -2,6 +2,8 @@
 
 #include "imgui.h"
 
+#include <iostream>
+
 void AttributePanel::Render()
 {
     if (!m_TileLayer || !m_TextureAtlas) return; // Ensure pointers are valid before rendering
@@ -11,7 +13,11 @@ void AttributePanel::Render()
     if (m_TileLayer->LayerSize() > 0)
     {
         glm::vec3 tilePosition = m_TileLayer->GetLastMousePosition();
+        if (!m_TileLayer->IsTileInBounds(tilePosition.x, tilePosition.z, tilePosition.y))
+            return; 
+
         TileData& tile = m_TileLayer->GetTile(tilePosition.x, tilePosition.y, tilePosition.z);
+
 
         if (tile.TextureIndex != -1)
         {

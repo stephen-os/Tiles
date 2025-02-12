@@ -1,0 +1,334 @@
+{
+    "atlas_grid_height": 16,
+    "atlas_grid_width": 16,
+    "atlas_path": "C:\\Users\\Stephen\\Dev\\Projects\\Tiles\\Tiles\\res\\texture\\test_atlas1.png",
+    "layers": [
+        {
+            "name": "background",
+            "tiles": [
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    }
+                ]
+            ]
+        }
+    ],
+    "tilelayer_height": 10,
+    "tilelayer_width": 10
+}

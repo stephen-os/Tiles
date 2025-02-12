@@ -46,7 +46,6 @@ public:
     size_t LayerWidth() const { return m_LayerWidth; }
     size_t LayerHeight() const { return m_LayerHeight; }
     size_t LayerSize() const { return m_TileLayers.size(); }
-private:
     bool IsTileInBounds(size_t layer, size_t y, size_t x) const;
 private:
     size_t m_LayerWidth;

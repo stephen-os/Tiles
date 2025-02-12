@@ -73,6 +73,7 @@ TileData& TileLayer::GetTile(size_t layer, size_t y, size_t x)
     }
     else
     {
+        std::cout << layer << " " << y << " " << x << std::endl;
         throw std::out_of_range("Tile is out of bounds.");
     }
 }
