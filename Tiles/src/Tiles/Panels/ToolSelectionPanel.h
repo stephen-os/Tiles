@@ -3,6 +3,7 @@
 #include "Lumina/Base.h"
 
 #include "../Core/ToolModes.h"
+
 #include "Lumina/Renderer/Texture.h"
 #include "Lumina/Base.h"
 
@@ -12,6 +13,7 @@ class ToolSelectionPanel
 {
 public:
 	ToolSelectionPanel();
+	~ToolSelectionPanel() = default;
 
     void Render();
 

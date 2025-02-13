@@ -66,7 +66,7 @@ void HeaderPanel::RenderFile()
         if (ImGuiFileDialog::Instance()->IsOk())
         {
             std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-            Project::Save(filePath, m_TileLayers, m_TextureAtlas);
+            Project::Save(filePath, m_Layers, m_Atlas);
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -77,7 +77,7 @@ void HeaderPanel::RenderFile()
         if (ImGuiFileDialog::Instance()->IsOk())
         {
             std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-            Project::Load(filePath, m_TileLayers, m_TextureAtlas);
+            Project::Load(filePath, m_Layers, m_Atlas);
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -89,7 +89,8 @@ void HeaderPanel::RenderFile()
         {
             TileExporter exporter; 
             std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-            exporter.Export(m_TileLayers, m_TextureAtlas, filePath);
+            // Fix
+            // exporter.Export(m_Layers, m_Atlas, filePath);
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -131,7 +132,8 @@ void HeaderPanel::RenderNewPopup()
         ImGui::InputInt("Height", &m_NewHeight);
         if (ImGui::Button("Create"))
         {
-            m_TileLayers->Create(m_NewWidth, m_NewHeight);
+            m_Layers->Clear(); 
+            m_Layers->Resize(m_NewWidth, m_NewHeight);
             m_ShowNewPopup = false;
         }
         ImGui::SameLine();

@@ -1,12 +1,14 @@
 #include "LayerSelectionPanel.h"
 
+#include "../Core/Layer.h"
+
 #include "imgui.h"
 
 // TODO: The pannel should render whether tile layer is created or not. 
 void LayerSelectionPanel::Render()
 {
     // TODO: This may be a good idea as a failsafe for the other panels
-    if (!m_TileLayer) return; // Early return if TileLayer is not set
+    if (!m_Layers) return; // Early return if TileLayer is not set
 
     ImGui::Begin("Layer Selection", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
@@ -17,22 +19,24 @@ void LayerSelectionPanel::Render()
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImGui::GetStyle().Colors[ImGuiCol_FrameBgHovered]);
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImGui::GetStyle().Colors[ImGuiCol_FrameBgActive]);
 
-    for (uint32_t i = 0; i < m_TileLayer->LayerSize(); i++)
+    for (uint32_t i = 0; i < m_Layers->GetSize(); i++)
     {
         ImGui::PushID(i);
 
-        bool flag = m_TileLayer->IsLayerVisible(i);
+        Layer& layer = m_Layers->GetLayer(i);
+
+        bool flag = layer.GetVisibility();
 
         if (ImGui::Checkbox("##Visible", &flag))
         {
-            m_TileLayer->ToggleLayerVisibilty(i);
+            layer.ToggleVisibility();
         }
 
         ImGui::SameLine();
 
-        if (ImGui::Selectable(m_TileLayer->GetLayerName(i), i == m_TileLayer->GetActiveLayer()))
+        if (ImGui::Selectable(layer.GetName().c_str(), i == m_Layers->GetActiveLayer()))
         {
-            m_TileLayer->SetActiveLayer(i);
+            m_Layers->SetActiveLayer(i);
         }
 
         ImGui::PopID();
@@ -47,36 +51,37 @@ void LayerSelectionPanel::Render()
 
     if (ImGui::Button("Add Layer"))
     {
-        m_TileLayer->AddLayer("Layer " + std::to_string(m_TileLayer->LayerSize() + 1));
+        m_Layers->NewLayer();
     }
 
     ImGui::SameLine();
 
     if (ImGui::Button("Delete Layer"))
     {
-        m_TileLayer->DeleteLayer();
+        m_Layers->DeleteLayer();
     }
 
     ImGui::SameLine();
 
     if (ImGui::Button("Clear Layer"))
     {
-        m_TileLayer->ClearLayer();
+        m_Layers->ClearLayer();
     }
 
     ImGui::Separator();
 
 
-    if (m_TileLayer->LayerSize() != 0)
+    if (m_Layers->GetSize() != 0)
     {
-        const char* layerName = m_TileLayer->GetLayerName(m_TileLayer->GetActiveLayer());
+        Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
+        const char* layerName = layer.GetName().c_str();
         char layerNameBuffer[128];
         strncpy_s(layerNameBuffer, layerName, sizeof(layerNameBuffer) - 1);
         layerNameBuffer[sizeof(layerNameBuffer) - 1] = '\0';
 
         if (ImGui::InputText("Layer Name", layerNameBuffer, sizeof(layerNameBuffer)))
         {
-            m_TileLayer->SetLayerName(std::string(layerNameBuffer));
+            layer.SetName(std::string(layerNameBuffer));
         }
     }
 

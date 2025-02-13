@@ -48,6 +48,5 @@ void ToolSelectionPanel::Render()
 
     ImGui::PopID();
 
-
     ImGui::End();
 }

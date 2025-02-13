@@ -1,8 +1,8 @@
 #pragma once
 
-#include "TileLayer.h"
+#include "Layers.h"
+#include "Atlas.h"
 
-#include "Lumina/Renderer/TextureAtlas.h"
 #include "Lumina/Base.h"
 
 #include "json.hpp"
@@ -12,6 +12,6 @@
 class Project
 {
 public:
-    static void Save(const std::string& path, const Lumina::Ref<TileLayer>& tileLayer, const Lumina::Ref<Lumina::TextureAtlas>& atlas);
-    static void Load(const std::string& path, Lumina::Ref<TileLayer>& tileLayer, Lumina::Ref<Lumina::TextureAtlas>& atlas);
+    static void Save(const std::string& path, const Lumina::Ref<Layers>& layers, const Lumina::Ref<Atlas>& atlas);
+    static void Load(const std::string& path, Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas);
 };

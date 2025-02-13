@@ -17,11 +17,11 @@
 #include "Panels/TextureSelectionPanel.h"
 #include "Panels/TileViewportPanel.h"
 #include "Panels/LayerSelectionPanel.h"
-#include "Panels/AttributePanel.h"
 #include "Panels/ToolSelectionPanel.h"
 
 #include "Core/ToolModes.h"
-#include "Core/TileLayer.h"
+#include "Core/Layers.h"
+#include "Core/Atlas.h"
 
 class Editor : public Lumina::Layer
 {
@@ -41,10 +41,9 @@ public:
 
         m_HeaderPanel.Render();
         m_TextureSelectionPanel.Render();
-        m_TileViewportPanel.Render(m_TextureSelectionPanel.GetSelectedTexture());
+        m_TileViewportPanel.Render();
         m_ToolSelectionPanel.Render();
-        m_LayerSelectionPanel.Render();
-        m_AttributePanel.Render(); 
+        m_LayerSelectionPanel.Render(); 
     }
 
     virtual void OnAttach() override
@@ -52,12 +51,10 @@ public:
         ThemeManager::GetInstance().ApplyDarkTheme();
 
         // References
-        Lumina::Ref<TileLayer> layers = Lumina::CreateRef<TileLayer>();
-        Lumina::Ref<Lumina::TextureAtlas> atlas = Lumina::CreateRef<Lumina::TextureAtlas>();
+        Lumina::Ref<Layers> layers = Lumina::CreateRef<Layers>();
+        layers->Resize(16, 16);
+        Lumina::Ref<Atlas> atlas = Lumina::CreateRef<Atlas>();
         Lumina::Ref<ToolModes> modes = Lumina::CreateRef<ToolModes>();
-
-        // TODO: Only init the grid from new or load
-        layers->Create(25, 25);
 
         // Header
         m_HeaderPanel.SetTileLayers(layers);
@@ -74,10 +71,6 @@ public:
         // Layer Selection
         m_LayerSelectionPanel.SetTileLayer(layers);
 
-        // Tile Attribute
-        m_AttributePanel.SetTileLayers(layers);
-        m_AttributePanel.SetTextureAtlas(atlas);
-
         // Tool Selection
         m_ToolSelectionPanel.SetToolModes(modes);
     }
@@ -93,7 +86,6 @@ private:
     TextureSelectionPanel m_TextureSelectionPanel;
     TileViewportPanel m_TileViewportPanel;
 	LayerSelectionPanel m_LayerSelectionPanel;
-    AttributePanel m_AttributePanel;
     ToolSelectionPanel m_ToolSelectionPanel;
 
     // Util

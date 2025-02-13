@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Core/TileLayer.h"
+#include "../Core/Layers.h"
 #include "../Core/TileExporter.h"
+#include "../Core/Atlas.h"
 
-#include "Lumina/Renderer/TextureAtlas.h"
 #include "Lumina/Base.h"
 
 class HeaderPanel
@@ -11,8 +11,8 @@ class HeaderPanel
 public:
 	void Render();
 
-	void SetTextureAtlas(const Lumina::Ref<Lumina::TextureAtlas>& atlas) { m_TextureAtlas = atlas; }
-	void SetTileLayers(const Lumina::Ref<TileLayer>& layers) { m_TileLayers = layers; }
+	void SetTextureAtlas(const Lumina::Ref<Atlas>& atlas) { m_Atlas = atlas; }
+	void SetTileLayers(const Lumina::Ref<Layers>& layers) { m_Layers = layers; }
 private:
 	void RenderFile();
 	void RenderEdit();
@@ -21,8 +21,8 @@ private:
 	void RenderNewPopup();
 
 private:
-	Lumina::Ref<TileLayer> m_TileLayers;
-	Lumina::Ref<Lumina::TextureAtlas> m_TextureAtlas;
+	Lumina::Ref<Layers> m_Layers;
+	Lumina::Ref<Atlas> m_Atlas;
 
 	// New
 	bool m_ShowNewPopup = false;

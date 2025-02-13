@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "TileObject.h"
-void TileExporter::Export(Lumina::Ref<TileLayer>& layers, Lumina::Ref<Lumina::TextureAtlas>& atlas, std::string& filename)
+void TileExporter::Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, std::string& filename)
 {
     TileObject tileObject;
 
@@ -63,12 +63,12 @@ void TileExporter::Export(Lumina::Ref<TileLayer>& layers, Lumina::Ref<Lumina::Te
             FragColor = texColor;
         }
     )";
-
+#if 0
     Lumina::ShaderProgram shader;
     shader.SetSource(vertexShader, fragmetShader);
 
-    int outputWidth = layers->LayerWidth() * m_Resolution;
-    int outputHeight = layers->LayerHeight() * m_Resolution;
+    int outputWidth = layers->GetWidth() * m_Resolution;
+    int outputHeight = layers->GetHeight() * m_Resolution;
 
     glm::mat4 orthoProjection = glm::ortho(0.0f, float(layers->LayerWidth()), 0.0f, float(layers->LayerHeight()), -1.0f, 2.0f);
 
@@ -108,4 +108,5 @@ void TileExporter::Export(Lumina::Ref<TileLayer>& layers, Lumina::Ref<Lumina::Te
     renderer.End();
 
     renderer.SaveFrameBufferToImage(filename);
+#endif
 }

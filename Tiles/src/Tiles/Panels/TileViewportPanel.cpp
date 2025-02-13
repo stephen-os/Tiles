@@ -1,27 +1,27 @@
 #include "TileViewportPanel.h"
 
+#include "../Core/Tools.h"
+
 #include <algorithm>
 
-void TileViewportPanel::Render(int selectedTexture) {
+void TileViewportPanel::Render() 
+{
+    if (!m_Layers) return;
+
     ImGui::Begin("Scene");
 
-    if (!m_TileLayers) return;
-
-    HandleScrolling();
-
-    RenderTileGrid();
-    RenderLayerTiles(selectedTexture);
+    HandleInput();
+    RenderBackground();
+    RenderTiles();
 
     ImGui::End();
 }
 
-#include <iostream>
-
-void TileViewportPanel::RenderTileGrid()
+void TileViewportPanel::RenderBackground()
 {
     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-    float gridWidth = m_TileLayers->LayerWidth() * TILE_SIZE * m_Zoom;
-    float gridHeight = m_TileLayers->LayerHeight() * TILE_SIZE * m_Zoom;
+    float gridWidth = m_Layers->GetWidth() * TILE_SIZE * m_Zoom;
+    float gridHeight = m_Layers->GetHeight() * TILE_SIZE * m_Zoom;
 
     // Define checkerboard properties
     float scaledSize = CHECKERBOARD_SIZE * m_Zoom;
@@ -40,10 +40,10 @@ void TileViewportPanel::RenderTileGrid()
         }
     }
 
-    // Render tile grid on top of checkerboard
-    for (size_t y = 0; y < m_TileLayers->LayerHeight(); y++)
+    // Render grid on top of checkerboard
+    for (size_t y = 0; y < m_Layers->GetWidth(); y++)
     {
-        for (size_t x = 0; x < m_TileLayers->LayerWidth(); x++)
+        for (size_t x = 0; x < m_Layers->GetHeight(); x++)
         {
             float offset = TILE_SIZE * m_Zoom;
             ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
@@ -55,31 +55,35 @@ void TileViewportPanel::RenderTileGrid()
     }
 }
 
-void TileViewportPanel::RenderLayerTiles(int selectedTexture)
+void TileViewportPanel::RenderTiles()
 {
-    for (size_t layer = 0; layer < m_TileLayers->LayerSize(); layer++)
+    for (size_t l = 0; l < m_Layers->GetSize(); l++)
     {
-        if (!m_TileLayers->IsLayerVisible(layer)) continue;
+        Layer& layer = m_Layers->GetLayer(l);
 
-        for (size_t y = 0; y < m_TileLayers->LayerHeight(); y++)
+        if (!layer.GetVisibility()) continue;
+
+        for (size_t y = 0; y < layer.GetHeight(); y++)
         {
-            for (size_t x = 0; x < m_TileLayers->LayerWidth(); x++)
+            for (size_t x = 0; x < layer.GetWidth(); x++)
             {
-                TileData& tile = m_TileLayers->GetTile(layer, y, x);
+                Tile& tile = layer.GetTile(y, x);
+
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
                 float offset = TILE_SIZE * m_Zoom;
                 ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
                 ImVec2 tileMax(tileMin.x + offset, tileMin.y + offset);
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0))
-                    HandleTileSelection(layer, x, y, selectedTexture);
+                {
+                    if (l == m_Layers->GetActiveLayer())
+                        HandleTileSelection(layer, tile, y, x);
+                } 
 
-                if (tile.TextureIndex != -1)
-                    DrawTileTexture(tile, tileMin, tileMax);
+                DrawTile(tile, tileMin, tileMax);
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
-                    m_TileLayers->SetLastMousePosition({ layer, y, x });
                     ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
                 }
             }
@@ -87,40 +91,38 @@ void TileViewportPanel::RenderLayerTiles(int selectedTexture)
     }
 }
 
-void TileViewportPanel::HandleTileSelection(int layer, int x, int y, int selectedTexture)
+void TileViewportPanel::HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x)
 {
-    TileData& tile = m_TileLayers->GetTile(layer, y, x);
+    if (m_Atlas->IsTextureSelected())
+    {
+        if (m_ToolModes->Fill)
+            Tools::Fill(layer, m_Atlas->GetSelectedTexture(), y, x);
+        else
+            tile.SetTextureIndex(m_Atlas->GetSelectedTexture());
 
-    if (m_TileLayers->GetActiveLayer() == layer) {
-        if (selectedTexture >= 0) {
-            if (m_ToolModes->Fill)
-            {
-                m_TileLayers->FillLayer(selectedTexture, y, x);
-            }
-            else {
-                tile.TextureIndex = selectedTexture;
-            }
-
-            if (m_ToolModes->Erase)
-            {
-                m_TileLayers->ResetTile(y, x);
-            }
+        if (m_ToolModes->Erase)
+        {
+            tile.Reset();
         }
     }
 }
 
-void TileViewportPanel::DrawTileTexture(const TileData& tile, ImVec2 tileMin, ImVec2 tileMax) {
-    if (!m_TextureAtlas) return;
+void TileViewportPanel::DrawTile(const Tile& tile, ImVec2 tileMin, ImVec2 tileMax)
+{
+    if (!m_Atlas) return;
 
-    intptr_t textureID = (intptr_t)m_TextureAtlas->GetTextureID();
-    glm::vec4 texCoords = m_TextureAtlas->GetTexCoords(static_cast<int>(tile.TextureIndex));
-    ImVec2 uvMin(texCoords.x, texCoords.y);
-    ImVec2 uvMax(texCoords.z, texCoords.w);
+    if (tile.UseTexture())
+    {
+        intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
+        glm::vec4 texCoords = m_Atlas->GetTexCoords(tile.GetTextureIndex());
+        ImVec2 uvMin(texCoords.x, texCoords.y);
+        ImVec2 uvMax(texCoords.z, texCoords.w);
 
-    ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, uvMin, uvMax, FILL_COLOR);
+        ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, uvMin, uvMax, FILL_COLOR);
+    }
 }
 
-void TileViewportPanel::HandleScrolling()
+void TileViewportPanel::HandleInput()
 {
     if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) 
     {

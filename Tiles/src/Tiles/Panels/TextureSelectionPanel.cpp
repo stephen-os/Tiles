@@ -13,7 +13,7 @@ void TextureSelectionPanel::Render()
     RenderAtlasPathSection();
     RenderFileDialog();
 
-    if (m_TextureAtlas->IsCreated()) 
+    if (m_Atlas->IsCreated()) 
     {
         RenderAtlasDimensionsSection(); 
         ImGui::Separator();
@@ -77,13 +77,8 @@ void TextureSelectionPanel::HandleAtlasFileSelection(const std::string& newPath)
     if (std::filesystem::exists(newPath)) 
     {
         m_TextureAtlasPath = newPath;
-        LoadTextureAtlas();
+        m_Atlas->Create(m_TextureAtlasPath, m_TextureAtlasWidth, m_TextureAtlasHeight);
     }
-}
-
-void TextureSelectionPanel::LoadTextureAtlas() 
-{
-    m_TextureAtlas->CreateAtlas(m_TextureAtlasPath, m_TextureAtlasWidth, m_TextureAtlasHeight);
 }
 
 void TextureSelectionPanel::RenderAtlasDimensionsSection() 
@@ -104,9 +99,9 @@ void TextureSelectionPanel::UpdateAtlasDimensions(int& dimension, const char* la
     if (ImGui::InputInt(("##" + std::string(label)).c_str(), &tempDimension)) 
     {
         dimension = std::max(1, tempDimension);
-        if (m_TextureAtlas->IsCreated())
+        if (m_Atlas->IsCreated())
         {
-            m_TextureAtlas->CalculateTexCoords(m_TextureAtlasWidth, m_TextureAtlasHeight);
+            m_Atlas->UpdateTexCoords(m_TextureAtlasWidth, m_TextureAtlasHeight);
         }
     }
 }
@@ -121,8 +116,8 @@ void TextureSelectionPanel::RenderTextureGrid()
     ImVec2 position = ImGui::GetCursorScreenPos();
     
     // Compute the full size based on tile size and grid count
-    float atlasWidthPixels = m_TextureAtlas->GetGridWidth() * TEXTURE_BUTTON_SIZE;
-    float atlasHeightPixels = m_TextureAtlas->GetGridHeight() * TEXTURE_BUTTON_SIZE;
+    float atlasWidthPixels = m_Atlas->GetWidth() * TEXTURE_BUTTON_SIZE;
+    float atlasHeightPixels = m_Atlas->GetHeight() * TEXTURE_BUTTON_SIZE;
 
     // Render checkerboard
     for (float y = position.y; y < position.y + atlasHeightPixels; y += CHECKERBOARD_SIZE)
@@ -138,14 +133,14 @@ void TextureSelectionPanel::RenderTextureGrid()
     }
 
     // Render texture grid on top of the checkerboard
-    for (int y = 0; y < m_TextureAtlas->GetGridHeight(); ++y)
+    for (int y = 0; y < m_Atlas->GetHeight(); ++y)
     {
-        for (int x = 0; x < m_TextureAtlas->GetGridWidth(); ++x)
+        for (int x = 0; x < m_Atlas->GetWidth(); ++x)
         {
-            int index = y * m_TextureAtlas->GetGridWidth() + x;
+            int index = y * m_Atlas->GetWidth() + x;
             RenderTextureGridItem(index, x, y);
 
-            if ((index + 1) % m_TextureAtlas->GetGridWidth() != 0)
+            if ((index + 1) % m_Atlas->GetWidth() != 0)
                 ImGui::SameLine();
         }
     }
@@ -153,26 +148,33 @@ void TextureSelectionPanel::RenderTextureGrid()
     ImGui::PopStyleVar(4);
 }
 
+#include <iostream>
+
 void TextureSelectionPanel::RenderTextureGridItem(int index, int x, int y)
 {
-    glm::vec4 texCoords = m_TextureAtlas->GetTexCoords(index);
+    glm::vec4 texCoords = m_Atlas->GetTexCoords(index);
     ImVec2 buttonSize(TEXTURE_BUTTON_SIZE, TEXTURE_BUTTON_SIZE);
     ImVec2 xy(texCoords.x, texCoords.y);
     ImVec2 zw(texCoords.z, texCoords.w);
-    intptr_t textureID = (intptr_t)m_TextureAtlas->GetTextureID();
+    intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
 
     // Render texture with full transparency support
     ImGui::Image((void*)textureID, buttonSize, xy, zw, ImVec4(1, 1, 1, 1), ImVec4(0, 0, 0, 0));
 
     // Handle selection
     if (ImGui::IsItemClicked())
-        m_SelectedTexture = (m_SelectedTexture == index) ? -1 : index;
+    {
+        if (index == m_Atlas->GetSelectedTexture())
+            m_Atlas->DeselectTexture();
+        else
+            m_Atlas->SelectTexture(index);
+    }
 
     ImVec2 min = ImGui::GetItemRectMin();
     ImVec2 max = ImGui::GetItemRectMax();
 
     // Highlight selected texture or default grid
-    if (index == m_SelectedTexture)
+    if (index == m_Atlas->GetSelectedTexture())
         ImGui::GetWindowDrawList()->AddRect(min, max, SELECTION_BORDER_COLOR, 0.0f, 0, 2.5f);
     else
         ImGui::GetWindowDrawList()->AddRect(min, max, DEAULT_BORDER_COLOR, 0.0f, 0, 1.0f);
@@ -181,7 +183,6 @@ void TextureSelectionPanel::RenderTextureGridItem(int index, int x, int y)
 
 void TextureSelectionPanel::Reset() 
 {
-    m_SelectedTexture = -1;
     m_TextureAtlasPath.clear();
     m_TextureAtlasWidth = 16;
     m_TextureAtlasHeight = 16;

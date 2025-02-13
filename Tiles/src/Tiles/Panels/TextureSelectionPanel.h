@@ -1,8 +1,9 @@
 // TextureSelectionPanel.h
 #pragma once
 
-#include "Lumina/Renderer/TextureAtlas.h"
 #include "Lumina/Base.h"
+
+#include "../Core/Atlas.h"
 
 #include <string>
 
@@ -11,14 +12,13 @@
 class TextureSelectionPanel 
 {
 public:
+	TextureSelectionPanel() = default;
+    ~TextureSelectionPanel() = default;
+
     void Render();
     void Reset();
-
-    // Accessors
-    int GetSelectedTexture() const { return m_SelectedTexture; }
-    void SetTextureAtlas(Lumina::Ref<Lumina::TextureAtlas> atlas) { m_TextureAtlas = atlas; }
-    bool IsAtlasLoaded() const { return m_IsAtlasLoaded; }
-
+    // Setters
+    void SetTextureAtlas(Lumina::Ref<Atlas> atlas) { m_Atlas = atlas; }
 private:
     // UI Rendering Methods
     void RenderAtlasPathSection();
@@ -28,7 +28,6 @@ private:
 
     // Helper Methods
     void HandleAtlasFileSelection(const std::string& newPath);
-    void LoadTextureAtlas();
     void UpdateAtlasDimensions(int& dimension, const char* label);
     void RenderTextureGridItem(int index, int x, int y);
 
@@ -38,13 +37,11 @@ private:
 
 private:
     // Texture Atlas State
-    Lumina::Ref<Lumina::TextureAtlas> m_TextureAtlas;
+    Lumina::Ref<Atlas> m_Atlas;
 
     std::string m_TextureAtlasPath;
     int m_TextureAtlasWidth = 16;
     int m_TextureAtlasHeight = 16;
-    int m_SelectedTexture = -1;
-    bool m_IsAtlasLoaded = false;
 
     // Constants
     static constexpr float TEXTURE_BUTTON_SIZE = 40.0f;
