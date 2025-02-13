@@ -43,7 +43,6 @@ void Project::Save(const std::string& path, const Lumina::Ref<Layers>& layers, c
             {
                 Tile tile = layer.GetTile(y, x);
                 jsonRow.push_back({
-                    {"texture_used", tile.UseTexture()},
                     {"texture_index", tile.GetTextureIndex()}
                 });
             }
@@ -82,32 +81,33 @@ void Project::Load(const std::string& path, Lumina::Ref<Layers>& layers, Lumina:
 
     // Load TextureAtlas
     std::string atlasPath = jsonProject.value("atlas_path", "");
-    int atlasWidth = jsonProject.value("atlas_grid_width", 0);
-    int atlasHeight = jsonProject.value("atlas_grid_height", 0);
+    int atlasWidth = jsonProject.value("atlas_width", 0);
+    int atlasHeight = jsonProject.value("atlas_height", 0);
 
     atlas->Create(atlasPath, atlasWidth, atlasHeight);
 
     // layers needs a create method that resets all attributes
-#if 0
-    size_t layerWidth = jsonProject.value("tilelayer_width", 0);
-	size_t layerHeight = jsonProject.value("tilelayer_height", 0);
-	layers->Create(layerWidth, layerHeight);
+
+    size_t layerWidth = jsonProject.value("layers_width", 0);
+	size_t layerHeight = jsonProject.value("layers_height", 0);
+    layers->Clear();
+	layers->Resize(layerWidth, layerHeight);
 
     // Load TileLayers
     for (const auto& jsonLayer : jsonProject["layers"])
     {
         std::string layerName = jsonLayer.at("name").get<std::string>();
-        tileLayer->AddLayer(layerName);
-        size_t layerIndex = tileLayer->LayerSize() - 1;
+        layers->NewLayer();
+        Layer& layer = layers->GetLayer(layers->GetActiveLayer());
 
-        for (size_t y = 0; y < layerWidth; y++)
+        for (size_t y = 0; y < layer.GetHeight(); y++)
         {
-            for (size_t x = 0; x < layerWidth; x++)
+            for (size_t x = 0; x < layer.GetWidth(); x++)
             {
-                TileData& tile = tileLayer->GetTile(layerIndex, y, x);
-                tile.TextureIndex = jsonLayer["tiles"][y][x]["texture_index"].get<size_t>();
+                Tile& tile = layer.GetTile(y, x);
+                tile.SetTextureIndex(jsonLayer["tiles"][y][x]["texture_index"].get<int>());
             }
         }
     }
-#endif
+
 }

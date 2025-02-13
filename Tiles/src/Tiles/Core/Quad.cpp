@@ -1,11 +1,5 @@
-#include "TileObject.h"
-
-TileObject::TileObject()
-{
-    InitializeGeometry();
-}
-
-void TileObject::InitializeGeometry()
+#include "Quad.h"
+Quad::Quad()
 {
     std::vector<float> vertices =
     {
@@ -21,7 +15,6 @@ void TileObject::InitializeGeometry()
         0, 1, 2,
         2, 3, 0
     };
-
 
     // Create Vertex Buffer
     Lumina::Ref<Lumina::VertexBuffer> vertexBuffer = std::make_shared<Lumina::VertexBuffer>(

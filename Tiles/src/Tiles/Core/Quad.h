@@ -4,17 +4,15 @@
 #include <vector>
 
 #include "Lumina/Renderer/VertexArray.h"
-#include "Lumina/Renderer/ShaderProgram.h"
+#include "Lumina/Base.h"
 
-#include "Lumina/Renderer/Transform.h"
-#include "Lumina/Renderer/TextureAtlas.h"
-
-class TileObject {
+class Quad 
+{
 public:
-    TileObject();
+    Quad();
+    ~Quad() = default;
+
     const Lumina::Ref<Lumina::VertexArray>& GetVertexArray() { return m_VertexArray; }
-private:
-    void InitializeGeometry();
 private:
     Lumina::Ref<Lumina::VertexArray> m_VertexArray;
 };

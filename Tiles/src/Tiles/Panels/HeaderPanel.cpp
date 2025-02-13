@@ -87,10 +87,9 @@ void HeaderPanel::RenderFile()
     {
         if (ImGuiFileDialog::Instance()->IsOk())
         {
-            TileExporter exporter; 
+            Exporter exporter; 
             std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-            // Fix
-            // exporter.Export(m_Layers, m_Atlas, filePath);
+            exporter.Export(m_Layers, m_Atlas, filePath);
         }
         ImGuiFileDialog::Instance()->Close();
     }

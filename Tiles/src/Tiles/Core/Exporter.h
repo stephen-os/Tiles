@@ -5,7 +5,7 @@
 
 #include "Lumina/Base.h"
 
-class TileExporter
+class Exporter
 {
 public:
 	int& GetResolution() { return m_Resolution; }

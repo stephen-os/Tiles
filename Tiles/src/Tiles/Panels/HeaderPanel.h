@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Core/Layers.h"
-#include "../Core/TileExporter.h"
+#include "../Core/Exporter.h"
 #include "../Core/Atlas.h"
 
 #include "Lumina/Base.h"
