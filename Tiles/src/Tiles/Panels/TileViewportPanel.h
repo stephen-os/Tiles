@@ -7,6 +7,7 @@
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 #include "../Core/Tile.h"
+#include "../Core/State.h"
 
 #include "imgui.h"
 
@@ -22,22 +23,25 @@ public:
     void SetTextureAtlas(const Lumina::Ref<Atlas>& atlas) { m_Atlas = atlas; }
     void SetTileLayers(const Lumina::Ref<Layers>& layers) { m_Layers = layers; }
     void SetToolModes(const Lumina::Ref<ToolModes>& modes) { m_ToolModes = modes; }
+    void SetState(const Lumina::Ref<State>& state) { m_State = state; }
 
 private:
     // UI Rendering Methods
     void RenderBackground();
     void RenderTiles();
-    void HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x);
+    void HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x, ImVec2 tilePos);
     void DrawTile(const Tile& tile, ImVec2 tileMin, ImVec2 tileMax);
     void HandleInput();
 
 private:
     float m_Zoom = 1.0f;
-    ImVec2 m_MousePosition = ImVec2(0.0f, 0.0f);
+    bool m_IsMouseDragging = false;  // Track if we're in the middle of a drag
+    ImVec2 m_LastMousePosition = ImVec2(-1, -1);  // Track last modified tile position
 
     Lumina::Ref<Layers> m_Layers;
     Lumina::Ref<Atlas> m_Atlas;
     Lumina::Ref<ToolModes> m_ToolModes;
+    Lumina::Ref<State> m_State;
 
     // Constants
     static constexpr float TILE_SIZE = 40.0f;

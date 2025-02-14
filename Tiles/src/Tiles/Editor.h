@@ -22,6 +22,7 @@
 #include "Core/ToolModes.h"
 #include "Core/Layers.h"
 #include "Core/Atlas.h"
+#include "Core/State.h"
 
 class Editor : public Lumina::Layer
 {
@@ -53,17 +54,24 @@ public:
         // References
         Lumina::Ref<Layers> layers = Lumina::CreateRef<Layers>();
         layers->Resize(16, 16);
+
         Lumina::Ref<Atlas> atlas = Lumina::CreateRef<Atlas>();
+
         Lumina::Ref<ToolModes> modes = Lumina::CreateRef<ToolModes>();
+
+        Lumina::Ref<State> state = Lumina::CreateRef<State>();
+        state->SetTileLayers(layers);
 
         // Header
         m_HeaderPanel.SetTileLayers(layers);
         m_HeaderPanel.SetTextureAtlas(atlas);
+        m_HeaderPanel.SetState(state);
 
         // Viewport
         m_TileViewportPanel.SetTileLayers(layers);
         m_TileViewportPanel.SetTextureAtlas(atlas);
         m_TileViewportPanel.SetToolModes(modes);
+		m_TileViewportPanel.SetState(state);
 
         // Texture Selection
         m_TextureSelectionPanel.SetTextureAtlas(atlas);

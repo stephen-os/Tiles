@@ -8,7 +8,9 @@
 class Layer
 {
 public:
+	Layer() = default;
 	Layer(size_t width, size_t height, const std::string& name);
+	~Layer() = default;
 
 	// Utility
 	void Clear();

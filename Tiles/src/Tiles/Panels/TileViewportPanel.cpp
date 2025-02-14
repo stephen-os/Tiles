@@ -66,7 +66,6 @@ void TileViewportPanel::RenderTiles()
     for (size_t l = 0; l < m_Layers->GetSize(); l++)
     {
         Layer& layer = m_Layers->GetLayer(l);
-
         if (!layer.GetVisibility()) continue;
 
         for (size_t y = 0; y < layer.GetHeight(); y++)
@@ -74,42 +73,80 @@ void TileViewportPanel::RenderTiles()
             for (size_t x = 0; x < layer.GetWidth(); x++)
             {
                 Tile& tile = layer.GetTile(y, x);
-
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
                 float offset = TILE_SIZE * m_Zoom;
                 ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
                 ImVec2 tileMax(tileMin.x + offset, tileMin.y + offset);
 
-                if (ImGui::IsMouseHoveringRect(tileMin, tileMax) && ImGui::IsMouseDown(0))
-                {
-                    if (l == m_Layers->GetActiveLayer())
-                        HandleTileSelection(layer, tile, y, x);
-                } 
-
-                DrawTile(tile, tileMin, tileMax);
-
+                // Only handle tile selection on mouse press, not hold
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
+                    if (l == m_Layers->GetActiveLayer())
+                    {
+                        HandleTileSelection(layer, tile, y, x, tileMin);
+                    }
+
+                    // Highlight hovered tile
                     ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
                 }
+
+                DrawTile(tile, tileMin, tileMax);
             }
         }
     }
+
+    // Reset drag state when mouse is released
+    if (!ImGui::IsMouseDown(0))
+    {
+        m_IsMouseDragging = false;
+        m_LastMousePosition = ImVec2(-1, -1);
+    }
 }
 
-void TileViewportPanel::HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x)
-{
-    if (m_Atlas->IsTextureSelected())
-    {
-        if (m_ToolModes->Fill)
-            Tools::Fill(layer, m_Atlas->GetSelectedTexture(), y, x);
-        else
-            tile.SetTextureIndex(m_Atlas->GetSelectedTexture());
-    }
 
-    if (m_ToolModes->Erase)
+void TileViewportPanel::HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x, ImVec2 tilePos)
+{
+    // Convert current tile position to ImVec2 for comparison
+    ImVec2 currentTilePos(x, y);
+
+    // Only process if mouse is just clicked or if we've moved to a new tile while dragging
+    bool isNewClick = ImGui::IsMouseClicked(0) && !m_IsMouseDragging;
+    bool isNewTileDuringDrag = ImGui::IsMouseDown(0) && m_IsMouseDragging &&
+        (currentTilePos.x != m_LastMousePosition.x ||
+            currentTilePos.y != m_LastMousePosition.y);
+
+    if (isNewClick || isNewTileDuringDrag)
     {
-        tile.Reset();
+        if (m_Atlas->IsTextureSelected())
+        {
+            if (m_ToolModes->Fill)
+            {
+                // Fill tool should only trigger on new clicks, not during drag
+                if (isNewClick)
+                {
+                    m_State->PushLayer(m_Layers->GetActiveLayer(), layer, StateType::Layer_Replace);
+                    Tools::Fill(layer, m_Atlas->GetSelectedTexture(), y, x);
+                }
+            }
+            else
+            {
+                m_State->PushTile(y, x, tile);
+                tile.SetTextureIndex(m_Atlas->GetSelectedTexture());
+            }
+        }
+
+        if (m_ToolModes->Erase)
+        {
+            m_State->PushTile(y, x, tile);
+            tile.Reset();
+        }
+
+        // Update tracking variables
+        m_LastMousePosition = currentTilePos;
+        if (isNewClick)
+        {
+            m_IsMouseDragging = true;
+        }
     }
 }
 

@@ -101,6 +101,7 @@ void HeaderPanel::RenderEdit()
     {
         if (ImGui::MenuItem("Undo"))
         {
+            m_State->Undo();
         }
         if (ImGui::MenuItem("Redo"))
         {

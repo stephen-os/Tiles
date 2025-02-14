@@ -3,6 +3,7 @@
 #include "../Core/Layers.h"
 #include "../Core/Exporter.h"
 #include "../Core/Atlas.h"
+#include "../Core/State.h"
 
 #include "Lumina/Base.h"
 
@@ -13,6 +14,7 @@ public:
 
 	void SetTextureAtlas(const Lumina::Ref<Atlas>& atlas) { m_Atlas = atlas; }
 	void SetTileLayers(const Lumina::Ref<Layers>& layers) { m_Layers = layers; }
+	void SetState(const Lumina::Ref<State>& state) { m_State = state; }
 private:
 	void RenderFile();
 	void RenderEdit();
@@ -23,6 +25,7 @@ private:
 private:
 	Lumina::Ref<Layers> m_Layers;
 	Lumina::Ref<Atlas> m_Atlas;
+	Lumina::Ref<State> m_State;
 
 	// New
 	bool m_ShowNewPopup = false;

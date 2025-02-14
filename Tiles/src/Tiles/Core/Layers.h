@@ -18,6 +18,11 @@ public:
 	void Resize(size_t width, size_t height);
 	void Clear();
 
+	// Util for State
+	void RemoveLayer(size_t layer);
+	void InsertLayer(size_t index, Layer layer); 
+	void SetTile(size_t y, size_t x, Tile tile);
+
 	// Setters
 	void SetActiveLayer(size_t layer) { m_ActiveLayer = layer; }
 
