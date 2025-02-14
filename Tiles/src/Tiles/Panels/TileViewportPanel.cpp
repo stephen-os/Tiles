@@ -25,35 +25,49 @@ void TileViewportPanel::RenderBackground()
 
     // Define checkerboard properties
     float scaledSize = CHECKERBOARD_SIZE * m_Zoom;
+    int numCheckerCols = static_cast<int>(gridWidth / scaledSize);
+    int numCheckerRows = static_cast<int>(gridHeight / scaledSize);
 
     // Render checkerboard background
-    for (float y = cursorPos.y; y < cursorPos.y + gridHeight; y += scaledSize)
+    for (int row = 0; row < numCheckerRows; row++)
     {
-        for (float x = cursorPos.x; x < cursorPos.x + gridWidth; x += scaledSize)
+        for (int col = 0; col < numCheckerCols; col++)
         {
-            ImVec2 minPos = ImVec2(x, y);
-            ImVec2 maxPos = ImVec2(x + scaledSize, y + scaledSize);
+            float x = cursorPos.x + col * scaledSize;
+            float y = cursorPos.y + row * scaledSize;
 
-            ImU32 fillColor = (((int)(x / scaledSize) + (int)(y / scaledSize)) % 2 == 0) ? CHECKERBOARD_COLOR_1 : CHECKERBOARD_COLOR_2;
+            ImVec2 minPos = ImVec2(x, y);
+            ImVec2 maxPos = ImVec2(std::min(x + scaledSize, cursorPos.x + gridWidth),
+                std::min(y + scaledSize, cursorPos.y + gridHeight));
+
+            ImU32 fillColor = ((col + row) % 2 == 0) ? CHECKERBOARD_COLOR_1 : CHECKERBOARD_COLOR_2;
 
             ImGui::GetWindowDrawList()->AddRectFilled(minPos, maxPos, fillColor);
         }
     }
 
     // Render grid on top of checkerboard
-    for (size_t y = 0; y < m_Layers->GetWidth(); y++)
-    {
-        for (size_t x = 0; x < m_Layers->GetHeight(); x++)
-        {
-            float offset = TILE_SIZE * m_Zoom;
-            ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
-            ImVec2 tileMax(tileMin.x + offset, tileMin.y + offset);
+    float tileSize = TILE_SIZE * m_Zoom;
+    int numGridCols = static_cast<int>(gridWidth / tileSize);
+    int numGridRows = static_cast<int>(gridHeight / tileSize);
 
-            // Only render the grid outline, remove the filled background
-            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, OUTLINE_COLOR);
-        }
+    for (int row = 0; row <= numGridRows; row++)
+    {
+        float y = cursorPos.y + row * tileSize;
+        ImVec2 p1(cursorPos.x, y);
+        ImVec2 p2(cursorPos.x + gridWidth, y);
+        ImGui::GetWindowDrawList()->AddLine(p1, p2, OUTLINE_COLOR);
+    }
+
+    for (int col = 0; col <= numGridCols; col++)
+    {
+        float x = cursorPos.x + col * tileSize;
+        ImVec2 p1(x, cursorPos.y);
+        ImVec2 p2(x, cursorPos.y + gridHeight);
+        ImGui::GetWindowDrawList()->AddLine(p1, p2, OUTLINE_COLOR);
     }
 }
+
 
 void TileViewportPanel::RenderTiles()
 {
