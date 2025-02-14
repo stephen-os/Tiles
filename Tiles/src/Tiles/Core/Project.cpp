@@ -96,9 +96,11 @@ void Project::Load(const std::string& path, Lumina::Ref<Layers>& layers, Lumina:
     // Load TileLayers
     for (const auto& jsonLayer : jsonProject["layers"])
     {
-        std::string layerName = jsonLayer.at("name").get<std::string>();
         layers->NewLayer();
         Layer& layer = layers->GetLayer(layers->GetActiveLayer());
+
+        std::string layerName = jsonLayer.at("name").get<std::string>();
+        layer.SetName(layerName); 
 
         for (size_t y = 0; y < layer.GetHeight(); y++)
         {
