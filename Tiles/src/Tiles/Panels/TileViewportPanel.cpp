@@ -99,11 +99,11 @@ void TileViewportPanel::HandleTileSelection(Layer& layer, Tile& tile, size_t y, 
             Tools::Fill(layer, m_Atlas->GetSelectedTexture(), y, x);
         else
             tile.SetTextureIndex(m_Atlas->GetSelectedTexture());
+    }
 
-        if (m_ToolModes->Erase)
-        {
-            tile.Reset();
-        }
+    if (m_ToolModes->Erase)
+    {
+        tile.Reset();
     }
 }
 
