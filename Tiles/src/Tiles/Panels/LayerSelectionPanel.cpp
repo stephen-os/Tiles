@@ -1,4 +1,4 @@
-#include "LayerSelectionPanel.h"
+﻿#include "LayerSelectionPanel.h"
 
 #include "../Core/Layer.h"
 
@@ -51,6 +51,7 @@ void LayerSelectionPanel::Render()
 
     if (ImGui::Button("Add Layer"))
     {
+        m_State->PushLayer(m_Layers->GetActiveLayer(), Layer(), StateType::Layer_Insert);
         m_Layers->NewLayer();
     }
 
@@ -58,6 +59,7 @@ void LayerSelectionPanel::Render()
 
     if (ImGui::Button("Delete Layer"))
     {
+        m_State->PushLayer(m_Layers->GetActiveLayer(), Layer(), StateType::Layer_Delete);
         m_Layers->DeleteLayer();
     }
 
@@ -65,6 +67,7 @@ void LayerSelectionPanel::Render()
 
     if (ImGui::Button("Clear Layer"))
     {
+        m_State->PushLayer(m_Layers->GetActiveLayer(), Layer(), StateType::Layer_Replace);
         m_Layers->ClearLayer();
     }
 

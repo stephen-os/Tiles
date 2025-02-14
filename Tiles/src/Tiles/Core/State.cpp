@@ -90,7 +90,7 @@ void State::Undo()
         break;
 
     case StateType::Layer_Replace:
-        m_Layers->GetLayer(action.Index) = action.Layer;
+        m_Layers->GetLayer(action.Index) = Layer(action.Layer);
         break;
 
     case StateType::Tile_Replace:

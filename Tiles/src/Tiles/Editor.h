@@ -78,6 +78,7 @@ public:
 
         // Layer Selection
         m_LayerSelectionPanel.SetTileLayer(layers);
+        m_LayerSelectionPanel.SetState(state);
 
         // Tool Selection
         m_ToolSelectionPanel.SetToolModes(modes);
