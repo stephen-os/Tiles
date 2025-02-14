@@ -47,27 +47,19 @@ void TileViewportPanel::RenderBackground()
     }
 
     // Render grid on top of checkerboard
-    float tileSize = TILE_SIZE * m_Zoom;
-    int numGridCols = static_cast<int>(gridWidth / tileSize);
-    int numGridRows = static_cast<int>(gridHeight / tileSize);
-
-    for (int row = 0; row <= numGridRows; row++)
+    for (size_t y = 0; y < m_Layers->GetWidth(); y++)
     {
-        float y = cursorPos.y + row * tileSize;
-        ImVec2 p1(cursorPos.x, y);
-        ImVec2 p2(cursorPos.x + gridWidth, y);
-        ImGui::GetWindowDrawList()->AddLine(p1, p2, OUTLINE_COLOR);
-    }
+        for (size_t x = 0; x < m_Layers->GetHeight(); x++)
+        {
+            float offset = TILE_SIZE * m_Zoom;
+            ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
+            ImVec2 tileMax(tileMin.x + offset, tileMin.y + offset);
 
-    for (int col = 0; col <= numGridCols; col++)
-    {
-        float x = cursorPos.x + col * tileSize;
-        ImVec2 p1(x, cursorPos.y);
-        ImVec2 p2(x, cursorPos.y + gridHeight);
-        ImGui::GetWindowDrawList()->AddLine(p1, p2, OUTLINE_COLOR);
+            // Only render the grid outline, remove the filled background
+            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, OUTLINE_COLOR);
+        }
     }
 }
-
 
 void TileViewportPanel::RenderTiles()
 {
