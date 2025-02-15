@@ -2,11 +2,10 @@
 
 #include <stack>
 
-#include "Lumina/Base.h"
-
 #include "Layers.h"
 #include "Layer.h"
 #include "Tile.h"
+#include "Base.h"
 
 namespace Tiles
 {
@@ -39,7 +38,7 @@ namespace Tiles
 		State() = default;
 		~State() = default;
 
-		void SetTileLayers(Lumina::Ref<Layers> layers) { m_Layers = layers; }
+		void SetTileLayers(Shared<Layers> layers) { m_Layers = layers; }
 
 		void PushLayer(size_t index, Layer& layer, StateType type = StateType::Layer_Replace);
 		void PushTile(size_t y, size_t x, Tile& tile);
@@ -49,7 +48,7 @@ namespace Tiles
 	private:
 		void Trim();
 	private:
-		Lumina::Ref<Layers> m_Layers;
+		Shared<Layers> m_Layers;
 
 		std::stack<Action> m_UndoStack;
 		std::stack<Action> m_RedoStack;

@@ -8,7 +8,6 @@
 
 #include "Lumina/Utils/Timer.h"
 #include "Lumina/Utils/FileReader.h"
-#include "Lumina/Base.h"
 
 // Client
 #include "Theme/ThemeManager.h"
@@ -23,6 +22,7 @@
 #include "Core/Layers.h"
 #include "Core/Atlas.h"
 #include "Core/State.h"
+#include "Core/Base.h"
 
 class Editor : public Lumina::Layer
 {
@@ -52,36 +52,36 @@ public:
         Tiles::ThemeManager::GetInstance().ApplyDarkTheme();
 
         // References
-        Lumina::Ref<Tiles::Layers> layers = Lumina::CreateRef<Tiles::Layers>();
-        layers->Resize(16, 16);
+        m_Layers = Tiles::MakeShared<Tiles::Layers>();
+        m_Layers->Resize(16, 16);
 
-        Lumina::Ref<Tiles::Atlas> atlas = Lumina::CreateRef<Tiles::Atlas>();
+        m_Atlas = Tiles::MakeShared<Tiles::Atlas>();
 
-        Lumina::Ref<Tiles::ToolModes> modes = Lumina::CreateRef<Tiles::ToolModes>();
+        m_Modes = Tiles::MakeShared<Tiles::ToolModes>();
 
-        Lumina::Ref<Tiles::State> state = Lumina::CreateRef<Tiles::State>();
-        state->SetTileLayers(layers);
+        m_State = Tiles::MakeShared<Tiles::State>();
+        m_State->SetTileLayers(m_Layers);
 
         // Header
-        m_HeaderPanel.SetTileLayers(layers);
-        m_HeaderPanel.SetTextureAtlas(atlas);
-        m_HeaderPanel.SetState(state);
+        m_HeaderPanel.SetTileLayers(m_Layers);
+        m_HeaderPanel.SetTextureAtlas(m_Atlas);
+        m_HeaderPanel.SetState(m_State);
 
         // Viewport
-        m_TileViewportPanel.SetTileLayers(layers);
-        m_TileViewportPanel.SetTextureAtlas(atlas);
-        m_TileViewportPanel.SetToolModes(modes);
-		m_TileViewportPanel.SetState(state);
+        m_TileViewportPanel.SetTileLayers(m_Layers);
+        m_TileViewportPanel.SetTextureAtlas(m_Atlas);
+        m_TileViewportPanel.SetToolModes(m_Modes);
+		m_TileViewportPanel.SetState(m_State);
 
         // Texture Selection
-        m_TextureSelectionPanel.SetTextureAtlas(atlas);
+        m_TextureSelectionPanel.SetTextureAtlas(m_Atlas);
 
         // Layer Selection
-        m_LayerSelectionPanel.SetTileLayer(layers);
-        m_LayerSelectionPanel.SetState(state);
+        m_LayerSelectionPanel.SetTileLayer(m_Layers);
+        m_LayerSelectionPanel.SetState(m_State);
 
         // Tool Selection
-        m_ToolSelectionPanel.SetToolModes(modes);
+        m_ToolSelectionPanel.SetToolModes(m_Modes);
     }
 
     virtual void OnDetach() override
@@ -90,6 +90,11 @@ public:
     }
 
 private:
+    Tiles::Shared<Tiles::Layers> m_Layers;
+    Tiles::Shared<Tiles::Atlas> m_Atlas;
+    Tiles::Shared<Tiles::ToolModes> m_Modes;
+    Tiles::Shared<Tiles::State> m_State;
+
     // Panels
     Tiles::HeaderPanel m_HeaderPanel;
     Tiles::TextureSelectionPanel m_TextureSelectionPanel;

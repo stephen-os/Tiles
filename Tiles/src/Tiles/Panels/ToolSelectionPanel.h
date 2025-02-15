@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Lumina/Base.h"
-
 #include "../Core/ToolModes.h"
+#include "../Core/Base.h"
 
 #include "Lumina/Renderer/Texture.h"
 #include "Lumina/Base.h"
@@ -20,10 +19,10 @@ namespace Tiles
 
         void Render();
 
-        void SetToolModes(const Lumina::Ref<ToolModes>& modes) { m_ToolModes = modes; }
+        void SetToolModes(const Shared<ToolModes>& modes) { m_ToolModes = modes; }
 
     private:
-        Lumina::Ref<ToolModes> m_ToolModes;
+        Shared<ToolModes> m_ToolModes;
 
         Lumina::Texture m_EraserTexture;
         Lumina::Texture m_FillTexture;

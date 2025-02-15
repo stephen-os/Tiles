@@ -9,7 +9,7 @@
 namespace Tiles
 {
 
-    void Project::Save(const std::string& path, const Lumina::Ref<Layers>& layers, const Lumina::Ref<Atlas>& atlas)
+    void Project::Save(const std::string& path, const Shared<Layers>& layers, const Shared<Atlas>& atlas)
     {
         if (!layers || !atlas)
         {
@@ -69,7 +69,7 @@ namespace Tiles
         }
     }
 
-    void Project::Load(const std::string& path, Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas)
+    void Project::Load(const std::string& path, Shared<Layers>& layers, Shared<Atlas>& atlas)
     {
         std::ifstream file(path);
         if (!file.is_open())

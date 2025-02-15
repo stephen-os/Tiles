@@ -5,7 +5,7 @@
 #include "../Core/Atlas.h"
 #include "../Core/State.h"
 
-#include "Lumina/Base.h"
+#include "../Core/Base.h"
 
 namespace Tiles
 {
@@ -15,9 +15,9 @@ namespace Tiles
 	public:
 		void Render();
 
-		void SetTextureAtlas(const Lumina::Ref<Atlas>& atlas) { m_Atlas = atlas; }
-		void SetTileLayers(const Lumina::Ref<Layers>& layers) { m_Layers = layers; }
-		void SetState(const Lumina::Ref<State>& state) { m_State = state; }
+		void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
+		void SetTileLayers(const Shared<Layers>& layers) { m_Layers = layers; }
+		void SetState(const Shared<State>& state) { m_State = state; }
 	private:
 		void RenderFile();
 		void RenderEdit();
@@ -26,9 +26,9 @@ namespace Tiles
 		void RenderNewPopup();
 
 	private:
-		Lumina::Ref<Layers> m_Layers;
-		Lumina::Ref<Atlas> m_Atlas;
-		Lumina::Ref<State> m_State;
+		Shared<Layers> m_Layers;
+		Shared<Atlas> m_Atlas;
+		Shared<State> m_State;
 
 		// New
 		bool m_ShowNewPopup = false;

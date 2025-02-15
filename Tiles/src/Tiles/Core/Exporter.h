@@ -3,7 +3,7 @@
 #include "Layers.h"
 #include "Atlas.h"
 
-#include "Lumina/Base.h"
+#include "Base.h"
 
 namespace Tiles
 {
@@ -12,7 +12,7 @@ namespace Tiles
 	{
 	public:
 		int& GetResolution() { return m_Resolution; }
-		void Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, std::string& filename);
+		void Export(Shared<Layers>& layers, Shared<Atlas>& atlas, std::string& filename);
 	private:
 		int m_Resolution = 64;
 	};

@@ -1,9 +1,7 @@
-// TextureSelectionPanel.h
 #pragma once
 
-#include "Lumina/Base.h"
-
 #include "../Core/Atlas.h"
+#include "../Core/Base.h"
 
 #include <string>
 
@@ -21,7 +19,7 @@ namespace Tiles
         void Render();
         void Reset();
         // Setters
-        void SetTextureAtlas(Lumina::Ref<Atlas> atlas) { m_Atlas = atlas; }
+        void SetTextureAtlas(Shared<Atlas> atlas) { m_Atlas = atlas; }
     private:
         // UI Rendering Methods
         void RenderAtlasPathSection();
@@ -40,7 +38,7 @@ namespace Tiles
 
     private:
         // Texture Atlas State
-        Lumina::Ref<Atlas> m_Atlas;
+        Shared<Atlas> m_Atlas;
 
         std::string m_TextureAtlasPath;
         int m_TextureAtlasWidth = 16;

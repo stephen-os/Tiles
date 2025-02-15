@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Lumina/Base.h"
-
 #include "../Core/ToolModes.h"
 #include "../Core/Atlas.h"
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 #include "../Core/Tile.h"
 #include "../Core/State.h"
+#include "../Core/Base.h"
 
 #include "imgui.h"
 
@@ -23,10 +22,10 @@ namespace Tiles
         void Render();
 
         // Setters
-        void SetTextureAtlas(const Lumina::Ref<Atlas>& atlas) { m_Atlas = atlas; }
-        void SetTileLayers(const Lumina::Ref<Layers>& layers) { m_Layers = layers; }
-        void SetToolModes(const Lumina::Ref<ToolModes>& modes) { m_ToolModes = modes; }
-        void SetState(const Lumina::Ref<State>& state) { m_State = state; }
+        void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
+        void SetTileLayers(const Shared<Layers>& layers) { m_Layers = layers; }
+        void SetToolModes(const Shared<ToolModes>& modes) { m_ToolModes = modes; }
+        void SetState(const Shared<State>& state) { m_State = state; }
 
     private:
         // UI Rendering Methods
@@ -41,10 +40,10 @@ namespace Tiles
         bool m_IsMouseDragging = false;  // Track if we're in the middle of a drag
         ImVec2 m_LastMousePosition = ImVec2(-1, -1);  // Track last modified tile position
 
-        Lumina::Ref<Layers> m_Layers;
-        Lumina::Ref<Atlas> m_Atlas;
-        Lumina::Ref<ToolModes> m_ToolModes;
-        Lumina::Ref<State> m_State;
+        Shared<Layers> m_Layers;
+        Shared<Atlas> m_Atlas;
+        Shared<ToolModes> m_ToolModes;
+        Shared<State> m_State;
 
         // Constants
         static constexpr float TILE_SIZE = 40.0f;

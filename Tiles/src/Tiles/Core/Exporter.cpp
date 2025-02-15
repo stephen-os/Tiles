@@ -13,7 +13,7 @@
 namespace Tiles
 {
 
-    void Exporter::Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, std::string& filename)
+    void Exporter::Export(Shared<Layers>& layers, Shared<Atlas>& atlas, std::string& filename)
     {
         Lumina::Quad quad;
 

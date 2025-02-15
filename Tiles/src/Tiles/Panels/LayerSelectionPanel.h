@@ -2,8 +2,7 @@
 
 #include "../Core/Layers.h"
 #include "../Core/State.h"
-
-#include "Lumina/Base.h"
+#include "../Core/Base.h"
 
 namespace Tiles
 {
@@ -14,11 +13,11 @@ namespace Tiles
         void Render();
 
         // Set the TileLayer pointer
-        void SetTileLayer(const Lumina::Ref<Layers>& layers) { m_Layers = layers; }
-        void SetState(const Lumina::Ref<State>& state) { m_State = state; }
+        void SetTileLayer(const Shared<Layers>& layers) { m_Layers = layers; }
+        void SetState(const Shared<State>& state) { m_State = state; }
     private:
-        Lumina::Ref<Layers> m_Layers;
-        Lumina::Ref<State> m_State;
+        Shared<Layers> m_Layers;
+        Shared<State> m_State;
     };
 
 }
