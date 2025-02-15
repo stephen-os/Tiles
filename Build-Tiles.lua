@@ -11,3 +11,7 @@ include "Lumina/LuminaExternal.lua"
 group "App"
    include "Tiles/Tiles.lua"
 group ""
+
+group "Tests"
+   include "Tests/UnitTests.lua"
+group ""
