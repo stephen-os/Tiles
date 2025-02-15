@@ -3,16 +3,16 @@
 #include "Lumina/Renderer/ShaderProgram.h"
 #include "Lumina/Renderer/FrameBuffer.h"
 #include "Lumina/Renderer/Renderer.h"
+#include "Lumina/Renderer/Shapes/Quad.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Quad.h"
 #include "Tile.h"
 #include "Layer.h"
 
 void Exporter::Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, std::string& filename)
 {
-    Quad quad;
+    Lumina::Quad quad;
 
     const std::string vertexShader = R"(
         #version 330 core
