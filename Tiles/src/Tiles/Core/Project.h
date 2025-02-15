@@ -9,9 +9,14 @@
 
 #include <fstream>
 
-class Project
+namespace Tiles
 {
-public:
-    static void Save(const std::string& path, const Lumina::Ref<Layers>& layers, const Lumina::Ref<Atlas>& atlas);
-    static void Load(const std::string& path, Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas);
-};
+
+    class Project
+    {
+    public:
+        static void Save(const std::string& path, const Lumina::Ref<Layers>& layers, const Lumina::Ref<Atlas>& atlas);
+        static void Load(const std::string& path, Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas);
+    };
+
+}

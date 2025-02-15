@@ -5,11 +5,16 @@
 
 #include "Lumina/Base.h"
 
-class Exporter
+namespace Tiles
 {
-public:
-	int& GetResolution() { return m_Resolution; }
-	void Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, std::string& filename);
-private:
-	int m_Resolution = 64;
-};
+
+	class Exporter
+	{
+	public:
+		int& GetResolution() { return m_Resolution; }
+		void Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, std::string& filename);
+	private:
+		int m_Resolution = 64;
+	};
+
+}

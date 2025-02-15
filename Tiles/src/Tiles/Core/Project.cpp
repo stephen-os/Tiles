@@ -6,110 +6,115 @@
 #include <iostream>
 #include <filesystem>
 
-void Project::Save(const std::string& path, const Lumina::Ref<Layers>& layers, const Lumina::Ref<Atlas>& atlas)
+namespace Tiles
 {
-    if (!layers || !atlas)
+
+    void Project::Save(const std::string& path, const Lumina::Ref<Layers>& layers, const Lumina::Ref<Atlas>& atlas)
     {
-        std::cerr << "Error: Invalid TileLayer or TextureAtlas reference." << std::endl;
-        return;
-    }
-
-    nlohmann::json jsonProject;
-    
-    // Atlas
-    jsonProject["atlas_path"] = atlas->GetPath();
-    jsonProject["atlas_width"] = atlas->GetWidth();
-    jsonProject["atlas_height"] = atlas->GetHeight();
-
-    // TileLayer
-    jsonProject["layers_width"] = layers->GetWidth();
-    jsonProject["layers_height"] = layers->GetHeight();
-
-    // Serialize TileLayer
-    nlohmann::json jsonLayers = nlohmann::json::array();
-    for (size_t l = 0; l < layers->GetSize(); l++)
-    {
-        nlohmann::json jsonLayer;
-
-        Layer& layer = layers->GetLayer(l);
-
-        jsonLayer["name"] = layer.GetName();
-
-        nlohmann::json jsonTiles = nlohmann::json::array();
-        for (size_t y = 0; y < layer.GetHeight(); y++)
+        if (!layers || !atlas)
         {
-            nlohmann::json jsonRow = nlohmann::json::array();
-            for (size_t x = 0; x < layer.GetWidth(); x++)
-            {
-                Tile tile = layer.GetTile(y, x);
-                jsonRow.push_back({
-                    {"texture_index", tile.GetTextureIndex()}
-                });
-            }
-            jsonTiles.push_back(jsonRow);
+            std::cerr << "Error: Invalid TileLayer or TextureAtlas reference." << std::endl;
+            return;
         }
-        jsonLayer["tiles"] = jsonTiles;
-        jsonLayers.push_back(jsonLayer);
+
+        nlohmann::json jsonProject;
+
+        // Atlas
+        jsonProject["atlas_path"] = atlas->GetPath();
+        jsonProject["atlas_width"] = atlas->GetWidth();
+        jsonProject["atlas_height"] = atlas->GetHeight();
+
+        // TileLayer
+        jsonProject["layers_width"] = layers->GetWidth();
+        jsonProject["layers_height"] = layers->GetHeight();
+
+        // Serialize TileLayer
+        nlohmann::json jsonLayers = nlohmann::json::array();
+        for (size_t l = 0; l < layers->GetSize(); l++)
+        {
+            nlohmann::json jsonLayer;
+
+            Layer& layer = layers->GetLayer(l);
+
+            jsonLayer["name"] = layer.GetName();
+
+            nlohmann::json jsonTiles = nlohmann::json::array();
+            for (size_t y = 0; y < layer.GetHeight(); y++)
+            {
+                nlohmann::json jsonRow = nlohmann::json::array();
+                for (size_t x = 0; x < layer.GetWidth(); x++)
+                {
+                    Tile tile = layer.GetTile(y, x);
+                    jsonRow.push_back({
+                        {"texture_index", tile.GetTextureIndex()}
+                        });
+                }
+                jsonTiles.push_back(jsonRow);
+            }
+            jsonLayer["tiles"] = jsonTiles;
+            jsonLayers.push_back(jsonLayer);
+        }
+
+        jsonProject["layers"] = jsonLayers;
+
+        std::ofstream file(path);
+        if (file.is_open())
+        {
+            file << jsonProject.dump(4);
+            file.close();
+        }
+        else
+        {
+            std::cerr << "Failed to open file for writing: " << path << std::endl;
+        }
     }
 
-    jsonProject["layers"] = jsonLayers;
-
-    std::ofstream file(path);
-    if (file.is_open())
+    void Project::Load(const std::string& path, Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas)
     {
-        file << jsonProject.dump(4);
+        std::ifstream file(path);
+        if (!file.is_open())
+        {
+            std::cerr << "Failed to open file for reading: " << path << std::endl;
+            return;
+        }
+
+        nlohmann::json jsonProject;
+        file >> jsonProject;
         file.close();
-    }
-    else
-    {
-        std::cerr << "Failed to open file for writing: " << path << std::endl;
-    }
-}
 
-void Project::Load(const std::string& path, Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas)
-{
-    std::ifstream file(path);
-    if (!file.is_open())
-    {
-        std::cerr << "Failed to open file for reading: " << path << std::endl;
-        return;
-    }
+        // Load TextureAtlas
+        std::string atlasPath = jsonProject.value("atlas_path", "");
+        int atlasWidth = jsonProject.value("atlas_width", 0);
+        int atlasHeight = jsonProject.value("atlas_height", 0);
 
-    nlohmann::json jsonProject;
-    file >> jsonProject;
-    file.close();
+        atlas->Create(atlasPath, atlasWidth, atlasHeight);
 
-    // Load TextureAtlas
-    std::string atlasPath = jsonProject.value("atlas_path", "");
-    int atlasWidth = jsonProject.value("atlas_width", 0);
-    int atlasHeight = jsonProject.value("atlas_height", 0);
+        // layers needs a create method that resets all attributes
 
-    atlas->Create(atlasPath, atlasWidth, atlasHeight);
+        size_t layerWidth = jsonProject.value("layers_width", 0);
+        size_t layerHeight = jsonProject.value("layers_height", 0);
+        layers->Clear();
+        layers->Resize(layerWidth, layerHeight);
 
-    // layers needs a create method that resets all attributes
-
-    size_t layerWidth = jsonProject.value("layers_width", 0);
-	size_t layerHeight = jsonProject.value("layers_height", 0);
-    layers->Clear();
-	layers->Resize(layerWidth, layerHeight);
-
-    // Load TileLayers
-    for (const auto& jsonLayer : jsonProject["layers"])
-    {
-        layers->NewLayer();
-        Layer& layer = layers->GetLayer(layers->GetActiveLayer());
-
-        std::string layerName = jsonLayer.at("name").get<std::string>();
-        layer.SetName(layerName); 
-
-        for (size_t y = 0; y < layer.GetHeight(); y++)
+        // Load TileLayers
+        for (const auto& jsonLayer : jsonProject["layers"])
         {
-            for (size_t x = 0; x < layer.GetWidth(); x++)
+            layers->NewLayer();
+            Layer& layer = layers->GetLayer(layers->GetActiveLayer());
+
+            std::string layerName = jsonLayer.at("name").get<std::string>();
+            layer.SetName(layerName);
+
+            for (size_t y = 0; y < layer.GetHeight(); y++)
             {
-                Tile& tile = layer.GetTile(y, x);
-                tile.SetTextureIndex(jsonLayer["tiles"][y][x]["texture_index"].get<int>());
+                for (size_t x = 0; x < layer.GetWidth(); x++)
+                {
+                    Tile& tile = layer.GetTile(y, x);
+                    tile.SetTextureIndex(jsonLayer["tiles"][y][x]["texture_index"].get<int>());
+                }
             }
         }
+
     }
 
 }

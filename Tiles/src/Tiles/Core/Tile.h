@@ -2,23 +2,28 @@
 
 #include "glm/glm.hpp"
 
-class Tile
+namespace Tiles
 {
-public:
-	Tile() = default;
-	~Tile() = default;
 
-	void Reset();
+	class Tile
+	{
+	public:
+		Tile() = default;
+		~Tile() = default;
 
-	// Setters
-	void SetTextureIndex(size_t textureIndex) { m_TextureIndex = textureIndex; }
+		void Reset();
 
-	// Getters
-	int GetTextureIndex() const { return m_TextureIndex; }
-	bool UseTexture() const { return m_TextureIndex != -1; }
+		// Setters
+		void SetTextureIndex(size_t textureIndex) { m_TextureIndex = textureIndex; }
 
-	// Operator
-	bool operator==(const Tile& other) const;
-private:
-	int m_TextureIndex = -1;
-};
+		// Getters
+		int GetTextureIndex() const { return m_TextureIndex; }
+		bool UseTexture() const { return m_TextureIndex != -1; }
+
+		// Operator
+		bool operator==(const Tile& other) const;
+	private:
+		int m_TextureIndex = -1;
+	};
+
+}

@@ -10,11 +10,14 @@
 #include "Tile.h"
 #include "Layer.h"
 
-void Exporter::Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, std::string& filename)
+namespace Tiles
 {
-    Lumina::Quad quad;
 
-    const std::string vertexShader = R"(
+    void Exporter::Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, std::string& filename)
+    {
+        Lumina::Quad quad;
+
+        const std::string vertexShader = R"(
         #version 330 core
 
         // Per Vertex
@@ -41,7 +44,7 @@ void Exporter::Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, st
         }
     )";
 
-    const std::string fragmetShader = R"(
+        const std::string fragmetShader = R"(
         #version 330 core
 
         in vec3 v_Normal;
@@ -67,50 +70,52 @@ void Exporter::Export(Lumina::Ref<Layers>& layers, Lumina::Ref<Atlas>& atlas, st
         }
     )";
 
-    Lumina::ShaderProgram shader;
-    shader.SetSource(vertexShader, fragmetShader);
+        Lumina::ShaderProgram shader;
+        shader.SetSource(vertexShader, fragmetShader);
 
-    int outputWidth = layers->GetWidth() * m_Resolution;
-    int outputHeight = layers->GetHeight() * m_Resolution;
+        int outputWidth = layers->GetWidth() * m_Resolution;
+        int outputHeight = layers->GetHeight() * m_Resolution;
 
-    glm::mat4 orthoProjection = glm::ortho(0.0f, float(layers->GetWidth()), 0.0f, float(layers->GetHeight()), -1.0f, 2.0f);
+        glm::mat4 orthoProjection = glm::ortho(0.0f, float(layers->GetWidth()), 0.0f, float(layers->GetHeight()), -1.0f, 2.0f);
 
-    Lumina::Renderer renderer;
+        Lumina::Renderer renderer;
 
-    renderer.Init();
-    renderer.Begin();
-    renderer.OnWindowResize(outputWidth, outputHeight);
-    renderer.Clear();
+        renderer.Init();
+        renderer.Begin();
+        renderer.OnWindowResize(outputWidth, outputHeight);
+        renderer.Clear();
 
-    atlas->Bind();
+        atlas->Bind();
 
-    shader.Bind();
-    shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
-    shader.SetUniform1f("u_NumberOfRows", static_cast<float>(atlas->GetWidth()));
+        shader.Bind();
+        shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
+        shader.SetUniform1f("u_NumberOfRows", static_cast<float>(atlas->GetWidth()));
 
-    for (int l = 0; l < layers->GetSize(); l++)
-    {
-        Layer& layer = layers->GetLayer(l);
-        for (int y = 0; y < layer.GetHeight(); y++)
+        for (int l = 0; l < layers->GetSize(); l++)
         {
-            for (int x = 0; x < layer.GetWidth(); x++)
+            Layer& layer = layers->GetLayer(l);
+            for (int y = 0; y < layer.GetHeight(); y++)
             {
-
-                Tile& tile = layer.GetTile(y, x);
-                if (tile.GetTextureIndex() != -1)
+                for (int x = 0; x < layer.GetWidth(); x++)
                 {
-                    glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, l * 0.01f));
-                    glm::vec2 offset = atlas->GetOffset(static_cast<int>(tile.GetTextureIndex()));
 
-                    shader.SetUniformMatrix4fv("u_Transform", transform);
-                    shader.SetUniform2fv("u_Offset", offset);
-                    renderer.Draw(quad.GetVertexArray());
+                    Tile& tile = layer.GetTile(y, x);
+                    if (tile.GetTextureIndex() != -1)
+                    {
+                        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, l * 0.01f));
+                        glm::vec2 offset = atlas->GetOffset(static_cast<int>(tile.GetTextureIndex()));
+
+                        shader.SetUniformMatrix4fv("u_Transform", transform);
+                        shader.SetUniform2fv("u_Offset", offset);
+                        renderer.Draw(quad.GetVertexArray());
+                    }
                 }
             }
         }
+
+        renderer.End();
+
+        renderer.SaveFrameBufferToImage(filename);
     }
 
-    renderer.End();
-
-    renderer.SaveFrameBufferToImage(filename);
 }

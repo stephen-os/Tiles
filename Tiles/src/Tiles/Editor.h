@@ -49,17 +49,17 @@ public:
 
     virtual void OnAttach() override
     {
-        ThemeManager::GetInstance().ApplyDarkTheme();
+        Tiles::ThemeManager::GetInstance().ApplyDarkTheme();
 
         // References
-        Lumina::Ref<Layers> layers = Lumina::CreateRef<Layers>();
+        Lumina::Ref<Tiles::Layers> layers = Lumina::CreateRef<Tiles::Layers>();
         layers->Resize(16, 16);
 
-        Lumina::Ref<Atlas> atlas = Lumina::CreateRef<Atlas>();
+        Lumina::Ref<Tiles::Atlas> atlas = Lumina::CreateRef<Tiles::Atlas>();
 
-        Lumina::Ref<ToolModes> modes = Lumina::CreateRef<ToolModes>();
+        Lumina::Ref<Tiles::ToolModes> modes = Lumina::CreateRef<Tiles::ToolModes>();
 
-        Lumina::Ref<State> state = Lumina::CreateRef<State>();
+        Lumina::Ref<Tiles::State> state = Lumina::CreateRef<Tiles::State>();
         state->SetTileLayers(layers);
 
         // Header
@@ -91,11 +91,11 @@ public:
 
 private:
     // Panels
-    HeaderPanel m_HeaderPanel;
-    TextureSelectionPanel m_TextureSelectionPanel;
-    TileViewportPanel m_TileViewportPanel;
-	LayerSelectionPanel m_LayerSelectionPanel;
-    ToolSelectionPanel m_ToolSelectionPanel;
+    Tiles::HeaderPanel m_HeaderPanel;
+    Tiles::TextureSelectionPanel m_TextureSelectionPanel;
+    Tiles::TileViewportPanel m_TileViewportPanel;
+    Tiles::LayerSelectionPanel m_LayerSelectionPanel;
+    Tiles::ToolSelectionPanel m_ToolSelectionPanel;
 
     // Util
     Lumina::Timer m_FrameTimer;

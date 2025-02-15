@@ -9,21 +9,26 @@
 
 #include "imgui.h"
 
-class ToolSelectionPanel
+namespace Tiles
 {
-public:
-	ToolSelectionPanel();
-	~ToolSelectionPanel() = default;
 
-    void Render();
+    class ToolSelectionPanel
+    {
+    public:
+        ToolSelectionPanel();
+        ~ToolSelectionPanel() = default;
 
-    void SetToolModes(const Lumina::Ref<ToolModes>& modes) { m_ToolModes = modes; }
+        void Render();
 
-private:
-    Lumina::Ref<ToolModes> m_ToolModes;
-    
-    Lumina::Texture m_EraserTexture;
-    Lumina::Texture m_FillTexture;
+        void SetToolModes(const Lumina::Ref<ToolModes>& modes) { m_ToolModes = modes; }
 
-    static constexpr ImU32 SELECTION_BORDER_COLOR = IM_COL32(255, 165, 0, 255); // Orange
-};
+    private:
+        Lumina::Ref<ToolModes> m_ToolModes;
+
+        Lumina::Texture m_EraserTexture;
+        Lumina::Texture m_FillTexture;
+
+        static constexpr ImU32 SELECTION_BORDER_COLOR = IM_COL32(255, 165, 0, 255); // Orange
+    };
+
+}

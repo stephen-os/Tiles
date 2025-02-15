@@ -7,28 +7,33 @@
 
 #include "Lumina/Base.h"
 
-class HeaderPanel
+namespace Tiles
 {
-public:
-	void Render();
 
-	void SetTextureAtlas(const Lumina::Ref<Atlas>& atlas) { m_Atlas = atlas; }
-	void SetTileLayers(const Lumina::Ref<Layers>& layers) { m_Layers = layers; }
-	void SetState(const Lumina::Ref<State>& state) { m_State = state; }
-private:
-	void RenderFile();
-	void RenderEdit();
-	void RenderOptions(); 
+	class HeaderPanel
+	{
+	public:
+		void Render();
 
-	void RenderNewPopup();
+		void SetTextureAtlas(const Lumina::Ref<Atlas>& atlas) { m_Atlas = atlas; }
+		void SetTileLayers(const Lumina::Ref<Layers>& layers) { m_Layers = layers; }
+		void SetState(const Lumina::Ref<State>& state) { m_State = state; }
+	private:
+		void RenderFile();
+		void RenderEdit();
+		void RenderOptions();
 
-private:
-	Lumina::Ref<Layers> m_Layers;
-	Lumina::Ref<Atlas> m_Atlas;
-	Lumina::Ref<State> m_State;
+		void RenderNewPopup();
 
-	// New
-	bool m_ShowNewPopup = false;
-	int m_NewWidth = 10;
-	int m_NewHeight = 10;
-};
+	private:
+		Lumina::Ref<Layers> m_Layers;
+		Lumina::Ref<Atlas> m_Atlas;
+		Lumina::Ref<State> m_State;
+
+		// New
+		bool m_ShowNewPopup = false;
+		int m_NewWidth = 10;
+		int m_NewHeight = 10;
+	};
+
+}

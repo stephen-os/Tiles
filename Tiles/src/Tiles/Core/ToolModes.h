@@ -1,7 +1,12 @@
 #pragma once
 
-struct ToolModes
+namespace Tiles
 {
-    bool Erase = false;
-    bool Fill = false;
-};
+
+    struct ToolModes
+    {
+        bool Erase = false;
+        bool Fill = false;
+    };
+
+}

@@ -2,16 +2,21 @@
 
 #include "imgui.h"
 
-class ThemeManager 
+namespace Tiles
 {
-public:
-    static ThemeManager& GetInstance();
 
-    void ApplyDarkTheme();
+    class ThemeManager
+    {
+    public:
+        static ThemeManager& GetInstance();
 
-private:
-    ThemeManager() = default;
-    ~ThemeManager() = default;
-    ThemeManager(const ThemeManager&) = delete;
-    ThemeManager& operator=(const ThemeManager&) = delete;
-};
+        void ApplyDarkTheme();
+
+    private:
+        ThemeManager() = default;
+        ~ThemeManager() = default;
+        ThemeManager(const ThemeManager&) = delete;
+        ThemeManager& operator=(const ThemeManager&) = delete;
+    };
+
+}
