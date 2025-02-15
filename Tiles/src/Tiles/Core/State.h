@@ -42,11 +42,13 @@ public:
 	void PushTile(size_t y, size_t x, Tile& tile);
 
 	void Undo();
+	void Redo();
 private:
 	void Trim();
 private:
 	Lumina::Ref<Layers> m_Layers;
 
-	std::stack<Action> m_StateStack;
+	std::stack<Action> m_UndoStack;
+	std::stack<Action> m_RedoStack;
 	static constexpr size_t MAX_STACK = 50; 
 };
