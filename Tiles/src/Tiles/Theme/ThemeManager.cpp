@@ -1,5 +1,7 @@
 #include "ThemeManager.h"
 
+#include <iostream>
+
 namespace Tiles
 {
 
@@ -49,6 +51,18 @@ namespace Tiles
             style.WindowRounding = 0.0f;                                        // Disable rounding for additional platform windows
             colors[ImGuiCol_WindowBg].w = 1.0f;                                 // Fully opaque background
         }
+
+        // Load and set a custom font
+        io.Fonts->Clear();  // Clear existing fonts if any
+
+        ImFont* customFont = io.Fonts->AddFontFromFileTTF("res/assets/fonts/Modeseven-L3n5.ttf", 12.0f);
+        if (!customFont)
+        {
+            std::cout << "Failed to load custom font." << std::endl;
+			return;
+        }
+
+        io.FontDefault = customFont;  // Set as default font
     }
 
 }
