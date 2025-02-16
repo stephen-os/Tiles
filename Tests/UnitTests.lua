@@ -18,7 +18,8 @@ project "UnitTests"
       "../Lumina/Dependencies/glm",
       "../Lumina/Dependencies/glad/include",
       "../Lumina/Dependencies/tinygltf",
-      "../Lumina/Dependencies/imguifd"
+      "../Lumina/Dependencies/imguifd",
+      "../Lumina/Dependencies/spdlog/include"
    }
 
     links
@@ -26,6 +27,8 @@ project "UnitTests"
         "Lumina",
         "Tiles"
     }
+
+    buildoptions { "/utf-8" }
 
    targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
    objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
