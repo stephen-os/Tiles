@@ -87,7 +87,13 @@ namespace Tiles
         int atlasWidth = jsonProject.value("atlas_width", 0);
         int atlasHeight = jsonProject.value("atlas_height", 0);
 
-        atlas->Create(atlasPath, atlasWidth, atlasHeight);
+        atlas->Create(atlasPath);
+        // TODO: Maybe add a resize method. This way we dont have to call UpdateTexCoords.
+        // atlas->Resize(atlasWidth, atlasHeight);
+        atlas->GetWidth() = atlasWidth;
+        atlas->GetHeight() = atlasHeight;
+        atlas->UpdateTexCoords();
+
 
         // layers needs a create method that resets all attributes
 

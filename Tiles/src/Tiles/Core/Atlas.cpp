@@ -5,7 +5,7 @@
 namespace Tiles
 {
 
-    void Atlas::Create(const std::string& path, size_t width, size_t height)
+    void Atlas::Create(const std::string& path)
     {
         if (!m_Texture.SetData(path))
         {
@@ -16,14 +16,11 @@ namespace Tiles
         m_Path = path;
         m_IsCreated = true;
 
-        UpdateTexCoords(width, height);
+        UpdateTexCoords();
     }
 
-    void Atlas::UpdateTexCoords(size_t width, size_t height)
+    void Atlas::UpdateTexCoords()
     {
-        m_GridWidth = width;
-        m_GridHeight = height;
-
         int texturePixelWidth = m_Texture.GetWidth();
         int texturePixelHeight = m_Texture.GetHeight();
 

@@ -80,7 +80,7 @@ namespace Tiles
         if (std::filesystem::exists(newPath))
         {
             m_TextureAtlasPath = newPath;
-            m_Atlas->Create(m_TextureAtlasPath, m_TextureAtlasWidth, m_TextureAtlasHeight);
+            m_Atlas->Create(m_TextureAtlasPath);
         }
     }
 
@@ -89,24 +89,25 @@ namespace Tiles
         ImGui::Text("Atlas Dimensions");
         ImGui::PushItemWidth(100.0f);
 
-        UpdateAtlasDimensions(m_TextureAtlasWidth, "Width:");
-        UpdateAtlasDimensions(m_TextureAtlasHeight, "Height:");
-
-        ImGui::PopItemWidth();
-    }
-
-    void TextureSelectionPanel::UpdateAtlasDimensions(int& dimension, const char* label) {
-        ImGui::Text(label);
-
-        int tempDimension = dimension;
-        if (ImGui::InputInt(("##" + std::string(label)).c_str(), &tempDimension))
+        if (ImGui::InputInt(("##" + std::string("Width:")).c_str(), &m_Atlas->GetWidth()))
         {
-            dimension = std::max(1, tempDimension);
+            m_Atlas->GetWidth() = std::max(1, m_Atlas->GetWidth());
             if (m_Atlas->IsCreated())
             {
-                m_Atlas->UpdateTexCoords(m_TextureAtlasWidth, m_TextureAtlasHeight);
+                m_Atlas->UpdateTexCoords();
             }
         }
+
+        if (ImGui::InputInt(("##" + std::string("Height:")).c_str(), &m_Atlas->GetHeight()))
+        {
+            m_Atlas->GetWidth() = std::max(1, m_Atlas->GetWidth());
+            if (m_Atlas->IsCreated())
+            {
+                m_Atlas->UpdateTexCoords();
+            }
+        }
+
+        ImGui::PopItemWidth();
     }
 
     void TextureSelectionPanel::RenderTextureGrid()
@@ -179,14 +180,6 @@ namespace Tiles
             ImGui::GetWindowDrawList()->AddRect(min, max, SELECTION_BORDER_COLOR, 0.0f, 0, 2.5f);
         else
             ImGui::GetWindowDrawList()->AddRect(min, max, DEAULT_BORDER_COLOR, 0.0f, 0, 1.0f);
-    }
-
-
-    void TextureSelectionPanel::Reset()
-    {
-        m_TextureAtlasPath.clear();
-        m_TextureAtlasWidth = 16;
-        m_TextureAtlasHeight = 16;
     }
 
 }

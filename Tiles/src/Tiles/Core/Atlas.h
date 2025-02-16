@@ -16,8 +16,8 @@ namespace Tiles
         Atlas() = default;
 	    ~Atlas() = default;
 
-        void Create(const std::string& path, size_t width, size_t height);
-        void UpdateTexCoords(size_t width, size_t height);
+        void Create(const std::string& path);
+        void UpdateTexCoords();
 
         void Bind() const;
         void Unbind() const;
@@ -29,8 +29,8 @@ namespace Tiles
         void DeselectTexture() { m_SelectedTexture = -1; }
 
         // Getters
-        size_t GetWidth() const { return m_GridWidth; }
-        size_t GetHeight() const { return m_GridHeight; }
+        int& GetWidth() { return m_GridWidth; }
+        int& GetHeight() { return m_GridHeight; }
 
         std::string GetPath() const { return m_Path; }
 
@@ -44,8 +44,8 @@ namespace Tiles
     private:
         Lumina::Texture m_Texture;              // Lumina Texture
         std::string m_Path = "";                // Atlas path
-        size_t m_GridWidth = 0;                 // Number of textures along the width
-        size_t m_GridHeight = 0;                // Number of textures along the height
+        int m_GridWidth = 16;                   // Number of textures along the width
+        int m_GridHeight = 16;                  // Number of textures along the height
         float m_TexWidth = 0.0f;                // Width of a single texture in UV space
         float m_TexHeight = 0.0f;               // Height of a single texture in UV space
         bool m_IsCreated = false;               // Is the atlas created

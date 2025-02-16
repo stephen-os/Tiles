@@ -17,7 +17,6 @@ namespace Tiles
         ~TextureSelectionPanel() = default;
 
         void Render();
-        void Reset();
         // Setters
         void SetTextureAtlas(Shared<Atlas> atlas) { m_Atlas = atlas; }
     private:
@@ -29,7 +28,6 @@ namespace Tiles
 
         // Helper Methods
         void HandleAtlasFileSelection(const std::string& newPath);
-        void UpdateAtlasDimensions(int& dimension, const char* label);
         void RenderTextureGridItem(int index, int x, int y);
 
         // File Dialog Methods
@@ -41,8 +39,6 @@ namespace Tiles
         Shared<Atlas> m_Atlas;
 
         std::string m_TextureAtlasPath;
-        int m_TextureAtlasWidth = 16;
-        int m_TextureAtlasHeight = 16;
 
         // Constants
         static constexpr float TEXTURE_BUTTON_SIZE = 40.0f;
