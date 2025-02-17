@@ -17,6 +17,8 @@ namespace Tiles
 	    ~Atlas() = default;
 
         void Create(const std::string& path);
+        void Destroy();
+
         void UpdateTexCoords();
 
         void Bind() const;
@@ -29,6 +31,7 @@ namespace Tiles
         int& GetHeight() { return m_GridHeight; }
 
         std::string GetPath() const { return m_Path; }
+        std::string GetFilename() const { return m_Path.substr(m_Path.find_last_of("/\\") + 1); }
 
         glm::vec4 GetTexCoords(int index) const;
         glm::vec2 GetOffset(int index) const;

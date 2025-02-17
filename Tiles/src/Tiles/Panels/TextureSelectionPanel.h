@@ -41,8 +41,6 @@ namespace Tiles
         Shared<Atlas> m_Atlas;
         Shared<Selection> m_Selection;
 
-        std::string m_TextureAtlasPath;
-
         // Constants
         static constexpr float TEXTURE_BUTTON_SIZE = 40.0f;
         static constexpr float CHECKERBOARD_SIZE = 10.0f;

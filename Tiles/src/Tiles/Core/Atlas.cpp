@@ -44,6 +44,18 @@ namespace Tiles
         }
     }
 
+    void Atlas::Destroy()
+    {
+		m_Texture.~Texture();
+        std::string m_Path = "";                
+        m_GridWidth = 16;                   
+        m_GridHeight = 16;                  
+        m_TexWidth = 0.0f;                
+        m_TexHeight = 0.0f;               
+        m_IsCreated = false;               
+        m_TexCoords.clear();     
+    }
+
     void Atlas::Bind() const
     {
         m_Texture.Bind();

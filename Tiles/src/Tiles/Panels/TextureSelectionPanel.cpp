@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <algorithm>
 
+#include <iostream>
+
 namespace Tiles
 {
 
@@ -16,28 +18,40 @@ namespace Tiles
         RenderAtlasPathSection();
         RenderFileDialog();
 
-        if (m_Atlas->IsCreated())
-        {
-            RenderAtlasDimensionsSection();
-            ImGui::Separator();
+        ImGui::Separator();
+        RenderAtlasDimensionsSection();
+        ImGui::Separator();
 
-            ImGui::BeginChild("TextureSelection", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-            RenderTextureGrid();
-            ImGui::EndChild();
-        }
+        ImGui::BeginChild("TextureSelection", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+        RenderTextureGrid();
+        ImGui::EndChild();
 
         ImGui::End();
     }
 
     void TextureSelectionPanel::RenderAtlasPathSection()
     {
-        ImGui::Text("Atlas Path: ");
-        ImGui::SameLine();
-        ImGui::Text(m_TextureAtlasPath.empty() ? "No file selected" : m_TextureAtlasPath.c_str());
+        ImGui::AlignTextToFramePadding(); // Aligns text with buttons
+        ImGui::Text("Atlas:");
         ImGui::SameLine();
 
-        if (ImGui::Button("Browse...")) {
-            OpenFileDialog();
+        if (!m_Atlas->IsCreated())
+        {
+            ImGui::AlignTextToFramePadding(); // Ensures vertical alignment
+            ImGui::TextWrapped("[ No file selected ]");
+            ImGui::SameLine();
+
+            if (ImGui::Button("Browse..."))
+                OpenFileDialog();
+        }
+        else
+        {
+            ImGui::AlignTextToFramePadding();
+            ImGui::TextWrapped("[ %s ]", m_Atlas->GetFilename().c_str()); // Wrapped for better visuals
+            ImGui::SameLine();
+
+            if (ImGui::Button("Remove"))
+                m_Atlas->Destroy();
         }
     }
 
@@ -79,8 +93,7 @@ namespace Tiles
     {
         if (std::filesystem::exists(newPath))
         {
-            m_TextureAtlasPath = newPath;
-            m_Atlas->Create(m_TextureAtlasPath);
+            m_Atlas->Create(newPath);
         }
     }
 
@@ -154,14 +167,26 @@ namespace Tiles
 
     void TextureSelectionPanel::RenderTextureGridItem(int index, int x, int y)
     {
-        glm::vec4 texCoords = m_Atlas->GetTexCoords(index);
         ImVec2 buttonSize(TEXTURE_BUTTON_SIZE, TEXTURE_BUTTON_SIZE);
-        ImVec2 xy(texCoords.x, texCoords.y);
-        ImVec2 zw(texCoords.z, texCoords.w);
-        intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
+        
+        // Render texture or transparent empty button
+        if (m_Atlas->IsCreated())
+        {
+            glm::vec4 texCoords = m_Atlas->GetTexCoords(index);
+            ImVec2 xy(texCoords.x, texCoords.y);
+            ImVec2 zw(texCoords.z, texCoords.w);
+            intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
 
-        // Render texture with full transparency support
-        ImGui::Image((void*)textureID, buttonSize, xy, zw, ImVec4(1, 1, 1, 1), ImVec4(0, 0, 0, 0));
+            ImGui::Image((void*)textureID, buttonSize, xy, zw, ImVec4(1, 1, 1, 1), ImVec4(0, 0, 0, 0));
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));        
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+            ImGui::Button(("##" + std::to_string(x) + std::to_string(y)).c_str(), buttonSize);
+            ImGui::PopStyleColor(3);
+        }
 
         // Handle selection
         if (ImGui::IsItemClicked())
