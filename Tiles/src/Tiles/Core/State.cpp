@@ -7,13 +7,11 @@ namespace Tiles
 
     void State::PushLayer(size_t index, Layer& layer, StateType type)
     {
-        if (!m_Layers || index > m_Layers->GetSize())
+        if (index > m_Layers->GetSize())
         {
             std::cerr << "Error: Invalid layer index for PushLayer.\n";
             return;
         }
-
-        std::cout << "PushLayer(" << index << ")\n";
 
         Action action;
         action.Type = type;
@@ -26,14 +24,12 @@ namespace Tiles
 
     void State::PushTile(size_t y, size_t x, Tile& tile)
     {
-        if (!m_Layers || x >= m_Layers->GetWidth() || y >= m_Layers->GetHeight())
+        if (x >= m_Layers->GetWidth() || y >= m_Layers->GetHeight())
         {
             std::cerr << "Error: Invalid tile coordinates for PushTile.\n";
             return;
         }
-
-        std::cout << "PushTile(" << y << ", " << x << ")\n";
-
+       
         Action action;
         action.Type = StateType::Tile_Replace;
         action.Y = y;
@@ -68,19 +64,10 @@ namespace Tiles
     void State::Undo()
     {
         if (m_UndoStack.empty())
-        {
-            std::cerr << "Undo stack is empty.\n";
-            return;
-        }
-
+           return;
+        
         Action action = m_UndoStack.top();
         m_UndoStack.pop();
-
-        if (!m_Layers)
-        {
-            std::cerr << "Error: No layers available for undo.\n";
-            return;
-        }
 
         Action redoAction = action;
 
@@ -110,25 +97,15 @@ namespace Tiles
         }
 
         m_RedoStack.push(redoAction);
-        std::cout << "Undo completed.\n";
     }
 
     void State::Redo()
     {
         if (m_RedoStack.empty())
-        {
-            std::cerr << "Redo stack is empty.\n";
             return;
-        }
 
         Action action = m_RedoStack.top();
         m_RedoStack.pop();
-
-        if (!m_Layers)
-        {
-            std::cerr << "Error: No layers available for redo.\n";
-            return;
-        }
 
         Action undoAction = action;
 
@@ -156,7 +133,6 @@ namespace Tiles
         }
 
         m_UndoStack.push(undoAction);
-        std::cout << "Redo completed.\n";
     }
 
 }
