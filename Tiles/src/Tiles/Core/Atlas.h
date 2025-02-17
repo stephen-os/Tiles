@@ -24,10 +24,6 @@ namespace Tiles
 
         bool IsCreated() const { return m_IsCreated; }
 
-        // Setters
-        void SelectTexture(size_t index) { m_SelectedTexture = index; }
-        void DeselectTexture() { m_SelectedTexture = -1; }
-
         // Getters
         int& GetWidth() { return m_GridWidth; }
         int& GetHeight() { return m_GridHeight; }
@@ -39,9 +35,6 @@ namespace Tiles
         glm::vec2 GetPosition(int index) const;
 
         unsigned int GetTextureID() { return m_Texture.GetID(); }
-
-        size_t GetSelectedTexture() const { return m_SelectedTexture; }
-        bool IsTextureSelected() const { return m_SelectedTexture != -1; }
     private:
         Lumina::Texture m_Texture;              // Lumina Texture
         std::string m_Path = "";                // Atlas path
@@ -50,7 +43,6 @@ namespace Tiles
         float m_TexWidth = 0.0f;                // Width of a single texture in UV space
         float m_TexHeight = 0.0f;               // Height of a single texture in UV space
         bool m_IsCreated = false;               // Is the atlas created
-        int m_SelectedTexture = -1;             // Selected Texture: -1 for none
         std::vector<glm::vec4> m_TexCoords;     // Precomputed texture coordinates
     };
 
