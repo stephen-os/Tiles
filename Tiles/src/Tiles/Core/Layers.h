@@ -37,6 +37,7 @@ namespace Tiles
 		size_t GetActiveLayer() { return m_ActiveLayer; }
 
 		Layer& GetLayer(size_t layer) { return m_Layers[layer]; }
+		Tile& GetTile(size_t layer, size_t y, size_t x) { return m_Layers[layer].GetTile(y, x); }
 	private:
 		bool IsLayerInBounds(size_t layer);
 	private:

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Core/Selection.h"
 #include "../Core/ToolModes.h"
 #include "../Core/Atlas.h"
 #include "../Core/Layers.h"
@@ -26,14 +27,16 @@ namespace Tiles
         void SetTileLayers(const Shared<Layers>& layers) { m_Layers = layers; }
         void SetToolModes(const Shared<ToolModes>& modes) { m_ToolModes = modes; }
         void SetState(const Shared<State>& state) { m_State = state; }
+        void SetSelection(const Shared<Selection>& selection) { m_Selection = selection; }
 
     private:
         // UI Rendering Methods
         void RenderBackground();
         void RenderTiles();
         void HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x, ImVec2 tilePos);
-        void DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax);
-        void DrawTile(const Tile& tile, ImVec2 tileMin, ImVec2 tileMax);
+        void HandleSelection(size_t l, size_t y, size_t x);
+        void DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x);
+        void DrawTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x);
         void HandleInput();
 
     private:
@@ -45,6 +48,7 @@ namespace Tiles
         Shared<Atlas> m_Atlas;
         Shared<ToolModes> m_ToolModes;
         Shared<State> m_State;
+        Shared<Selection> m_Selection;
 
         // Constants
         static constexpr float TILE_SIZE = 40.0f;

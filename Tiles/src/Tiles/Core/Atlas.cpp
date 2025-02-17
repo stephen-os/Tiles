@@ -65,6 +65,7 @@ namespace Tiles
         return m_TexCoords[index];
     }
 
+    // Calulates the offset of the tile reative to the top left of the atlas between 0 and 1
     glm::vec2 Atlas::GetOffset(int index) const
     {
         if (index < 0 || index >= (m_GridWidth * m_GridHeight))
@@ -80,6 +81,18 @@ namespace Tiles
         float yOffset = row * m_TexHeight;
 
         return glm::vec2(xOffset, yOffset);
+    }
+
+    // Calculates the positon of the tile reative to the top left of the atlas
+    glm::vec2 Atlas::GetPosition(int index) const
+    {
+        if (index < 0 || index >= m_GridWidth * m_GridHeight)
+            return glm::vec2(0.0f);
+
+        int x = index % m_GridWidth;
+        int y = index / m_GridWidth;
+
+        return glm::vec2(x, y);
     }
 
 }

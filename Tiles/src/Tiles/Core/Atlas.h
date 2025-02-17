@@ -36,6 +36,7 @@ namespace Tiles
 
         glm::vec4 GetTexCoords(int index) const;
         glm::vec2 GetOffset(int index) const;
+        glm::vec2 GetPosition(int index) const;
 
         unsigned int GetTextureID() { return m_Texture.GetID(); }
 

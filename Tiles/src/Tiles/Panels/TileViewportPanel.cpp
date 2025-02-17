@@ -3,6 +3,7 @@
 #include "../Core/Tools.h"
 
 #include <algorithm>
+#include <iostream>
 
 namespace Tiles
 {
@@ -75,101 +76,95 @@ namespace Tiles
             {
                 for (size_t x = 0; x < layer.GetWidth(); x++)
                 {
-                    Tile& tile = layer.GetTile(y, x);
                     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
                     float offset = TILE_SIZE * m_Zoom;
                     ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
                     ImVec2 tileMax(tileMin.x + offset, tileMin.y + offset);
 
-                    // Only handle tile selection on mouse press, not hold
                     if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                     {
-                        if (l == m_Layers->GetActiveLayer())
-                        {
-                            HandleTileSelection(layer, tile, y, x, tileMin);
-                        }
-
-                        // Highlight hovered tile
-                        ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
-                        DrawHoveredTile(tileMin, tileMax);
+                        HandleSelection(l, y, x); 
+                        DrawHoveredTile(tileMin, tileMax, l, y, x);
                     }
-
-                    DrawTile(tile, tileMin, tileMax);
+                    DrawTile(tileMin, tileMax, l, y, x);
                 }
             }
         }
+    }
 
-        // Reset drag state when mouse is released
+    void TileViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
+    {
+        if (!m_Selection || m_Selection->Empty()) 
+            return;
+
+        if (l != m_Layers->GetActiveLayer())
+            return;
+
         if (!ImGui::IsMouseDown(0))
+            return;
+
+        int baseIndex = m_Selection->Front();
+        glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
+
+        for (int texture : *m_Selection)
         {
-            m_IsMouseDragging = false;
-            m_LastMousePosition = ImVec2(-1, -1);
+            glm::vec2 relativePos = m_Atlas->GetPosition(texture);
+            glm::vec2 normalizedPos = relativePos - basePos;
+
+            int targetX = x + (int)normalizedPos.x;
+            int targetY = y + (int)normalizedPos.y;
+
+            // Skip out-of-bounds tiles
+            if (targetX < 0 || targetY < 0 || targetX >= m_Layers->GetWidth() || targetY >= m_Layers->GetHeight())
+            {
+                continue;
+            }
+
+            // Get the tile and update it
+            Tile& tile = m_Layers->GetTile(l, targetY, targetX);
+            tile.SetTextureIndex(texture);
         }
     }
 
-
-    void TileViewportPanel::HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x, ImVec2 tilePos)
+    void TileViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
-        // Convert current tile position to ImVec2 for comparison
-        ImVec2 currentTilePos(x, y);
-
-        // Only process if mouse is just clicked or if we've moved to a new tile while dragging
-        bool isNewClick = ImGui::IsMouseClicked(0) && !m_IsMouseDragging;
-        bool isNewTileDuringDrag = ImGui::IsMouseDown(0) && m_IsMouseDragging &&
-            (currentTilePos.x != m_LastMousePosition.x ||
-                currentTilePos.y != m_LastMousePosition.y);
-
-        if (isNewClick || isNewTileDuringDrag)
-        {
-            if (m_Atlas->IsTextureSelected())
-            {
-                if (m_ToolModes->Fill)
-                {
-                    // Fill tool should only trigger on new clicks, not during drag
-                    if (isNewClick)
-                    {
-                        m_State->PushLayer(m_Layers->GetActiveLayer(), layer, StateType::Layer_Replace);
-                        Tools::Fill(layer, m_Atlas->GetSelectedTexture(), y, x);
-                    }
-                }
-                else
-                {
-                    m_State->PushTile(y, x, tile);
-                    tile.SetTextureIndex(m_Atlas->GetSelectedTexture());
-                }
-            }
-
-            if (m_ToolModes->Erase)
-            {
-                m_State->PushTile(y, x, tile);
-                tile.Reset();
-            }
-
-            // Update tracking variables
-            m_LastMousePosition = currentTilePos;
-            if (isNewClick)
-            {
-                m_IsMouseDragging = true;
-            }
-        }
-    }
-
-    void TileViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax)
-    {
-        if (!m_Atlas) return;
-		if (!m_Atlas->IsTextureSelected()) return;
+        if (!m_Atlas || !m_Selection || m_Selection->Empty()) return;
 
         intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
-        glm::vec4 texCoords = m_Atlas->GetTexCoords(m_Atlas->GetSelectedTexture());
-        ImVec2 uvMin(texCoords.x, texCoords.y);
-        ImVec2 uvMax(texCoords.z, texCoords.w);
+        int baseIndex = m_Selection->Front();
 
-        ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, uvMin, uvMax, FILL_COLOR);
+        // Get base (reference) position
+        glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
+
+        for (int texture : *m_Selection)
+        {
+            glm::vec2 relativePos = m_Atlas->GetPosition(texture);
+            glm::vec4 texCoords = m_Atlas->GetTexCoords(texture);
+
+            // Translate relative position so the first selected tile is at (0,0)
+            glm::vec2 normalizedPos = relativePos - basePos;
+
+            // Adjust tile position based on normalized offset
+            ImVec2 adjustedMin(tileMin.x + normalizedPos.x * TILE_SIZE * m_Zoom,
+                tileMin.y + normalizedPos.y * TILE_SIZE * m_Zoom);
+            ImVec2 adjustedMax(adjustedMin.x + TILE_SIZE * m_Zoom, adjustedMin.y + TILE_SIZE * m_Zoom);
+
+            // Texture UV mapping
+            ImVec2 uvMin(texCoords.x, texCoords.y);
+            ImVec2 uvMax(texCoords.z, texCoords.w);
+
+            // Draw the texture
+            ImGui::GetWindowDrawList()->AddImage((void*)textureID, adjustedMin, adjustedMax, uvMin, uvMax, FILL_COLOR);
+            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
+        }
     }
 
-    void TileViewportPanel::DrawTile(const Tile& tile, ImVec2 tileMin, ImVec2 tileMax)
+    void TileViewportPanel::DrawTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
-        if (!m_Atlas) return;
+        if (!m_Atlas->IsCreated()) 
+            return;
+
+        Tile& tile = m_Layers->GetTile(l, y, x);
 
         if (tile.UseTexture())
         {

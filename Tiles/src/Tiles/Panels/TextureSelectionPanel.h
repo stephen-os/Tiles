@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core/Atlas.h"
+#include "../Core/Selection.h"
 #include "../Core/Base.h"
 
 #include <string>
@@ -19,6 +20,7 @@ namespace Tiles
         void Render();
         // Setters
         void SetTextureAtlas(Shared<Atlas> atlas) { m_Atlas = atlas; }
+        void SetSelection(Shared<Selection> selection) { m_Selection = selection; }
     private:
         // UI Rendering Methods
         void RenderAtlasPathSection();
@@ -37,6 +39,7 @@ namespace Tiles
     private:
         // Texture Atlas State
         Shared<Atlas> m_Atlas;
+        Shared<Selection> m_Selection;
 
         std::string m_TextureAtlasPath;
 
