@@ -89,9 +89,9 @@ namespace Tiles
             {
                 layer.SetName(std::string(layerNameBuffer));
             }
-        }
 
-        ImGui::Separator();
+            ImGui::Separator();
+        }
 
         ImGui::End();
     }
