@@ -25,8 +25,6 @@
 #include "Core/State.h"
 #include "Core/Base.h"
 
-#include "spdlog/spdlog.h"
-
 class Editor : public Lumina::Layer
 {
 public:
@@ -52,8 +50,6 @@ public:
 
     virtual void OnAttach() override
     {
-        spdlog::info("Welcome to spdlog!");
-
         Tiles::ThemeManager::GetInstance().ApplyDarkTheme();
 
         // References
