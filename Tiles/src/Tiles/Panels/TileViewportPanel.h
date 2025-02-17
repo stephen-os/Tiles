@@ -28,17 +28,21 @@ namespace Tiles
         void SetToolModes(const Shared<ToolModes>& modes) { m_ToolModes = modes; }
         void SetState(const Shared<State>& state) { m_State = state; }
         void SetSelection(const Shared<Selection>& selection) { m_Selection = selection; }
-
     private:
         // UI Rendering Methods
         void RenderBackground();
         void RenderTiles();
-        void HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x, ImVec2 tilePos);
-        void HandleSelection(size_t l, size_t y, size_t x);
+        // Drawing Methods
         void DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x);
         void DrawTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x);
+        
+        // Input Handling 
         void HandleInput();
+        void HandleSelection(size_t l, size_t y, size_t x);
 
+        // Utilities
+        bool IsNewClick(); 
+        bool IsNewTileDuringDrag(ImVec2 currentTilePos);
     private:
         float m_Zoom = 1.0f;
         bool m_IsMouseDragging = false;  // Track if we're in the middle of a drag

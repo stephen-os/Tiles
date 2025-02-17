@@ -83,7 +83,7 @@ namespace Tiles
 
                     if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                     {
-                        HandleSelection(l, y, x); 
+                        HandleSelection(l, y, x);
                         DrawHoveredTile(tileMin, tileMax, l, y, x);
                     }
                     DrawTile(tileMin, tileMax, l, y, x);
@@ -99,36 +99,70 @@ namespace Tiles
 
         if (l != m_Layers->GetActiveLayer())
             return;
+        
+        ImVec2 currentTilePos(y, x);
+        if (!IsNewClick() && !IsNewTileDuringDrag(currentTilePos))
+			return;
 
-        if (!ImGui::IsMouseDown(0))
-            return;
+        // std::cout << "we getting to here?" << std::endl;
 
-        int baseIndex = m_Selection->Front();
-        glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
+        // Are we dragging?
+        m_LastMousePosition = currentTilePos;
+        if (IsNewClick())
+            m_IsMouseDragging = true;
 
-        for (int texture : *m_Selection)
+        // If we are erasing, that is all we will do in this method. 
+        if (m_ToolModes->Erase)
         {
-            glm::vec2 relativePos = m_Atlas->GetPosition(texture);
-            glm::vec2 normalizedPos = relativePos - basePos;
+            Tile& tile = m_Layers->GetTile(l, y, x);
+            m_State->PushTile(y, x, tile);
+            tile.Reset();
+            return;
+        }
 
-            int targetX = x + (int)normalizedPos.x;
-            int targetY = y + (int)normalizedPos.y;
+        // For now we are only going to fill what is the first texture in the selection
+        if (m_ToolModes->Fill)
+        {
+            Layer& layer = m_Layers->GetLayer(l);
+            m_State->PushLayer(m_Selection->Front(), layer, StateType::Layer_Replace);
+            Tools::Fill(layer, m_Selection->Front(), y, x);
+        }
+        else
+        {
+            int baseIndex = m_Selection->Front();
+            glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
 
-            // Skip out-of-bounds tiles
-            if (targetX < 0 || targetY < 0 || targetX >= m_Layers->GetWidth() || targetY >= m_Layers->GetHeight())
+            for (int texture : *m_Selection)
             {
-                continue;
-            }
+                glm::vec2 relativePos = m_Atlas->GetPosition(texture);
+                glm::vec2 normalizedPos = relativePos - basePos;
 
-            // Get the tile and update it
-            Tile& tile = m_Layers->GetTile(l, targetY, targetX);
-            tile.SetTextureIndex(texture);
+                int targetX = x + (int)normalizedPos.x;
+                int targetY = y + (int)normalizedPos.y;
+
+                // Skip out-of-bounds tiles
+                if (targetX < 0 || targetY < 0 || targetX >= m_Layers->GetWidth() || targetY >= m_Layers->GetHeight())
+                    continue;
+
+                // Get the tile
+                Tile& tile = m_Layers->GetTile(l, targetY, targetX);
+                
+                // Store previouse state
+                m_State->PushTile(targetY, targetX, tile);
+
+                // Update texture
+                tile.SetTextureIndex(texture);
+            }
         }
     }
 
     void TileViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
         if (!m_Atlas || !m_Selection || m_Selection->Empty()) return;
+
+        // We dont draw the hovered tile if we are erasing
+        if (m_ToolModes->Erase)
+            return; 
 
         intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
         int baseIndex = m_Selection->Front();
@@ -188,6 +222,21 @@ namespace Tiles
                 m_Zoom = std::clamp(m_Zoom + scroll * zoomFactor, 0.5f, 3.0f);
             }
         }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Utils
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    bool TileViewportPanel::IsNewClick()
+    {
+        return ImGui::IsMouseClicked(0) && !m_IsMouseDragging;
+    }
+
+    bool TileViewportPanel::IsNewTileDuringDrag(ImVec2 currentTilePos)
+    {
+        return ImGui::IsMouseDown(0) && m_IsMouseDragging && 
+            (currentTilePos.x != m_LastMousePosition.x || currentTilePos.y != m_LastMousePosition.y);
     }
 
 }
