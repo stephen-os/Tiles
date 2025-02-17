@@ -32,6 +32,7 @@ namespace Tiles
         void RenderBackground();
         void RenderTiles();
         void HandleTileSelection(Layer& layer, Tile& tile, size_t y, size_t x, ImVec2 tilePos);
+        void DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax);
         void DrawTile(const Tile& tile, ImVec2 tileMin, ImVec2 tileMax);
         void HandleInput();
 

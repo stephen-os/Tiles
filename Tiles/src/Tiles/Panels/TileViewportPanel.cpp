@@ -91,6 +91,7 @@ namespace Tiles
 
                         // Highlight hovered tile
                         ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
+                        DrawHoveredTile(tileMin, tileMax);
                     }
 
                     DrawTile(tile, tileMin, tileMax);
@@ -151,6 +152,19 @@ namespace Tiles
                 m_IsMouseDragging = true;
             }
         }
+    }
+
+    void TileViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax)
+    {
+        if (!m_Atlas) return;
+		if (!m_Atlas->IsTextureSelected()) return;
+
+        intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
+        glm::vec4 texCoords = m_Atlas->GetTexCoords(m_Atlas->GetSelectedTexture());
+        ImVec2 uvMin(texCoords.x, texCoords.y);
+        ImVec2 uvMax(texCoords.z, texCoords.w);
+
+        ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, uvMin, uvMax, FILL_COLOR);
     }
 
     void TileViewportPanel::DrawTile(const Tile& tile, ImVec2 tileMin, ImVec2 tileMax)
