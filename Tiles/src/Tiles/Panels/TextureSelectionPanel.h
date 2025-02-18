@@ -45,7 +45,7 @@ namespace Tiles
         static constexpr float TEXTURE_BUTTON_SIZE = 40.0f;
         static constexpr float CHECKERBOARD_SIZE = 10.0f;
         static constexpr ImU32 SELECTION_BORDER_COLOR = IM_COL32(255, 165, 0, 255); // Orange
-        static constexpr ImU32 DEAULT_BORDER_COLOR = IM_COL32(255, 255, 255, 255);  // White
+        static constexpr ImU32 DEAULT_BORDER_COLOR = IM_COL32(51, 51, 51, 255);     // Black
         static constexpr ImU32 CHECKERBOARD_COLOR_1 = IM_COL32(120, 120, 120, 255); // Dark gray
         static constexpr ImU32 CHECKERBOARD_COLOR_2 = IM_COL32(80, 80, 80, 255);    // Even darker gray
     };
