@@ -49,21 +49,32 @@ void main()
     bool isCornerVertical   = (cell.x == int(u_GridSize.x)) && (cellPos.x < lineThickness);
     bool isCornerHorizontal = (cell.y == int(u_GridSize.y)) && (cellPos.y < lineThickness);
 
+
+    // Not pretty but this get the job done. 
     if (isOnVerticalLine || isOnHorizontalLine) 
     {
-        // Use a darker color for the grid lines
-        FragColor = vec4(0.2, 0.2, 0.2, 1.0);
+        if (isAnchorVertical || isAnchorHorizontal || isCornerVertical || isCornerHorizontal) 
+        {
+            FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+        else
+        {
+            // Use a darker color for the grid lines
+            FragColor = vec4(0.2, 0.2, 0.2, 1.0);
+        }
     } 
     else 
     {
-        // Regular checkerboard pattern
-        bool isLightTile = (cell.x + cell.y) % 2 == 0;
-        vec3 color = isLightTile ? u_GridColor1 : u_GridColor2;
-        FragColor = vec4(color, 1.0);
-    }
-
-    if (isAnchorVertical || isAnchorHorizontal || isCornerVertical || isCornerHorizontal) 
-    {
-        FragColor = vec4(1.0, 0.0, 0.0, 1.0); // Red color for the special grid lines
+        if (isAnchorVertical || isAnchorHorizontal || isCornerVertical || isCornerHorizontal) 
+        {
+            FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+        else
+        {
+            // Regular checkerboard pattern
+            bool isLightTile = (cell.x + cell.y) % 2 == 0;
+            vec3 color = isLightTile ? u_GridColor1 : u_GridColor2;
+            FragColor = vec4(color, 1.0);
+        }
     }
 }
