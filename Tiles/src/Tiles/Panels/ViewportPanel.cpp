@@ -5,6 +5,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "Lumina/Utils/FileReader.h"
+
 #include <iostream>
 
 namespace Tiles
@@ -44,67 +46,8 @@ namespace Tiles
         m_Grid->SetIndexBuffer(indexBuffer);
 
         // Create Infinite Grid Shader
-        const std::string vertexSrc = R"(
-            #version 330 core
-            layout(location = 0) in vec3 a_Position;
-
-            out vec2 v_ScreenPos;
-
-            void main()
-            {
-                gl_Position = vec4(a_Position, 1.0);
-                // Convert from [-1,1] range to [0,1] range for screen position
-                v_ScreenPos = (a_Position.xy + 1.0) * 0.5;
-            }
-        )";
-
-        const std::string fragmentSrc = R"(
-            #version 330 core
-            in vec2 v_ScreenPos;
-            out vec4 FragColor;
-
-            uniform mat4 u_ViewProjection;
-            uniform float u_AspectRatio;
-            uniform float u_GridSpacing = 1.0;
-            uniform vec3 u_GridColor1 = vec3(0.47, 0.47, 0.47);
-            uniform vec3 u_GridColor2 = vec3(0.31, 0.31, 0.31);
-
-            void main()
-            {
-                // Convert screen position to world space
-                vec2 screenPos = v_ScreenPos * vec2(u_AspectRatio, 1.0);
-    
-                // Get the inverse view-projection matrix to transform from screen to world space
-                mat4 invViewProj = inverse(u_ViewProjection);
-    
-                // Transform to world space
-                vec4 worldPos = invViewProj * vec4(screenPos, 0.0, 1.0);
-                worldPos /= worldPos.w;
-    
-                // Calculate grid coordinates in world space
-                vec2 gridCoord = worldPos.xy / u_GridSpacing;
-    
-                // Get the cell coordinates
-                ivec2 cell = ivec2(floor(gridCoord));
-    
-                // Calculate position within the current cell
-                vec2 cellPos = fract(gridCoord);
-    
-                // Determine if we're on a major grid line (every 4 tiles)
-                bool isOnVerticalLine = (cell.x % 4 == 0) && (cellPos.x < 0.1);
-                bool isOnHorizontalLine = (cell.y % 4 == 0) && (cellPos.y < 0.1);
-    
-                if (isOnVerticalLine || isOnHorizontalLine) {
-                    // Use a darker color for the grid lines
-                    FragColor = vec4(0.2, 0.2, 0.2, 1.0);
-                } else {
-                    // Regular checkerboard pattern
-                    bool isLightTile = (cell.x + cell.y) % 2 == 0;
-                    vec3 color = isLightTile ? u_GridColor1 : u_GridColor2;
-                    FragColor = vec4(color, 1.0);
-                }
-            }
-        )";
+        const std::string vertexSrc = Lumina::ReadFile("res/shaders/GridShader.vert");
+        const std::string fragmentSrc = Lumina::ReadFile("res/shaders/GridShader.frag");
 
         m_GridShader = Lumina::CreateRef<Lumina::ShaderProgram>(vertexSrc, fragmentSrc);
 
@@ -115,10 +58,56 @@ namespace Tiles
     {
         ImGui::Begin("GL Viewport");
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
+        // Get the screen position of the viewport
+        ImVec2 viewportScreenPos = ImGui::GetCursorScreenPos();
+
         m_Renderer.Begin();
         m_Renderer.OnWindowResize(viewportSize.x, viewportSize.y);
 
         float aspectRatio = viewportSize.x / viewportSize.y;
+
+        // Handle mouse input
+        ImVec2 mousePos = ImGui::GetMousePos();
+        mousePos.x -= viewportScreenPos.x;
+        mousePos.y -= viewportScreenPos.y;
+
+        // Check if mouse is within viewport bounds
+        bool isMouseInViewport = (mousePos.x >= 0 && mousePos.x < viewportSize.x &&
+            mousePos.y >= 0 && mousePos.y < viewportSize.y);
+
+        if (isMouseInViewport)
+        {
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
+            {
+                if (!m_IsMiddleMouseDown)
+                {
+                    // Middle mouse just pressed
+                    m_IsMiddleMouseDown = true;
+                    m_LastMousePos = glm::vec2(mousePos.x, mousePos.y);
+                }
+                else
+                {
+                    // Middle mouse being held - calculate drag delta
+                    glm::vec2 currentMousePos(mousePos.x, mousePos.y);
+                    glm::vec2 mouseDelta = currentMousePos - m_LastMousePos;
+
+                    // Convert mouse delta to world space movement
+                    float orthoSize = 10.0f;
+                    float worldSpaceScale = 2.0f * orthoSize / viewportSize.y;  // Scale factor to convert from screen to world space
+
+                    // Apply the sensitivity multiplier
+                    m_CameraPosition -= glm::vec2(-mouseDelta.x * worldSpaceScale * m_Sensitivity,
+                        -mouseDelta.y * worldSpaceScale * m_Sensitivity);
+
+                    m_LastMousePos = currentMousePos;
+                }
+            }
+            else
+            {
+                m_IsMiddleMouseDown = false;
+            }
+        }
 
         // Keep a fixed world-space size regardless of screen size
         float orthoSize = 10.0f;
@@ -131,6 +120,9 @@ namespace Tiles
 
         m_Camera.SetProjectionMatrix(left, right, bottom, top, znear, zfar);
 
+        // Create view matrix with camera position
+        glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(m_CameraPosition.x, m_CameraPosition.y, 0.0f));
+
         m_Renderer.Clear();
         m_Renderer.ClearColor(0.1f, 0.1f, 0.1f);
         m_Renderer.Enable(Lumina::RenderState::DepthTest);
@@ -138,11 +130,11 @@ namespace Tiles
 
         m_GridShader->Bind();
 
-        // Update uniforms
-        glm::mat4 viewProjection = m_Camera.GetViewMatrix();
-        m_GridShader->SetUniformMatrix4fv("u_ViewProjection", viewProjection);
+        // Update uniforms with the new view matrix
+        m_GridShader->SetUniformMatrix4fv("u_ViewProjection", viewMatrix);
         m_GridShader->SetUniform1f("u_AspectRatio", aspectRatio);
         m_GridShader->SetUniform1f("u_GridSpacing", 0.01f);
+        m_GridShader->SetUniform2fv("u_GridSize", { 20.0f * 4, 15.0f * 4 });
         m_GridShader->SetUniform3fv("u_GridColor1", { 0.47f, 0.47f, 0.47f });
         m_GridShader->SetUniform3fv("u_GridColor2", { 0.31f, 0.31f, 0.31f });
 
@@ -153,4 +145,5 @@ namespace Tiles
         m_Renderer.End();
         ImGui::End();
     }
+
 }
