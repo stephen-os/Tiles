@@ -44,7 +44,7 @@ public:
 
         m_HeaderPanel.Render();
         m_TextureSelectionPanel.Render();
-        // m_TileViewportPanel.Render();
+        m_TileViewportPanel.Render();
         m_ToolSelectionPanel.Render();
         m_LayerSelectionPanel.Render(); 
 

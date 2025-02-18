@@ -8,6 +8,9 @@
 #include "Lumina/Renderer/OrthographicCamera.h"
 
 #include "../Core/Base.h"
+#include "../Core/Camera.h"
+
+#include "imgui.h"
 
 namespace Tiles
 {
@@ -16,11 +19,18 @@ namespace Tiles
 	public:
 		ViewportPanel();
 		void Render();
+
+		// Mouse events
+		void HandleMouseInput(); 
+
+		// Helper
+		bool IsMouseInViewport(ImVec2& mousePos, ImVec2& viewportSize);
 	private:
 		Lumina::Renderer m_Renderer;
 		Shared<Lumina::VertexArray> m_Grid;
 		Shared<Lumina::ShaderProgram> m_GridShader;
-		OrthographicCamera m_Camera; // Not in namespace for some reason
+
+		Camera m_Camera;
 
 		// Mouse interaction state
 		bool m_IsMiddleMouseDown = false;
