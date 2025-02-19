@@ -21,10 +21,8 @@ namespace Tiles
 		void Resize(size_t width, size_t height);
 		void Clear();
 
-		// Util for State
-		void RemoveLayer(size_t layer);
-		void InsertLayer(size_t index, Layer layer);
-		void SetTile(size_t y, size_t x, Tile tile);
+		void Remove(size_t index);
+		void Insert(size_t index, Layer layer);
 
 		// Setters
 		void SetActiveLayer(size_t layer) { m_ActiveLayer = layer; }
@@ -33,11 +31,10 @@ namespace Tiles
 		size_t GetWidth() const { return m_LayerWidth; }
 		size_t GetHeight() const { return m_LayerHeight; }
 		size_t GetSize() { return m_Layers.size(); }
-
 		size_t GetActiveLayer() { return m_ActiveLayer; }
 
-		Layer& GetLayer(size_t layer) { return m_Layers[layer]; }
-		Tile& GetTile(size_t layer, size_t y, size_t x) { return m_Layers[layer].GetTile(y, x); }
+		Layer& GetLayer(size_t index) { return m_Layers[index]; }
+		Tile& GetTile(size_t index, size_t y, size_t x) { return m_Layers[index].GetTile(y, x); }
 	private:
 		bool IsLayerInBounds(size_t layer);
 	private:

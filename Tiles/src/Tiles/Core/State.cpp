@@ -74,12 +74,12 @@ namespace Tiles
         switch (action.Type)
         {
         case StateType::Layer_Insert:
-            m_Layers->RemoveLayer(action.Index);
+            m_Layers->Remove(action.Index);
             redoAction.Type = StateType::Layer_Delete;
             break;
 
         case StateType::Layer_Delete:
-            m_Layers->InsertLayer(action.Index, action.Layer);
+            m_Layers->Insert(action.Index, action.Layer);
             redoAction.Type = StateType::Layer_Insert;
             break;
 
@@ -92,7 +92,9 @@ namespace Tiles
             // This line is auffle but it works
             // probably expand functions in Layers
             redoAction.Tile = m_Layers->GetLayer(m_Layers->GetActiveLayer()).GetTile(action.Y, action.X);
-            m_Layers->SetTile(action.Y, action.X, action.Tile);
+            Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
+            Tile& tile = layer.GetTile(action.Y, action.X);
+            tile = Tile(action.Tile);
             break;
         }
 
@@ -112,12 +114,12 @@ namespace Tiles
         switch (action.Type)
         {
         case StateType::Layer_Insert:
-            m_Layers->RemoveLayer(action.Index);
+            m_Layers->Remove(action.Index);
             undoAction.Type = StateType::Layer_Delete;
             break;
 
         case StateType::Layer_Delete:
-            m_Layers->InsertLayer(action.Index, action.Layer);
+            m_Layers->Insert(action.Index, action.Layer);
             undoAction.Type = StateType::Layer_Insert;
             break;
 
@@ -128,7 +130,9 @@ namespace Tiles
 
         case StateType::Tile_Replace:
             undoAction.Tile = m_Layers->GetLayer(m_Layers->GetActiveLayer()).GetTile(action.Y, action.X);
-            m_Layers->SetTile(action.Y, action.X, action.Tile);
+            Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
+            Tile& tile = layer.GetTile(action.Y, action.X);
+            tile = Tile(action.Tile);
             break;
         }
 

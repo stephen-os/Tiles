@@ -40,9 +40,9 @@ namespace Tiles
         }
     }
 
-    void Layers::RemoveLayer(size_t layer) {
-        if (IsLayerInBounds(layer)) {
-            m_Layers.erase(m_Layers.begin() + layer);
+    void Layers::Remove(size_t index) {
+        if (IsLayerInBounds(index)) {
+            m_Layers.erase(m_Layers.begin() + index);
             if (m_ActiveLayer >= m_Layers.size() && !m_Layers.empty())
             {
                 m_ActiveLayer = m_Layers.size() - 1;
@@ -53,7 +53,7 @@ namespace Tiles
         }
     }
 
-    void Layers::InsertLayer(size_t index, Layer layer) {
+    void Layers::Insert(size_t index, Layer layer) {
         if (index <= m_Layers.size())
         { // Allow inserting at end
             m_Layers.insert(m_Layers.begin() + index, std::move(layer));
@@ -62,18 +62,6 @@ namespace Tiles
             std::cerr << "Error: Attempted to insert layer at an invalid index.\n";
         }
     }
-
-    void Layers::SetTile(size_t y, size_t x, Tile tile)
-    {
-        if (IsLayerInBounds(m_ActiveLayer) && x < m_LayerWidth && y < m_LayerHeight)
-        {
-            m_Layers[m_ActiveLayer].GetTile(y, x) = tile;
-        }
-        else {
-            std::cerr << "Error: Attempted to set tile out of bounds.\n";
-        }
-    }
-
 
     bool Layers::IsLayerInBounds(size_t layer)
     {

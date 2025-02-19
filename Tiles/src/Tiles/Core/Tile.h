@@ -14,7 +14,7 @@ namespace Tiles
 		void Reset();
 
 		// Setters
-		void SetTextureIndex(size_t textureIndex) { m_TextureIndex = textureIndex; }
+		void SetTextureIndex(int textureIndex) { m_TextureIndex = textureIndex; }
 
 		// Getters
 		int GetTextureIndex() const { return m_TextureIndex; }
