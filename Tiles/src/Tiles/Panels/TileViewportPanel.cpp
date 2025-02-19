@@ -2,11 +2,53 @@
 
 #include "../Core/Tools.h"
 
+#include "Lumina/Utils/FileReader.h"
+
 #include <algorithm>
+#include <array>
 #include <iostream>
 
 namespace Tiles
 {
+
+    TileViewportPanel::TileViewportPanel()
+    {
+        // Data
+        float vertices[] = 
+        {
+            // Positions    
+            -1.0f, -1.0f, 0.0f,
+             1.0f, -1.0f, 0.0f,
+             1.0f,  1.0f, 0.0f,
+            -1.0f,  1.0f, 0.0f
+        };
+
+        uint32_t indices[] = 
+        {
+            0, 1, 2,
+            2, 3, 0
+        };
+
+
+        // Buffer
+        m_Background = Lumina::CreateRef<Lumina::VertexArray>();
+
+        auto vertexBuffer = Lumina::CreateRef<Lumina::VertexBuffer>(vertices, sizeof(vertices));
+        auto indexBuffer = Lumina::CreateRef<Lumina::IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
+
+        vertexBuffer->SetLayout({{ Lumina::BufferDataType::Float3, "a_Position" }});
+
+        m_Background->AddVertexBuffer(vertexBuffer);
+		m_Background->SetIndexBuffer(indexBuffer);
+
+        // Shader
+        const std::string vertexSrc = Lumina::ReadFile("res/shaders/GridShader.vert");
+        const std::string fragmentSrc = Lumina::ReadFile("res/shaders/GridShader.frag");
+
+        m_BackgroundShader = Lumina::CreateRef<Lumina::ShaderProgram>(vertexSrc, fragmentSrc);
+
+        m_Renderer.Init(); 
+    }
 
     void TileViewportPanel::Render()
     {
@@ -14,7 +56,7 @@ namespace Tiles
 
         ImGui::Begin("Scene");
 
-        HandleInput();
+        HandleMouseInput();
         RenderBackground();
         RenderTiles();
 
@@ -23,63 +65,70 @@ namespace Tiles
 
     void TileViewportPanel::RenderBackground()
     {
-        ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-        float gridWidth = m_Layers->GetWidth() * TILE_SIZE * m_Zoom;
-        float gridHeight = m_Layers->GetHeight() * TILE_SIZE * m_Zoom;
+        ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-        // Define checkerboard properties
-        float scaledSize = CHECKERBOARD_SIZE * m_Zoom;
-        int numCheckerCols = static_cast<int>(gridWidth / scaledSize);
-        int numCheckerRows = static_cast<int>(gridHeight / scaledSize);
+        ImVec2 windowPos = ImGui::GetWindowPos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
+        ImVec2 mousePos = ImGui::GetMousePos();
 
-        // Render checkerboard background
-        for (int row = 0; row < numCheckerRows; row++)
-        {
-            for (int col = 0; col < numCheckerCols; col++)
-            {
-                float x = cursorPos.x + col * scaledSize;
-                float y = cursorPos.y + row * scaledSize;
+        m_Renderer.Begin();
+        m_Renderer.OnWindowResize(viewportSize.x, viewportSize.y);
 
-                ImVec2 minPos = ImVec2(x, y);
-                ImVec2 maxPos = ImVec2(std::min(x + scaledSize, cursorPos.x + gridWidth),
-                    std::min(y + scaledSize, cursorPos.y + gridHeight));
+        m_Renderer.Clear();
+        m_Renderer.ClearColor(0.1f, 0.1f, 0.1f);
+        m_Renderer.Enable(Lumina::RenderState::DepthTest);
+        m_Renderer.Enable(Lumina::RenderState::CullFace);
 
-                ImU32 fillColor = ((col + row) % 2 == 0) ? CHECKERBOARD_COLOR_1 : CHECKERBOARD_COLOR_2;
+        m_BackgroundShader->Bind();
 
-                ImGui::GetWindowDrawList()->AddRectFilled(minPos, maxPos, fillColor);
-            }
-        }
+        glm::vec2 gridSize = { 20, 15 };
 
-        // Render grid on top of checkerboard
-        for (size_t y = 0; y < m_Layers->GetWidth(); y++)
-        {
-            for (size_t x = 0; x < m_Layers->GetHeight(); x++)
-            {
-                float offset = TILE_SIZE * m_Zoom;
-                ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
-                ImVec2 tileMax(tileMin.x + offset, tileMin.y + offset);
+        // Update uniforms with the new view matrix
+        m_BackgroundShader->SetUniformMatrix4fv("u_ViewProjection", m_Camera.GetViewMatrix());
+        m_BackgroundShader->SetUniform1f("u_AspectRatio", viewportSize.x / viewportSize.y);
+        m_BackgroundShader->SetUniform1f("u_GridSpacing", 0.01f);
+        m_BackgroundShader->SetUniform2fv("u_GridSize", { m_Layers->GetWidth() * 4.0f, m_Atlas->GetHeight() * 4.0f });
+        m_BackgroundShader->SetUniform3fv("u_GridColor1", { 0.47f, 0.47f, 0.47f });
+        m_BackgroundShader->SetUniform3fv("u_GridColor2", { 0.31f, 0.31f, 0.31f });
 
-                // Only render the grid outline, remove the filled background
-                ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, OUTLINE_COLOR);
-            }
-        }
+        m_Renderer.Draw(m_Background);
+
+        ImGui::Image((void*)(intptr_t)m_Renderer.GetID(), viewportSize);
+        m_Renderer.End();
     }
 
     void TileViewportPanel::RenderTiles()
     {
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f); // Remove roundness
+
+        // Set transparent colors for the button fill
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));        // Fully transparent button
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.5f, 0.0f, 0.0f)); // Transparent when hovered
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));  // Transparent when clicked
+
+        // Set border colors and thickness
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));        // Transparent border by default
+        ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));  // Transparent border shadow
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);                       // Border thickness
+
+
         for (size_t l = 0; l < m_Layers->GetSize(); l++)
         {
             Layer& layer = m_Layers->GetLayer(l);
             if (!layer.GetVisibility()) continue;
 
+            glm::vec2 cameraPos = m_Camera.GetPosition();
+
             for (size_t y = 0; y < layer.GetHeight(); y++)
             {
                 for (size_t x = 0; x < layer.GetWidth(); x++)
                 {
+                    ImVec2 buttonSize = ImVec2(TILE_SIZE * m_Camera.GetZoom(), TILE_SIZE * m_Camera.GetZoom());
+                    ImGui::SetCursorPos(ImVec2(8 + (1000 * cameraPos.x) + (x * buttonSize.x), (30 + 1000 * cameraPos.y) + (y * buttonSize.y)));
+                    
                     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-                    float offset = TILE_SIZE * m_Zoom;
-                    ImVec2 tileMin(cursorPos.x + x * offset, cursorPos.y + y * offset);
-                    ImVec2 tileMax(tileMin.x + offset, tileMin.y + offset);
+                    ImVec2 tileMin(cursorPos.x, cursorPos.y);
+                    ImVec2 tileMax(tileMin.x + buttonSize.x, tileMin.y + buttonSize.y);
 
                     if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                     {
@@ -90,6 +139,10 @@ namespace Tiles
                 }
             }
         }
+
+        // Restore previous styles
+        ImGui::PopStyleVar(2);  // Pop FrameRounding and FrameBorderSize
+        ImGui::PopStyleColor(5); // Pop all color styles we pushed
     }
 
     void TileViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
@@ -179,9 +232,9 @@ namespace Tiles
             glm::vec2 normalizedPos = relativePos - basePos;
 
             // Adjust tile position based on normalized offset
-            ImVec2 adjustedMin(tileMin.x + normalizedPos.x * TILE_SIZE * m_Zoom,
-                tileMin.y + normalizedPos.y * TILE_SIZE * m_Zoom);
-            ImVec2 adjustedMax(adjustedMin.x + TILE_SIZE * m_Zoom, adjustedMin.y + TILE_SIZE * m_Zoom);
+            ImVec2 adjustedMin(tileMin.x + normalizedPos.x * TILE_SIZE * m_Camera.GetZoom(),
+                tileMin.y + normalizedPos.y * TILE_SIZE * m_Camera.GetZoom());
+            ImVec2 adjustedMax(adjustedMin.x + TILE_SIZE * m_Camera.GetZoom(), adjustedMin.y + TILE_SIZE * m_Camera.GetZoom());
 
             // Texture UV mapping
             ImVec2 uvMin(texCoords.x, texCoords.y);
@@ -211,19 +264,6 @@ namespace Tiles
         }
     }
 
-    void TileViewportPanel::HandleInput()
-    {
-        if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
-        {
-            float scroll = ImGui::GetIO().MouseWheel;
-            if (scroll != 0.0f)
-            {
-                float zoomFactor = 0.1f;
-                m_Zoom = std::clamp(m_Zoom + scroll * zoomFactor, 0.5f, 3.0f);
-            }
-        }
-    }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // Utils
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,4 +279,53 @@ namespace Tiles
             (currentTilePos.x != m_LastMousePosition.x || currentTilePos.y != m_LastMousePosition.y);
     }
 
+    void TileViewportPanel::HandleMouseInput()
+    {
+        ImVec2 windowPos = ImGui::GetWindowPos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
+        ImVec2 mousePos = ImGui::GetMousePos();
+
+        // Check if mouse is within viewport bounds
+        if (!IsMouseInViewport(mousePos, windowPos, windowSize))
+            return;
+
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
+        {
+            if (!m_IsMiddleMouseDown)
+            {
+                // Middle mouse just pressed
+                m_IsMiddleMouseDown = true;
+                m_LastMousePos = glm::vec2(mousePos.x, mousePos.y);
+            }
+            else
+            {
+                // Middle mouse being held - calculate drag delta
+                glm::vec2 currentMousePos(mousePos.x, mousePos.y);
+                glm::vec2 mouseDelta = currentMousePos - m_LastMousePos;
+
+                m_Camera.Drag(mouseDelta);
+
+                m_AnchorePos = m_Camera.GetPosition();
+
+                m_LastMousePos = currentMousePos;
+            }
+        }
+        else
+        {
+            m_IsMiddleMouseDown = false;
+        }
+
+        // Handle zoom input
+        float mouseWheel = ImGui::GetIO().MouseWheel;
+        if (mouseWheel != 0.0f)
+        {
+            m_Camera.Zoom(mouseWheel);
+        }
+    }
+
+    bool TileViewportPanel::IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize)
+    {
+        return (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
+            mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
+    }
 }

@@ -17,7 +17,6 @@
 #include "Panels/TileViewportPanel.h"
 #include "Panels/LayerSelectionPanel.h"
 #include "Panels/ToolSelectionPanel.h"
-#include "Panels/ViewportPanel.h"
 
 #include "Core/Selection.h"
 #include "Core/ToolModes.h"
@@ -46,9 +45,7 @@ public:
         m_TextureSelectionPanel.Render();
         m_TileViewportPanel.Render();
         m_ToolSelectionPanel.Render();
-        m_LayerSelectionPanel.Render(); 
-
-        m_ViewportPanel.Render();
+        m_LayerSelectionPanel.Render();
     }
 
     virtual void OnAttach() override
@@ -103,8 +100,6 @@ private:
     Tiles::Shared<Tiles::ToolModes> m_Modes;
     Tiles::Shared<Tiles::State> m_State;
     Tiles::Shared<Tiles::Selection> m_Selection;
-
-    Tiles::ViewportPanel m_ViewportPanel;
 
     // Panels
     Tiles::HeaderPanel m_HeaderPanel;

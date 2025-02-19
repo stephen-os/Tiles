@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Lumina/Renderer/VertexArray.h"
+#include "Lumina/Renderer/ShaderProgram.h"
+#include "Lumina/Renderer/Renderer.h"
+
 #include "../Core/Selection.h"
 #include "../Core/ToolModes.h"
 #include "../Core/Atlas.h"
@@ -8,6 +12,7 @@
 #include "../Core/Tile.h"
 #include "../Core/State.h"
 #include "../Core/Base.h"
+#include "../Core/Camera.h"
 
 #include "imgui.h"
 
@@ -17,7 +22,7 @@ namespace Tiles
     class TileViewportPanel
     {
     public:
-        TileViewportPanel() = default;
+        TileViewportPanel();
         ~TileViewportPanel() = default;
 
         void Render();
@@ -37,22 +42,37 @@ namespace Tiles
         void DrawTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x);
         
         // Input Handling 
-        void HandleInput();
         void HandleSelection(size_t l, size_t y, size_t x);
 
         // Utilities
         bool IsNewClick(); 
         bool IsNewTileDuringDrag(ImVec2 currentTilePos);
+        bool IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize);
+        void HandleMouseInput();
     private:
-        float m_Zoom = 1.0f;
-        bool m_IsMouseDragging = false;  // Track if we're in the middle of a drag
-        ImVec2 m_LastMousePosition = ImVec2(-1, -1);  // Track last modified tile position
-
         Shared<Layers> m_Layers;
         Shared<Atlas> m_Atlas;
         Shared<ToolModes> m_ToolModes;
         Shared<State> m_State;
         Shared<Selection> m_Selection;
+
+        // Ui State
+        bool m_IsMouseDragging = false;  // Track if we're in the middle of a drag
+        ImVec2 m_LastMousePosition = ImVec2(-1, -1);  // Track last modified tile position
+
+        // Renderer
+        Lumina::Renderer m_Renderer;
+        Camera m_Camera;
+
+        // Mouse interaction state
+        bool m_IsMiddleMouseDown = false;
+        glm::vec2 m_LastMousePos = { 0.0f, 0.0f };
+        glm::vec2 m_CameraPosition = { 0.0f, 0.0f };
+        glm::vec2 m_AnchorePos = { 0.0f, 0.0f };
+
+        // Lumina
+        Shared<Lumina::VertexArray> m_Background;
+        Shared<Lumina::ShaderProgram> m_BackgroundShader; 
 
         // Constants
         static constexpr float TILE_SIZE = 40.0f;
