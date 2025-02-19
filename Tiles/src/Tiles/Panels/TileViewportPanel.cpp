@@ -69,33 +69,21 @@ namespace Tiles
     {
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-        ImVec2 windowPos = ImGui::GetWindowPos();
-        ImVec2 windowSize = ImGui::GetWindowSize();
-        ImVec2 mousePos = ImGui::GetMousePos();
-
         m_Renderer.Begin();
         m_Renderer.OnWindowResize(viewportSize.x, viewportSize.y);
 
         m_Renderer.Clear();
-        m_Renderer.ClearColor(0.1f, 0.1f, 0.1f);
-        m_Renderer.Enable(Lumina::RenderState::DepthTest);
-        m_Renderer.Enable(Lumina::RenderState::CullFace);
 
         m_BackgroundShader->Bind();
 
-        glm::vec2 gridSize = { 20, 15 };
-
-        // Update uniforms with the new view matrix
         m_BackgroundShader->SetUniformMatrix4fv("u_ViewProjection", m_Camera.GetViewMatrix());
         m_BackgroundShader->SetUniform1f("u_AspectRatio", viewportSize.x / viewportSize.y);
-        m_BackgroundShader->SetUniform1f("u_GridSpacing", 0.01f);
         m_BackgroundShader->SetUniform2fv("u_GridSize", { m_Layers->GetWidth() * 4.0f, m_Layers->GetHeight() * 4.0f });
-        m_BackgroundShader->SetUniform3fv("u_GridColor1", { 0.47f, 0.47f, 0.47f });
-        m_BackgroundShader->SetUniform3fv("u_GridColor2", { 0.31f, 0.31f, 0.31f });
 
         m_Renderer.Draw(m_Background);
 
         ImGui::Image((void*)(intptr_t)m_Renderer.GetID(), viewportSize);
+
         m_Renderer.End();
     }
 

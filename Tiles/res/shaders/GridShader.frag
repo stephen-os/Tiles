@@ -1,14 +1,18 @@
 #version 330 core
 in vec2 v_ScreenPos;
 out vec4 FragColor;
+
 uniform mat4 u_ViewProjection;
 uniform float u_AspectRatio;
-uniform float u_GridSpacing;
-uniform vec3 u_GridColor1;
-uniform vec3 u_GridColor2;
 uniform vec2 u_GridSize;
-uniform float u_BlackLineThickness = 0.01; // Adjust thickness of black grid lines
-uniform float u_RedLineThickness = 0.3;   // Adjust thickness of red anchor lines
+
+const float GRID_SPACING = 0.01;
+const float RED_LINE_THICKNESS = 0.3;
+const float BLACK_LINE_THICKNESS = 0.01;
+const vec3 GRID_COLOR_1 = vec3(0.47, 0.47, 0.47);     // Inner light gray
+const vec3 GRID_COLOR_2 = vec3(0.31, 0.31, 0.31);     // Inner dark gray
+const vec3 GRID_COLOR_3 = vec3(0.27, 0.27, 0.27);     // Outer light gray
+const vec3 GRID_COLOR_4 = vec3(0.15, 0.15, 0.15);     // Outer dark gray
 
 void main()
 {
@@ -18,7 +22,7 @@ void main()
     worldPos /= worldPos.w;
 
     // Calculate grid coordinates
-    vec2 gridCoord = worldPos.xy / u_GridSpacing;
+    vec2 gridCoord = worldPos.xy / GRID_SPACING;
     ivec2 cell = ivec2(floor(gridCoord));
     vec2 cellPos = fract(gridCoord);
 
@@ -26,34 +30,45 @@ void main()
     ivec2 groupCell = cell / 4;
     vec2 groupLocalPos = fract(gridCoord / 4.0);
 
+    // Check if we're outside the boundary
+    bool isOutsideBoundary = 
+        gridCoord.x < 0.0 || 
+        gridCoord.x > float(u_GridSize.x) ||
+        gridCoord.y < 0.0 || 
+        gridCoord.y > float(u_GridSize.y);
+
     // Grid line conditions for 4x4 groups
     bool isOnVerticalLine = (
-        // Right edge of current group
-        (groupLocalPos.x > (1.0 - u_BlackLineThickness)) ||
-        // Left edge of next group
-        (groupLocalPos.x < u_BlackLineThickness)
+        (groupLocalPos.x > (1.0 - BLACK_LINE_THICKNESS)) ||
+        (groupLocalPos.x < BLACK_LINE_THICKNESS)
     );
-
     bool isOnHorizontalLine = (
-        // Bottom edge of current group
-        (groupLocalPos.y > (1.0 - u_BlackLineThickness)) ||
-        // Top edge of next group
-        (groupLocalPos.y < u_BlackLineThickness)
+        (groupLocalPos.y > (1.0 - BLACK_LINE_THICKNESS)) ||
+        (groupLocalPos.y < BLACK_LINE_THICKNESS)
     );
 
-    // Modified red boundary lines to be offset from the checkerboard edges
-    bool isAnchorVertical = (gridCoord.x < 0.0 && gridCoord.x > -u_RedLineThickness);
-    bool isCornerVertical = (gridCoord.x > float(u_GridSize.x) && gridCoord.x < float(u_GridSize.x) + u_RedLineThickness);
+    // Modified red boundary lines
+    bool isAnchorVertical = (gridCoord.x < 0.0 && gridCoord.x > -RED_LINE_THICKNESS);
+    bool isCornerVertical = (gridCoord.x > float(u_GridSize.x) && gridCoord.x < float(u_GridSize.x) + RED_LINE_THICKNESS);
     
-    bool isAnchorHorizontal = (gridCoord.y < 0.0 && gridCoord.y > -u_RedLineThickness);
-    bool isCornerHorizontal = (gridCoord.y > float(u_GridSize.y) && gridCoord.y < float(u_GridSize.y) + u_RedLineThickness);
+    bool isAnchorHorizontal = (gridCoord.y < 0.0 && gridCoord.y > -RED_LINE_THICKNESS);
+    bool isCornerHorizontal = (gridCoord.y > float(u_GridSize.y) && gridCoord.y < float(u_GridSize.y) + RED_LINE_THICKNESS);
 
-    // Assign colors
-    vec3 gridColor = ((cell.x + cell.y) % 2 == 0) ? u_GridColor1 : u_GridColor2;
+    // Assign colors based on position
+    vec3 gridColor;
+    if (isOutsideBoundary) {
+        // Use darker colors outside boundary
+        gridColor = ((cell.x + cell.y) % 2 == 0) ? GRID_COLOR_3 : GRID_COLOR_4;
+    } else {
+        // Use normal colors inside boundary
+        gridColor = ((cell.x + cell.y) % 2 == 0) ? GRID_COLOR_1 : GRID_COLOR_2;
+    }
+
     vec3 finalColor = gridColor;
-
+    
     if (isOnVerticalLine || isOnHorizontalLine)
         finalColor = vec3(0.2); // Black grid lines
+        
     if (isAnchorVertical || isAnchorHorizontal || isCornerVertical || isCornerHorizontal)
         finalColor = vec3(1.0, 0.0, 0.0); // Red anchor lines
 
