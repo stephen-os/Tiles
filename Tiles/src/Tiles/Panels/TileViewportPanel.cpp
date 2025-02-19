@@ -48,6 +48,8 @@ namespace Tiles
         m_BackgroundShader = Lumina::CreateRef<Lumina::ShaderProgram>(vertexSrc, fragmentSrc);
 
         m_Renderer.Init(); 
+
+        m_Camera.Drag({ 40.0f, 40.0f });
     }
 
     void TileViewportPanel::Render()
@@ -87,7 +89,7 @@ namespace Tiles
         m_BackgroundShader->SetUniformMatrix4fv("u_ViewProjection", m_Camera.GetViewMatrix());
         m_BackgroundShader->SetUniform1f("u_AspectRatio", viewportSize.x / viewportSize.y);
         m_BackgroundShader->SetUniform1f("u_GridSpacing", 0.01f);
-        m_BackgroundShader->SetUniform2fv("u_GridSize", { m_Layers->GetWidth() * 4.0f, m_Atlas->GetHeight() * 4.0f });
+        m_BackgroundShader->SetUniform2fv("u_GridSize", { m_Layers->GetWidth() * 4.0f, m_Layers->GetHeight() * 4.0f });
         m_BackgroundShader->SetUniform3fv("u_GridColor1", { 0.47f, 0.47f, 0.47f });
         m_BackgroundShader->SetUniform3fv("u_GridColor2", { 0.31f, 0.31f, 0.31f });
 
