@@ -19,11 +19,11 @@
 namespace Tiles
 {
 
-    class TileViewportPanel
+    class ViewportPanel
     {
     public:
-        TileViewportPanel();
-        ~TileViewportPanel() = default;
+        ViewportPanel();
+        ~ViewportPanel() = default;
 
         void Render();
 

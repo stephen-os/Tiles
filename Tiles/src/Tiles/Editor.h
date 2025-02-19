@@ -14,7 +14,7 @@
 
 #include "Panels/HeaderPanel.h"
 #include "Panels/TextureSelectionPanel.h"
-#include "Panels/TileViewportPanel.h"
+#include "Panels/ViewportPanel.h"
 #include "Panels/LayerSelectionPanel.h"
 #include "Panels/ToolSelectionPanel.h"
 
@@ -43,7 +43,7 @@ public:
 
         m_HeaderPanel.Render();
         m_TextureSelectionPanel.Render();
-        m_TileViewportPanel.Render();
+        m_ViewportPanel.Render();
         m_ToolSelectionPanel.Render();
         m_LayerSelectionPanel.Render();
     }
@@ -71,11 +71,11 @@ public:
         m_HeaderPanel.SetState(m_State);
 
         // Viewport
-        m_TileViewportPanel.SetTileLayers(m_Layers);
-        m_TileViewportPanel.SetTextureAtlas(m_Atlas);
-        m_TileViewportPanel.SetToolModes(m_Modes);
-		m_TileViewportPanel.SetState(m_State);
-        m_TileViewportPanel.SetSelection(m_Selection);
+        m_ViewportPanel.SetTileLayers(m_Layers);
+        m_ViewportPanel.SetTextureAtlas(m_Atlas);
+        m_ViewportPanel.SetToolModes(m_Modes);
+        m_ViewportPanel.SetState(m_State);
+        m_ViewportPanel.SetSelection(m_Selection);
 
         // Texture Selection
         m_TextureSelectionPanel.SetTextureAtlas(m_Atlas);
@@ -104,7 +104,7 @@ private:
     // Panels
     Tiles::HeaderPanel m_HeaderPanel;
     Tiles::TextureSelectionPanel m_TextureSelectionPanel;
-    Tiles::TileViewportPanel m_TileViewportPanel;
+    Tiles::ViewportPanel m_ViewportPanel;
     Tiles::LayerSelectionPanel m_LayerSelectionPanel;
     Tiles::ToolSelectionPanel m_ToolSelectionPanel;
 

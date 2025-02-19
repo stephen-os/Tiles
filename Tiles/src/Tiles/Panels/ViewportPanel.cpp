@@ -1,4 +1,4 @@
-#include "TileViewportPanel.h"
+#include "ViewportPanel.h"
 
 #include "../Core/Tools.h"
 
@@ -11,7 +11,7 @@
 namespace Tiles
 {
 
-    TileViewportPanel::TileViewportPanel()
+    ViewportPanel::ViewportPanel()
     {
         // Data
         float vertices[] = 
@@ -52,7 +52,7 @@ namespace Tiles
         m_Camera.Drag({ 40.0f, 40.0f });
     }
 
-    void TileViewportPanel::Render()
+    void ViewportPanel::Render()
     {
         if (!m_Layers) return;
 
@@ -65,7 +65,7 @@ namespace Tiles
         ImGui::End();
     }
 
-    void TileViewportPanel::RenderBackground()
+    void ViewportPanel::RenderBackground()
     {
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
@@ -87,7 +87,7 @@ namespace Tiles
         m_Renderer.End();
     }
 
-    void TileViewportPanel::RenderTiles()
+    void ViewportPanel::RenderTiles()
     {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f); // Remove roundness
 
@@ -135,7 +135,7 @@ namespace Tiles
         ImGui::PopStyleColor(5); // Pop all color styles we pushed
     }
 
-    void TileViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
+    void ViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
     {
         if (!m_Selection || m_Selection->Empty()) 
             return;
@@ -199,7 +199,7 @@ namespace Tiles
         }
     }
 
-    void TileViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
+    void ViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
         if (!m_Atlas || !m_Selection || m_Selection->Empty()) return;
 
@@ -236,7 +236,7 @@ namespace Tiles
         }
     }
 
-    void TileViewportPanel::DrawTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
+    void ViewportPanel::DrawTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
         if (!m_Atlas->IsCreated()) 
             return;
@@ -258,18 +258,18 @@ namespace Tiles
     // Utils
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    bool TileViewportPanel::IsNewClick()
+    bool ViewportPanel::IsNewClick()
     {
         return ImGui::IsMouseClicked(0) && !m_IsMouseDragging;
     }
 
-    bool TileViewportPanel::IsNewTileDuringDrag(ImVec2 currentTilePos)
+    bool ViewportPanel::IsNewTileDuringDrag(ImVec2 currentTilePos)
     {
         return ImGui::IsMouseDown(0) && m_IsMouseDragging && 
             (currentTilePos.x != m_LastMousePosition.x || currentTilePos.y != m_LastMousePosition.y);
     }
 
-    void TileViewportPanel::HandleMouseInput()
+    void ViewportPanel::HandleMouseInput()
     {
         ImVec2 windowPos = ImGui::GetWindowPos();
         ImVec2 windowSize = ImGui::GetWindowSize();
@@ -313,7 +313,7 @@ namespace Tiles
         }
     }
 
-    bool TileViewportPanel::IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize)
+    bool ViewportPanel::IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize)
     {
         return (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
             mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
