@@ -57,7 +57,12 @@ namespace Tiles
     void ViewportPanel::Render()
     {
         ImGui::Begin("GL Viewport");
+
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
+        ImVec2 windowPos = ImGui::GetWindowPos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
+        ImVec2 mousePos = ImGui::GetMousePos();
 
         HandleMouseInput();
 
@@ -71,11 +76,13 @@ namespace Tiles
 
         m_GridShader->Bind();
 
+        glm::vec2 gridSize = { 20, 15 };
+
         // Update uniforms with the new view matrix
         m_GridShader->SetUniformMatrix4fv("u_ViewProjection", m_Camera.GetViewMatrix());
         m_GridShader->SetUniform1f("u_AspectRatio", viewportSize.x / viewportSize.y);
         m_GridShader->SetUniform1f("u_GridSpacing", 0.01f);
-        m_GridShader->SetUniform2fv("u_GridSize", { 20.0f * 4, 15.0f * 4 });
+        m_GridShader->SetUniform2fv("u_GridSize", { gridSize.x * 4.0f, gridSize.y * 4.0f });
         m_GridShader->SetUniform3fv("u_GridColor1", { 0.47f, 0.47f, 0.47f });
         m_GridShader->SetUniform3fv("u_GridColor2", { 0.31f, 0.31f, 0.31f });
 
@@ -83,23 +90,83 @@ namespace Tiles
 
         ImGui::Image((void*)(intptr_t)m_Renderer.GetID(), viewportSize);
 
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f); // Remove roundness
+
+        // Set transparent colors for the button fill
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));        // Fully transparent button
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.5f, 0.0f, 0.0f)); // Transparent when hovered
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));  // Transparent when clicked
+
+        // Set border colors and thickness
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));        // Transparent border by default
+        ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));  // Transparent border shadow
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);                       // Border thickness
+
+        glm::vec2 camPos = m_Camera.GetPosition();
+
+        for (int i = 0; i < gridSize.x; ++i)
+        {
+            for (int j = 0; j < gridSize.y; ++j)
+            {
+                ImVec2 buttonSize = ImVec2(40 * m_Camera.GetZoom(), 40 * m_Camera.GetZoom());
+                ImGui::SetCursorPos(ImVec2(8 + (1000 * camPos.x) + (i * buttonSize.x), (30 + 1000 * camPos.y) + (j * buttonSize.y)));
+
+                // Create unique ID for each button
+                ImGui::PushID(i + j * gridSize.x);
+
+                // Check if button is being hovered before drawing it
+                ImGui::SetNextItemAllowOverlap();  // Allow buttons to overlap if needed
+                bool hovered = ImGui::IsMouseHoveringRect(
+                    ImGui::GetCursorScreenPos(),
+                    ImVec2(ImGui::GetCursorScreenPos().x + buttonSize.x,
+                        ImGui::GetCursorScreenPos().y + buttonSize.y)
+                );
+
+                // Change border color based on hover state
+                if (hovered)
+                {
+                    ImGui::PopStyleColor();  // Pop previous border colors
+                    ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 165, 0, 255));        // White border
+                }
+
+                ImGui::Button("B", buttonSize);
+
+                // Restore border colors if we changed them
+                if (hovered)
+                {
+                    ImGui::PopStyleColor();
+                    ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                }
+
+                ImGui::PopID();
+            }
+        }
+
+        // Restore previous styles
+        ImGui::PopStyleVar(2);  // Pop FrameRounding and FrameBorderSize
+        ImGui::PopStyleColor(5); // Pop all color styles we pushed
+
         m_Renderer.End();
+        ImGui::End();
+
+        ImGui::Begin("Hovered Info");
+        if (IsMouseInViewport(mousePos, windowPos, windowSize))
+        {
+            ImGui::Text("Mouse Position: (%.2f, %.2f)", mousePos.x, mousePos.y);
+            ImGui::Text("World Position: (%.2f, %.2f)", m_Camera.GetPosition().x, m_Camera.GetPosition().y);
+        }
+
         ImGui::End();
     }
 
     void ViewportPanel::HandleMouseInput()
     {
-        ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-
-        ImVec2 viewportScreenPos = ImGui::GetCursorScreenPos();
-
-        // Handle mouse input
+        ImVec2 windowPos = ImGui::GetWindowPos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
         ImVec2 mousePos = ImGui::GetMousePos();
-        mousePos.x -= viewportScreenPos.x;
-        mousePos.y -= viewportScreenPos.y;
 
         // Check if mouse is within viewport bounds
-        if (!IsMouseInViewport(mousePos, viewportSize))
+        if (!IsMouseInViewport(mousePos, windowPos, windowSize))
             return; 
 
         if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
@@ -118,6 +185,8 @@ namespace Tiles
 
                 m_Camera.Drag(mouseDelta);
 
+                m_AnchorePos = m_Camera.GetPosition();
+
                 m_LastMousePos = currentMousePos;
             }
         }
@@ -134,9 +203,10 @@ namespace Tiles
         }
     }
 
-    bool ViewportPanel::IsMouseInViewport(ImVec2& mousePos, ImVec2& viewportSize)
+    bool ViewportPanel::IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize)
     {
-        return (mousePos.x >= 0 && mousePos.x < viewportSize.x && mousePos.y >= 0 && mousePos.y < viewportSize.y);
+        return (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
+            mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
     }
 
 }

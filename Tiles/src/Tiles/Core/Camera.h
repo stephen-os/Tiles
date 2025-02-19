@@ -17,6 +17,7 @@ namespace Tiles
 		// Getters
 		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 		glm::vec2& GetPosition() { return m_Position; }
+		float GetZoom() const { return m_Zoom; }
 
 		// Setters
 		void SetPosition(const glm::vec2& position) { m_Position = position; UpdateViewMatrix(); }

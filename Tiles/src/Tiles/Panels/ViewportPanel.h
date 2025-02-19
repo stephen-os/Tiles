@@ -24,7 +24,7 @@ namespace Tiles
 		void HandleMouseInput(); 
 
 		// Helper
-		bool IsMouseInViewport(ImVec2& mousePos, ImVec2& viewportSize);
+		bool IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize);
 	private:
 		Lumina::Renderer m_Renderer;
 		Shared<Lumina::VertexArray> m_Grid;
@@ -36,6 +36,8 @@ namespace Tiles
 		bool m_IsMiddleMouseDown = false;
 		glm::vec2 m_LastMousePos = { 0.0f, 0.0f };
 		glm::vec2 m_CameraPosition = { 0.0f, 0.0f };
+		
+		glm::vec2 m_AnchorePos = { 0.0f, 0.0f };
 
 		float m_Sensitivity = 0.05f; // Adjust this value for the desired speed reduction
 	};
