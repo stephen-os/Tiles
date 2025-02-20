@@ -43,7 +43,7 @@ public:
         ImGui::End();
 
         m_HeaderPanel.Render();
-        m_TextureSelectionPanel.Render();
+        m_TextureSelectionPanel.OnUIRender();
         m_ViewportPanel.OnUIRender();
         m_ToolSelectionPanel.Render();
         m_LayerSelectionPanel.Render();
