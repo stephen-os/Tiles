@@ -1,5 +1,7 @@
 #include "ToolSelectionPanel.h"
 
+#include "../Theme/Color.h"
+
 namespace Tiles
 {
 
@@ -26,7 +28,7 @@ namespace Tiles
         {
             ImVec2 min = ImGui::GetItemRectMin();
             ImVec2 max = ImGui::GetItemRectMax();
-            ImGui::GetWindowDrawList()->AddRect(min, max, SELECTION_BORDER_COLOR, 5.0f, 0, 1.0f);
+            ImGui::GetWindowDrawList()->AddRect(min, max, Color::SELECTION_BORDER_COLOR, 5.0f, 0, 1.0f);
         }
 
         ImGui::PopID();
@@ -44,7 +46,7 @@ namespace Tiles
         {
             ImVec2 min = ImGui::GetItemRectMin();
             ImVec2 max = ImGui::GetItemRectMax();
-            ImGui::GetWindowDrawList()->AddRect(min, max, SELECTION_BORDER_COLOR, 5.0f, 0, 1.0f);
+            ImGui::GetWindowDrawList()->AddRect(min, max, Color::SELECTION_BORDER_COLOR, 5.0f, 0, 1.0f);
         }
 
         ImGui::PopID();
