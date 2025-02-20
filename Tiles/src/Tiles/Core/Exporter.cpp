@@ -80,10 +80,10 @@ namespace Tiles
 
         Lumina::Renderer renderer;
 
-        renderer.Init();
-        renderer.Begin();
-        renderer.OnWindowResize(outputWidth, outputHeight);
-        renderer.Clear();
+        Lumina::Renderer::Init();
+        Lumina::Renderer::Begin();
+        Lumina::Renderer::OnWindowResize(outputWidth, outputHeight);
+        Lumina::Renderer::Clear();
 
         atlas->Bind();
 
@@ -98,7 +98,6 @@ namespace Tiles
             {
                 for (int x = 0; x < layer.GetWidth(); x++)
                 {
-
                     Tile& tile = layer.GetTile(y, x);
                     if (tile.GetTextureIndex() != -1)
                     {
@@ -107,15 +106,15 @@ namespace Tiles
 
                         shader.SetUniformMatrix4fv("u_Transform", transform);
                         shader.SetUniform2fv("u_Offset", offset);
-                        renderer.Draw(quad.GetVertexArray());
+                        Lumina::Renderer::Draw(quad.GetVertexArray());
                     }
                 }
             }
         }
 
-        renderer.End();
+        Lumina::Renderer::End();
 
-        renderer.SaveFrameBufferToImage(filename);
+        Lumina::Renderer::SaveFrameBufferToImage(filename);
     }
 
 }

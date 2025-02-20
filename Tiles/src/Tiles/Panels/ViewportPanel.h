@@ -2,7 +2,7 @@
 
 #include "Lumina/Renderer/VertexArray.h"
 #include "Lumina/Renderer/ShaderProgram.h"
-#include "Lumina/Renderer/Renderer.h"
+
 
 #include "../Core/Selection.h"
 #include "../Core/ToolModes.h"
@@ -59,7 +59,6 @@ namespace Tiles
         Shared<Selection> m_Selection;
 
         // Rendering
-        Lumina::Renderer m_Renderer;
         Quad m_Background;
         Camera m_Camera;
 

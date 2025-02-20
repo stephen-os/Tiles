@@ -4,6 +4,7 @@
 
 #include "../Theme/Color.h"
 
+#include "Lumina/Renderer/Renderer.h"
 #include "Lumina/Utils/FileReader.h"
 
 #include <algorithm>
@@ -16,7 +17,6 @@ namespace Tiles
 
     ViewportPanel::ViewportPanel()
     {
-        m_Renderer.Init(); 
         m_Camera.Drag({ 40.0f, 56.0f });
     }
 
@@ -41,20 +41,20 @@ namespace Tiles
     {
         ImVec2 viewportSize = { 1000, 1000 };
      
-        m_Renderer.Begin();
-        m_Renderer.OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
+        Lumina::Renderer::Begin();
+        Lumina::Renderer::OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
 
-        m_Renderer.Clear();
+        Lumina::Renderer::Clear();
 
         m_Background.Bind();
         m_Background.SetUniforms(m_Camera, m_Layers);
 
-        m_Renderer.Draw(m_Background.GetArrays());
+        Lumina::Renderer::Draw(m_Background.GetArrays());
         m_Background.Unbind(); 
 
-        ImGui::Image((void*)(intptr_t)m_Renderer.GetID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
+        ImGui::Image((void*)(intptr_t)Lumina::Renderer::GetID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
 
-        m_Renderer.End();
+        Lumina::Renderer::End();
     }
 
     void ViewportPanel::RenderTiles()

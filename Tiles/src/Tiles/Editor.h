@@ -8,6 +8,7 @@
 
 #include "Lumina/Utils/Timer.h"
 #include "Lumina/Utils/FileReader.h"
+#include "Lumina/Renderer/Renderer.h"
 
 // Client
 #include "Theme/ThemeManager.h"
@@ -50,6 +51,8 @@ public:
 
     virtual void OnAttach() override
     {
+        Lumina::Renderer::Init();
+
         Tiles::ThemeManager::GetInstance().ApplyDarkTheme();
 
         // References
@@ -91,7 +94,7 @@ public:
 
     virtual void OnDetach() override
     {
-        
+        Lumina::Renderer::Shutdown();
     }
 
 private:
