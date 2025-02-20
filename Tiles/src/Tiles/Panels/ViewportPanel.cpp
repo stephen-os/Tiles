@@ -39,8 +39,6 @@ namespace Tiles
 
     void ViewportPanel::RenderBackground()
     {
-        ImVec2 viewportSize = { 1000, 1000 };
-     
         Lumina::Renderer::Begin();
         Lumina::Renderer::OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
 
