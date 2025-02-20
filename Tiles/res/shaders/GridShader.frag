@@ -8,7 +8,7 @@ uniform vec2 u_GridSize;
 
 const float GRID_SPACING = 0.01;
 const float RED_LINE_THICKNESS = 0.3;
-const float BLACK_LINE_THICKNESS = 0.01;
+const float BLACK_LINE_THICKNESS = 0.015;
 const vec3 GRID_COLOR_1 = vec3(0.47, 0.47, 0.47);     // Inner light gray
 const vec3 GRID_COLOR_2 = vec3(0.31, 0.31, 0.31);     // Inner dark gray
 const vec3 GRID_COLOR_3 = vec3(0.27, 0.27, 0.27);     // Outer light gray
