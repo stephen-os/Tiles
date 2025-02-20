@@ -56,7 +56,7 @@ namespace Tiles
     {
         if (!m_Layers) return;
 
-        ImGui::Begin("Scene");
+        ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
         HandleMouseInput();
         RenderBackground();
