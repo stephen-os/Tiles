@@ -1,17 +1,16 @@
 // TextureSelectionPanel.cpp
 #include "TextureSelectionPanel.h"
+#include "../Theme/Color.h"
 
 #include "ImGuiFileDialog.h"
 
 #include <filesystem>
 #include <algorithm>
 
-#include <iostream>
-
 namespace Tiles
 {
 
-    void TextureSelectionPanel::Render()
+    void TextureSelectionPanel::OnUIRender()
     {
         ImGui::Begin("Texture Selection");
 
@@ -29,15 +28,19 @@ namespace Tiles
         ImGui::End();
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // UI Render
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
     void TextureSelectionPanel::RenderAtlasPathSection()
     {
-        ImGui::AlignTextToFramePadding(); // Aligns text with buttons
+        ImGui::AlignTextToFramePadding();
         ImGui::Text("Atlas:");
         ImGui::SameLine();
 
         if (!m_Atlas->IsCreated())
         {
-            ImGui::AlignTextToFramePadding(); // Ensures vertical alignment
+            ImGui::AlignTextToFramePadding();
             ImGui::TextWrapped("[ No file selected ]");
             ImGui::SameLine();
 
@@ -47,53 +50,11 @@ namespace Tiles
         else
         {
             ImGui::AlignTextToFramePadding();
-            ImGui::TextWrapped("[ %s ]", m_Atlas->GetFilename().c_str()); // Wrapped for better visuals
+            ImGui::TextWrapped("[ %s ]", m_Atlas->GetFilename().c_str());
             ImGui::SameLine();
 
             if (ImGui::Button("Remove"))
                 m_Atlas->Destroy();
-        }
-    }
-
-    void TextureSelectionPanel::OpenFileDialog()
-    {
-        IGFD::FileDialogConfig config;
-        config.path = ".";
-        config.flags = ImGuiFileDialogFlags_Modal;
-        config.countSelectionMax = 1;
-
-        ImGuiFileDialog::Instance()->OpenDialog(
-            "ChooseAtlasFileDlg",
-            "Choose Atlas File",
-            ".png,.jpg,.jpeg",
-            config
-        );
-    }
-
-    void TextureSelectionPanel::HandleFileDialogResult()
-    {
-        if (ImGuiFileDialog::Instance()->IsOk())
-        {
-            HandleAtlasFileSelection(ImGuiFileDialog::Instance()->GetFilePathName());
-        }
-        ImGuiFileDialog::Instance()->Close();
-    }
-
-    void TextureSelectionPanel::RenderFileDialog()
-    {
-        if (ImGuiFileDialog::Instance()->Display("ChooseAtlasFileDlg",
-            ImGuiWindowFlags_NoCollapse,
-            ImVec2(600, 400)))
-        {
-            HandleFileDialogResult();
-        }
-    }
-
-    void TextureSelectionPanel::HandleAtlasFileSelection(const std::string& newPath)
-    {
-        if (std::filesystem::exists(newPath))
-        {
-            m_Atlas->Create(newPath);
         }
     }
 
@@ -133,26 +94,29 @@ namespace Tiles
         ImVec2 position = ImGui::GetCursorScreenPos();
 
         // Compute the full size based on tile size and grid count
-        float atlasWidthPixels = m_Atlas->GetWidth() * TEXTURE_BUTTON_SIZE;
-        float atlasHeightPixels = m_Atlas->GetHeight() * TEXTURE_BUTTON_SIZE;
+        float atlasWidthPixels = m_Atlas->GetWidth() * m_TextureButtonSize;
+        float atlasHeightPixels = m_Atlas->GetHeight() * m_TextureButtonSize;
 
         // Render checkerboard
-        for (float y = position.y; y < position.y + atlasHeightPixels; y += CHECKERBOARD_SIZE)
+        // TODO:: Use Shader to render background like in viewport.
+        for (float y = position.y; y < position.y + atlasHeightPixels; y += m_CheckerboardSize)
         {
-            for (float x = position.x; x < position.x + atlasWidthPixels; x += CHECKERBOARD_SIZE)
+            for (float x = position.x; x < position.x + atlasWidthPixels; x += m_CheckerboardSize)
             {
                 ImVec2 minPos = ImVec2(x, y);
-                ImVec2 maxPos = ImVec2(x + CHECKERBOARD_SIZE, y + CHECKERBOARD_SIZE);
+                ImVec2 maxPos = ImVec2(x + m_CheckerboardSize, y + m_CheckerboardSize);
 
-                ImU32 fillColor = (((int)(x / CHECKERBOARD_SIZE) + (int)(y / CHECKERBOARD_SIZE)) % 2 == 0) ? CHECKERBOARD_COLOR_1 : CHECKERBOARD_COLOR_2;
-                ImGui::GetWindowDrawList()->AddRectFilled(minPos, maxPos, fillColor);
+                if (((int)(x / m_CheckerboardSize) + (int)(y / m_CheckerboardSize)) % 2 == 0)
+                    ImGui::GetWindowDrawList()->AddRectFilled(minPos, maxPos, Color::CHECKERBOARD_COLOR_1);
+                else
+                    ImGui::GetWindowDrawList()->AddRectFilled(minPos, maxPos, Color::CHECKERBOARD_COLOR_2);
             }
         }
 
         // Render texture grid on top of the checkerboard
-        for (int y = 0; y < m_Atlas->GetHeight(); ++y)
+        for (int y = 0; y < m_Atlas->GetHeight(); y++)
         {
-            for (int x = 0; x < m_Atlas->GetWidth(); ++x)
+            for (int x = 0; x < m_Atlas->GetWidth(); x++)
             {
                 int index = y * m_Atlas->GetWidth() + x;
                 RenderTextureGridItem(index, x, y);
@@ -167,8 +131,8 @@ namespace Tiles
 
     void TextureSelectionPanel::RenderTextureGridItem(int index, int x, int y)
     {
-        ImVec2 buttonSize(TEXTURE_BUTTON_SIZE, TEXTURE_BUTTON_SIZE);
-        
+        ImVec2 buttonSize(m_TextureButtonSize, m_TextureButtonSize);
+
         // Render texture or transparent empty button
         if (m_Atlas->IsCreated())
         {
@@ -181,7 +145,7 @@ namespace Tiles
         }
         else
         {
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));        
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
             ImGui::Button(("##" + std::to_string(x) + std::to_string(y)).c_str(), buttonSize);
@@ -202,9 +166,55 @@ namespace Tiles
 
         // Highlight selected texture or default grid
         if (m_Selection->IsSelected(index))
-            ImGui::GetWindowDrawList()->AddRect(min, max, SELECTION_BORDER_COLOR, 0.0f, 0, 2.5f);
+            ImGui::GetWindowDrawList()->AddRect(min, max, Color::SELECTION_BORDER_COLOR, 0.0f, 0, 2.5f);
         else
-            ImGui::GetWindowDrawList()->AddRect(min, max, DEAULT_BORDER_COLOR, 0.0f, 0, 0.0f);
+            ImGui::GetWindowDrawList()->AddRect(min, max, Color::DEAULT_BORDER_COLOR, 0.0f, 0, 0.0f);
+    }
+
+    void TextureSelectionPanel::RenderFileDialog()
+    {
+        if (ImGuiFileDialog::Instance()->Display("ChooseAtlasFileDlg",
+            ImGuiWindowFlags_NoCollapse,
+            ImVec2(600, 400)))
+        {
+            HandleFileDialogResult();
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Helper Methods
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void TextureSelectionPanel::HandleAtlasFileSelection(const std::string& newPath)
+    {
+        if (std::filesystem::exists(newPath))
+        {
+            m_Atlas->Create(newPath);
+        }
+    }
+
+    void TextureSelectionPanel::OpenFileDialog()
+    {
+        IGFD::FileDialogConfig config;
+        config.path = ".";
+        config.flags = ImGuiFileDialogFlags_Modal;
+        config.countSelectionMax = 1;
+
+        ImGuiFileDialog::Instance()->OpenDialog(
+            "ChooseAtlasFileDlg",
+            "Choose Atlas File",
+            ".png,.jpg,.jpeg",
+            config
+        );
+    }
+
+    void TextureSelectionPanel::HandleFileDialogResult()
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            HandleAtlasFileSelection(ImGuiFileDialog::Instance()->GetFilePathName());
+        }
+        ImGuiFileDialog::Instance()->Close();
     }
 
 }
