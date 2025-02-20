@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+
 #include <iostream>
 
 namespace Tiles
@@ -13,7 +14,8 @@ namespace Tiles
 
     ViewportPanel::ViewportPanel()
     {
-        // Data
+        // This probably should be handled by some Tile or Quad class. 
+        // Not very high on the priorty list right now. 
         float vertices[] = 
         {
             // Positions    
@@ -28,7 +30,6 @@ namespace Tiles
             0, 1, 2,
             2, 3, 0
         };
-
 
         // Buffer
         m_Background = Lumina::CreateRef<Lumina::VertexArray>();
@@ -49,14 +50,14 @@ namespace Tiles
 
         m_Renderer.Init(); 
 
-        m_Camera.Drag({ 40.0f, 40.0f });
+        m_Camera.Drag({ 40.0f, 56.0f });
     }
 
-    void ViewportPanel::Render()
+    void ViewportPanel::OnUIRender()
     {
-        if (!m_Layers) return;
-
         ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+        ImGui::SetCursorPos({ 0.0f, 0.0f });
 
         HandleMouseInput();
         RenderBackground();
@@ -70,51 +71,51 @@ namespace Tiles
         ImVec2 viewportSize = { 1000, 1000 };
      
         m_Renderer.Begin();
-        m_Renderer.OnWindowResize(viewportSize.x, viewportSize.y);
+        m_Renderer.OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
 
         m_Renderer.Clear();
 
         m_BackgroundShader->Bind();
 
         m_BackgroundShader->SetUniformMatrix4fv("u_ViewProjection", m_Camera.GetViewMatrix());
-        m_BackgroundShader->SetUniform1f("u_AspectRatio", viewportSize.x / viewportSize.y);
+        m_BackgroundShader->SetUniform1f("u_AspectRatio", m_ViewportSize.x / m_ViewportSize.y);
         m_BackgroundShader->SetUniform2fv("u_GridSize", { m_Layers->GetWidth() * 4.0f, m_Layers->GetHeight() * 4.0f });
 
         m_Renderer.Draw(m_Background);
 
-        ImGui::Image((void*)(intptr_t)m_Renderer.GetID(), viewportSize);
+        ImGui::Image((void*)(intptr_t)m_Renderer.GetID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
 
         m_Renderer.End();
     }
 
     void ViewportPanel::RenderTiles()
     {
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f); // Remove roundness
+        if (!m_Layers || m_Layers->IsEmpty()) 
+            return;
 
-        // Set transparent colors for the button fill
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));        // Fully transparent button
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.5f, 0.0f, 0.0f)); // Transparent when hovered
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));  // Transparent when clicked
-
-        // Set border colors and thickness
-        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));        // Transparent border by default
-        ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));  // Transparent border shadow
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));         // Fully transparent button
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));  // Transparent when hovered
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));   // Transparent when clicked
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));         // Transparent border by default
+        ImGui::PushStyleColor(ImGuiCol_BorderShadow, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));   // Transparent border shadow
+        
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);                         // Remove roundness
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);                       // Border thickness
-
 
         for (size_t l = 0; l < m_Layers->GetSize(); l++)
         {
             Layer& layer = m_Layers->GetLayer(l);
             if (!layer.GetVisibility()) continue;
 
-            glm::vec2 cameraPos = m_Camera.GetPosition();
+            glm::vec2 cameraPos = m_Camera.GetPosition() * m_ViewportSize;
 
             for (size_t y = 0; y < layer.GetHeight(); y++)
             {
                 for (size_t x = 0; x < layer.GetWidth(); x++)
                 {
-                    ImVec2 buttonSize = ImVec2(TILE_SIZE * m_Camera.GetZoom(), TILE_SIZE * m_Camera.GetZoom());
-                    ImGui::SetCursorPos(ImVec2(8 + (1000 * cameraPos.x) + (x * buttonSize.x), (30 + 1000 * cameraPos.y) + (y * buttonSize.y)));
+                    float scale = m_ViewportSize.x / 1000;
+                    ImVec2 buttonSize = ImVec2(m_TileSize * m_Camera.GetZoom() * scale, m_TileSize * m_Camera.GetZoom() * scale);
+                    ImGui::SetCursorPos(ImVec2(cameraPos.x + (x * buttonSize.x), cameraPos.y + (y * buttonSize.y)));
                     
                     ImVec2 cursorPos = ImGui::GetCursorScreenPos();
                     ImVec2 tileMin(cursorPos.x, cursorPos.y);
@@ -130,30 +131,30 @@ namespace Tiles
             }
         }
 
-        // Restore previous styles
-        ImGui::PopStyleVar(2);  // Pop FrameRounding and FrameBorderSize
-        ImGui::PopStyleColor(5); // Pop all color styles we pushed
+        ImGui::PopStyleColor(5);
+        ImGui::PopStyleVar(2);
     }
 
     void ViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
     {
+        // Is there a selection?
         if (!m_Selection || m_Selection->Empty()) 
             return;
 
+        // Are we ont the active layer? 
         if (l != m_Layers->GetActiveLayer())
             return;
-        
-        ImVec2 currentTilePos(y, x);
+
+        // Is this a new click?
+        glm::vec2 currentTilePos(y, x);
         if (!IsNewClick() && !IsNewTileDuringDrag(currentTilePos))
 			return;
 
-        // std::cout << "we getting to here?" << std::endl;
-
         // Are we dragging?
-        m_LastMousePosition = currentTilePos;
+        m_LastMousePos = currentTilePos;
         if (IsNewClick())
-            m_IsMouseDragging = true;
-
+            m_IsMouseDragging = true; 
+         
         // If we are erasing, that is all we will do in this method. 
         if (m_ToolModes->Erase)
         {
@@ -164,6 +165,7 @@ namespace Tiles
         }
 
         // For now we are only going to fill what is the first texture in the selection
+        // otherwise paint with whole selection. 
         if (m_ToolModes->Fill)
         {
             Layer& layer = m_Layers->GetLayer(l);
@@ -201,7 +203,11 @@ namespace Tiles
 
     void ViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
-        if (!m_Atlas || !m_Selection || m_Selection->Empty()) return;
+        if (!m_Atlas || !m_Atlas->IsCreated())
+			return;
+
+        if (!m_Selection || m_Selection->Empty()) 
+            return;
 
         // We dont draw the hovered tile if we are erasing
         if (m_ToolModes->Erase)
@@ -221,10 +227,10 @@ namespace Tiles
             // Translate relative position so the first selected tile is at (0,0)
             glm::vec2 normalizedPos = relativePos - basePos;
 
-            // Adjust tile position based on normalized offset
-            ImVec2 adjustedMin(tileMin.x + normalizedPos.x * TILE_SIZE * m_Camera.GetZoom(),
-                tileMin.y + normalizedPos.y * TILE_SIZE * m_Camera.GetZoom());
-            ImVec2 adjustedMax(adjustedMin.x + TILE_SIZE * m_Camera.GetZoom(), adjustedMin.y + TILE_SIZE * m_Camera.GetZoom());
+            // Adjust tile position based on normalized offset and scale 
+            float scale = m_ViewportSize.x / 1000;
+            ImVec2 adjustedMin(tileMin.x + normalizedPos.x * m_TileSize * m_Camera.GetZoom() * scale, tileMin.y + normalizedPos.y * m_TileSize * m_Camera.GetZoom() * scale);
+            ImVec2 adjustedMax(adjustedMin.x + m_TileSize * m_Camera.GetZoom() * scale, adjustedMin.y + m_TileSize * m_Camera.GetZoom() * scale);
 
             // Texture UV mapping
             ImVec2 uvMin(texCoords.x, texCoords.y);
@@ -238,7 +244,7 @@ namespace Tiles
 
     void ViewportPanel::DrawTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
-        if (!m_Atlas->IsCreated()) 
+        if (!m_Atlas || !m_Atlas->IsCreated())
             return;
 
         Tile& tile = m_Layers->GetTile(l, y, x);
@@ -263,10 +269,10 @@ namespace Tiles
         return ImGui::IsMouseClicked(0) && !m_IsMouseDragging;
     }
 
-    bool ViewportPanel::IsNewTileDuringDrag(ImVec2 currentTilePos)
+    bool ViewportPanel::IsNewTileDuringDrag(glm::vec2 currentTilePos)
     {
         return ImGui::IsMouseDown(0) && m_IsMouseDragging && 
-            (currentTilePos.x != m_LastMousePosition.x || currentTilePos.y != m_LastMousePosition.y);
+            (currentTilePos.x != m_LastMousePos.x || currentTilePos.y != m_LastMousePos.y);
     }
 
     void ViewportPanel::HandleMouseInput()
@@ -275,28 +281,23 @@ namespace Tiles
         ImVec2 windowSize = ImGui::GetWindowSize();
         ImVec2 mousePos = ImGui::GetMousePos();
 
-        // Check if mouse is within viewport bounds
         if (!IsMouseInViewport(mousePos, windowPos, windowSize))
             return;
 
+        // Translating Screen
         if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
         {
             if (!m_IsMiddleMouseDown)
             {
-                // Middle mouse just pressed
                 m_IsMiddleMouseDown = true;
                 m_LastMousePos = glm::vec2(mousePos.x, mousePos.y);
             }
             else
             {
-                // Middle mouse being held - calculate drag delta
                 glm::vec2 currentMousePos(mousePos.x, mousePos.y);
                 glm::vec2 mouseDelta = currentMousePos - m_LastMousePos;
 
                 m_Camera.Drag(mouseDelta);
-
-                m_AnchorePos = m_Camera.GetPosition();
-
                 m_LastMousePos = currentMousePos;
             }
         }
@@ -305,12 +306,10 @@ namespace Tiles
             m_IsMiddleMouseDown = false;
         }
 
-        // Handle zoom input
-        float mouseWheel = ImGui::GetIO().MouseWheel;
-        if (mouseWheel != 0.0f)
-        {
-            m_Camera.Zoom(mouseWheel);
-        }
+        // Zooming
+        float scrollDelta = ImGui::GetIO().MouseWheel;
+        if (scrollDelta != 0.0f)
+            m_Camera.Zoom(scrollDelta);
     }
 
     bool ViewportPanel::IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize)

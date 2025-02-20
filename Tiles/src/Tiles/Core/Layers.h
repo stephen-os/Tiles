@@ -24,6 +24,8 @@ namespace Tiles
 		void Remove(size_t index);
 		void Insert(size_t index, Layer layer);
 
+		bool IsEmpty() { return m_Layers.empty(); }
+
 		// Setters
 		void SetActiveLayer(size_t layer) { m_ActiveLayer = layer; }
 

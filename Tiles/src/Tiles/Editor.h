@@ -43,7 +43,7 @@ public:
 
         m_HeaderPanel.Render();
         m_TextureSelectionPanel.Render();
-        m_ViewportPanel.Render();
+        m_ViewportPanel.OnUIRender();
         m_ToolSelectionPanel.Render();
         m_LayerSelectionPanel.Render();
     }

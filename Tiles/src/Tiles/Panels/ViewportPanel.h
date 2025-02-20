@@ -25,7 +25,8 @@ namespace Tiles
         ViewportPanel();
         ~ViewportPanel() = default;
 
-        void Render();
+        void OnUIRender();
+		void OnUpdate();
 
         // Setters
         void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
@@ -46,7 +47,7 @@ namespace Tiles
 
         // Utilities
         bool IsNewClick(); 
-        bool IsNewTileDuringDrag(ImVec2 currentTilePos);
+        bool IsNewTileDuringDrag(glm::vec2 currentTilePos);
         bool IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize);
         void HandleMouseInput();
     private:
@@ -56,27 +57,25 @@ namespace Tiles
         Shared<State> m_State;
         Shared<Selection> m_Selection;
 
-        // Ui State
-        bool m_IsMouseDragging = false;  // Track if we're in the middle of a drag
-        ImVec2 m_LastMousePosition = ImVec2(-1, -1);  // Track last modified tile position
-
-        // Renderer
+        // Rendering
+        Shared<Lumina::VertexArray> m_Background;
+        Shared<Lumina::ShaderProgram> m_BackgroundShader;
         Lumina::Renderer m_Renderer;
         Camera m_Camera;
 
-        // Mouse interaction state
+        // Ui State
+        bool m_IsMouseDragging = false;
         bool m_IsMiddleMouseDown = false;
-        glm::vec2 m_LastMousePos = { 0.0f, 0.0f };
-        glm::vec2 m_CameraPosition = { 0.0f, 0.0f };
-        glm::vec2 m_AnchorePos = { 0.0f, 0.0f };
+        bool m_ProcessClick = false;
 
-        // Lumina
-        Shared<Lumina::VertexArray> m_Background;
-        Shared<Lumina::ShaderProgram> m_BackgroundShader; 
+        glm::vec2 m_LastMousePos = { 0.0f, 0.0f };
+        glm::vec2 m_LastTilePos = { 0.0f, 0.0f };
+
+        // Viewport Specifications
+		glm::vec2 m_ViewportSize = { 1200.0f, 1200.0f };
+        float m_TileSize = 40.0f;
 
         // Constants
-        static constexpr float TILE_SIZE = 40.0f;
-        static constexpr float CHECKERBOARD_SIZE = 10.0f;
         static constexpr ImU32 BACKGROUND_COLOR = IM_COL32(77, 77, 77, 255);
         static constexpr ImU32 OUTLINE_COLOR = IM_COL32(169, 169, 169, 255);
         static constexpr ImU32 SELECTION_BORDER_COLOR = IM_COL32(255, 165, 0, 255);
