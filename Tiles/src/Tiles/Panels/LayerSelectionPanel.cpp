@@ -7,12 +7,8 @@
 namespace Tiles
 {
 
-    // TODO: The pannel should render whether tile layer is created or not. 
-    void LayerSelectionPanel::Render()
+    void LayerSelectionPanel::OnUIRender()
     {
-        // TODO: This may be a good idea as a failsafe for the other panels
-        if (!m_Layers) return; // Early return if TileLayer is not set
-
         ImGui::Begin("Layer Selection", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);

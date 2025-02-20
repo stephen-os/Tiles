@@ -10,7 +10,10 @@ namespace Tiles
     class LayerSelectionPanel
     {
     public:
-        void Render();
+        LayerSelectionPanel() = default;
+		~LayerSelectionPanel() = default;
+
+        void OnUIRender();
 
         // Set the TileLayer pointer
         void SetTileLayer(const Shared<Layers>& layers) { m_Layers = layers; }

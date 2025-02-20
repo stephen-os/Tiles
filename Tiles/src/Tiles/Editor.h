@@ -46,7 +46,7 @@ public:
         m_TextureSelectionPanel.OnUIRender();
         m_ViewportPanel.OnUIRender();
         m_ToolSelectionPanel.Render();
-        m_LayerSelectionPanel.Render();
+        m_LayerSelectionPanel.OnUIRender();
     }
 
     virtual void OnAttach() override
