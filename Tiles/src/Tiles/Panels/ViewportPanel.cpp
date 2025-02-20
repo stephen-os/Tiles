@@ -67,8 +67,8 @@ namespace Tiles
 
     void ViewportPanel::RenderBackground()
     {
-        ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-
+        ImVec2 viewportSize = { 1000, 1000 };
+     
         m_Renderer.Begin();
         m_Renderer.OnWindowResize(viewportSize.x, viewportSize.y);
 
