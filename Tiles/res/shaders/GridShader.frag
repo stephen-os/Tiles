@@ -3,7 +3,6 @@ in vec2 v_ScreenPos;
 out vec4 FragColor;
 
 uniform mat4 u_ViewProjection;
-uniform float u_AspectRatio;
 uniform vec2 u_GridSize;
 
 const float GRID_SPACING = 0.01;
@@ -17,7 +16,7 @@ const vec3 GRID_COLOR_4 = vec3(0.15, 0.15, 0.15);     // Outer dark gray
 void main()
 {
     // Convert screen position to world space
-    vec2 screenPos = v_ScreenPos * vec2(u_AspectRatio, 1.0);
+    vec2 screenPos = v_ScreenPos;
     vec4 worldPos = inverse(u_ViewProjection) * vec4(screenPos, 0.0, 1.0);
     worldPos /= worldPos.w;
 

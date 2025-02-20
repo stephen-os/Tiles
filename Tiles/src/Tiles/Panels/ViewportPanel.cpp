@@ -2,6 +2,8 @@
 
 #include "../Core/Tools.h"
 
+#include "../Theme/Color.h"
+
 #include "Lumina/Utils/FileReader.h"
 
 #include <algorithm>
@@ -14,42 +16,7 @@ namespace Tiles
 
     ViewportPanel::ViewportPanel()
     {
-        // This probably should be handled by some Tile or Quad class. 
-        // Not very high on the priorty list right now. 
-        float vertices[] = 
-        {
-            // Positions    
-            -1.0f, -1.0f, 0.0f,
-             1.0f, -1.0f, 0.0f,
-             1.0f,  1.0f, 0.0f,
-            -1.0f,  1.0f, 0.0f
-        };
-
-        uint32_t indices[] = 
-        {
-            0, 1, 2,
-            2, 3, 0
-        };
-
-        // Buffer
-        m_Background = Lumina::CreateRef<Lumina::VertexArray>();
-
-        auto vertexBuffer = Lumina::CreateRef<Lumina::VertexBuffer>(vertices, sizeof(vertices));
-        auto indexBuffer = Lumina::CreateRef<Lumina::IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
-
-        vertexBuffer->SetLayout({{ Lumina::BufferDataType::Float3, "a_Position" }});
-
-        m_Background->AddVertexBuffer(vertexBuffer);
-		m_Background->SetIndexBuffer(indexBuffer);
-
-        // Shader
-        const std::string vertexSrc = Lumina::ReadFile("res/shaders/GridShader.vert");
-        const std::string fragmentSrc = Lumina::ReadFile("res/shaders/GridShader.frag");
-
-        m_BackgroundShader = Lumina::CreateRef<Lumina::ShaderProgram>(vertexSrc, fragmentSrc);
-
         m_Renderer.Init(); 
-
         m_Camera.Drag({ 40.0f, 56.0f });
     }
 
@@ -66,6 +33,10 @@ namespace Tiles
         ImGui::End();
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // UI Render
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
     void ViewportPanel::RenderBackground()
     {
         ImVec2 viewportSize = { 1000, 1000 };
@@ -75,13 +46,11 @@ namespace Tiles
 
         m_Renderer.Clear();
 
-        m_BackgroundShader->Bind();
+        m_Background.Bind();
+        m_Background.SetUniforms(m_Camera, m_Layers);
 
-        m_BackgroundShader->SetUniformMatrix4fv("u_ViewProjection", m_Camera.GetViewMatrix());
-        m_BackgroundShader->SetUniform1f("u_AspectRatio", m_ViewportSize.x / m_ViewportSize.y);
-        m_BackgroundShader->SetUniform2fv("u_GridSize", { m_Layers->GetWidth() * 4.0f, m_Layers->GetHeight() * 4.0f });
-
-        m_Renderer.Draw(m_Background);
+        m_Renderer.Draw(m_Background.GetArrays());
+        m_Background.Unbind(); 
 
         ImGui::Image((void*)(intptr_t)m_Renderer.GetID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
 
@@ -135,71 +104,9 @@ namespace Tiles
         ImGui::PopStyleVar(2);
     }
 
-    void ViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
-    {
-        // Is there a selection?
-        if (!m_Selection || m_Selection->Empty()) 
-            return;
-
-        // Are we ont the active layer? 
-        if (l != m_Layers->GetActiveLayer())
-            return;
-
-        // Is this a new click?
-        glm::vec2 currentTilePos(y, x);
-        if (!IsNewClick() && !IsNewTileDuringDrag(currentTilePos))
-			return;
-
-        // Are we dragging?
-        m_LastMousePos = currentTilePos;
-        if (IsNewClick())
-            m_IsMouseDragging = true; 
-         
-        // If we are erasing, that is all we will do in this method. 
-        if (m_ToolModes->Erase)
-        {
-            Tile& tile = m_Layers->GetTile(l, y, x);
-            m_State->PushTile(y, x, tile);
-            tile.Reset();
-            return;
-        }
-
-        // For now we are only going to fill what is the first texture in the selection
-        // otherwise paint with whole selection. 
-        if (m_ToolModes->Fill)
-        {
-            Layer& layer = m_Layers->GetLayer(l);
-            m_State->PushLayer(m_Selection->Front(), layer, StateType::Layer_Replace);
-            Tools::Fill(layer, m_Selection->Front(), y, x);
-        }
-        else
-        {
-            int baseIndex = m_Selection->Front();
-            glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
-
-            for (int texture : *m_Selection)
-            {
-                glm::vec2 relativePos = m_Atlas->GetPosition(texture);
-                glm::vec2 normalizedPos = relativePos - basePos;
-
-                int targetX = x + (int)normalizedPos.x;
-                int targetY = y + (int)normalizedPos.y;
-
-                // Skip out-of-bounds tiles
-                if (targetX < 0 || targetY < 0 || targetX >= m_Layers->GetWidth() || targetY >= m_Layers->GetHeight())
-                    continue;
-
-                // Get the tile
-                Tile& tile = m_Layers->GetTile(l, targetY, targetX);
-                
-                // Store previouse state
-                m_State->PushTile(targetY, targetX, tile);
-
-                // Update texture
-                tile.SetTextureIndex(texture);
-            }
-        }
-    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Drawing Methods
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     void ViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
@@ -237,8 +144,8 @@ namespace Tiles
             ImVec2 uvMax(texCoords.z, texCoords.w);
 
             // Draw the texture
-            ImGui::GetWindowDrawList()->AddImage((void*)textureID, adjustedMin, adjustedMax, uvMin, uvMax, FILL_COLOR);
-            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, SELECTION_BORDER_COLOR);
+            ImGui::GetWindowDrawList()->AddImage((void*)textureID, adjustedMin, adjustedMax, uvMin, uvMax, Color::FILL_COLOR);
+            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR);
         }
     }
 
@@ -256,23 +163,78 @@ namespace Tiles
             ImVec2 uvMin(texCoords.x, texCoords.y);
             ImVec2 uvMax(texCoords.z, texCoords.w);
 
-            ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, uvMin, uvMax, FILL_COLOR);
+            ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, uvMin, uvMax, Color::FILL_COLOR);
         }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Utils
+    // Input Handling
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    bool ViewportPanel::IsNewClick()
+    void ViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
     {
-        return ImGui::IsMouseClicked(0) && !m_IsMouseDragging;
-    }
+        // Is there a selection?
+        if (!m_Selection || m_Selection->Empty())
+            return;
 
-    bool ViewportPanel::IsNewTileDuringDrag(glm::vec2 currentTilePos)
-    {
-        return ImGui::IsMouseDown(0) && m_IsMouseDragging && 
-            (currentTilePos.x != m_LastMousePos.x || currentTilePos.y != m_LastMousePos.y);
+        // Are we ont the active layer? 
+        if (l != m_Layers->GetActiveLayer())
+            return;
+
+        // Is this a new click?
+        glm::vec2 currentTilePos(y, x);
+        if (!IsNewClick() && !IsNewTileDuringDrag(currentTilePos))
+            return;
+
+        // Are we dragging?
+        m_LastMousePos = currentTilePos;
+        if (IsNewClick())
+            m_IsMouseDragging = true;
+
+        // If we are erasing, that is all we will do in this method. 
+        if (m_ToolModes->Erase)
+        {
+            Tile& tile = m_Layers->GetTile(l, y, x);
+            m_State->PushTile(y, x, tile);
+            tile.Reset();
+            return;
+        }
+
+        // For now we are only going to fill what is the first texture in the selection
+        // otherwise paint with whole selection. 
+        if (m_ToolModes->Fill)
+        {
+            Layer& layer = m_Layers->GetLayer(l);
+            m_State->PushLayer(m_Selection->Front(), layer, StateType::Layer_Replace);
+            Tools::Fill(layer, m_Selection->Front(), y, x);
+        }
+        else
+        {
+            int baseIndex = m_Selection->Front();
+            glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
+
+            for (int texture : *m_Selection)
+            {
+                glm::vec2 relativePos = m_Atlas->GetPosition(texture);
+                glm::vec2 normalizedPos = relativePos - basePos;
+
+                int targetX = x + (int)normalizedPos.x;
+                int targetY = y + (int)normalizedPos.y;
+
+                // Skip out-of-bounds tiles
+                if (targetX < 0 || targetY < 0 || targetX >= m_Layers->GetWidth() || targetY >= m_Layers->GetHeight())
+                    continue;
+
+                // Get the tile
+                Tile& tile = m_Layers->GetTile(l, targetY, targetX);
+
+                // Store previouse state
+                m_State->PushTile(targetY, targetX, tile);
+
+                // Update texture
+                tile.SetTextureIndex(texture);
+            }
+        }
     }
 
     void ViewportPanel::HandleMouseInput()
@@ -310,6 +272,21 @@ namespace Tiles
         float scrollDelta = ImGui::GetIO().MouseWheel;
         if (scrollDelta != 0.0f)
             m_Camera.Zoom(scrollDelta);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Utils
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    bool ViewportPanel::IsNewClick()
+    {
+        return ImGui::IsMouseClicked(0) && !m_IsMouseDragging;
+    }
+
+    bool ViewportPanel::IsNewTileDuringDrag(glm::vec2 currentTilePos)
+    {
+        return ImGui::IsMouseDown(0) && m_IsMouseDragging && 
+            (currentTilePos.x != m_LastMousePos.x || currentTilePos.y != m_LastMousePos.y);
     }
 
     bool ViewportPanel::IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize)
