@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Core/Atlas.h"
-#include "../Core/Selection.h"
+#include "../Core/TextureSelection.h"
 #include "../Core/Base.h"
 
 #include <string>
@@ -21,7 +21,7 @@ namespace Tiles
 
         // Setters
         void SetTextureAtlas(Shared<Atlas> atlas) { m_Atlas = atlas; }
-        void SetSelection(Shared<Selection> selection) { m_Selection = selection; }
+        void SetSelection(Shared<TextureSelection> selection) { m_Selection = selection; }
     private:
         // UI Rendering Methods
         void RenderAtlasPathSection();
@@ -37,7 +37,7 @@ namespace Tiles
 
     private:
         Shared<Atlas> m_Atlas;
-        Shared<Selection> m_Selection;
+        Shared<TextureSelection> m_Selection;
 
         float m_TextureButtonSize = 40.0f;
         float m_CheckerboardSize = 10.0f;

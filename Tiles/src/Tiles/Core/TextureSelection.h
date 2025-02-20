@@ -7,11 +7,11 @@
 namespace Tiles
 {
 
-    class Selection
+    class TextureSelection
     {
     public:
-        Selection() = default;
-        ~Selection() = default;
+        TextureSelection() = default;
+        ~TextureSelection() = default;
 
         void Select(int texture) { m_SelectedTextures.insert(texture); }
         void Deselect(int texture) { m_SelectedTextures.erase(texture); }

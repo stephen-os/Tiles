@@ -4,7 +4,7 @@
 #include "Lumina/Renderer/ShaderProgram.h"
 
 
-#include "../Core/Selection.h"
+#include "../Core/TextureSelection.h"
 #include "../Core/ToolModes.h"
 #include "../Core/Atlas.h"
 #include "../Core/Layers.h"
@@ -33,7 +33,7 @@ namespace Tiles
         void SetTileLayers(const Shared<Layers>& layers) { m_Layers = layers; }
         void SetToolModes(const Shared<ToolModes>& modes) { m_ToolModes = modes; }
         void SetState(const Shared<State>& state) { m_State = state; }
-        void SetSelection(const Shared<Selection>& selection) { m_Selection = selection; }
+        void SetSelection(const Shared<TextureSelection>& selection) { m_Selection = selection; }
     private:
         // UI Rendering
         void RenderBackground();
@@ -56,7 +56,7 @@ namespace Tiles
         Shared<Atlas> m_Atlas;
         Shared<ToolModes> m_ToolModes;
         Shared<State> m_State;
-        Shared<Selection> m_Selection;
+        Shared<TextureSelection> m_Selection;
 
         // Rendering
         Quad m_Background;

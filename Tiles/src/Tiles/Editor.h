@@ -19,7 +19,7 @@
 #include "Panels/LayerSelectionPanel.h"
 #include "Panels/ToolSelectionPanel.h"
 
-#include "Core/Selection.h"
+#include "Core/TextureSelection.h"
 #include "Core/ToolModes.h"
 #include "Core/Layers.h"
 #include "Core/Atlas.h"
@@ -66,7 +66,7 @@ public:
         m_State = Tiles::MakeShared<Tiles::State>();
         m_State->SetTileLayers(m_Layers);
 
-        m_Selection = Tiles::MakeShared<Tiles::Selection>();
+        m_Selection = Tiles::MakeShared<Tiles::TextureSelection>();
 
         // Header
         m_HeaderPanel.SetTileLayers(m_Layers);
@@ -102,7 +102,7 @@ private:
     Tiles::Shared<Tiles::Atlas> m_Atlas;
     Tiles::Shared<Tiles::ToolModes> m_Modes;
     Tiles::Shared<Tiles::State> m_State;
-    Tiles::Shared<Tiles::Selection> m_Selection;
+    Tiles::Shared<Tiles::TextureSelection> m_Selection;
 
     // Panels
     Tiles::HeaderPanel m_HeaderPanel;
