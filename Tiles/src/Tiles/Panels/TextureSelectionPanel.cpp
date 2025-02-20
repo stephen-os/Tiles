@@ -1,6 +1,7 @@
 // TextureSelectionPanel.cpp
 #include "TextureSelectionPanel.h"
-#include "../Theme/Color.h"
+
+#include "../Core/Color.h"
 
 #include "ImGuiFileDialog.h"
 

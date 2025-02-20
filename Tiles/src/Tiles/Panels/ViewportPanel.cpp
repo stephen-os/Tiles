@@ -1,8 +1,7 @@
 #include "ViewportPanel.h"
 
 #include "../Core/Tools.h"
-
-#include "../Theme/Color.h"
+#include "../Core/Color.h"
 
 #include "Lumina/Renderer/Renderer.h"
 #include "Lumina/Utils/FileReader.h"

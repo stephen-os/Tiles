@@ -1,6 +1,6 @@
 #include "ToolSelectionPanel.h"
 
-#include "../Theme/Color.h"
+#include "../Core/Color.h"
 
 namespace Tiles
 {

@@ -11,8 +11,6 @@
 #include "Lumina/Renderer/Renderer.h"
 
 // Client
-#include "Theme/ThemeManager.h"
-
 #include "Panels/HeaderPanel.h"
 #include "Panels/TextureSelectionPanel.h"
 #include "Panels/ViewportPanel.h"
@@ -24,6 +22,7 @@
 #include "Core/Layers.h"
 #include "Core/Atlas.h"
 #include "Core/State.h"
+#include "Core/Color.h"
 #include "Core/Base.h"
 
 class Editor : public Lumina::Layer
@@ -53,7 +52,7 @@ public:
     {
         Lumina::Renderer::Init();
 
-        Tiles::ThemeManager::GetInstance().ApplyDarkTheme();
+        Tiles::Theme::ApplyTheme();
 
         // References
         Tiles::Shared<Tiles::Layers> layers = Tiles::MakeShared<Tiles::Layers>();
