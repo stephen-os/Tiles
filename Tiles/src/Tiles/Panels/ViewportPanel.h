@@ -5,7 +5,7 @@
 
 
 #include "../Core/TextureSelection.h"
-#include "../Core/ToolModes.h"
+#include "../Core/ToolSelection.h"
 #include "../Core/Atlas.h"
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
@@ -31,7 +31,7 @@ namespace Tiles
         // Setters
         void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
         void SetTileLayers(const Shared<Layers>& layers) { m_Layers = layers; }
-        void SetToolModes(const Shared<ToolModes>& modes) { m_ToolModes = modes; }
+        void SetToolModes(const Shared<ToolSelection>& modes) { m_ToolModes = modes; }
         void SetState(const Shared<State>& state) { m_State = state; }
         void SetSelection(const Shared<TextureSelection>& selection) { m_Selection = selection; }
     private:
@@ -54,7 +54,7 @@ namespace Tiles
     private:
         Shared<Layers> m_Layers;
         Shared<Atlas> m_Atlas;
-        Shared<ToolModes> m_ToolModes;
+        Shared<ToolSelection> m_ToolModes;
         Shared<State> m_State;
         Shared<TextureSelection> m_Selection;
 

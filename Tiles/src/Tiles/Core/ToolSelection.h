@@ -3,7 +3,7 @@
 namespace Tiles
 {
 
-    struct ToolModes
+    struct ToolSelection
     {
         bool Erase = false;
         bool Fill = false;
