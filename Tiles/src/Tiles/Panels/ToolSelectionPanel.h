@@ -19,10 +19,10 @@ namespace Tiles
 
         void Render();
 
-        void SetToolModes(const Shared<ToolSelection>& modes) { m_ToolModes = modes; }
+        void SetToolSelection(const Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
 
     private:
-        Shared<ToolSelection> m_ToolModes;
+        Shared<ToolSelection> m_ToolSelection;
 
         Lumina::Texture m_EraserTexture;
         Lumina::Texture m_FillTexture;

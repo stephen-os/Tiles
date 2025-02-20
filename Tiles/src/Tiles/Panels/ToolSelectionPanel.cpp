@@ -11,8 +11,6 @@ namespace Tiles
 
     void ToolSelectionPanel::Render()
     {
-        if (!m_ToolModes) return;
-
         ImGui::Begin("Tools");
 
         ImVec2 imageSize(32, 32);
@@ -21,10 +19,10 @@ namespace Tiles
 
         if (ImGui::ImageButton((void*)(intptr_t)m_EraserTexture.GetID(), imageSize))
         {
-            m_ToolModes->Erase = !m_ToolModes->Erase;
+            m_ToolSelection->Erase = !m_ToolSelection->Erase;
         }
 
-        if (m_ToolModes->Erase)
+        if (m_ToolSelection->Erase)
         {
             ImVec2 min = ImGui::GetItemRectMin();
             ImVec2 max = ImGui::GetItemRectMax();
@@ -39,10 +37,10 @@ namespace Tiles
 
         if (ImGui::ImageButton((void*)(intptr_t)m_FillTexture.GetID(), imageSize))
         {
-            m_ToolModes->Fill = !m_ToolModes->Fill;
+            m_ToolSelection->Fill = !m_ToolSelection->Fill;
         }
 
-        if (m_ToolModes->Fill)
+        if (m_ToolSelection->Fill)
         {
             ImVec2 min = ImGui::GetItemRectMin();
             ImVec2 max = ImGui::GetItemRectMax();

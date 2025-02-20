@@ -16,7 +16,7 @@ namespace Tiles
         void OnUIRender();
 
         // Set the TileLayer pointer
-        void SetTileLayer(const Shared<Layers>& layers) { m_Layers = layers; }
+        void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
         void SetState(const Shared<State>& state) { m_State = state; }
     private:
         Shared<Layers> m_Layers;

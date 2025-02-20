@@ -111,20 +111,20 @@ namespace Tiles
         if (!m_Atlas || !m_Atlas->IsCreated())
 			return;
 
-        if (!m_Selection || m_Selection->Empty()) 
+        if (!m_TextureSelection || m_TextureSelection->Empty())
             return;
 
         // We dont draw the hovered tile if we are erasing
-        if (m_ToolModes->Erase)
+        if (m_ToolSelection->Erase)
             return; 
 
         intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
-        int baseIndex = m_Selection->Front();
+        int baseIndex = m_TextureSelection->Front();
 
         // Get base (reference) position
         glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
 
-        for (int texture : *m_Selection)
+        for (int texture : *m_TextureSelection)
         {
             glm::vec2 relativePos = m_Atlas->GetPosition(texture);
             glm::vec4 texCoords = m_Atlas->GetTexCoords(texture);
@@ -172,7 +172,7 @@ namespace Tiles
     void ViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
     {
         // Is there a selection?
-        if (!m_Selection || m_Selection->Empty())
+        if (!m_TextureSelection || m_TextureSelection->Empty())
             return;
 
         // Are we ont the active layer? 
@@ -190,7 +190,7 @@ namespace Tiles
             m_IsMouseDragging = true;
 
         // If we are erasing, that is all we will do in this method. 
-        if (m_ToolModes->Erase)
+        if (m_ToolSelection->Erase)
         {
             Tile& tile = m_Layers->GetTile(l, y, x);
             m_State->PushTile(y, x, tile);
@@ -200,18 +200,18 @@ namespace Tiles
 
         // For now we are only going to fill what is the first texture in the selection
         // otherwise paint with whole selection. 
-        if (m_ToolModes->Fill)
+        if (m_ToolSelection->Fill)
         {
             Layer& layer = m_Layers->GetLayer(l);
-            m_State->PushLayer(m_Selection->Front(), layer, StateType::Layer_Replace);
-            Tools::Fill(layer, m_Selection->Front(), y, x);
+            m_State->PushLayer(m_TextureSelection->Front(), layer, StateType::Layer_Replace);
+            Tools::Fill(layer, m_TextureSelection->Front(), y, x);
         }
         else
         {
-            int baseIndex = m_Selection->Front();
+            int baseIndex = m_TextureSelection->Front();
             glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
 
-            for (int texture : *m_Selection)
+            for (int texture : *m_TextureSelection)
             {
                 glm::vec2 relativePos = m_Atlas->GetPosition(texture);
                 glm::vec2 normalizedPos = relativePos - basePos;

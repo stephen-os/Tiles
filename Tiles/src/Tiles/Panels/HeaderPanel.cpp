@@ -8,7 +8,7 @@
 namespace Tiles
 {
 
-    void HeaderPanel::Render()
+    void HeaderPanel::OnUIRender()
     {
         if (ImGui::BeginMainMenuBar())
         {

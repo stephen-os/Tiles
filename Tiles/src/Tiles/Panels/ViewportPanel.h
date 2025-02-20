@@ -29,11 +29,11 @@ namespace Tiles
         void OnUIRender();
 
         // Setters
+        void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
         void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
-        void SetTileLayers(const Shared<Layers>& layers) { m_Layers = layers; }
-        void SetToolModes(const Shared<ToolSelection>& modes) { m_ToolModes = modes; }
         void SetState(const Shared<State>& state) { m_State = state; }
-        void SetSelection(const Shared<TextureSelection>& selection) { m_Selection = selection; }
+        void SetToolSelection(const Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
+        void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
     private:
         // UI Rendering
         void RenderBackground();
@@ -54,9 +54,9 @@ namespace Tiles
     private:
         Shared<Layers> m_Layers;
         Shared<Atlas> m_Atlas;
-        Shared<ToolSelection> m_ToolModes;
         Shared<State> m_State;
-        Shared<TextureSelection> m_Selection;
+        Shared<ToolSelection> m_ToolSelection;
+        Shared<TextureSelection> m_TextureSelection;
 
         // Rendering
         Quad m_Background;

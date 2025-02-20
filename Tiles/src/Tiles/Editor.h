@@ -42,7 +42,7 @@ public:
         ImGui::Text("FPS: %.1f", m_FPS);
         ImGui::End();
 
-        m_HeaderPanel.Render();
+        m_HeaderPanel.OnUIRender();
         m_TextureSelectionPanel.OnUIRender();
         m_ViewportPanel.OnUIRender();
         m_ToolSelectionPanel.Render();
@@ -56,40 +56,37 @@ public:
         Tiles::ThemeManager::GetInstance().ApplyDarkTheme();
 
         // References
-        m_Layers = Tiles::MakeShared<Tiles::Layers>();
-        m_Layers->Resize(16, 16);
+        Tiles::Shared<Tiles::Layers> layers = Tiles::MakeShared<Tiles::Layers>();
+        Tiles::Shared<Tiles::Atlas> atlas = Tiles::MakeShared<Tiles::Atlas>();
+        Tiles::Shared<Tiles::ToolSelection> toolSelection = Tiles::MakeShared<Tiles::ToolSelection>();
+        Tiles::Shared<Tiles::State> state = Tiles::MakeShared<Tiles::State>();
+        Tiles::Shared<Tiles::TextureSelection> textureSelection = Tiles::MakeShared<Tiles::TextureSelection>();
 
-        m_Atlas = Tiles::MakeShared<Tiles::Atlas>();
-
-        m_Modes = Tiles::MakeShared<Tiles::ToolSelection>();
-
-        m_State = Tiles::MakeShared<Tiles::State>();
-        m_State->SetTileLayers(m_Layers);
-
-        m_Selection = Tiles::MakeShared<Tiles::TextureSelection>();
+        layers->Resize(16, 16);
+        state->SetLayers(layers);
 
         // Header
-        m_HeaderPanel.SetTileLayers(m_Layers);
-        m_HeaderPanel.SetTextureAtlas(m_Atlas);
-        m_HeaderPanel.SetState(m_State);
+        m_HeaderPanel.SetLayers(layers);
+        m_HeaderPanel.SetTextureAtlas(atlas);
+        m_HeaderPanel.SetState(state);
 
         // Viewport
-        m_ViewportPanel.SetTileLayers(m_Layers);
-        m_ViewportPanel.SetTextureAtlas(m_Atlas);
-        m_ViewportPanel.SetToolModes(m_Modes);
-        m_ViewportPanel.SetState(m_State);
-        m_ViewportPanel.SetSelection(m_Selection);
+        m_ViewportPanel.SetLayers(layers);
+        m_ViewportPanel.SetTextureAtlas(atlas);
+        m_ViewportPanel.SetState(state);
+        m_ViewportPanel.SetToolSelection(toolSelection);
+        m_ViewportPanel.SetTextureSelection(textureSelection);
 
         // Texture Selection
-        m_TextureSelectionPanel.SetTextureAtlas(m_Atlas);
-        m_TextureSelectionPanel.SetSelection(m_Selection);
+        m_TextureSelectionPanel.SetTextureAtlas(atlas);
+        m_TextureSelectionPanel.SetTextureSelection(textureSelection);
 
         // Layer Selection
-        m_LayerSelectionPanel.SetTileLayer(m_Layers);
-        m_LayerSelectionPanel.SetState(m_State);
+        m_LayerSelectionPanel.SetLayers(layers);
+        m_LayerSelectionPanel.SetState(state);
 
         // Tool Selection
-        m_ToolSelectionPanel.SetToolModes(m_Modes);
+        m_ToolSelectionPanel.SetToolSelection(toolSelection);
     }
 
     virtual void OnDetach() override
@@ -98,12 +95,6 @@ public:
     }
 
 private:
-    Tiles::Shared<Tiles::Layers> m_Layers;
-    Tiles::Shared<Tiles::Atlas> m_Atlas;
-    Tiles::Shared<Tiles::ToolSelection> m_Modes;
-    Tiles::Shared<Tiles::State> m_State;
-    Tiles::Shared<Tiles::TextureSelection> m_Selection;
-
     // Panels
     Tiles::HeaderPanel m_HeaderPanel;
     Tiles::TextureSelectionPanel m_TextureSelectionPanel;

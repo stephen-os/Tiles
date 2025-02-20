@@ -38,7 +38,7 @@ namespace Tiles
 		State() = default;
 		~State() = default;
 
-		void SetTileLayers(Shared<Layers> layers) { m_Layers = layers; }
+		void SetLayers(Shared<Layers> layers) { m_Layers = layers; }
 
 		void PushLayer(size_t index, Layer& layer, StateType type = StateType::Layer_Replace);
 		void PushTile(size_t y, size_t x, Tile& tile);

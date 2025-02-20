@@ -13,10 +13,10 @@ namespace Tiles
 	class HeaderPanel
 	{
 	public:
-		void Render();
+		void OnUIRender();
 
 		void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
-		void SetTileLayers(const Shared<Layers>& layers) { m_Layers = layers; }
+		void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
 		void SetState(const Shared<State>& state) { m_State = state; }
 	private:
 		void RenderFile();

@@ -21,7 +21,7 @@ namespace Tiles
 
         // Setters
         void SetTextureAtlas(Shared<Atlas> atlas) { m_Atlas = atlas; }
-        void SetSelection(Shared<TextureSelection> selection) { m_Selection = selection; }
+        void SetTextureSelection(Shared<TextureSelection> textureSelection) { m_TextureSelection = textureSelection; }
     private:
         // UI Rendering Methods
         void RenderAtlasPathSection();
@@ -37,7 +37,7 @@ namespace Tiles
 
     private:
         Shared<Atlas> m_Atlas;
-        Shared<TextureSelection> m_Selection;
+        Shared<TextureSelection> m_TextureSelection;
 
         float m_TextureButtonSize = 40.0f;
         float m_CheckerboardSize = 10.0f;
