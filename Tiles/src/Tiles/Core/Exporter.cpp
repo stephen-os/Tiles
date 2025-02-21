@@ -13,7 +13,7 @@
 namespace Tiles
 {
 
-    void Exporter::Export(Shared<Layers>& layers, Shared<Atlas>& atlas, std::string& filename)
+    void Exporter::Export(Shared<Layers>& layers, Shared<Atlas>& atlas, std::string& filepath, std::string& filename, std::vector<size_t>& groupings)
     {
         Lumina::Quad quad;
 
@@ -78,43 +78,53 @@ namespace Tiles
 
         glm::mat4 orthoProjection = glm::ortho(0.0f, float(layers->GetWidth()), 0.0f, float(layers->GetHeight()), -1.0f, 2.0f);
 
-        Lumina::Renderer renderer;
+        size_t offset = 0;
+        size_t index = 1; 
+        for (size_t group : groupings)
+		{
+            if (group == 0)
+                continue;
 
-        Lumina::Renderer::Init();
-        Lumina::Renderer::Begin();
-        Lumina::Renderer::OnWindowResize(outputWidth, outputHeight);
-        Lumina::Renderer::Clear();
+            Lumina::Renderer::Begin();
+            Lumina::Renderer::OnWindowResize(outputWidth, outputHeight);
+            Lumina::Renderer::Clear();
 
-        atlas->Bind();
+            atlas->Bind();
 
-        shader.Bind();
-        shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
-        shader.SetUniform1f("u_NumberOfRows", static_cast<float>(atlas->GetWidth()));
+            shader.Bind();
+            shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
+            shader.SetUniform1f("u_NumberOfRows", static_cast<float>(atlas->GetWidth()));
 
-        for (int l = 0; l < layers->GetSize(); l++)
-        {
-            Layer& layer = layers->GetLayer(l);
-            for (int y = 0; y < layer.GetHeight(); y++)
+            std::cout << "Group: " << group << std::endl;
+
+            for (int l = offset; l < (offset + group) && l < layers->GetSize(); l++)
             {
-                for (int x = 0; x < layer.GetWidth(); x++)
+                std::cout << "Layer: " << l << std::endl;
+                Layer& layer = layers->GetLayer(l);
+                for (int y = 0; y < layer.GetHeight(); y++)
                 {
-                    Tile& tile = layer.GetTile(y, x);
-                    if (tile.GetTextureIndex() != -1)
+                    for (int x = 0; x < layer.GetWidth(); x++)
                     {
-                        glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, l * 0.01f));
-                        glm::vec2 offset = atlas->GetOffset(static_cast<int>(tile.GetTextureIndex()));
+                        Tile& tile = layer.GetTile(y, x);
+                        if (tile.GetTextureIndex() != -1)
+                        {
+                            glm::mat4 transform = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, l * 0.01f));
+                            glm::vec2 offset = atlas->GetOffset(static_cast<int>(tile.GetTextureIndex()));
 
-                        shader.SetUniformMatrix4fv("u_Transform", transform);
-                        shader.SetUniform2fv("u_Offset", offset);
-                        Lumina::Renderer::Draw(quad.GetVertexArray());
+                            shader.SetUniformMatrix4fv("u_Transform", transform);
+                            shader.SetUniform2fv("u_Offset", offset);
+                            Lumina::Renderer::Draw(quad.GetVertexArray());
+                        }
                     }
                 }
             }
-        }
 
-        Lumina::Renderer::End();
+            Lumina::Renderer::End();
+            Lumina::Renderer::SaveFrameBufferToImage(filepath + "/" + filename + "-" + std::to_string(index) + ".png");
 
-        Lumina::Renderer::SaveFrameBufferToImage(filename);
+            offset += group;
+            index++;
+		}
     }
 
 }

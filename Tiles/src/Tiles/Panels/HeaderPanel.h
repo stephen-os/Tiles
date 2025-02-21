@@ -7,6 +7,8 @@
 
 #include "../Core/Base.h"
 
+#include <string>
+
 namespace Tiles
 {
 
@@ -24,16 +26,22 @@ namespace Tiles
 		void RenderOptions();
 
 		void RenderNewPopup();
+		void RenderRenderMatrixPopup();
 
 	private:
 		Shared<Layers> m_Layers;
 		Shared<Atlas> m_Atlas;
 		Shared<State> m_State;
 
-		// New
 		bool m_ShowNewPopup = false;
+		bool m_ShowRenderMatrixPopup = false;
+
 		int m_NewWidth = 10;
 		int m_NewHeight = 10;
+
+		std::vector<bool> m_Checkboxes;
+		char m_ExportFileName[256] = "";
+		char m_ExportFilePath[256] = "";
 	};
 
 }

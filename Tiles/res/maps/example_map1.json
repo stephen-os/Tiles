@@ -2862,56 +2862,6 @@
                         "texture_index": -1
                     },
                     {
-                        "texture_index": 169
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": 169
-                    }
-                ],
-                [
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
-                        "texture_index": -1
-                    },
-                    {
                         "texture_index": -1
                     },
                     {
@@ -3059,13 +3009,13 @@
                         "texture_index": -1
                     },
                     {
-                        "texture_index": 169
+                        "texture_index": -1
                     },
                     {
                         "texture_index": -1
                     },
                     {
-                        "texture_index": 169
+                        "texture_index": -1
                     },
                     {
                         "texture_index": -1
@@ -3115,7 +3065,57 @@
                         "texture_index": -1
                     },
                     {
-                        "texture_index": 169
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
                     },
                     {
                         "texture_index": -1
