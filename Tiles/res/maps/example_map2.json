@@ -1,0 +1,4839 @@
+{
+    "atlas_height": 16,
+    "atlas_path": "C:\\Users\\Stephen\\Dev\\Projects\\Tiles\\Tiles\\res\\atlas\\factory_atlas.png",
+    "atlas_width": 16,
+    "layers": [
+        {
+            "name": "Background.",
+            "tiles": [
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 21
+                    },
+                    {
+                        "texture_index": 22
+                    },
+                    {
+                        "texture_index": 22
+                    },
+                    {
+                        "texture_index": 23
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 27
+                    },
+                    {
+                        "texture_index": 28
+                    },
+                    {
+                        "texture_index": 28
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 37
+                    },
+                    {
+                        "texture_index": 15
+                    },
+                    {
+                        "texture_index": 22
+                    },
+                    {
+                        "texture_index": 23
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 18
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 27
+                    },
+                    {
+                        "texture_index": 28
+                    },
+                    {
+                        "texture_index": 28
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 21
+                    },
+                    {
+                        "texture_index": 22
+                    },
+                    {
+                        "texture_index": 23
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 34
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 27
+                    },
+                    {
+                        "texture_index": 28
+                    },
+                    {
+                        "texture_index": 28
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 37
+                    },
+                    {
+                        "texture_index": 38
+                    },
+                    {
+                        "texture_index": 39
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 27
+                    },
+                    {
+                        "texture_index": 28
+                    },
+                    {
+                        "texture_index": 28
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 108
+                    },
+                    {
+                        "texture_index": 108
+                    },
+                    {
+                        "texture_index": 108
+                    },
+                    {
+                        "texture_index": 108
+                    },
+                    {
+                        "texture_index": 55
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 27
+                    },
+                    {
+                        "texture_index": 28
+                    },
+                    {
+                        "texture_index": 28
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 71
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 43
+                    },
+                    {
+                        "texture_index": 79
+                    },
+                    {
+                        "texture_index": 28
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 19
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 126
+                    },
+                    {
+                        "texture_index": 54
+                    },
+                    {
+                        "texture_index": 54
+                    },
+                    {
+                        "texture_index": 54
+                    },
+                    {
+                        "texture_index": 102
+                    },
+                    {
+                        "texture_index": 103
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 43
+                    },
+                    {
+                        "texture_index": 44
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 35
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 158
+                    },
+                    {
+                        "texture_index": 118
+                    },
+                    {
+                        "texture_index": 103
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 61
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 119
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 77
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 158
+                    },
+                    {
+                        "texture_index": 105
+                    },
+                    {
+                        "texture_index": 105
+                    },
+                    {
+                        "texture_index": 105
+                    },
+                    {
+                        "texture_index": 105
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 93
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 67
+                    },
+                    {
+                        "texture_index": 67
+                    },
+                    {
+                        "texture_index": 67
+                    },
+                    {
+                        "texture_index": 67
+                    },
+                    {
+                        "texture_index": 64
+                    },
+                    {
+                        "texture_index": 64
+                    },
+                    {
+                        "texture_index": 64
+                    },
+                    {
+                        "texture_index": 64
+                    },
+                    {
+                        "texture_index": 66
+                    },
+                    {
+                        "texture_index": 66
+                    },
+                    {
+                        "texture_index": 66
+                    },
+                    {
+                        "texture_index": 66
+                    },
+                    {
+                        "texture_index": 65
+                    },
+                    {
+                        "texture_index": 65
+                    },
+                    {
+                        "texture_index": 65
+                    },
+                    {
+                        "texture_index": 65
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 3
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 0
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 2
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    },
+                    {
+                        "texture_index": 1
+                    }
+                ]
+            ]
+        },
+        {
+            "name": "Radioactive goop.",
+            "tiles": [
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 177
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 160
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 177
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 177
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 193
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 209
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 209
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 209
+                    },
+                    {
+                        "texture_index": 225
+                    },
+                    {
+                        "texture_index": 225
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    },
+                    {
+                        "texture_index": 241
+                    }
+                ]
+            ]
+        },
+        {
+            "name": "Pipes.",
+            "tiles": [
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 88
+                    },
+                    {
+                        "texture_index": 58
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 88
+                    },
+                    {
+                        "texture_index": 89
+                    },
+                    {
+                        "texture_index": 57
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 74
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 56
+                    },
+                    {
+                        "texture_index": 73
+                    },
+                    {
+                        "texture_index": 90
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 89
+                    },
+                    {
+                        "texture_index": 89
+                    },
+                    {
+                        "texture_index": 89
+                    },
+                    {
+                        "texture_index": 89
+                    },
+                    {
+                        "texture_index": 90
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ]
+            ]
+        },
+        {
+            "name": "Walkways.",
+            "tiles": [
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 128
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 113
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 114
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": 83
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 114
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 114
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": 81
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": 114
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 114
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": 81
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 114
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 96
+                    },
+                    {
+                        "texture_index": 98
+                    },
+                    {
+                        "texture_index": 96
+                    },
+                    {
+                        "texture_index": 96
+                    },
+                    {
+                        "texture_index": 97
+                    },
+                    {
+                        "texture_index": 96
+                    },
+                    {
+                        "texture_index": 96
+                    },
+                    {
+                        "texture_index": 96
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": 82
+                    },
+                    {
+                        "texture_index": 80
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ]
+            ]
+        },
+        {
+            "name": "Railing.",
+            "tiles": [
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": 115
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ]
+            ]
+        },
+        {
+            "name": "Forground.",
+            "tiles": [
+                [
+                    {
+                        "texture_index": 4
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 4
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 4
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": 20
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ],
+                [
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    },
+                    {
+                        "texture_index": -1
+                    }
+                ]
+            ]
+        }
+    ],
+    "layers_height": 16,
+    "layers_width": 16
+}
