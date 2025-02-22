@@ -87,12 +87,13 @@ namespace Tiles
                     ImVec2 tileMin(cursorPos.x, cursorPos.y);
                     ImVec2 tileMax(tileMin.x + buttonSize.x, tileMin.y + buttonSize.y);
 
+                    DrawTile(tileMin, tileMax, l, y, x);
+
                     if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                     {
                         HandleSelection(l, y, x);
                         DrawHoveredTile(tileMin, tileMax, l, y, x);
                     }
-                    DrawTile(tileMin, tileMax, l, y, x);
                 }
             }
         }
