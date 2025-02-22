@@ -21,8 +21,8 @@ namespace Tiles
         void OnUIRender();
 
         // Setters
-        void SetTextureAtlas(Shared<Atlas> atlas) { m_Atlas = atlas; }
-        void SetTextureSelection(Shared<TextureSelection> textureSelection) { m_TextureSelection = textureSelection; }
+        void SetTextureAtlas(Shared<Atlas>* atlas) { m_Atlas = atlas; }
+        void SetTextureSelection(Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
         void SetToolSelection(Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
     private:
         // UI Rendering Methods
