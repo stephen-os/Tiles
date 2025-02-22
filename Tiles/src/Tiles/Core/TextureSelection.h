@@ -13,7 +13,7 @@ namespace Tiles
         TextureSelection() = default;
         ~TextureSelection() = default;
 
-        void Select(int texture) { m_SelectedTextures.insert(texture); }
+        void Select(int texture);
         void Deselect(int texture) { m_SelectedTextures.erase(texture); }
         void Clear() { m_SelectedTextures.clear(); }
 
@@ -28,5 +28,6 @@ namespace Tiles
         std::vector<int> GetSelectedTextures() const { return std::vector<int>(m_SelectedTextures.begin(), m_SelectedTextures.end()); }
     private:
         std::set<int> m_SelectedTextures;
+        bool m_MultiSelect = false;
     };
 }
