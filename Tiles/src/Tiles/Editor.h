@@ -79,6 +79,7 @@ public:
         // Texture Selection
         m_TextureSelectionPanel.SetTextureAtlas(atlas);
         m_TextureSelectionPanel.SetTextureSelection(textureSelection);
+        m_TextureSelectionPanel.SetToolSelection(toolSelection);
 
         // Layer Selection
         m_LayerSelectionPanel.SetLayers(layers);
@@ -86,6 +87,7 @@ public:
 
         // Tool Selection
         m_ToolSelectionPanel.SetToolSelection(toolSelection);
+        m_ToolSelectionPanel.SetTextureSelection(textureSelection);
     }
 
     virtual void OnDetach() override

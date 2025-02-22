@@ -157,9 +157,14 @@ namespace Tiles
         if (ImGui::IsItemClicked())
         {
             if (m_TextureSelection->IsSelected(index))
+            {
                 m_TextureSelection->Deselect(index);
+            }
             else
+            {
                 m_TextureSelection->Select(index);
+                m_ToolSelection->Erase = false;
+            }
         }
 
         ImVec2 min = ImGui::GetItemRectMin();

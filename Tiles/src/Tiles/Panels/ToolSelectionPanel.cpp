@@ -22,6 +22,10 @@ namespace Tiles
         if (ImGui::ImageButton((void*)(intptr_t)m_EraserTexture.GetID(), imageSize))
         {
             m_ToolSelection->Erase = !m_ToolSelection->Erase;
+            m_TextureSelection->Clear();
+
+            if (m_ToolSelection->Fill)
+                m_ToolSelection->Fill = !m_ToolSelection->Fill;
         }
 
         if (m_ToolSelection->Erase)
@@ -40,6 +44,9 @@ namespace Tiles
         if (ImGui::ImageButton((void*)(intptr_t)m_FillTexture.GetID(), imageSize))
         {
             m_ToolSelection->Fill = !m_ToolSelection->Fill;
+
+            if (m_ToolSelection->Erase)
+                m_ToolSelection->Erase = !m_ToolSelection->Erase;
         }
 
         if (m_ToolSelection->Fill)
