@@ -104,8 +104,6 @@ private:
     Tiles::LayerSelectionPanel m_LayerSelectionPanel;
     Tiles::ToolSelectionPanel m_ToolSelectionPanel;
 
-    char m_ExportFileName[256] = "Test";
-
     // Util
     Lumina::Timer m_FrameTimer;
     float m_FPS = 0;
