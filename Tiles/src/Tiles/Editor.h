@@ -68,6 +68,7 @@ public:
         m_HeaderPanel.SetLayers(layers);
         m_HeaderPanel.SetTextureAtlas(atlas);
         m_HeaderPanel.SetState(state);
+        m_HeaderPanel.SetTextureSelection(textureSelection);
 
         // Viewport
         m_ViewportPanel.SetLayers(layers);

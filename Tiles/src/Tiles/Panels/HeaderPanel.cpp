@@ -14,10 +14,6 @@ namespace Tiles
     {
         if (ImGui::BeginMainMenuBar())
         {
-            // Clearing texture selection to prevent drawing to viewport when in header menues. 
-            // We may want to manage drawing states a differnt way instead of clearing selection. 
-            m_TextureSelection->Clear();
-
             RenderFile();
             RenderEdit();
             RenderOptions();
@@ -28,6 +24,8 @@ namespace Tiles
 
         if (m_ShowNewPopup)
         {
+            // Clearing texture selection to prevent drawing to viewport when in header menues. 
+            // We may want to manage drawing states a differnt way instead of clearing selection. 
             m_TextureSelection->Clear();
 
             RenderNewPopup();
