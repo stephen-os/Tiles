@@ -26,6 +26,7 @@ namespace Tiles
 		void RenderFile();
 		void RenderEdit();
 		void RenderOptions();
+		void RenderDebug();
 
 		void RenderNewPopup();
 		void RenderRenderMatrixPopup();

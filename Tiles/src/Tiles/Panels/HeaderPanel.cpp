@@ -17,7 +17,7 @@ namespace Tiles
             RenderFile();
             RenderEdit();
             RenderOptions();
-
+			RenderDebug();
         }
 
         ImGui::EndMainMenuBar();
@@ -131,6 +131,18 @@ namespace Tiles
             }
             ImGui::EndMenu();
         }
+    }
+
+    void HeaderPanel::RenderDebug()
+    {
+        if (ImGui::BeginMenu("Debug"))
+		{
+            if (ImGui::MenuItem("Show Example Project"))
+            {
+                Project::Load("res/maps/example_map1.json", m_Layers, m_Atlas);
+            }
+			ImGui::EndMenu();
+		}
     }
 
     void HeaderPanel::RenderNewPopup()
