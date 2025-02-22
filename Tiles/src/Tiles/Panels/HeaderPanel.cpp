@@ -14,20 +14,29 @@ namespace Tiles
     {
         if (ImGui::BeginMainMenuBar())
         {
+            // Clearing texture selection to prevent drawing to viewport when in header menues. 
+            // We may want to manage drawing states a differnt way instead of clearing selection. 
+            m_TextureSelection->Clear();
+
             RenderFile();
             RenderEdit();
             RenderOptions();
+
         }
 
         ImGui::EndMainMenuBar();
 
         if (m_ShowNewPopup)
         {
+            m_TextureSelection->Clear();
+
             RenderNewPopup();
         }
 
         if (m_ShowRenderMatrixPopup)
         {
+            m_TextureSelection->Clear();
+
             RenderRenderMatrixPopup();
         }
     }
@@ -175,22 +184,18 @@ namespace Tiles
             ImGui::Text("Define Layer Groupings:");
             ImGui::Separator();
 
-            // Begin a centered window for the table
             ImVec2 windowSize = ImGui::GetWindowSize();
-            float contentWidth = windowSize.x * 0.8f;  // Make it 80% of the window's width
+            float contentWidth = windowSize.x * 0.8f;
             ImGui::SetNextItemWidth(contentWidth);
-            ImGui::BeginGroup();  // Start a group to center the content
+            ImGui::BeginGroup();
 
             size_t rows = m_Layers->GetSize();
-            size_t cols = m_Layers->GetSize();  // This is the number of groupings (columns)
+            size_t cols = m_Layers->GetSize();
 
-            // Create a table for checkboxes
             if (ImGui::BeginTable("CheckboxTable", cols + 1, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit))
             {
-                // Add the first column for the "Layer Number"
                 ImGui::TableSetupColumn("Layer", ImGuiTableColumnFlags_WidthFixed);
 
-                // Add headers for the columns (groupings)
                 for (int col = 0; col < cols; col++)
                 {
                     std::string groupingLabel = std::to_string(col + 1);
@@ -199,19 +204,16 @@ namespace Tiles
 
                 ImGui::TableHeadersRow();
 
-                // Fill in the table with checkboxes and layer numbers
                 for (int row = 0; row < rows; row++)
                 {
                     ImGui::TableNextRow();
 
-                    // Layer number on the left
                     ImGui::TableSetColumnIndex(0);
                     ImGui::Text("Layer %d", row + 1);
 
-                    // Checkboxes for each column
                     for (int col = 0; col < cols; col++)
                     {
-                        ImGui::TableSetColumnIndex(col + 1); // +1 because the first column is the layer number
+                        ImGui::TableSetColumnIndex(col + 1);
                         std::string label = "##chk" + std::to_string(row) + "_" + std::to_string(col);
 
                         bool checked = m_Checkboxes[row * cols + col];
@@ -219,7 +221,6 @@ namespace Tiles
                         {
                             m_Checkboxes[row * cols + col] = checked;
 
-                            // Uncheck other checkboxes in the same row
                             for (size_t otherCol = 0; otherCol < cols; otherCol++)
                             {
                                 if (otherCol != col)
@@ -232,7 +233,7 @@ namespace Tiles
                 ImGui::EndTable();
             }
 
-            ImGui::EndGroup();  // End the group to center content
+            ImGui::EndGroup();
 
             ImGui::Separator();
 
@@ -258,7 +259,6 @@ namespace Tiles
                 if (ImGuiFileDialog::Instance()->IsOk())
                 {
                     std::string path = ImGuiFileDialog::Instance()->GetCurrentPath();
-                    std::cout << "Selected: " << path << std::endl;
                     strncpy_s(m_ExportFilePath, path.c_str(), sizeof(m_ExportFilePath) - 1);
                 }
                 ImGuiFileDialog::Instance()->Close();
