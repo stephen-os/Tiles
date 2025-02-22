@@ -171,10 +171,6 @@ namespace Tiles
 
     void ViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
     {
-        // Is there a selection?
-        if (!m_TextureSelection || m_TextureSelection->Empty())
-            return;
-
         // Are we ont the active layer? 
         if (l != m_Layers->GetActiveLayer())
             return;
@@ -197,6 +193,11 @@ namespace Tiles
             tile.Reset();
             return;
         }
+
+        // Is there a selection?
+        if (!m_TextureSelection || m_TextureSelection->Empty())
+            return;
+
 
         // For now we are only going to fill what is the first texture in the selection
         // otherwise paint with whole selection. 
