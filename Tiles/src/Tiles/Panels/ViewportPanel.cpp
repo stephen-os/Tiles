@@ -93,6 +93,10 @@ namespace Tiles
                     {
                         HandleSelection(l, y, x);
                         DrawHoveredTile(tileMin, tileMax, l, y, x);
+
+                        // Show boarder on hovered on last layer
+                        if (l == m_Layers->GetSize() - 1)
+                            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR);
                     }
                 }
             }
@@ -143,7 +147,6 @@ namespace Tiles
 
             // Draw the texture
             ImGui::GetWindowDrawList()->AddImage((void*)textureID, adjustedMin, adjustedMax, uvMin, uvMax, Color::FILL_COLOR);
-            ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR);
         }
     }
 
