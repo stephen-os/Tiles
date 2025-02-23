@@ -50,7 +50,6 @@ namespace Tiles
 
         if (ImGui::Button("Add Layer"))
         {
-            m_State->PushLayer(m_Layers->GetActiveLayer(), Layer(), StateType::Layer_Insert);
             m_Layers->NewLayer();
         }
 
@@ -58,7 +57,6 @@ namespace Tiles
 
         if (ImGui::Button("Delete Layer"))
         {
-            m_State->PushLayer(m_Layers->GetActiveLayer(), Layer(), StateType::Layer_Delete);
             m_Layers->DeleteLayer();
         }
 
@@ -66,7 +64,6 @@ namespace Tiles
 
         if (ImGui::Button("Clear Layer"))
         {
-            m_State->PushLayer(m_Layers->GetActiveLayer(), Layer(), StateType::Layer_Replace);
             m_Layers->ClearLayer();
         }
 

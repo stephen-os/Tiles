@@ -3,7 +3,6 @@
 #include "../Core/Layers.h"
 #include "../Core/Exporter.h"
 #include "../Core/Atlas.h"
-#include "../Core/State.h"
 #include "../Core/TextureSelection.h"
 
 #include "../Core/Base.h"
@@ -20,7 +19,6 @@ namespace Tiles
 
 		void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
 		void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
-		void SetState(const Shared<State>& state) { m_State = state; }
 		void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
 	private:
 		void RenderFile();
@@ -34,7 +32,6 @@ namespace Tiles
 	private:
 		Shared<Layers> m_Layers;
 		Shared<Atlas> m_Atlas;
-		Shared<State> m_State;
 		Shared<TextureSelection> m_TextureSelection;
 
 		bool m_ShowNewPopup = false;

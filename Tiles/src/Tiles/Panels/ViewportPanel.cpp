@@ -192,7 +192,6 @@ namespace Tiles
         if (m_ToolSelection->Erase)
         {
             Tile& tile = m_Layers->GetTile(l, y, x);
-            m_State->PushTile(y, x, tile);
             tile.Reset();
             return;
         }
@@ -207,7 +206,6 @@ namespace Tiles
         if (m_ToolSelection->Fill)
         {
             Layer& layer = m_Layers->GetLayer(l);
-            m_State->PushLayer(m_TextureSelection->Front(), layer, StateType::Layer_Replace);
             Tools::Fill(layer, m_TextureSelection->Front(), y, x);
         }
         else
@@ -229,9 +227,6 @@ namespace Tiles
 
                 // Get the tile
                 Tile& tile = m_Layers->GetTile(l, targetY, targetX);
-
-                // Store previouse state
-                m_State->PushTile(targetY, targetX, tile);
 
                 // Update texture
                 tile.SetTextureIndex(texture);

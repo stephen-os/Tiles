@@ -21,7 +21,6 @@
 #include "Core/ToolSelection.h"
 #include "Core/Layers.h"
 #include "Core/Atlas.h"
-#include "Core/State.h"
 #include "Core/Color.h"
 #include "Core/Base.h"
 
@@ -58,22 +57,18 @@ public:
         Tiles::Shared<Tiles::Layers> layers = Tiles::MakeShared<Tiles::Layers>();
         Tiles::Shared<Tiles::Atlas> atlas = Tiles::MakeShared<Tiles::Atlas>();
         Tiles::Shared<Tiles::ToolSelection> toolSelection = Tiles::MakeShared<Tiles::ToolSelection>();
-        Tiles::Shared<Tiles::State> state = Tiles::MakeShared<Tiles::State>();
         Tiles::Shared<Tiles::TextureSelection> textureSelection = Tiles::MakeShared<Tiles::TextureSelection>();
 
         layers->Resize(16, 16);
-        state->SetLayers(layers);
 
         // Header
         m_HeaderPanel.SetLayers(layers);
         m_HeaderPanel.SetTextureAtlas(atlas);
-        m_HeaderPanel.SetState(state);
         m_HeaderPanel.SetTextureSelection(textureSelection);
 
         // Viewport
         m_ViewportPanel.SetLayers(layers);
         m_ViewportPanel.SetTextureAtlas(atlas);
-        m_ViewportPanel.SetState(state);
         m_ViewportPanel.SetToolSelection(toolSelection);
         m_ViewportPanel.SetTextureSelection(textureSelection);
 
@@ -84,7 +79,6 @@ public:
 
         // Layer Selection
         m_LayerSelectionPanel.SetLayers(layers);
-        m_LayerSelectionPanel.SetState(state);
 
         // Tool Selection
         m_ToolSelectionPanel.SetToolSelection(toolSelection);

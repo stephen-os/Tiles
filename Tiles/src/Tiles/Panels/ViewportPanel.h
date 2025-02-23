@@ -10,7 +10,6 @@
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 #include "../Core/Tile.h"
-#include "../Core/State.h"
 #include "../Core/Base.h"
 #include "../Core/Camera.h"
 #include "../Core/Quad.h"
@@ -31,7 +30,6 @@ namespace Tiles
         // Setters
         void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
         void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
-        void SetState(const Shared<State>& state) { m_State = state; }
         void SetToolSelection(const Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
         void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
     private:
@@ -54,7 +52,6 @@ namespace Tiles
     private:
         Shared<Layers> m_Layers;
         Shared<Atlas> m_Atlas;
-        Shared<State> m_State;
         Shared<ToolSelection> m_ToolSelection;
         Shared<TextureSelection> m_TextureSelection;
 
