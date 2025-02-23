@@ -195,7 +195,8 @@ namespace Tiles
     {
         if (std::filesystem::exists(newPath))
         {
-            m_Atlas->Create(newPath);
+            std::filesystem::path relativePath = std::filesystem::relative(newPath, std::filesystem::current_path());
+            m_Atlas->Create(relativePath.string());
         }
     }
 

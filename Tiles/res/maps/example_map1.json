@@ -1,6 +1,6 @@
 {
     "atlas_height": 16,
-    "atlas_path": "C:\\Users\\Stephen\\Dev\\Projects\\Tiles\\Tiles\\res\\atlas\\factory_atlas.png",
+    "atlas_path": "res\\atlas\\factory_atlas.png",
     "atlas_width": 16,
     "layers": [
         {
