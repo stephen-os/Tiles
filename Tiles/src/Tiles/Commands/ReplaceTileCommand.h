@@ -8,10 +8,10 @@
 
 namespace Tiles
 {
-	class PaintCommand : public Command
+	class ReplaceTileCommand : public Command
 	{
 	public:
-		PaintCommand(const Position& position, const Tile& oldTile, const Tile& newTile)
+		ReplaceTileCommand(const Position& position, const Tile& oldTile, const Tile& newTile)
 		{
 			m_Position = position;
 			m_PreviousTile = oldTile; 

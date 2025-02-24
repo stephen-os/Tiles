@@ -4,7 +4,7 @@
 #include "../Core/Color.h"
 #include "../Core/Base.h"
 
-#include "../Commands/PaintCommand.h"
+#include "../Commands/ReplaceTileCommand.h"
 #include "../Commands/ReplaceLayerCommand.h"
 
 #include "Lumina/Renderer/Renderer.h"
@@ -204,7 +204,7 @@ namespace Tiles
 
             Tile newTile; // Default Tile
 
-            m_CommandHistory->ExecuteCommand(MakeUnique<PaintCommand>(position, oldTile, newTile));
+            m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
 
             return;
         }
@@ -249,7 +249,7 @@ namespace Tiles
                 Tile newTile;
                 newTile.SetTextureIndex(texture);
 
-                m_CommandHistory->ExecuteCommand(MakeUnique<PaintCommand>(position, oldTile, newTile));
+                m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
             }
         }
     }
