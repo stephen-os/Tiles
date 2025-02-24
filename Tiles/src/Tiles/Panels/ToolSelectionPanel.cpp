@@ -59,6 +59,30 @@ namespace Tiles
         ImGui::PopID();
 
         ImGui::End();
+
+        if (m_ToolSelection->Erase)
+        {
+            ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+            ImVec2 mousePos = ImGui::GetMousePos();
+
+            ImGui::GetForegroundDrawList()->AddImage(
+                (void*)(intptr_t)m_EraserTexture.GetID(),
+                ImVec2(mousePos.x - imageSize.x / 2, mousePos.y - imageSize.y / 2),
+                ImVec2(mousePos.x + imageSize.x / 2, mousePos.y + imageSize.y / 2)
+            );
+        }
+
+        if (m_ToolSelection->Fill)
+        {
+            ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+            ImVec2 mousePos = ImGui::GetMousePos();
+
+            ImGui::GetForegroundDrawList()->AddImage(
+                (void*)(intptr_t)m_FillTexture.GetID(),
+                ImVec2(mousePos.x - imageSize.x / 2, mousePos.y - imageSize.y / 2),
+                ImVec2(mousePos.x + imageSize.x / 2, mousePos.y + imageSize.y / 2)
+            );
+        }
     }
 
 }
