@@ -85,6 +85,7 @@ public:
 
         // Layer Selection
         m_LayerSelectionPanel.SetLayers(layers);
+        m_LayerSelectionPanel.SetCommandHistory(commandHistory);
 
         // Tool Selection
         m_ToolSelectionPanel.SetToolSelection(toolSelection);

@@ -4,6 +4,9 @@
 #include "../Core/Color.h"
 #include "../Core/Base.h"
 
+#include "../Commands/PaintCommand.h"
+#include "../Commands/ReplaceLayerCommand.h"
+
 #include "Lumina/Renderer/Renderer.h"
 #include "Lumina/Utils/FileReader.h"
 
@@ -217,7 +220,7 @@ namespace Tiles
             Layer& oldLayer = m_Layers->GetLayer(l);
             Layer newLayer = oldLayer;
             Tools::Fill(newLayer, m_TextureSelection->Front(), y, x);
-            m_CommandHistory->ExecuteCommand(MakeUnique<FillCommand>(l, oldLayer, newLayer));
+            m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceLayerCommand>(l, oldLayer, newLayer));
         }
         else
         {

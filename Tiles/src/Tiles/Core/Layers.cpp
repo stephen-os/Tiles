@@ -67,7 +67,7 @@ namespace Tiles
 
 	bool Layers::IsLayerInBounds(size_t index) const
 	{
-		return index < m_Layers.size();
+		return index <= m_Layers.size();
 	}
 
 	size_t Layers::ResolveLayerIndex(size_t index) const

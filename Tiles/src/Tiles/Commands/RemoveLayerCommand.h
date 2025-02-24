@@ -8,28 +8,26 @@
 
 namespace Tiles
 {
-	class FillCommand : public Command
+	class RemoveLayerCommand : public Command
 	{
 	public:
-		FillCommand(const size_t& index, const Layer& previousLayer, const Layer& newLayer)
+		RemoveLayerCommand(const size_t& index, Layer& previousLayer)
 		{
 			m_Index = index;
 			m_PreviousLayer = previousLayer;
-			m_NewLayer = newLayer;
 		}
 
 		virtual void Execute(Layers& layers) override
 		{
-			layers.ReplaceLayer(m_Index, m_NewLayer);
+			layers.RemoveLayer(m_Index);
 		}
 
 		virtual void Undo(Layers& layers) override
 		{
-			layers.ReplaceLayer(m_Index, m_PreviousLayer);
+			layers.InsertLayer(m_Index, m_PreviousLayer);
 		}
 	private:
 		size_t m_Index;
-		Layer m_PreviousLayer;
-		Layer m_NewLayer;
+		Layer m_PreviousLayer; 
 	};
 }

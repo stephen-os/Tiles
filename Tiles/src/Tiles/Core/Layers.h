@@ -15,7 +15,8 @@ namespace Tiles
 		Layers() = default;
 		~Layers() = default;
 
-		void AddLayer(); 
+		void AddLayer();
+		void DeleteLayer();
 		void RemoveLayer(size_t index = std::numeric_limits<size_t>::max());
 		void ClearLayer(size_t index = std::numeric_limits<size_t>::max());
 		void InsertLayer(Layer& layer);

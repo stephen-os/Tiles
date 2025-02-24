@@ -2,6 +2,10 @@
 
 #include "../Core/Layer.h"
 
+#include "../Commands/AddLayerCommand.h"
+#include "../Commands/RemoveLayerCommand.h"
+#include "../Commands/ReplaceLayerCommand.h"
+
 #include "imgui.h"
 
 namespace Tiles
@@ -50,21 +54,25 @@ namespace Tiles
 
         if (ImGui::Button("Add Layer"))
         {
-            m_Layers->AddLayer();
+            m_CommandHistory->ExecuteCommand(MakeUnique<AddLayerCommand>(m_Layers->GetSize()));
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Delete Layer"))
         {
-            m_Layers->RemoveLayer();
+            Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
+            m_CommandHistory->ExecuteCommand(MakeUnique<RemoveLayerCommand>(m_Layers->GetActiveLayer(), layer));
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Clear Layer"))
         {
-            m_Layers->ClearLayer();
+            Layer& oldLayer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
+            Layer newLayer = oldLayer;
+            newLayer.Clear(); 
+            m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceLayerCommand>(m_Layers->GetActiveLayer(), oldLayer, newLayer));
         }
 
         ImGui::Separator();
