@@ -99,13 +99,13 @@ namespace Tiles
 
         size_t layerWidth = jsonProject.value("layers_width", 0);
         size_t layerHeight = jsonProject.value("layers_height", 0);
-        layers->Clear();
+        layers->ClearAllLayers();
         layers->Resize(layerWidth, layerHeight);
 
         // Load TileLayers
         for (const auto& jsonLayer : jsonProject["layers"])
         {
-            layers->NewLayer();
+            layers->AddLayer();
             Layer& layer = layers->GetLayer(layers->GetActiveLayer());
 
             std::string layerName = jsonLayer.at("name").get<std::string>();

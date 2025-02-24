@@ -164,7 +164,7 @@ namespace Tiles
             ImGui::InputInt("Height", &m_NewHeight);
             if (ImGui::Button("Create"))
             {
-                m_Layers->Clear();
+                m_Layers->ClearAllLayers();
                 m_Layers->Resize(m_NewWidth, m_NewHeight);
                 m_ShowNewPopup = false;
             }

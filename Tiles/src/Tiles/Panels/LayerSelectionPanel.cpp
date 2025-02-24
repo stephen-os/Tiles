@@ -50,14 +50,14 @@ namespace Tiles
 
         if (ImGui::Button("Add Layer"))
         {
-            m_Layers->NewLayer();
+            m_Layers->AddLayer();
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Delete Layer"))
         {
-            m_Layers->DeleteLayer();
+            m_Layers->RemoveLayer();
         }
 
         ImGui::SameLine();
