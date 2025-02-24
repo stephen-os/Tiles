@@ -105,11 +105,8 @@ namespace Tiles
         // Load TileLayers
         for (const auto& jsonLayer : jsonProject["layers"])
         {
-            layers->AddLayer();
-            Layer& layer = layers->GetLayer(layers->GetActiveLayer());
-
             std::string layerName = jsonLayer.at("name").get<std::string>();
-            layer.SetName(layerName);
+            Layer layer(layers->GetWidth(), layers->GetHeight(), layerName);
 
             for (size_t y = 0; y < layer.GetHeight(); y++)
             {
@@ -119,6 +116,8 @@ namespace Tiles
                     tile.SetTextureIndex(jsonLayer["tiles"][y][x]["texture_index"].get<int>());
                 }
             }
+
+            layers->InsertLayer(layers->GetSize(), layer);
         }
 
     }

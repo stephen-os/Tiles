@@ -20,7 +20,7 @@ namespace Tiles
 
 		virtual void Execute(Layers& layers) override
 		{
-			layers.AddLayer();
+			layers.InsertLayer(m_Index, Layer());
 		}
 
 		virtual void Undo(Layers& layers) override

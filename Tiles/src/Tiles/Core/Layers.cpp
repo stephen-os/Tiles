@@ -10,12 +10,6 @@ namespace Tiles
 		m_LayerHeight = height;
 	}
 
-	void Layers::AddLayer()
-	{
-		m_Layers.emplace_back(m_LayerWidth, m_LayerHeight, "Layer " + std::to_string(m_Layers.size()));
-		m_ActiveLayer = m_Layers.size() - 1;
-	}
-
 	void Layers::RemoveLayer(size_t index)
 	{
 		index = ResolveLayerIndex(index);
