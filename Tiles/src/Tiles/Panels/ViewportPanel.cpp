@@ -192,8 +192,17 @@ namespace Tiles
         // If we are erasing, that is all we will do in this method. 
         if (m_ToolSelection->Erase)
         {
-            Tile& tile = m_Layers->GetTile(l, y, x);
-            tile.Reset();
+            Position position;
+            position.index = l;
+            position.y = y;
+            position.x = x;
+
+            Tile& oldTile = m_Layers->GetTile(l, y, x);
+
+            Tile newTile; // Default Tile
+
+            m_CommandHistory->ExecuteCommand(MakeUnique<PaintCommand>(position, oldTile, newTile));
+
             return;
         }
 
@@ -201,13 +210,14 @@ namespace Tiles
         if (!m_TextureSelection || m_TextureSelection->Empty())
             return;
 
-
         // For now we are only going to fill what is the first texture in the selection
         // otherwise paint with whole selection. 
         if (m_ToolSelection->Fill)
         {
-            Layer& layer = m_Layers->GetLayer(l);
-            Tools::Fill(layer, m_TextureSelection->Front(), y, x);
+            Layer& oldLayer = m_Layers->GetLayer(l);
+            Layer newLayer = oldLayer;
+            Tools::Fill(newLayer, m_TextureSelection->Front(), y, x);
+            m_CommandHistory->ExecuteCommand(MakeUnique<FillCommand>(l, oldLayer, newLayer));
         }
         else
         {
@@ -237,12 +247,6 @@ namespace Tiles
                 newTile.SetTextureIndex(texture);
 
                 m_CommandHistory->ExecuteCommand(MakeUnique<PaintCommand>(position, oldTile, newTile));
-
-                // Get the tile
-                // Tile& tile = m_Layers->GetTile(l, targetY, targetX);
-
-                // Update texture
-                // tile.SetTextureIndex(texture);
             }
         }
     }

@@ -16,6 +16,7 @@
 
 #include "../Commands/CommandHistory.h"
 #include "../Commands/PaintCommand.h"
+#include "../Commands/FillCommand.h"
 
 #include "imgui.h"
 

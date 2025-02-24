@@ -56,6 +56,15 @@ namespace Tiles
 			spdlog::error("Error: Attempted to insert layer at an invalid index.");
 	}
 
+	void Layers::ReplaceLayer(size_t index, Layer& layer)
+	{
+		index = ResolveLayerIndex(index);
+		if (IsLayerInBounds(index))
+			m_Layers[index] = std::move(layer);
+		else
+			spdlog::error("Error: Attempted to replace an out-of-bounds layer.");
+	}
+
 	bool Layers::IsLayerInBounds(size_t index) const
 	{
 		return index < m_Layers.size();

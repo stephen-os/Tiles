@@ -20,6 +20,7 @@ namespace Tiles
 		void ClearLayer(size_t index = std::numeric_limits<size_t>::max());
 		void InsertLayer(Layer& layer);
 		void InsertLayer(size_t index, Layer& layer);
+		void ReplaceLayer(size_t index, Layer& layer);
 
 		void ClearAllLayers() { m_Layers.clear(); }
 		void Resize(size_t width, size_t height);
