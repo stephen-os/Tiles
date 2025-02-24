@@ -14,6 +14,9 @@
 #include "../Core/Camera.h"
 #include "../Core/Quad.h"
 
+#include "../Commands/CommandHistory.h"
+#include "../Commands/PaintCommand.h"
+
 #include "imgui.h"
 
 namespace Tiles
@@ -32,6 +35,7 @@ namespace Tiles
         void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
         void SetToolSelection(const Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
         void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
+        void SetCommandHistory(const Shared<CommandHistory>& history) { m_CommandHistory = history; }
     private:
         // UI Rendering
         void RenderBackground();
@@ -54,6 +58,7 @@ namespace Tiles
         Shared<Atlas> m_Atlas;
         Shared<ToolSelection> m_ToolSelection;
         Shared<TextureSelection> m_TextureSelection;
+        Shared<CommandHistory> m_CommandHistory;
 
         // Rendering
         Quad m_Background;

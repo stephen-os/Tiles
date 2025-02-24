@@ -113,10 +113,18 @@ namespace Tiles
             if (ImGui::MenuItem("Undo"))
             {
                 // Undo
+                if (m_CommandHistory->CanUndo())
+				{
+					m_CommandHistory->Undo();
+				}
             }
             if (ImGui::MenuItem("Redo"))
             {
                 // Redo
+                if (m_CommandHistory->CanRedo())
+                {
+                    m_CommandHistory->Redo();
+                }
             }
             ImGui::EndMenu();
         }

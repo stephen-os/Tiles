@@ -2,6 +2,7 @@
 
 #include "../Core/Tools.h"
 #include "../Core/Color.h"
+#include "../Core/Base.h"
 
 #include "Lumina/Renderer/Renderer.h"
 #include "Lumina/Utils/FileReader.h"
@@ -225,11 +226,23 @@ namespace Tiles
                 if (targetX < 0 || targetY < 0 || targetX >= m_Layers->GetWidth() || targetY >= m_Layers->GetHeight())
                     continue;
 
+                Position position;
+                position.index = l;
+                position.y = targetY;
+                position.x = targetX;
+
+                Tile& oldTile = m_Layers->GetTile(l, targetY, targetX);
+
+                Tile newTile;
+                newTile.SetTextureIndex(texture);
+
+                m_CommandHistory->ExecuteCommand(MakeUnique<PaintCommand>(position, oldTile, newTile));
+
                 // Get the tile
-                Tile& tile = m_Layers->GetTile(l, targetY, targetX);
+                // Tile& tile = m_Layers->GetTile(l, targetY, targetX);
 
                 // Update texture
-                tile.SetTextureIndex(texture);
+                // tile.SetTextureIndex(texture);
             }
         }
     }
