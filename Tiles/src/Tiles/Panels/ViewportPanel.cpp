@@ -15,6 +15,8 @@
 
 #include <iostream>
 
+#include <spdlog/spdlog.h>
+
 namespace Tiles
 {
 
@@ -178,6 +180,17 @@ namespace Tiles
 
     void ViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
     {
+        static bool wasErasing = m_ToolSelection->Erase;
+        static bool wasFilling = m_ToolSelection->Fill;
+
+        if (wasErasing != m_ToolSelection->Erase || wasFilling != m_ToolSelection->Fill)
+        {
+            m_LastMousePos = { -1, -1 };
+        }
+
+        wasErasing = m_ToolSelection->Erase;
+        wasFilling = m_ToolSelection->Fill;
+
         // Are we ont the active layer? 
         if (l != m_Layers->GetActiveLayer())
             return;
@@ -203,6 +216,8 @@ namespace Tiles
             Tile& oldTile = m_Layers->GetTile(l, y, x);
 
             Tile newTile; // Default Tile
+
+            spdlog::debug("Erasing tile: ({}, {}, {})", position.index, position.y, position.x);
 
             m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
 
@@ -250,6 +265,8 @@ namespace Tiles
                 newTile.SetTextureIndex(texture);
 
                 m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
+
+                spdlog::info("Painting tile at ({}, {}) with texture {}", targetY, targetX, texture);
             }
         }
     }
