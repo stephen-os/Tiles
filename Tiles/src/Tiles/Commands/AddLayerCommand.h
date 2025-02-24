@@ -6,7 +6,9 @@
 
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
+
 #include <iostream>
+#include <string>
 
 namespace Tiles
 {
@@ -20,7 +22,8 @@ namespace Tiles
 
 		virtual void Execute(Layers& layers) override
 		{
-			layers.InsertLayer(m_Index, Layer());
+			Layer layer(layers.GetWidth(), layers.GetHeight(), std::string("Layer " + std::to_string(m_Index)));
+			layers.InsertLayer(m_Index, layer);
 		}
 
 		virtual void Undo(Layers& layers) override
