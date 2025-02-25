@@ -15,13 +15,13 @@ namespace Tiles
     {
         ImGui::Begin("Layer Selection", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
-        ImGui::InputText("Layer Name", m_ProjectName, sizeof(m_ProjectName));
-   
-        ImGui::SameLine();
+        strncpy_s(m_ProjectName, m_Layers->GetName().c_str(), sizeof(m_ProjectName) - 1);
+        m_ProjectName[sizeof(m_ProjectName) - 1] = '\0';
 
-        if (ImGui::Button("Set Name"))
+        ImGui::Text("Project Name");
+        if (ImGui::InputText("###ProjectName", m_ProjectName, sizeof(m_ProjectName)))
         {
-			m_Layers->SetName(std::string(m_ProjectName));
+            m_Layers->SetName(std::string(m_ProjectName));
         }
 
         if (m_Layers->GetSize() != 0)
