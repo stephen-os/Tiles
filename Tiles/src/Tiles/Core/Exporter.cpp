@@ -25,8 +25,8 @@ namespace Tiles
         Lumina::ShaderProgram shader;
         shader.SetSource(vertexShader, fragmetShader);
 
-        int outputWidth = layers->GetWidth() * m_Resolution;
-        int outputHeight = layers->GetHeight() * m_Resolution;
+        int outputWidth = static_cast<int>(layers->GetWidth() * m_Resolution);
+        int outputHeight = static_cast<int>(layers->GetHeight() * m_Resolution);
 
         glm::mat4 orthoProjection = glm::ortho(0.0f, float(layers->GetWidth()), 0.0f, float(layers->GetHeight()), -1.0f, 2.0f);
 
@@ -47,12 +47,12 @@ namespace Tiles
             shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
             shader.SetUniform1f("u_NumberOfRows", static_cast<float>(atlas->GetWidth()));
 
-            for (int l = offset; l < (offset + group) && l < layers->GetSize(); l++)
+            for (size_t l = offset; l < (offset + group) && l < layers->GetSize(); l++)
             {
                 Layer& layer = layers->GetLayer(l);
-                for (int y = 0; y < layer.GetHeight(); y++)
+                for (size_t y = 0; y < layer.GetHeight(); y++)
                 {
-                    for (int x = 0; x < layer.GetWidth(); x++)
+                    for (size_t x = 0; x < layer.GetWidth(); x++)
                     {
                         Tile& tile = layer.GetTile(y, x);
                         if (tile.GetTextureIndex() != -1)
