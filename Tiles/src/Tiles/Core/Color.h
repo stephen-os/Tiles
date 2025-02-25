@@ -2,6 +2,8 @@
 
 #include "imgui.h"
 
+#include "spdlog/spdlog.h"
+
 namespace Tiles
 {
     struct Color
@@ -65,7 +67,10 @@ namespace Tiles
 
             ImFont* customFont = io.Fonts->AddFontFromFileTTF("res/assets/fonts/Modeseven-L3n5.ttf", 12.0f);
             if (!customFont)
+            {
+                spdlog::error("[Color] -> Failed to load custom font.");
                 return;
+            }
 
             io.FontDefault = customFont;  // Set as default font
         }
