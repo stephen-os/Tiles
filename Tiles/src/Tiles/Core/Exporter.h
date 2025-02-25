@@ -2,7 +2,6 @@
 
 #include "Layers.h"
 #include "Atlas.h"
-
 #include "Base.h"
 
 namespace Tiles
