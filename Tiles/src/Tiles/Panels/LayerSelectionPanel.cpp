@@ -8,6 +8,8 @@
 
 #include "imgui.h"
 
+#include <iostream>
+
 namespace Tiles
 {
 
@@ -74,18 +76,24 @@ namespace Tiles
 
         if (ImGui::Button("Delete Layer"))
         {
-            Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
-            m_CommandHistory->ExecuteCommand(MakeUnique<RemoveLayerCommand>(m_Layers->GetActiveLayer(), layer));
+            if (m_Layers->GetSize() != 0)
+            {
+                Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
+                m_CommandHistory->ExecuteCommand(MakeUnique<RemoveLayerCommand>(m_Layers->GetActiveLayer(), layer));
+            }
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Clear Layer"))
         {
-            Layer& oldLayer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
-            Layer newLayer = oldLayer;
-            newLayer.Clear(); 
-            m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceLayerCommand>(m_Layers->GetActiveLayer(), oldLayer, newLayer));
+            if (m_Layers->GetSize() != 0)
+            {
+                Layer& oldLayer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
+                Layer newLayer = oldLayer;
+                newLayer.Clear();
+                m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceLayerCommand>(m_Layers->GetActiveLayer(), oldLayer, newLayer));
+            }
         }
 
         ImGui::Separator();

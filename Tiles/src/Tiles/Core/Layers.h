@@ -20,35 +20,34 @@ namespace Tiles
 		void InsertLayer(Layer& layer);
 		void InsertLayer(size_t index, Layer& layer);
 		void ReplaceLayer(size_t index, Layer& layer);
-
 		void ClearAllLayers() { m_Layers.clear(); }
+
 		void Resize(size_t width, size_t height);
-		bool IsEmpty() { return m_Layers.empty(); }
+		bool IsEmpty() const { return m_Layers.empty(); }
 
 		// Setters
 		void SetActiveLayer(size_t index) { m_ActiveLayer = index; }
-		void SetName(std::string name) { m_Name = name; }
+		void SetName(const std::string name) { m_Name = name; }
 
 		// Getters
-		size_t GetActiveLayer() { return m_ActiveLayer; }
+		size_t GetActiveLayer() const { return m_ActiveLayer; }
 		size_t GetWidth() const { return m_LayerWidth; }
 		size_t GetHeight() const { return m_LayerHeight; }
-		size_t GetSize() { return m_Layers.size(); }
-		std::string GetName() { return m_Name; }
+		size_t GetSize() const { return m_Layers.size(); }
+		const std::string GetName() const { return m_Name; }
 		
 		Layer& GetLayer(size_t index) { return m_Layers[index]; }
+		const Tile& GetTile(size_t index, size_t y, size_t x) const { return m_Layers[index].GetTile(y, x); }
 		Tile& GetTile(size_t index, size_t y, size_t x) { return m_Layers[index].GetTile(y, x); }
+
 	private:
-		bool IsLayerInBounds(size_t index) const;
 		size_t ResolveLayerIndex(size_t index) const;
 	private:
-		std::string m_Name = "New Project";
-
-		size_t m_LayerWidth = 0;		// Height of each layer
-		size_t m_LayerHeight = 0;		// Width of each layer
-		size_t m_ActiveLayer = 0;		// Working layer
-
-		std::vector<Layer> m_Layers;	// Layers
+		std::string m_Name = "New Project"; // Name of the project
+		size_t m_LayerWidth = 0;			// Height of each layer
+		size_t m_LayerHeight = 0;			// Width of each layer
+		size_t m_ActiveLayer = 0;			// Working layer
+		std::vector<Layer> m_Layers;		// Layers
 	};
 
 }

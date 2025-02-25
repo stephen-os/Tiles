@@ -13,7 +13,7 @@ namespace Tiles
 	void Layers::RemoveLayer(size_t index)
 	{
 		index = ResolveLayerIndex(index);
-		if (IsLayerInBounds(index))
+		if (index < m_Layers.size())
 		{
 			m_Layers.erase(m_Layers.begin() + index);
 			if (m_ActiveLayer >= m_Layers.size() && !m_Layers.empty())
@@ -30,7 +30,7 @@ namespace Tiles
 	void Layers::ClearLayer(size_t index)
 	{
 		index = ResolveLayerIndex(index);
-		if (IsLayerInBounds(index))
+		if (index < m_Layers.size())
 			m_Layers[index].Clear();
 		else
 			spdlog::error("Error: Attempted to clear an out - of - bounds layer.");
@@ -44,7 +44,7 @@ namespace Tiles
 	void Layers::InsertLayer(size_t index, Layer& layer)
 	{
 		index = ResolveLayerIndex(index);
-		if (IsLayerInBounds(index))
+		if (index <= m_Layers.size())
 			m_Layers.insert(m_Layers.begin() + index, std::move(layer));
 		else
 			spdlog::error("Error: Attempted to insert layer at an invalid index.");
@@ -53,15 +53,10 @@ namespace Tiles
 	void Layers::ReplaceLayer(size_t index, Layer& layer)
 	{
 		index = ResolveLayerIndex(index);
-		if (IsLayerInBounds(index))
+		if (index < m_Layers.size())
 			m_Layers[index] = std::move(layer);
 		else
 			spdlog::error("Error: Attempted to replace an out-of-bounds layer.");
-	}
-
-	bool Layers::IsLayerInBounds(size_t index) const
-	{
-		return index <= m_Layers.size();
 	}
 
 	size_t Layers::ResolveLayerIndex(size_t index) const
