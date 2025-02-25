@@ -13,7 +13,7 @@ namespace Tiles
 
     void LayerSelectionPanel::OnUIRender()
     {
-        ImGui::Begin("Layer Selection", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+        ImGui::Begin("Layer Selection");
 
         strncpy_s(m_ProjectName, m_Layers->GetName().c_str(), sizeof(m_ProjectName) - 1);
         m_ProjectName[sizeof(m_ProjectName) - 1] = '\0';
@@ -24,22 +24,12 @@ namespace Tiles
             m_Layers->SetName(std::string(m_ProjectName));
         }
 
-        if (m_Layers->GetSize() != 0)
-        {
-            Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
-            const char* layerName = layer.GetName().c_str();
-            char layerNameBuffer[128];
-            strncpy_s(layerNameBuffer, layerName, sizeof(layerNameBuffer) - 1);
-            layerNameBuffer[sizeof(layerNameBuffer) - 1] = '\0';
+        ImGui::Separator();
 
-
-
-            ImGui::Separator();
-        }
-
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyle().Colors[ImGuiCol_FrameBg]);
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-        ImGui::BeginChild("LayerBox", ImVec2(0, 200), true, ImGuiWindowFlags_None);
+
+        ImGui::BeginChild("LayerBox", ImVec2(0, 400), true, ImGuiWindowFlags_None);
 
         ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImGui::GetStyle().Colors[ImGuiCol_FrameBgHovered]);
         ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImGui::GetStyle().Colors[ImGuiCol_FrameBgActive]);
@@ -67,10 +57,11 @@ namespace Tiles
             ImGui::PopID();
         }
 
-        ImGui::PopStyleColor(2);
+        ImGui::PopStyleColor(3);
+
         ImGui::EndChild();
+
         ImGui::PopStyleVar();
-        ImGui::PopStyleColor();
 
         ImGui::Separator();
 
