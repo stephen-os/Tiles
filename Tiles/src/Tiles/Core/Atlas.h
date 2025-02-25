@@ -26,10 +26,13 @@ namespace Tiles
 
         bool IsCreated() const { return m_IsCreated; }
 
-        // Getters
-        int& GetWidth() { return m_GridWidth; }
-        int& GetHeight() { return m_GridHeight; }
+        // Setters
+        void SetWidth(int width) { m_GridWidth = width; }
+		void SetHeight(int height) { m_GridHeight = height; }
 
+        // Getters
+        int GetWidth() { return m_GridWidth; }
+        int GetHeight() { return m_GridHeight; }
         std::string GetPath() const { return m_Path; }
         std::string GetFilename() const { return m_Path.substr(m_Path.find_last_of("/\\") + 1); }
 

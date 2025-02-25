@@ -1,6 +1,6 @@
 #include "Atlas.h"
 
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 namespace Tiles
 {
@@ -9,7 +9,7 @@ namespace Tiles
     {
         if (!m_Texture.SetData(path))
         {
-            std::cerr << "[Atlas] -> Create: Failed to load texture: " << path << "\n";
+            spdlog::error("[Atlas] -> Create: Failed to load texture: {}", path);
             return;
         }
 
@@ -46,8 +46,8 @@ namespace Tiles
 
     void Atlas::Destroy()
     {
-		m_Texture.~Texture();
-        std::string m_Path = "";                
+		m_Texture.Reset();
+        m_Path.clear();                
         m_GridWidth = 16;                   
         m_GridHeight = 16;                  
         m_TexWidth = 0.0f;                
@@ -70,19 +70,19 @@ namespace Tiles
     {
         if (index < 0 || index >= static_cast<int>(m_TexCoords.size()))
         {
-            std::cerr << "[Atlas] -> GetTexCoords: Invalid texture index: " << index << "\n";
+            spdlog::error("[Atlas] -> GetTexCoords: Invalid texture index: {}", index);
             return glm::vec4(0.0f);
         }
 
         return m_TexCoords[index];
     }
 
-    // Calulates the offset of the tile reative to the top left of the atlas between 0 and 1
+    // Calculates the offset of the tile reative to the top left of the atlas between 0 and 1
     glm::vec2 Atlas::GetOffset(int index) const
     {
         if (index < 0 || index >= (m_GridWidth * m_GridHeight))
 	    {
-		    std::cerr << "[Atlas] -> GetOffset: Invalid texture index: " << index << "\n";
+            spdlog::error("[Atlas] -> GetOffset: Invalid texture index: {}", index);
 		    return glm::vec2(0.0f);
 	    }
 
@@ -95,7 +95,7 @@ namespace Tiles
         return glm::vec2(xOffset, yOffset);
     }
 
-    // Calculates the positon of the tile reative to the top left of the atlas
+    // Calculates the positon of the tile relative to the top left of the atlas
     glm::vec2 Atlas::GetPosition(int index) const
     {
         if (index < 0 || index >= m_GridWidth * m_GridHeight)

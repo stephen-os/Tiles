@@ -64,18 +64,20 @@ namespace Tiles
         ImGui::Text("Atlas Dimensions");
         ImGui::PushItemWidth(100.0f);
 
-        if (ImGui::InputInt(("##" + std::string("Width:")).c_str(), &m_Atlas->GetWidth()))
+        int width = m_Atlas->GetWidth();
+        if (ImGui::InputInt(("##" + std::string("Width:")).c_str(), &width))
         {
-            m_Atlas->GetWidth() = std::max(1, m_Atlas->GetWidth());
+            m_Atlas->SetWidth(std::max(1, width));
             if (m_Atlas->IsCreated())
             {
                 m_Atlas->UpdateTexCoords();
             }
         }
 
-        if (ImGui::InputInt(("##" + std::string("Height:")).c_str(), &m_Atlas->GetHeight()))
+        int height = m_Atlas->GetHeight();
+        if (ImGui::InputInt(("##" + std::string("Height:")).c_str(), &height))
         {
-            m_Atlas->GetWidth() = std::max(1, m_Atlas->GetWidth());
+            m_Atlas->SetHeight(std::max(1, height));
             if (m_Atlas->IsCreated())
             {
                 m_Atlas->UpdateTexCoords();
