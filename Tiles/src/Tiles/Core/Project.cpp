@@ -83,16 +83,14 @@ namespace Tiles
         file >> jsonProject;
         file.close();
 
-        // Load TextureAtlas
+        // Load Texture Atlas
         std::string atlasPath = jsonProject.value("atlas_path", "");
         int atlasWidth = jsonProject.value("atlas_width", 0);
         int atlasHeight = jsonProject.value("atlas_height", 0);
 
         atlas->Create(atlasPath);
-        // TODO: Maybe add a resize method. This way we dont have to call UpdateTexCoords.
-        // atlas->Resize(atlasWidth, atlasHeight);
-        atlas->GetWidth() = atlasWidth;
-        atlas->GetHeight() = atlasHeight;
+        atlas->SetWidth(atlasWidth);
+        atlas->SetHeight(atlasHeight);
         atlas->UpdateTexCoords();
 
 
