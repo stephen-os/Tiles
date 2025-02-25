@@ -2,7 +2,7 @@
 
 **Tiles** is a 2D map creator that allows users to upload texture atlases and build detailed 2D worlds. It features a **layer-based approach**, enabling users to organize, edit, and toggle textured layers for precise control. The tool includes essential features like erase and fill tools for modifying large areas efficiently. Projects can be **saved and loaded** for continued editing and exported as a **single image** or **multiple grouped layers**, depending on user needs.
 
-<div style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
+<div align="center" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
     <img src="assets/Application.png" alt="Tiles Screenshot" width="800">
 </div>
 
@@ -47,7 +47,7 @@ ModeSeven by Andrew Bulhak.
 3. Open the `.sln` file in Visual Studio 2017 or later.
 4. Build and run the project from Visual Studio.
 
-<div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; margin-bottom: 20px;">
+<div align="center" style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; margin-bottom: 20px;">
     <img src="assets/factory-level-1.png" alt="Factory Level 1" width="400">
     <img src="assets/factory-level-2.png" alt="Factory Level 2" width="400">
 </div>
