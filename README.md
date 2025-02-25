@@ -28,6 +28,10 @@ Tiles is built using several key libraries:
 - **[Glad](https://github.com/Resetss/glad)** – An OpenGL loader that manages API function pointers.  
 - **[GLM](https://github.com/g-truc/glm)** – A C++ mathematics library optimized for graphics applications.  
 
+## 🎨 Font
+
+ModeSeven by Andrew Bulhak.
+
 ## 📥 Installation & Usage
 
 ### 🔧 Prerequisites
@@ -39,7 +43,7 @@ Tiles is built using several key libraries:
    ```sh
    git clone --recursive https://github.com/Resetss/Tiles.git
    ```
-2. Navigate to the `Scripts` folder and run the `Setup` script.
+2. Navigate to the `scripts` folder and run the `Setup` script.
 3. Open the `.sln` file in Visual Studio 2017 or later.
 4. Build and run the project from Visual Studio.
 
