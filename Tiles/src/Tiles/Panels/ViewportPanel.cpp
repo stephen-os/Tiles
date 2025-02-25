@@ -215,9 +215,7 @@ namespace Tiles
 
             Tile& oldTile = m_Layers->GetTile(l, y, x);
 
-            Tile newTile; // Default Tile
-
-            spdlog::debug("Erasing tile: ({}, {}, {})", position.index, position.y, position.x);
+            Tile newTile;
 
             m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
 
@@ -264,9 +262,10 @@ namespace Tiles
                 Tile newTile;
                 newTile.SetTextureIndex(texture);
 
-                m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
+                if (newTile == oldTile)
+					continue;
 
-                spdlog::info("Painting tile at ({}, {}) with texture {}", targetY, targetX, texture);
+                m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
             }
         }
     }
