@@ -230,13 +230,10 @@ namespace Tiles
         // otherwise paint with whole selection. 
         if (m_ToolSelection->Fill)
         {
-            // Check Tile. 
-            Tile& oldTile = m_Layers->GetTile(l, y, x);
+            Tile& tile = m_Layers->GetTile(l, y, x);
 
-            Tile newTile;
-            newTile.SetTextureIndex(m_TextureSelection->Front());
-
-            if (newTile == oldTile)
+            // Check tile to make sure its not the same. 
+            if (tile.GetTextureIndex() == m_TextureSelection->Front())
                 return;
 
             // If the tiles are different, then we ill
@@ -269,11 +266,12 @@ namespace Tiles
 
                 Tile& oldTile = m_Layers->GetTile(l, targetY, targetX);
 
+                // Check tile to make sure its not the same. 
+                if (oldTile.GetTextureIndex() == texture)
+                    return;
+
                 Tile newTile;
                 newTile.SetTextureIndex(texture);
-
-                if (newTile == oldTile)
-					continue;
 
                 m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
             }
