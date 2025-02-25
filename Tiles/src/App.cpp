@@ -10,7 +10,7 @@ Lumina::Application* Lumina::CreateApplication(int argc, char** argv)
     spec.Width = 1920;
     spec.Height = 1080;
     spec.Fullscreen = false;
-    spec.Dock = true; 
+    spec.Dock = false; 
 
     Lumina::Application* app = new Lumina::Application(spec);
     app->PushLayer<Editor>();
