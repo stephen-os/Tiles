@@ -18,8 +18,9 @@ namespace Tiles
         {
             RenderFile();
             RenderEdit();
-            RenderOptions();
-			RenderDebug();
+            // RenderOptions(); // will be implemented in the future
+            RenderExample();
+            RenderHelp(); 
         }
 
         ImGui::EndMainMenuBar();
@@ -39,6 +40,11 @@ namespace Tiles
 
             RenderRenderMatrixPopup();
         }
+
+        if (m_ShowAboutPopup)
+		{
+			RenderAboutPopup();
+		}
 
         HandleShortcuts();
     }
@@ -149,14 +155,30 @@ namespace Tiles
         }
     }
 
-    void HeaderPanel::RenderDebug()
+    void HeaderPanel::RenderExample()
     {
-        if (ImGui::BeginMenu("Debug"))
+        if (ImGui::BeginMenu("Examples"))
 		{
-            if (ImGui::MenuItem("Show Example Project"))
+            if (ImGui::MenuItem("Example Project 1"))
             {
                 Project::Load("res/maps/example_map1.json", m_Layers, m_Atlas);
             }
+            if (ImGui::MenuItem("Example Project 2"))
+            {
+                Project::Load("res/maps/example_map2.json", m_Layers, m_Atlas);
+            }
+            ImGui::EndMenu();
+		}
+    }
+
+    void HeaderPanel::RenderHelp()
+    {
+        if (ImGui::BeginMenu("Help"))
+		{
+			if (ImGui::MenuItem("About"))
+			{
+                m_ShowAboutPopup = true; 
+			}
 			ImGui::EndMenu();
 		}
     }
@@ -165,11 +187,20 @@ namespace Tiles
     {
         ImGui::OpenPopup("New Project");
 
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
         if (ImGui::BeginPopupModal("New Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("Enter width and height:");
             ImGui::InputInt("Width", &m_NewWidth);
             ImGui::InputInt("Height", &m_NewHeight);
+
+            float windowWidth = ImGui::GetWindowSize().x;
+            float createButtonWidth = ImGui::CalcTextSize("Create").x + ImGui::GetStyle().FramePadding.x * 2;
+            float cancelButtonWidth = ImGui::CalcTextSize("Cancel").x + ImGui::GetStyle().FramePadding.x * 2;
+            ImGui::SetCursorPosX((windowWidth - createButtonWidth - cancelButtonWidth - 2) * 0.5f);
+
             if (ImGui::Button("Create"))
             {
                 m_Layers->ClearAllLayers();
@@ -190,10 +221,18 @@ namespace Tiles
         if (m_Layers->IsEmpty())
 		{
 			ImGui::OpenPopup("Render Matrix");
+
+            ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
 			ImGui::BeginPopupModal("Render Matrix", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 			ImGui::Text("No layers available");
             
-            if (ImGui::Button("Cancel"))
+            float windowWidth = ImGui::GetWindowSize().x;
+            float buttonWidth = ImGui::CalcTextSize("Close").x + ImGui::GetStyle().FramePadding.x * 2;
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+            if (ImGui::Button("Close"))
             {
                 m_ShowRenderMatrixPopup = false;
             }
@@ -204,6 +243,9 @@ namespace Tiles
 		}
 
         ImGui::OpenPopup("Render Matrix");
+
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
         if (ImGui::BeginPopupModal("Render Matrix", NULL, ImGuiWindowFlags_AlwaysAutoResize))
         {
@@ -317,12 +359,77 @@ namespace Tiles
 
             ImGui::SameLine();
 
+            float windowWidth = ImGui::GetWindowSize().x;
+            float buttonWidth = ImGui::CalcTextSize("Cancel").x + ImGui::GetStyle().FramePadding.x * 2;
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
             if (ImGui::Button("Cancel"))
             {
                 m_ShowRenderMatrixPopup = false;
             }
 
             ImGui::EndPopup();
+        }
+    }
+
+    void HeaderPanel::RenderAboutPopup()
+    {
+        ImGui::OpenPopup("About");
+
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+        if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Suggested Workflow:");
+            ImGui::Text("* Go to File->New Project to create a new project with specific dimensions.");
+            ImGui::Text("* Browse a texture atlas, load it and resize it.");
+            ImGui::Text("* Add layers via the Add Layer button.");
+            ImGui::Text("* Select a layer and paint, erase, or fill it.");
+            ImGui::Text("* Export the project as a PNG.");
+            ImGui::Text("* Optional: Save project for future editing.");
+            
+            ImGui::Separator();
+            ImGui::Text("Example Projects:");
+            ImGui::Text("There are 2 example projects that can be viewed under Examples->Example Project 1 and Examples->Example Project 2.");
+
+            ImGui::Separator();
+            ImGui::Text("Features:");
+            ImGui::Text("* Painting, Erasing, and Filling tiles per layer.");
+            ImGui::Text("* Adding, Removing, Clearing, and Renaming of a selected layer.");
+            ImGui::Text("* Resizing texture atlas on the fly.");
+            ImGui::Text("* Saving and Loading of a project as JSON.");
+            ImGui::Text("* Exporting of a project as a PNG.");
+            ImGui::Text("* * Rendering Matrix for grouping layers for export.");
+            ImGui::Text("* * Export Multiple PNGs based on groupings.");
+            ImGui::Text("* Shortcuts for Undo/Redo.");
+
+            ImGui::Separator();
+            ImGui::Text("Technical Dependencies:");
+            ImGui::Text("Lumina - Custom Render/Application Starter - https://github.com/Resetss/Lumina");
+            ImGui::Text("* ImGui - https://github.com/Resetss/imgui");
+			ImGui::Text("* ImGuiFileDialog - https://github.com/Resetss/ImGuiFileDialog");
+		    ImGui::Text("* GLFW - https://github.com/Resetss/glfw");
+            ImGui::Text("* Glad - https://github.com/Resetss/glad");
+            ImGui::Text("* GLM - https://github.com/g-truc/glm"); 
+
+            ImGui::Separator();
+            ImGui::Text("Shortcuts:");
+            ImGui::Text("CTRL + Z - Undo");
+            ImGui::Text("CTRL + Y - Redo");
+
+
+            ImGui::Separator();
+
+            float windowWidth = ImGui::GetWindowSize().x;
+            float buttonWidth = ImGui::CalcTextSize("Close").x + ImGui::GetStyle().FramePadding.x * 2;
+            ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+
+            if (ImGui::Button("Close"))
+            {
+                m_ShowAboutPopup = false;
+            }
+            ImGui::End();
         }
     }
 

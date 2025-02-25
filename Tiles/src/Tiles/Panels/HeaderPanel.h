@@ -27,9 +27,13 @@ namespace Tiles
 		void RenderFile();
 		void RenderEdit();
 		void RenderOptions();
-		void RenderDebug();
+		void RenderExample();
+		void RenderHelp();
+
+		// Popups
 		void RenderNewPopup();
 		void RenderRenderMatrixPopup();
+		void RenderAboutPopup();
 
 		void HandleShortcuts();
 	private:
@@ -40,6 +44,7 @@ namespace Tiles
 
 		bool m_ShowNewPopup = false;
 		bool m_ShowRenderMatrixPopup = false;
+		bool m_ShowAboutPopup = false;
 
 		int m_NewWidth = 10;
 		int m_NewHeight = 10;
