@@ -95,11 +95,8 @@ namespace Tiles
             shader.SetUniformMatrix4fv("u_OrthoProjection", orthoProjection);
             shader.SetUniform1f("u_NumberOfRows", static_cast<float>(atlas->GetWidth()));
 
-            std::cout << "Group: " << group << std::endl;
-
             for (int l = offset; l < (offset + group) && l < layers->GetSize(); l++)
             {
-                std::cout << "Layer: " << l << std::endl;
                 Layer& layer = layers->GetLayer(l);
                 for (int y = 0; y < layer.GetHeight(); y++)
                 {
