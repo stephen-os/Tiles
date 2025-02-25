@@ -248,7 +248,7 @@ namespace Tiles
             size_t rows = m_Layers->GetSize();
             size_t cols = m_Layers->GetSize();
 
-            if (ImGui::BeginTable("CheckboxTable", cols + 1, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit))
+            if (ImGui::BeginTable("CheckboxTable", static_cast<int>(cols + 1), ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit))
             {
                 ImGui::TableSetupColumn("Layer", ImGuiTableColumnFlags_WidthFixed);
 
