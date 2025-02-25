@@ -4,10 +4,6 @@
 #include "Atlas.h"
 #include "Base.h"
 
-#include "json.hpp"
-
-#include <fstream>
-
 namespace Tiles
 {
 

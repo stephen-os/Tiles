@@ -3,8 +3,12 @@
 #include "Layer.h"
 #include "Tile.h"
 
-#include <iostream>
 #include <filesystem>
+#include <fstream>
+
+#include "spdlog/spdlog.h"
+
+#include "json.hpp"
 
 namespace Tiles
 {
@@ -13,7 +17,7 @@ namespace Tiles
     {
         if (!layers || !atlas)
         {
-            std::cerr << "Error: Invalid TileLayer or TextureAtlas reference." << std::endl;
+            spdlog::error("[Project] -> Save: Invalid TileLayer or TextureAtlas reference.");
             return;
         }
 
@@ -46,9 +50,7 @@ namespace Tiles
                 for (size_t x = 0; x < layer.GetWidth(); x++)
                 {
                     Tile tile = layer.GetTile(y, x);
-                    jsonRow.push_back({
-                        {"texture_index", tile.GetTextureIndex()}
-                        });
+                    jsonRow.push_back({{"texture_index", tile.GetTextureIndex()}});
                 }
                 jsonTiles.push_back(jsonRow);
             }
@@ -66,7 +68,7 @@ namespace Tiles
         }
         else
         {
-            std::cerr << "Failed to open file for writing: " << path << std::endl;
+            spdlog::error("[Project] -> Save: Failed to open file for writing: {}", path);
         }
     }
 
@@ -75,7 +77,7 @@ namespace Tiles
         std::ifstream file(path);
         if (!file.is_open())
         {
-            std::cerr << "Failed to open file for reading: " << path << std::endl;
+            spdlog::error("[Project] -> Load: Failed to open file for reading: {}", path);
             return;
         }
 
@@ -92,7 +94,6 @@ namespace Tiles
         atlas->SetWidth(atlasWidth);
         atlas->SetHeight(atlasHeight);
         atlas->UpdateTexCoords();
-
 
         // layers needs a create method that resets all attributes
 
@@ -120,7 +121,6 @@ namespace Tiles
 
             layers->InsertLayer(layers->GetSize(), layer);
         }
-
     }
 
 }
