@@ -34,8 +34,6 @@ public:
         float elapsedTime = m_FrameTimer.Elapsed();
         m_FPS = 1.0f / elapsedTime;
         m_FrameTimer.Reset();
-
-        m_HeaderPanel.OnUpdate();
     }
 
     virtual void OnUIRender() override
