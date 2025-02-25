@@ -230,6 +230,16 @@ namespace Tiles
         // otherwise paint with whole selection. 
         if (m_ToolSelection->Fill)
         {
+            // Check Tile. 
+            Tile& oldTile = m_Layers->GetTile(l, y, x);
+
+            Tile newTile;
+            newTile.SetTextureIndex(m_TextureSelection->Front());
+
+            if (newTile == oldTile)
+                return;
+
+            // If the tiles are different, then we ill
             Layer& oldLayer = m_Layers->GetLayer(l);
             Layer newLayer = oldLayer;
             Tools::Fill(newLayer, m_TextureSelection->Front(), y, x);
