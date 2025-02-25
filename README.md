@@ -72,6 +72,7 @@ ModeSeven by Andrew Bulhak.
 7. Save and load projects:
    - **File → Save** to store your project.
    - **File → Load** to reopen saved projects.
+8. To exit the application, go to File->Exit.
 
 <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; margin-bottom: 20px;">
     <img src="assets/render-matrix.png" alt="Render Matrix" width="400">
