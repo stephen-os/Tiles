@@ -27,7 +27,7 @@ namespace Tiles
 
     void ViewportPanel::OnUIRender()
     {
-        ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
         ImGui::SetCursorPos({ 0.0f, 0.0f });
 

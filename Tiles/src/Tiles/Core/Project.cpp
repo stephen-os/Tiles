@@ -27,6 +27,7 @@ namespace Tiles
         // TileLayer
         jsonProject["layers_width"] = layers->GetWidth();
         jsonProject["layers_height"] = layers->GetHeight();
+        jsonProject["layers_name"] = layers->GetName();
 
         // Serialize TileLayer
         nlohmann::json jsonLayers = nlohmann::json::array();
@@ -99,8 +100,10 @@ namespace Tiles
 
         size_t layerWidth = jsonProject.value("layers_width", 0);
         size_t layerHeight = jsonProject.value("layers_height", 0);
+        std::string layerName = jsonProject.value("layers_name", "");
         layers->ClearAllLayers();
         layers->Resize(layerWidth, layerHeight);
+        layers->SetName(layerName);
 
         // Load TileLayers
         for (const auto& jsonLayer : jsonProject["layers"])

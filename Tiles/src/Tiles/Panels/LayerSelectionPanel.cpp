@@ -15,6 +15,28 @@ namespace Tiles
     {
         ImGui::Begin("Layer Selection", nullptr, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 
+        ImGui::InputText("Layer Name", m_ProjectName, sizeof(m_ProjectName));
+   
+        ImGui::SameLine();
+
+        if (ImGui::Button("Set Name"))
+        {
+			m_Layers->SetName(std::string(m_ProjectName));
+        }
+
+        if (m_Layers->GetSize() != 0)
+        {
+            Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
+            const char* layerName = layer.GetName().c_str();
+            char layerNameBuffer[128];
+            strncpy_s(layerNameBuffer, layerName, sizeof(layerNameBuffer) - 1);
+            layerNameBuffer[sizeof(layerNameBuffer) - 1] = '\0';
+
+
+
+            ImGui::Separator();
+        }
+
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyle().Colors[ImGuiCol_WindowBg]);
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
         ImGui::BeginChild("LayerBox", ImVec2(0, 200), true, ImGuiWindowFlags_None);
@@ -76,7 +98,6 @@ namespace Tiles
         }
 
         ImGui::Separator();
-
 
         if (m_Layers->GetSize() != 0)
         {

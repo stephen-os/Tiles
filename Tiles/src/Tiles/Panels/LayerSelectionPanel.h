@@ -21,6 +21,8 @@ namespace Tiles
     private:
         Shared<Layers> m_Layers;
         Shared<CommandHistory> m_CommandHistory;
+
+        char m_ProjectName[256];
     };
 
 }

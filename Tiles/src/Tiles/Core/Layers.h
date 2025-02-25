@@ -25,14 +25,16 @@ namespace Tiles
 		void Resize(size_t width, size_t height);
 		bool IsEmpty() { return m_Layers.empty(); }
 
-		// ActiveLayer
+		// Setters
 		void SetActiveLayer(size_t index) { m_ActiveLayer = index; }
-		size_t GetActiveLayer() { return m_ActiveLayer; }
+		void SetName(std::string name) { m_Name = name; }
 
 		// Getters
+		size_t GetActiveLayer() { return m_ActiveLayer; }
 		size_t GetWidth() const { return m_LayerWidth; }
 		size_t GetHeight() const { return m_LayerHeight; }
 		size_t GetSize() { return m_Layers.size(); }
+		std::string GetName() { return m_Name; }
 		
 		Layer& GetLayer(size_t index) { return m_Layers[index]; }
 		Tile& GetTile(size_t index, size_t y, size_t x) { return m_Layers[index].GetTile(y, x); }
@@ -40,9 +42,10 @@ namespace Tiles
 		bool IsLayerInBounds(size_t index) const;
 		size_t ResolveLayerIndex(size_t index) const;
 	private:
+		std::string m_Name = "New Project";
+
 		size_t m_LayerWidth = 0;		// Height of each layer
 		size_t m_LayerHeight = 0;		// Width of each layer
-
 		size_t m_ActiveLayer = 0;		// Working layer
 
 		std::vector<Layer> m_Layers;	// Layers
