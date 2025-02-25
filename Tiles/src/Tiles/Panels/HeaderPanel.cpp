@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "GLFW/glfw3.h"
+
 namespace Tiles
 {
 
@@ -81,6 +83,10 @@ namespace Tiles
 				{
 				    m_Checkboxes[row * cols] = true;
 				}
+            }
+            if (ImGui::MenuItem("Exit"))
+            {
+                glfwSetWindowShouldClose(glfwGetCurrentContext(), true);
             }
             ImGui::EndMenu();
         }
