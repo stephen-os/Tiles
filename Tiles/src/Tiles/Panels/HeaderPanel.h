@@ -26,7 +26,6 @@ namespace Tiles
 	private:
 		void RenderFile();
 		void RenderEdit();
-		void RenderOptions();
 		void RenderExample();
 		void RenderHelp();
 

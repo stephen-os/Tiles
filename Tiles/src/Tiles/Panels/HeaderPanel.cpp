@@ -18,7 +18,6 @@ namespace Tiles
         {
             RenderFile();
             RenderEdit();
-            // RenderOptions(); // will be implemented in the future
             RenderExample();
             RenderHelp(); 
         }
@@ -139,17 +138,6 @@ namespace Tiles
                 {
                     m_CommandHistory->Redo();
                 }
-            }
-            ImGui::EndMenu();
-        }
-    }
-
-    void HeaderPanel::RenderOptions()
-    {
-        if (ImGui::BeginMenu("Options"))
-        {
-            if (ImGui::MenuItem("Settings"))
-            {
             }
             ImGui::EndMenu();
         }
