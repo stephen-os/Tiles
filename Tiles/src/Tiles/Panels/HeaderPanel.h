@@ -28,10 +28,10 @@ namespace Tiles
 		void RenderEdit();
 		void RenderOptions();
 		void RenderDebug();
-
 		void RenderNewPopup();
 		void RenderRenderMatrixPopup();
 
+		void HandleShortcuts();
 	private:
 		Shared<Layers> m_Layers;
 		Shared<Atlas> m_Atlas;

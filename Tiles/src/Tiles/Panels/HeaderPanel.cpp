@@ -37,6 +37,8 @@ namespace Tiles
 
             RenderRenderMatrixPopup();
         }
+
+        HandleShortcuts();
     }
 
     void HeaderPanel::RenderFile()
@@ -315,6 +317,25 @@ namespace Tiles
             }
 
             ImGui::EndPopup();
+        }
+    }
+
+    void HeaderPanel::HandleShortcuts() 
+    {
+        if (ImGui::IsKeyPressed(ImGuiKey_Z, false) && ImGui::GetIO().KeyCtrl)
+        {
+            if (m_CommandHistory->CanUndo())
+			{
+				m_CommandHistory->Undo();
+			}
+        }
+
+        if (ImGui::IsKeyPressed(ImGuiKey_Y, false) && ImGui::GetIO().KeyCtrl)
+        {
+            if (m_CommandHistory->CanRedo())
+            {
+				m_CommandHistory->Redo();
+            }
         }
     }
 

@@ -2,6 +2,7 @@
     "atlas_height": 16,
     "atlas_path": "res\\atlas\\factory_atlas.png",
     "atlas_width": 16,
+    "layers_name": "Factory Level 1.",
     "layers": [
         {
             "name": "Background.",
