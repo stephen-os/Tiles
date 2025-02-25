@@ -4,7 +4,8 @@
 
 namespace Tiles
 {
-	void Camera::Drag(const glm::vec2 delta)
+
+	void Camera::Drag(const glm::vec2& delta)
 	{
 		m_Position -= glm::vec2(-delta.x * m_Sensitivity, -delta.y * m_Sensitivity);
 		UpdateViewMatrix();
@@ -24,4 +25,5 @@ namespace Tiles
 
 		m_ViewMatrix = translation * scale;
 	}
+
 }

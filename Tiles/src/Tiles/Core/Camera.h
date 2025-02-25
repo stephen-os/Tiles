@@ -11,7 +11,7 @@ namespace Tiles
 	public:
 		Camera() = default;
 		~Camera() = default;
-		void Drag(const glm::vec2 delta);
+		void Drag(const glm::vec2& delta);
 		void Zoom(const float delta);
 
 		// Getters
@@ -31,4 +31,5 @@ namespace Tiles
 		float m_Zoom = 1.0f;
 		float m_ZoomSpeed = 0.1f;
 	};
+
 }
