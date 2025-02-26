@@ -32,6 +32,10 @@ Tiles is built using several key libraries:
 
 ModeSeven by Andrew Bulhak.
 
+<div align="center" style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; margin-bottom: 20px;">
+    <img src="assets/factory-level-1.png" alt="Factory Level 1" width="400">
+</div>
+
 ## 📥 Installation & Usage
 
 ### 🔧 Prerequisites
@@ -47,11 +51,9 @@ ModeSeven by Andrew Bulhak.
 3. Open the `.sln` file in Visual Studio 2017 or later.
 4. Build and run the project from Visual Studio.
 
-<div align="center" style="display: flex; flex-direction: row; justify-content: center; gap: 20px; margin-top: 20px; margin-bottom: 20px; align-items: center; flex-wrap: nowrap;">
-    <img src="assets/factory-level-1.png" alt="Factory Level 1" width="400">
-    <img src="assets/factory-level-2.png" alt="Factory Level 2" width="400">
+<div align="center" style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; margin-bottom: 20px;">
+    <img src="assets/factory-level-2.png" alt="Factory Level 1" width="400">
 </div>
-
 
 ## 🎨 How to Use
 1. Launch the application. A default project with a 16x16 workspace will be loaded.
