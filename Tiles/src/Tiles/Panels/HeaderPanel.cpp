@@ -405,7 +405,8 @@ namespace Tiles
             ImGui::Text("Shortcuts:");
             ImGui::Text("CTRL + Z - Undo");
             ImGui::Text("CTRL + Y - Redo");
-
+            ImGui::Text("MIDDLE MOUSE - Drag");
+            ImGui::Text("SCROLL WHEEL - Scroll");
 
             ImGui::Separator();
 
