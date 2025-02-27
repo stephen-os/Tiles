@@ -86,6 +86,8 @@ Two example projects are included, featuring a **factory-themed** texture atlas:
 ## ⌨️ Keyboard Shortcuts
 - **CTRL + Z** – Undo  
 - **CTRL + Y** – Redo  
+- **MIDDLE MOUSE** – Hold to drag inside viewport
+- **SCROLL WHEEL** – Zoom in/out inside viewport 
 
 ## 🚀 Potential Future Features
 - **Multi-Tile Selection** – Select and move multiple tiles at once.
