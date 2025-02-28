@@ -5,7 +5,6 @@
 #include "../Core/Base.h"
 
 #include "Lumina/Renderer/Texture.h"
-#include "Lumina/Base.h"
 
 #include "imgui.h"
 

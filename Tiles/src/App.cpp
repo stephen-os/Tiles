@@ -1,5 +1,5 @@
-#include "Lumina/Application.h"
-#include "Lumina/EntryPoint.h"
+#include "Lumina/Core/Application.h"
+#include "Lumina/Core/EntryPoint.h"
 
 #include "Tiles/Editor.h"
 

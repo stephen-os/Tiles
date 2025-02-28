@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Lumina/Layer.h"
+#include "Lumina/Core/Layer.h"
 
 #include "Lumina/Utils/Timer.h"
 #include "Lumina/Utils/FileReader.h"

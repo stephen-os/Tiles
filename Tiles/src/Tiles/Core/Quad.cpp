@@ -3,6 +3,8 @@
 #include <Lumina/Renderer/Buffer.h>
 #include <Lumina/Utils/FileReader.h>
 
+#include "../Core/Base.h"
+
 namespace Tiles
 {
 
@@ -25,8 +27,8 @@ namespace Tiles
 
         m_VertexArray = MakeShared<Lumina::VertexArray>();
 
-        auto vertexBuffer = Lumina::CreateRef<Lumina::VertexBuffer>(vertices, sizeof(vertices));
-        auto indexBuffer = Lumina::CreateRef<Lumina::IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
+        auto vertexBuffer = MakeShared<Lumina::VertexBuffer>(vertices, sizeof(vertices));
+        auto indexBuffer = MakeShared<Lumina::IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
 
         vertexBuffer->SetLayout({ { Lumina::BufferDataType::Float3, "a_Position" } });
 
@@ -35,7 +37,7 @@ namespace Tiles
 
         const std::string vertexSrc = Lumina::ReadFile("res/shaders/GridShader.vert");
         const std::string fragmentSrc = Lumina::ReadFile("res/shaders/GridShader.frag");
-        m_Shader = Lumina::CreateRef<Lumina::ShaderProgram>(vertexSrc, fragmentSrc);
+        m_Shader = Lumina::MakeShared<Lumina::ShaderProgram>(vertexSrc, fragmentSrc);
 	}
 
     void Quad::SetUniforms(const Camera& camera, const Shared<Layers>& layers) const
