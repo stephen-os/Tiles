@@ -13,7 +13,7 @@
 namespace Tiles
 {
 
-    void Project::Save(const std::string& path, const Shared<Layers>& layers, const Shared<Atlas>& atlas)
+    void Project::Save(const std::string& path, const Shared<Layers>& layers, const Shared<Lumina::TextureAtlas>& atlas)
     {
         if (!layers || !atlas)
         {
@@ -24,7 +24,7 @@ namespace Tiles
         nlohmann::json jsonProject;
 
         // Atlas
-        jsonProject["atlas_path"] = atlas->GetPath();
+        jsonProject["atlas_path"] = atlas->GetTexture()->GetPath();
         jsonProject["atlas_width"] = atlas->GetWidth();
         jsonProject["atlas_height"] = atlas->GetHeight();
 
@@ -72,7 +72,7 @@ namespace Tiles
         }
     }
 
-    void Project::Load(const std::string& path, Shared<Layers>& layers, Shared<Atlas>& atlas)
+    void Project::Load(const std::string& path, Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas)
     {
         std::ifstream file(path);
         if (!file.is_open())
@@ -90,10 +90,7 @@ namespace Tiles
         int atlasWidth = jsonProject.value("atlas_width", 0);
         int atlasHeight = jsonProject.value("atlas_height", 0);
 
-        atlas->Create(atlasPath);
-        atlas->SetWidth(atlasWidth);
-        atlas->SetHeight(atlasHeight);
-        atlas->UpdateTexCoords();
+        atlas = MakeShared<Lumina::TextureAtlas>(atlasPath, atlasWidth, atlasHeight);
 
         // layers needs a create method that resets all attributes
 

@@ -39,7 +39,7 @@ namespace Tiles
         ImGui::Text("Atlas:");
         ImGui::SameLine();
 
-        if (!m_Atlas->IsCreated())
+        if (!m_Atlas->GetTexture())
         {
             ImGui::AlignTextToFramePadding();
             ImGui::TextWrapped("[ No file selected ]");
@@ -51,11 +51,13 @@ namespace Tiles
         else
         {
             ImGui::AlignTextToFramePadding();
-            ImGui::TextWrapped("[ %s ]", m_Atlas->GetFilename().c_str());
+            std::string path = m_Atlas->GetTexture()->GetPath();
+            std::string filename = path.substr(path.find_last_of("/\\") + 1);
+            ImGui::TextWrapped("[ %s ]", filename.c_str());
             ImGui::SameLine();
 
             if (ImGui::Button("Remove"))
-                m_Atlas->Destroy();
+                m_Atlas.reset();
         }
     }
 
@@ -67,21 +69,13 @@ namespace Tiles
         int width = m_Atlas->GetWidth();
         if (ImGui::InputInt(("##" + std::string("Width:")).c_str(), &width))
         {
-            m_Atlas->SetWidth(std::max(1, width));
-            if (m_Atlas->IsCreated())
-            {
-                m_Atlas->UpdateTexCoords();
-            }
+            m_Atlas->Resize(std::max(1, width), m_Atlas->GetHeight());
         }
 
         int height = m_Atlas->GetHeight();
         if (ImGui::InputInt(("##" + std::string("Height:")).c_str(), &height))
         {
-            m_Atlas->SetHeight(std::max(1, height));
-            if (m_Atlas->IsCreated())
-            {
-                m_Atlas->UpdateTexCoords();
-            }
+            m_Atlas->Resize(m_Atlas->GetWidth(), std::max(1, height));
         }
 
         ImGui::PopItemWidth();
@@ -137,12 +131,12 @@ namespace Tiles
         ImVec2 buttonSize(m_TextureButtonSize, m_TextureButtonSize);
 
         // Render texture or transparent empty button
-        if (m_Atlas->IsCreated())
+        if (m_Atlas->GetTexture())
         {
-            glm::vec4 texCoords = m_Atlas->GetTexCoords(index);
+            glm::vec4 texCoords = m_Atlas->GetTextureCoords(index);
             ImVec2 xy(texCoords.x, texCoords.y);
             ImVec2 zw(texCoords.z, texCoords.w);
-            intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
+            intptr_t textureID = (intptr_t)m_Atlas->GetTexture()->GetID();
 
             ImGui::Image((void*)textureID, buttonSize, xy, zw, ImVec4(1, 1, 1, 1), ImVec4(0, 0, 0, 0));
         }
@@ -198,7 +192,7 @@ namespace Tiles
         if (std::filesystem::exists(newPath))
         {
             std::filesystem::path relativePath = std::filesystem::relative(newPath, std::filesystem::current_path());
-            m_Atlas->Create(relativePath.string());
+            m_Atlas->SetTexture(relativePath.string());
         }
     }
 

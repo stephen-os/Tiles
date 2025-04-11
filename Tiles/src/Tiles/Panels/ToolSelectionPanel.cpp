@@ -7,8 +7,11 @@ namespace Tiles
 
     ToolSelectionPanel::ToolSelectionPanel()
     {
-        m_EraserTexture.SetData("res/assets/eraser.png");
-        m_FillTexture.SetData("res/assets/bucket.png");
+        std::string eraserSource = "res/assets/eraser.png";
+        std::string fillSource = "res/assets/bucket.png";
+
+        m_EraserTexture = Lumina::Texture::Create(eraserSource);
+        m_FillTexture = Lumina::Texture::Create(fillSource);
     }
 
     void ToolSelectionPanel::Render()
@@ -19,7 +22,7 @@ namespace Tiles
 
         ImGui::PushID("EraserMode");
 
-        if (ImGui::ImageButton((void*)(intptr_t)m_EraserTexture.GetID(), imageSize))
+        if (ImGui::ImageButton((void*)(intptr_t)m_EraserTexture->GetID(), imageSize))
         {
             m_ToolSelection->Erase = !m_ToolSelection->Erase;
             m_TextureSelection->Clear();
@@ -41,7 +44,7 @@ namespace Tiles
 
         ImGui::PushID("FillMode");
 
-        if (ImGui::ImageButton((void*)(intptr_t)m_FillTexture.GetID(), imageSize))
+        if (ImGui::ImageButton((void*)(intptr_t)m_FillTexture->GetID(), imageSize))
         {
             m_ToolSelection->Fill = !m_ToolSelection->Fill;
 
@@ -66,7 +69,7 @@ namespace Tiles
             ImVec2 mousePos = ImGui::GetMousePos();
 
             ImGui::GetForegroundDrawList()->AddImage(
-                (void*)(intptr_t)m_EraserTexture.GetID(),
+                (void*)(intptr_t)m_EraserTexture->GetID(),
                 ImVec2(mousePos.x - imageSize.x / 2, mousePos.y - imageSize.y / 2),
                 ImVec2(mousePos.x + imageSize.x / 2, mousePos.y + imageSize.y / 2)
             );
@@ -78,7 +81,7 @@ namespace Tiles
             ImVec2 mousePos = ImGui::GetMousePos();
 
             ImGui::GetForegroundDrawList()->AddImage(
-                (void*)(intptr_t)m_FillTexture.GetID(),
+                (void*)(intptr_t)m_FillTexture->GetID(),
                 ImVec2(mousePos.x - imageSize.x / 2, mousePos.y - imageSize.y / 2),
                 ImVec2(mousePos.x + imageSize.x / 2, mousePos.y + imageSize.y / 2)
             );

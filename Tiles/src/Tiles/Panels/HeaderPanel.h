@@ -1,8 +1,9 @@
 #pragma once
 
+#include "Lumina/Renderer/TextureAtlas.h"
+
 #include "../Core/Layers.h"
 #include "../Core/Exporter.h"
-#include "../Core/Atlas.h"
 #include "../Core/TextureSelection.h"
 
 #include "../Core/Base.h"
@@ -19,7 +20,7 @@ namespace Tiles
 	public:
 		void OnUIRender();
 
-		void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
+		void SetTextureAtlas(const Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
 		void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
 		void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
 		void SetCommandHistory(const Shared<CommandHistory>& commandHistory) { m_CommandHistory = commandHistory; }
@@ -37,7 +38,7 @@ namespace Tiles
 		void HandleShortcuts();
 	private:
 		Shared<Layers> m_Layers;
-		Shared<Atlas> m_Atlas;
+		Shared<Lumina::TextureAtlas> m_Atlas;
 		Shared<TextureSelection> m_TextureSelection;
 		Shared<CommandHistory> m_CommandHistory;
 

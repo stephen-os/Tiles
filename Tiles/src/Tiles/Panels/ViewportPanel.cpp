@@ -32,8 +32,13 @@ namespace Tiles
         ImGui::SetCursorPos({ 0.0f, 0.0f });
 
         HandleMouseInput();
+
+        Lumina::Renderer::Begin();
+
         RenderBackground();
         RenderTiles();
+
+        Lumina::Renderer::End();
 
         ImGui::End();
     }
@@ -44,20 +49,15 @@ namespace Tiles
 
     void ViewportPanel::RenderBackground()
     {
-        Lumina::Renderer::Begin();
-        Lumina::Renderer::OnWindowResize(m_ViewportSize.x, m_ViewportSize.y);
-
-        Lumina::Renderer::Clear();
+        
+        Lumina::Renderer::SetResolution(m_ViewportSize.x, m_ViewportSize.y);
 
         m_Background.Bind();
         m_Background.SetUniforms(m_Camera, m_Layers);
-
-        Lumina::Renderer::Draw(m_Background.GetArrays());
+        m_Background.GetArrays()->DrawIndexed();
         m_Background.Unbind(); 
 
-        ImGui::Image((void*)(intptr_t)Lumina::Renderer::GetID(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
-
-        Lumina::Renderer::End();
+        ImGui::Image((void*)(intptr_t)Lumina::Renderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
     }
 
     void ViewportPanel::RenderTiles()
@@ -94,11 +94,10 @@ namespace Tiles
                     ImVec2 tileMax(tileMin.x + buttonSize.x, tileMin.y + buttonSize.y);
 
                     DrawTile(tileMin, tileMax, l, y, x);
-
                     if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                     {
                         HandleSelection(l, y, x);
-                        DrawHoveredTile(tileMin, tileMax, l, y, x);
+                        // DrawHoveredTile(tileMin, tileMax, l, y, x);
 
                         // Show boarder on hovered on last layer
                         if (l == m_Layers->GetSize() - 1)
@@ -118,7 +117,7 @@ namespace Tiles
 
     void ViewportPanel::DrawHoveredTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
-        if (!m_Atlas || !m_Atlas->IsCreated())
+        if (!m_Atlas)
 			return;
 
         if (!m_TextureSelection || m_TextureSelection->Empty())
@@ -126,9 +125,9 @@ namespace Tiles
 
         // We dont draw the hovered tile if we are erasing
         if (m_ToolSelection->Erase)
-            return; 
+            return;
 
-        intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
+        intptr_t textureID = (intptr_t)m_Atlas->GetTexture()->GetID();
         int baseIndex = m_TextureSelection->Front();
 
         // Get base (reference) position
@@ -137,7 +136,7 @@ namespace Tiles
         for (int texture : *m_TextureSelection)
         {
             glm::vec2 relativePos = m_Atlas->GetPosition(texture);
-            glm::vec4 texCoords = m_Atlas->GetTexCoords(texture);
+            glm::vec4 texCoords = m_Atlas->GetTextureCoords(texture);
 
             // Translate relative position so the first selected tile is at (0,0)
             glm::vec2 normalizedPos = relativePos - basePos;
@@ -158,21 +157,39 @@ namespace Tiles
 
     void ViewportPanel::DrawTile(ImVec2 tileMin, ImVec2 tileMax, size_t l, size_t y, size_t x)
     {
-        if (!m_Atlas || !m_Atlas->IsCreated())
+        if (!m_Atlas)
             return;
 
         Tile& tile = m_Layers->GetTile(l, y, x);
 
-        if (tile.UseTexture())
-        {
-            intptr_t textureID = (intptr_t)m_Atlas->GetTextureID();
-            glm::vec4 texCoords = m_Atlas->GetTexCoords(tile.GetTextureIndex());
-            ImVec2 uvMin(texCoords.x, texCoords.y);
-            ImVec2 uvMax(texCoords.z, texCoords.w);
+        if (!tile.UseTexture())
+            return;
 
-            ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, uvMin, uvMax, Color::FILL_COLOR);
-        }
+        float scale = m_ViewportSize.x / 1000.0f;
+        
+        spdlog::info("Zoom: {}", m_Camera.GetZoom()); 
+
+        glm::vec2 cameraPos = m_Camera.GetPosition() * 2.0f;
+        // glm::vec2 position = glm::vec2((x * 0.08) - 0.96 + cameraPos.x, (y * 0.08) - 0.96 + cameraPos.y);
+        glm::vec2 position = glm::vec2((x * 0.08) - 0.96 + cameraPos.x, (y * 0.08) - 0.96 + cameraPos.y);
+
+        // Adjusted position based on zoom and scale
+        glm::vec2 size = glm::vec2(0.04 * (m_Camera.GetZoom() / 1), 0.04 * (m_Camera.GetZoom() / 1));
+
+        // Texture and UV
+        Shared<Lumina::Texture> texture = m_Atlas->GetTexture();
+        glm::vec4 texCoords = m_Atlas->GetTextureCoords(tile.GetTextureIndex());
+
+        // Draw the tile quad
+        Lumina::Renderer::DrawQuad(
+            position,               // Position in world space
+            size,                   // Size of tile
+            texture,                // Texture
+            texCoords,              // UV coords
+            glm::vec4(1.0f)         // White tint (no color blending)
+        );
     }
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     // Input Handling

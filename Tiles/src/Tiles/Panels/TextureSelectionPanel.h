@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../Core/Atlas.h"
+#include "Lumina/Renderer/TextureAtlas.h"
+
 #include "../Core/TextureSelection.h"
 #include "../Core/ToolSelection.h"
 #include "../Core/Base.h"
@@ -21,7 +22,7 @@ namespace Tiles
         void OnUIRender();
 
         // Setters
-        void SetTextureAtlas(Shared<Atlas>& atlas) { m_Atlas = atlas; }
+        void SetTextureAtlas(Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
         void SetTextureSelection(Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
         void SetToolSelection(Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
     private:
@@ -38,7 +39,7 @@ namespace Tiles
         void HandleFileDialogResult();
 
     private:
-        Shared<Atlas> m_Atlas;
+        Shared<Lumina::TextureAtlas> m_Atlas;
         Shared<TextureSelection> m_TextureSelection;
         Shared<ToolSelection> m_ToolSelection;
 

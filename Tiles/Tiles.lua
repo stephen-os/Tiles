@@ -34,22 +34,22 @@ project "Tiles"
 
    filter "system:windows"
       systemversion "latest"
-      defines { "WL_PLATFORM_WINDOWS" }
+      defines { "LUMINA_PLATFORM_WINDOWS" }
 
    filter "configurations:Debug"
-      defines { "WL_DEBUG" }
+      defines { "LUMINA_DEBUG" }
       runtime "Debug"
       symbols "On"
 
    filter "configurations:Release"
-      defines { "WL_RELEASE" }
+      defines { "LUMINA_RELEASE" }
       runtime "Release"
       optimize "On"
       symbols "On"
 
    filter "configurations:Dist"
       kind "WindowedApp"
-      defines { "WL_DIST" }
+      defines { "LUMINA_DIST" }
       runtime "Release"
       optimize "On"
       symbols "Off"

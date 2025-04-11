@@ -9,6 +9,7 @@
 #include "Lumina/Utils/Timer.h"
 #include "Lumina/Utils/FileReader.h"
 #include "Lumina/Renderer/Renderer.h"
+#include "Lumina/Renderer/TextureAtlas.h"
 
 // Client
 #include "Panels/HeaderPanel.h"
@@ -20,7 +21,6 @@
 #include "Core/TextureSelection.h"
 #include "Core/ToolSelection.h"
 #include "Core/Layers.h"
-#include "Core/Atlas.h"
 #include "Core/Color.h"
 #include "Core/Base.h"
 
@@ -57,7 +57,7 @@ public:
 
         // References
         Tiles::Shared<Tiles::Layers> layers = Tiles::MakeShared<Tiles::Layers>();
-        Tiles::Shared<Tiles::Atlas> atlas = Tiles::MakeShared<Tiles::Atlas>();
+        Tiles::Shared<Lumina::TextureAtlas> atlas = Tiles::MakeShared<Lumina::TextureAtlas>(16, 16);
         Tiles::Shared<Tiles::ToolSelection> toolSelection = Tiles::MakeShared<Tiles::ToolSelection>();
         Tiles::Shared<Tiles::TextureSelection> textureSelection = Tiles::MakeShared<Tiles::TextureSelection>();
         Tiles::Shared<Tiles::CommandHistory> commandHistory = Tiles::MakeShared<Tiles::CommandHistory>(layers);

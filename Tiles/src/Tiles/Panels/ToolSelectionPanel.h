@@ -26,8 +26,8 @@ namespace Tiles
         Shared<ToolSelection> m_ToolSelection;
         Shared<TextureSelection> m_TextureSelection;
 
-        Lumina::Texture m_EraserTexture;
-        Lumina::Texture m_FillTexture;
+        Shared<Lumina::Texture> m_EraserTexture;
+        Shared<Lumina::Texture> m_FillTexture;
     };
 
 }

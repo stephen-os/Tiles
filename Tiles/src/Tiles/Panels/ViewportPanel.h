@@ -2,11 +2,11 @@
 
 #include "Lumina/Renderer/VertexArray.h"
 #include "Lumina/Renderer/ShaderProgram.h"
+#include "Lumina/Renderer/TextureAtlas.h"
 
 
 #include "../Core/TextureSelection.h"
 #include "../Core/ToolSelection.h"
-#include "../Core/Atlas.h"
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 #include "../Core/Tile.h"
@@ -31,7 +31,7 @@ namespace Tiles
 
         // Setters
         void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
-        void SetTextureAtlas(const Shared<Atlas>& atlas) { m_Atlas = atlas; }
+        void SetTextureAtlas(const Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
         void SetToolSelection(const Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
         void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
         void SetCommandHistory(const Shared<CommandHistory>& history) { m_CommandHistory = history; }
@@ -54,7 +54,7 @@ namespace Tiles
         bool IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize);
     private:
         Shared<Layers> m_Layers;
-        Shared<Atlas> m_Atlas;
+        Shared<Lumina::TextureAtlas> m_Atlas;
         Shared<ToolSelection> m_ToolSelection;
         Shared<TextureSelection> m_TextureSelection;
         Shared<CommandHistory> m_CommandHistory;
@@ -72,7 +72,7 @@ namespace Tiles
         glm::vec2 m_LastTilePos = { 0.0f, 0.0f };
 
         // Viewport Specifications
-        glm::vec2 m_ViewportSize = { 1200.0f, 1200.0f };
+        glm::vec2 m_ViewportSize = { 1000.0f, 1000.0f };
         float m_TileSize = 40.0f;
     };
 

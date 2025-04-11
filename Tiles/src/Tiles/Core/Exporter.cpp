@@ -3,7 +3,6 @@
 #include "Lumina/Renderer/ShaderProgram.h"
 #include "Lumina/Renderer/FrameBuffer.h"
 #include "Lumina/Renderer/Renderer.h"
-#include "Lumina/Renderer/Shapes/Quad.h"
 
 #include "Lumina/Utils/FileReader.h"
 
@@ -15,8 +14,9 @@
 namespace Tiles
 {
 
-    void Exporter::Export(Shared<Layers>& layers, Shared<Atlas>& atlas, std::string& filepath, std::string& filename, std::vector<size_t>& groupings)
+    void Exporter::Export(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, std::string& filepath, std::string& filename, std::vector<size_t>& groupings)
     {
+#if 0
         Lumina::Quad quad;
 
         const std::string vertexShader = Lumina::ReadFile("res/shaders/ExportShader.vert");
@@ -74,6 +74,7 @@ namespace Tiles
             offset += group;
             index++;
 		}
+#endif
     }
 
 }

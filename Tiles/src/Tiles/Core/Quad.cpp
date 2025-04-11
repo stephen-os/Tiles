@@ -7,7 +7,6 @@
 
 namespace Tiles
 {
-
 	Quad::Quad()
 	{
         float vertices[] =
@@ -25,10 +24,10 @@ namespace Tiles
             2, 3, 0
         };
 
-        m_VertexArray = MakeShared<Lumina::VertexArray>();
+        m_VertexArray = Lumina::VertexArray::Create();
 
-        auto vertexBuffer = MakeShared<Lumina::VertexBuffer>(vertices, sizeof(vertices));
-        auto indexBuffer = MakeShared<Lumina::IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
+        auto vertexBuffer = Lumina::VertexBuffer::Create(vertices, sizeof(vertices));
+        auto indexBuffer = Lumina::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 
         vertexBuffer->SetLayout({ { Lumina::BufferDataType::Float3, "a_Position" } });
 
@@ -37,13 +36,13 @@ namespace Tiles
 
         const std::string vertexSrc = Lumina::ReadFile("res/shaders/GridShader.vert");
         const std::string fragmentSrc = Lumina::ReadFile("res/shaders/GridShader.frag");
-        m_Shader = Lumina::MakeShared<Lumina::ShaderProgram>(vertexSrc, fragmentSrc);
+        m_Shader = Lumina::ShaderProgram::Create(vertexSrc, fragmentSrc);
 	}
 
     void Quad::SetUniforms(const Camera& camera, const Shared<Layers>& layers) const
     {
-        m_Shader->SetUniformMatrix4fv("u_ViewProjection", camera.GetViewMatrix());
-        m_Shader->SetUniform2fv("u_GridSize", { layers->GetWidth() * 4.0f, layers->GetHeight() * 4.0f }); // x4 for 4x4 checkerboard pattern
+        m_Shader->SetUniformMat4("u_ViewProjection", camera.GetViewMatrix());
+        m_Shader->SetUniformVec2("u_GridSize", { layers->GetWidth() * 4.0f, layers->GetHeight() * 4.0f }); // x4 for 4x4 checkerboard pattern
     }
 
     void Quad::Bind() const
@@ -57,5 +56,4 @@ namespace Tiles
         m_Shader->Unbind();
 		m_VertexArray->Unbind();
     }
-
 }

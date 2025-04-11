@@ -1,7 +1,8 @@
 #pragma once
 
+#include "Lumina/Renderer/TextureAtlas.h"
+
 #include "Layers.h"
-#include "Atlas.h"
 #include "Base.h"
 
 namespace Tiles
@@ -11,7 +12,7 @@ namespace Tiles
 	{
 	public:
 		int& GetResolution() { return m_Resolution; }
-		void Export(Shared<Layers>& layers, Shared<Atlas>& atlas, std::string& filepath, std::string& filename, std::vector<size_t>& groupings);
+		void Export(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, std::string& filepath, std::string& filename, std::vector<size_t>& groupings);
 	private:
 		int m_Resolution = 64;
 	};
