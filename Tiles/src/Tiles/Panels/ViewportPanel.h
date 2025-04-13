@@ -36,6 +36,8 @@ namespace Tiles
         void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
         void SetCommandHistory(const Shared<CommandHistory>& history) { m_CommandHistory = history; }
     private:
+        void Render(); 
+    private:
         Shared<Layers> m_Layers;
         Shared<Lumina::TextureAtlas> m_Atlas;
         Shared<ToolSelection> m_ToolSelection;

@@ -90,7 +90,10 @@ namespace Tiles
         int atlasWidth = jsonProject.value("atlas_width", 0);
         int atlasHeight = jsonProject.value("atlas_height", 0);
 
-        atlas = MakeShared<Lumina::TextureAtlas>(atlasPath, atlasWidth, atlasHeight);
+        // atlas = MakeShared<Lumina::TextureAtlas>(atlasPath, atlasWidth, atlasHeight);
+
+		atlas->Resize(atlasWidth, atlasHeight);
+		atlas->SetTexture(atlasPath);
 
         // layers needs a create method that resets all attributes
 

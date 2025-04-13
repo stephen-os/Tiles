@@ -64,7 +64,6 @@ public:
 
         layers->Resize(16, 16);
 
-
         // Header
         m_HeaderPanel.SetLayers(layers);
         m_HeaderPanel.SetTextureAtlas(atlas);

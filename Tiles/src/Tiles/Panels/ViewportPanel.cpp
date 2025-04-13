@@ -36,41 +36,13 @@ namespace Tiles
 
     void ViewportPanel::OnUIRender()
     {
-        ImGui::Begin("Zoom Controls");
-		ImGui::PushItemWidth(100.0f);
-		ImGui::SliderFloat("Zoom", &m_Zoom, 1.0f, 20.0f, "%.2f", 1.0f);
-		ImGui::PopItemWidth();
-        ImGui::End();
-
-        ImGui::Begin("Position Controls");
-		ImGui::PushItemWidth(100.0f);
-		ImGui::SliderFloat("X", &m_TileAttributes.Position.x, -1.0f, 1.0f, "%.2f", 1.0f);
-		ImGui::SliderFloat("Y", &m_TileAttributes.Position.y, -1.0f, 1.0f, "%.2f", 1.0f);
-		ImGui::PopItemWidth();
-		ImGui::End();
-
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::SetCursorPos({ 0.0f, 0.0f });
 
         // 10 zoom for now until we fix that
-        m_ViewportCamera.SetProjectionMatrix(1.0f * m_Zoom, m_ViewportSize.x / m_ViewportSize.y, 0.01f, 100.0f);
-        m_ViewportCamera.HandleKeyInput(0.01f); 
 
-        Lumina::Renderer::Begin(m_ViewportCamera);
+        Render(); 
 
-        Lumina::Renderer::SetResolution(m_ViewportSize.x, m_ViewportSize.y);
-
-        m_BackgroundAttributes.Shader->Bind();
-		// * 4.0f because 4 small squares make 1 big square
-        m_BackgroundAttributes.Shader->SetUniformVec2("u_GridSize", { 4.0f * 20, 4.0f * 20 });
-        m_BackgroundAttributes.Shader->Unbind();
-
-		Lumina::Renderer::DrawQuad(m_BackgroundAttributes);
-        Lumina::Renderer::DrawQuad(m_TileAttributes);
-
-        Lumina::Renderer::End();
-
-        ImGui::Image((void*)(intptr_t)Lumina::Renderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));         // Fully transparent button
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));  // Transparent when hovered
@@ -88,8 +60,6 @@ namespace Tiles
         {
             for (size_t x = 0; x < 1; x++)
             {
-				Lumina::Renderer::DrawQuad(m_TileAttributes);
-
                 float scale = m_ViewportSize.x / 1000;
                 ImVec2 buttonSize = ImVec2(m_TileSize / m_Zoom * scale, m_TileSize / m_Zoom * scale);
                 ImGui::SetCursorPos(ImVec2(-cameraPos.x + (x * buttonSize.x), -cameraPos.y + (y * buttonSize.y)));
@@ -106,5 +76,62 @@ namespace Tiles
         ImGui::PopStyleVar(2);
 
         ImGui::End();
+
+        ImGui::Begin("Statistic");
+        Lumina::Renderer::Statistics stats = Lumina::Renderer::GetStats();
+        ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+        ImGui::Text("Quad Count: %d", stats.QuadCount);
+        Lumina::Renderer::ResetStats();
+        ImGui::End();
+    }
+
+    void ViewportPanel::Render()
+    {
+		// No layers, skip completely
+		if (!m_Layers)
+			return; 
+
+        m_ViewportCamera.SetProjectionMatrix(1.0f * m_Zoom, m_ViewportSize.x / m_ViewportSize.y, 0.01f, 100.0f);
+        m_ViewportCamera.HandleKeyInput(0.01f);
+
+        Lumina::Renderer::Begin(m_ViewportCamera);
+        Lumina::Renderer::SetResolution(m_ViewportSize.x, m_ViewportSize.y);
+
+        m_BackgroundAttributes.Shader->Bind();
+        // * 4.0f because 4 small squares make 1 big square
+        m_BackgroundAttributes.Shader->SetUniformVec2("u_GridSize", { 4.0f * m_Layers->GetWidth(), 4.0f * m_Layers->GetHeight()});
+        m_BackgroundAttributes.Shader->Unbind();
+
+        // Draw Background
+        Lumina::Renderer::DrawQuad(m_BackgroundAttributes);
+
+        // No atlas, just render the background 
+		if (!m_Atlas)
+			return;
+
+        m_TileAttributes.Texture = m_Atlas->GetTexture();
+
+		// Draw Tiles
+		for (size_t layerIndex = 0; layerIndex < m_Layers->GetSize(); layerIndex++)
+		{
+			Layer& layer = m_Layers->GetLayer(layerIndex);
+			for (size_t y = 0; y < layer.GetHeight(); y++)
+			{
+				for (size_t x = 0; x < layer.GetWidth(); x++)
+				{
+					Tile& tile = layer.GetTile(y, x);
+					if (tile.GetTextureIndex() == -1)
+						continue;
+					m_TileAttributes.Position = { x * 0.04f + 0.02f, y * 0.04f + 0.02f, 0.0f };
+					m_TileAttributes.TextureCoords = m_Atlas->GetTextureCoords(tile.GetTextureIndex());
+					// spdlog::info("Drawing Tile: {} {} {}", layerIndex, y, x);
+					Lumina::Renderer::DrawQuad(m_TileAttributes);
+				}
+			}
+		}
+        
+        Lumina::Renderer::End();
+
+        ImGui::Image((void*)(intptr_t)Lumina::Renderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
     }
 }
