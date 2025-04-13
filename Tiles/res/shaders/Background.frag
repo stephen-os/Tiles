@@ -1,10 +1,9 @@
 #version 450 core
 
-in vec2 v_ScreenPos;
+in vec2 v_WorldPos;
 
 out vec4 FragColor;
 
-uniform mat4 u_ViewProjection;
 uniform vec2 u_GridSize;
 
 const float GRID_SPACING = 0.01;
@@ -19,13 +18,8 @@ layout (binding = 0) uniform sampler2D u_Textures[32];
 
 void main()
 {
-    // Convert screen position to world space
-    vec2 screenPos = v_ScreenPos;
-    vec4 worldPos = inverse(u_ViewProjection) * vec4(screenPos, 0.0, 1.0);
-    worldPos /= worldPos.w;
-
     // Calculate grid coordinates
-    vec2 gridCoord = worldPos.xy / GRID_SPACING;
+    vec2 gridCoord = v_WorldPos / GRID_SPACING;
     ivec2 cell = ivec2(floor(gridCoord));
     vec2 cellPos = fract(gridCoord);
 

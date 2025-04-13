@@ -21,16 +21,17 @@ namespace Tiles
 
     ViewportPanel::ViewportPanel()
     {
-        m_ViewportCamera.SetPosition({ -0.1f, -0.1f, -1.0f });
+        m_ViewportCamera.SetPosition({ 0.9f, 0.9f, -1.0f });
 
         std::string vertexShaderSource = Lumina::ReadFile("res/shaders/Background.vert");
         std::string fragmentShaderSource = Lumina::ReadFile("res/shaders/Background.frag");
         Shared<Lumina::ShaderProgram> shader = Lumina::ShaderProgram::Create(vertexShaderSource, fragmentShaderSource);
 
         m_BackgroundAttributes.Shader = shader;
+		m_BackgroundAttributes.Size = { 5.0f, 5.0f };
 
-        m_TileAttributes.Position = { -0.4f, -0.4f, 0.0f };
-		m_TileAttributes.Size = { 0.04f, 0.04f };
+        m_TileAttributes.Position = { 0.02f, 0.02f, 0.0f };
+		m_TileAttributes.Size = { 0.02f, 0.02f };
     }
 
     void ViewportPanel::OnUIRender()
@@ -87,18 +88,7 @@ namespace Tiles
         {
             for (size_t x = 0; x < 1; x++)
             {
-                float baseTileSize = 0.004f; // your grid tile size
-                m_TileAttributes.Size = { baseTileSize * m_Zoom, baseTileSize * m_Zoom };
-
-                float tileX = static_cast<float>(x);
-                float tileY = static_cast<float>(y);
-
-                // align with grid starting at -0.40f, -0.40f
-                float worldX = -0.41f + tileX * baseTileSize - (m_ViewportCamera.GetPosition().x + 0.1f) / 2;
-                float worldY = -0.41f + tileY * baseTileSize - (m_ViewportCamera.GetPosition().y + 0.1f) / 2;
-
-                // set tile position directly (no zoom compensation)
-                m_TileAttributes.Position = { worldX * (m_Zoom / 10), worldY * (m_Zoom / 10), 0.0f };
+				Lumina::Renderer::DrawQuad(m_TileAttributes);
 
                 float scale = m_ViewportSize.x / 1000;
                 ImVec2 buttonSize = ImVec2(m_TileSize / m_Zoom * scale, m_TileSize / m_Zoom * scale);
@@ -108,7 +98,7 @@ namespace Tiles
                 ImVec2 tileMin(cursorPos.x, cursorPos.y);
                 ImVec2 tileMax(tileMin.x + buttonSize.x, tileMin.y + buttonSize.y);
 
-                //ImGui::GetWindowDrawList()->AddRectFilled(tileMin, tileMax, IM_COL32_BLACK);
+                // ImGui::GetWindowDrawList()->AddRectFilled(tileMin, tileMax, IM_COL32_BLACK);
             }
         }
 

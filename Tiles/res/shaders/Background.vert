@@ -7,12 +7,10 @@ layout(location = 3) in float a_TexIndex;
 
 uniform mat4 u_ViewProjection;
 
-out vec2 v_ScreenPos;
+out vec2 v_WorldPos; 
 
 void main()
 {
-    // gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
-    gl_Position = vec4(a_Position, 1.0);
-
-    v_ScreenPos = (a_Position.xy + 1.0) * 0.5;
+    gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+    v_WorldPos = a_Position.xy;
 }
