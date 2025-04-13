@@ -57,8 +57,9 @@ namespace Tiles
         glm::vec2 m_LastTilePos = { 0.0f, 0.0f };
 
         // Viewport Specifications
-        glm::vec2 m_ViewportSize = { 1000.0f, 1000.0f };
-        float m_TileSize = 40.0f;
+        glm::vec2 m_ViewportSize = { 1200.0f, 1200.0f };
+        float m_TileSize = 800.0f;
+        float m_Zoom = 10.0f;
     };
 
 }
