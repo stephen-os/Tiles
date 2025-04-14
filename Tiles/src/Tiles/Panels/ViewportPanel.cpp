@@ -39,7 +39,7 @@ namespace Tiles
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::SetCursorPos({ 0.0f, 0.0f });
 
-        // 10 zoom for now until we fix that
+        HandleMouseInput();
 
         Render(); 
 
@@ -281,9 +281,8 @@ namespace Tiles
                 glm::vec2 currentMousePos(mousePos.x, mousePos.y);
                 glm::vec2 mouseDelta = currentMousePos - m_LastMousePos;
 
-                // m_Camera.Drag(mouseDelta);
-				m_ViewportCamera.Advance(mouseDelta.x);
-				m_ViewportCamera.Strafe(mouseDelta.y);
+				m_ViewportCamera.Advance(-mouseDelta.y * 0.002f);
+				m_ViewportCamera.Strafe(-mouseDelta.x * 0.002f);
 
                 m_LastMousePos = currentMousePos;
             }
