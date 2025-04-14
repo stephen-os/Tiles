@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Lumina/Renderer/VertexArray.h"
-#include "Lumina/Renderer/ShaderProgram.h"
-#include "Lumina/Renderer/TextureAtlas.h"
 #include "Lumina/Renderer/Cameras/OrthographicCamera.h"
 #include "Lumina/Renderer/Renderer.h"
+#include "Lumina/Renderer/ShaderProgram.h"
+#include "Lumina/Renderer/TextureAtlas.h"
+#include "Lumina/Renderer/VertexArray.h"
 
 #include "../Core/TextureSelection.h"
 #include "../Core/ToolSelection.h"
@@ -36,7 +36,8 @@ namespace Tiles
         void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
         void SetCommandHistory(const Shared<CommandHistory>& history) { m_CommandHistory = history; }
     private:
-        void Render();
+        void RenderTilesAndBackground();
+        void RenderPaintingOverlay(); 
 
         void HandleSelection(size_t l, size_t y, size_t x);
 		void HandleMouseInput();
@@ -55,6 +56,7 @@ namespace Tiles
 		Lumina::QuadAttributes m_BackgroundAttributes;
 		Lumina::QuadAttributes m_TileAttributes;
 
+        // Camera
         Lumina::OrthographicCamera m_ViewportCamera; 
 
         // Ui State
@@ -63,7 +65,6 @@ namespace Tiles
         bool m_ProcessClick = false;
 
         glm::vec2 m_CursorPos = { 60.0f, 60.0f }; 
-
 
         glm::vec2 m_LastMousePos = { 0.0f, 0.0f };
         glm::vec2 m_LastTilePos = { 0.0f, 0.0f };

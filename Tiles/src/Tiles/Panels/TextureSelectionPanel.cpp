@@ -39,7 +39,7 @@ namespace Tiles
         ImGui::Text("Atlas:");
         ImGui::SameLine();
 
-        if (!m_Atlas->GetTexture())
+        if (!m_Atlas->HasTexture())
         {
             ImGui::AlignTextToFramePadding();
             ImGui::TextWrapped("[ No file selected ]");
@@ -57,7 +57,7 @@ namespace Tiles
             ImGui::SameLine();
 
             if (ImGui::Button("Remove"))
-                m_Atlas.reset();
+                m_Atlas->RemoveTexture();
         }
     }
 
@@ -131,7 +131,7 @@ namespace Tiles
         ImVec2 buttonSize(m_TextureButtonSize, m_TextureButtonSize);
 
         // Render texture or transparent empty button
-        if (m_Atlas->GetTexture())
+        if (m_Atlas->HasTexture())
         {
             glm::vec4 texCoords = m_Atlas->GetTextureCoords(index);
             ImVec2 xy(texCoords.x, texCoords.y);
