@@ -63,7 +63,7 @@ namespace Tiles
 			return; 
 
         m_ViewportCamera.SetProjectionMatrix(1.0f * m_Zoom, m_ViewportSize.x / m_ViewportSize.y, 0.01f, 100.0f);
-        m_ViewportCamera.HandleKeyInput(0.01f);
+        
 
         Lumina::Renderer::Begin(m_ViewportCamera);
         Lumina::Renderer::SetResolution(m_ViewportSize.x, m_ViewportSize.y);
@@ -278,6 +278,13 @@ namespace Tiles
 
         if (!IsMouseInViewport(mousePos, windowPos, windowSize))
             return;
+
+        // The goal of this is to turn of viewport movement when we are in other menues and popups. 
+		// We could some flag to check if we are in a popup.
+		if (!ImGui::IsWindowFocused())
+		    return;
+
+        m_ViewportCamera.HandleKeyInput(0.01f);
 
         // Translating Screen
         if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
