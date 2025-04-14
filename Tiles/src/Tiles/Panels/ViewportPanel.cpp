@@ -97,6 +97,8 @@ namespace Tiles
         Lumina::Renderer::Statistics stats = Lumina::Renderer::GetStats();
         ImGui::Text("Draw Calls: %d", stats.DrawCalls);
         ImGui::Text("Quad Count: %d", stats.QuadCount);
+		ImGui::Text("Textures Used: %d", stats.TexturesUsed);
+		ImGui::Text("Shaders Used: %d", stats.ShadersUsed);
         Lumina::Renderer::ResetStats();
         ImGui::End();
     }
