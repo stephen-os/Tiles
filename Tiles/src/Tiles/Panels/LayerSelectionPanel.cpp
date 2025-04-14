@@ -65,6 +65,24 @@ namespace Tiles
 
         ImGui::PopStyleVar();
 
+        if (ImGui::Button("Move Up"))
+        {
+            if (m_Layers->GetSize() > 1 && m_Layers->GetActiveLayer() > 0)
+            {
+                m_Layers->ShiftLayerUp(m_Layers->GetActiveLayer());
+            }
+        }
+
+        ImGui::SameLine();
+        
+        if (ImGui::Button("Move Down"))
+        {
+            if (m_Layers->GetSize() > 1 && m_Layers->GetActiveLayer() + 1 < m_Layers->GetSize())
+            {
+                m_Layers->ShiftLayerDown(m_Layers->GetActiveLayer());
+            }
+        }
+
         ImGui::Separator();
 
         if (ImGui::Button("Add Layer"))

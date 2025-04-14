@@ -59,6 +59,26 @@ namespace Tiles
 			spdlog::error("Error: Attempted to replace an out-of-bounds layer.");
 	}
 
+	void Layers::ShiftLayerUp(size_t index)
+	{
+		index = ResolveLayerIndex(index);
+		if (index > 0 && index < m_Layers.size())
+		{
+			std::swap(m_Layers[index], m_Layers[index - 1]);
+			m_ActiveLayer = index - 1;
+		}
+	}
+
+	void Layers::ShiftLayerDown(size_t index)
+	{
+		index = ResolveLayerIndex(index);
+		if (index >= 0 && index < m_Layers.size() - 1)
+		{
+			std::swap(m_Layers[index], m_Layers[index + 1]);
+			m_ActiveLayer = index + 1;
+		}
+	}
+
 	size_t Layers::ResolveLayerIndex(size_t index) const
 	{
 		return (index == std::numeric_limits<size_t>::max()) ? m_ActiveLayer : index;
