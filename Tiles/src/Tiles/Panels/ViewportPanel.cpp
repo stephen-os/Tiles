@@ -131,6 +131,10 @@ namespace Tiles
 		for (size_t layerIndex = 0; layerIndex < m_Layers->GetSize(); layerIndex++)
 		{
 			Layer& layer = m_Layers->GetLayer(layerIndex);
+
+			if (!layer.GetVisibility())
+				continue;
+
 			for (size_t y = 0; y < layer.GetHeight(); y++)
 			{
 				for (size_t x = 0; x < layer.GetWidth(); x++)
