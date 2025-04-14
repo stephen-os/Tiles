@@ -16,22 +16,16 @@
 
 #include <spdlog/spdlog.h>
 
+#include "../Core/TileRenderer.h"; 
+
 namespace Tiles
 {
 
     ViewportPanel::ViewportPanel()
     {
         m_ViewportCamera.SetPosition({ 0.9f, 0.9f, -1.0f });
-     
-        std::string vertexShaderSource = "res/shaders/Background.vert";
-        std::string fragmentShaderSource = "res/shaders/Background.frag";
-        Shared<Lumina::ShaderProgram> shader = Lumina::ShaderProgram::Create(vertexShaderSource, fragmentShaderSource);
-
-        m_BackgroundAttributes.Shader = shader;
-		m_BackgroundAttributes.Size = { 5.0f, 5.0f };
-
-        m_TileAttributes.Position = { 0.02f, 0.02f, 0.0f };
-		m_TileAttributes.Size = { 0.02f, 0.02f };
+		
+        TileRenderer::Init();
     }
 
     void ViewportPanel::OnUIRender()
@@ -40,74 +34,11 @@ namespace Tiles
         ImGui::SetCursorPos({ 0.0f, 0.0f });
 
         HandleMouseInput();
-        RenderTilesAndBackground();
-        ImGui::Image((void*)(intptr_t)Lumina::Renderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
+		TileRenderer::Render(m_ViewportCamera, m_Layers, m_Atlas, m_ViewportSize, m_Zoom);
+        ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
         RenderPaintingOverlay();
 
         ImGui::End();
-
-        ImGui::Begin("Statistic");
-        Lumina::Renderer::Statistics stats = Lumina::Renderer::GetStats();
-        ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-        ImGui::Text("Quad Count: %d", stats.QuadCount);
-		ImGui::Text("Textures Used: %d", stats.TexturesUsed);
-		ImGui::Text("Shaders Used: %d", stats.ShadersUsed);
-        Lumina::Renderer::ResetStats();
-        ImGui::End();
-    }
-
-    void ViewportPanel::RenderTilesAndBackground()
-    {
-		// No layers, skip completely
-		if (!m_Layers)
-			return; 
-
-        m_ViewportCamera.SetProjectionMatrix(1.0f * m_Zoom, m_ViewportSize.x / m_ViewportSize.y, 0.01f, 100.0f);
-        
-
-        Lumina::Renderer::Begin(m_ViewportCamera);
-        Lumina::Renderer::SetResolution(m_ViewportSize.x, m_ViewportSize.y);
-
-        m_BackgroundAttributes.Shader->Bind();
-        // * 4.0f because 4 small squares make 1 big square
-        m_BackgroundAttributes.Shader->SetUniformVec2("u_GridSize", { 4.0f * m_Layers->GetWidth(), 4.0f * m_Layers->GetHeight()});
-        m_BackgroundAttributes.Shader->Unbind();
-
-        // Draw Background
-        Lumina::Renderer::DrawQuad(m_BackgroundAttributes);
-
-        // No atlas, just render the background 
-        if (!m_Atlas->HasTexture())
-        {
-            Lumina::Renderer::End();
-			return;
-        }
-
-        m_TileAttributes.Texture = m_Atlas->GetTexture();
-
-		// Draw Tiles
-		for (size_t layerIndex = 0; layerIndex < m_Layers->GetSize(); layerIndex++)
-		{
-			Layer& layer = m_Layers->GetLayer(layerIndex);
-
-			if (!layer.GetVisibility())
-				continue;
-
-			for (size_t y = 0; y < layer.GetHeight(); y++)
-			{
-				for (size_t x = 0; x < layer.GetWidth(); x++)
-				{
-					Tile& tile = layer.GetTile(y, x);
-					if (tile.GetTextureIndex() == -1)
-						continue;
-					m_TileAttributes.Position = { x * 0.04f + 0.02f, y * 0.04f + 0.02f, 0.0f };
-					m_TileAttributes.TextureCoords = m_Atlas->GetTextureCoords(tile.GetTextureIndex());
-					Lumina::Renderer::DrawQuad(m_TileAttributes);
-				}
-			}
-		}
-        
-        Lumina::Renderer::End();
     }
 
     void ViewportPanel::RenderPaintingOverlay()

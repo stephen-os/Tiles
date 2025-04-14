@@ -31,12 +31,11 @@ namespace Tiles
 
         // Setters
         void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
-        void SetTextureAtlas(const Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; m_TileAttributes.Texture = atlas->GetTexture(); }
+        void SetTextureAtlas(const Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
         void SetToolSelection(const Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
         void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
         void SetCommandHistory(const Shared<CommandHistory>& history) { m_CommandHistory = history; }
     private:
-        void RenderTilesAndBackground();
         void RenderPaintingOverlay(); 
 
         void HandleSelection(size_t l, size_t y, size_t x);
@@ -51,10 +50,6 @@ namespace Tiles
         Shared<ToolSelection> m_ToolSelection;
         Shared<TextureSelection> m_TextureSelection;
         Shared<CommandHistory> m_CommandHistory;
-
-        // Background
-		Lumina::QuadAttributes m_BackgroundAttributes;
-		Lumina::QuadAttributes m_TileAttributes;
 
         // Camera
         Lumina::OrthographicCamera m_ViewportCamera; 

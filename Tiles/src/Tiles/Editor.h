@@ -44,6 +44,15 @@ namespace Tiles
             ImGui::Text("FPS: %.1f", m_FPS);
             ImGui::End();
 
+            ImGui::Begin("Statistic");
+            Lumina::Renderer::Statistics stats = Lumina::Renderer::GetStats();
+            ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+            ImGui::Text("Quad Count: %d", stats.QuadCount);
+            ImGui::Text("Textures Used: %d", stats.TexturesUsed);
+            ImGui::Text("Shaders Used: %d", stats.ShadersUsed);
+            Lumina::Renderer::ResetStats();
+            ImGui::End();
+
             m_HeaderPanel.OnUIRender();
             m_TextureSelectionPanel.OnUIRender();
             m_ViewportPanel.OnUIRender();
