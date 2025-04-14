@@ -8,7 +8,6 @@
 
 #include "Lumina/Utils/Timer.h"
 #include "Lumina/Utils/FileReader.h"
-#include "Lumina/Renderer/Renderer.h"
 #include "Lumina/Renderer/TextureAtlas.h"
 
 // Client
@@ -20,6 +19,7 @@
 
 #include "Core/TextureSelection.h"
 #include "Core/ToolSelection.h"
+#include "Core/TileRenderer.h"
 #include "Core/Layers.h"
 #include "Core/Color.h"
 #include "Core/Base.h"
@@ -62,7 +62,7 @@ namespace Tiles
 
         virtual void OnAttach() override
         {
-            Lumina::Renderer::Init();
+            TileRenderer::Init();
 
             Theme::ApplyTheme();
 
@@ -104,7 +104,7 @@ namespace Tiles
 
         virtual void OnDetach() override
         {
-            Lumina::Renderer::Shutdown();
+			TileRenderer::Shutdown();
         }
 
     private:

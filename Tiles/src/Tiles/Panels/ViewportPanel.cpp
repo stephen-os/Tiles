@@ -24,8 +24,6 @@ namespace Tiles
     ViewportPanel::ViewportPanel()
     {
         m_ViewportCamera.SetPosition({ 0.9f, 0.9f, -1.0f });
-		
-        TileRenderer::Init();
     }
 
     void ViewportPanel::OnUIRender()

@@ -1,12 +1,16 @@
 #include "TileRenderer.h"
 
+#include "Lumina/Renderer/Renderer.h"
+
 namespace Tiles
 {
-	Lumina::QuadAttributes TileRenderer::s_BackgroundAttributes;
-	Lumina::QuadAttributes TileRenderer::s_TileAttributes;
+	static Lumina::QuadAttributes s_BackgroundAttributes;
+	static Lumina::QuadAttributes s_TileAttributes;
 
 	void TileRenderer::Init()
 	{
+		Lumina::Renderer::Init();
+
 		std::string vertexShaderSource = "res/shaders/Background.vert";
 		std::string fragmentShaderSource = "res/shaders/Background.frag";
 		Shared<Lumina::ShaderProgram> shader = Lumina::ShaderProgram::Create(vertexShaderSource, fragmentShaderSource);
@@ -15,6 +19,11 @@ namespace Tiles
 		s_BackgroundAttributes.Size = { 5.0f, 5.0f };
 
 		s_TileAttributes.Size = { 0.02f, 0.02f };
+	}
+
+	void TileRenderer::Shutdown()
+	{
+		Lumina::Renderer::Shutdown();
 	}
 
 	void TileRenderer::Render(Lumina::Camera& camera, Shared<Layers>& layers, Shared<Lumina::TextureAtlas> atlas, glm::vec2 & viewportSize, float& zoom)

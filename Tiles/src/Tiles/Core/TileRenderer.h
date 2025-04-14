@@ -13,10 +13,9 @@ namespace Tiles
 	{
 	public:
 		static void Init();
+		static void Shutdown();
+
 		static void Render(Lumina::Camera& camera, Shared<Layers>& layers, Shared<Lumina::TextureAtlas> atlas, glm::vec2& viewportSize, float& zoom);
 		static void* GetImage();
-	private:
-		static Lumina::QuadAttributes s_BackgroundAttributes;
-		static Lumina::QuadAttributes s_TileAttributes;
 	};
 }
