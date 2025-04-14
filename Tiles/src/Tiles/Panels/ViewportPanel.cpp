@@ -23,8 +23,8 @@ namespace Tiles
     {
         m_ViewportCamera.SetPosition({ 0.9f, 0.9f, -1.0f });
      
-        std::string vertexShaderSource = Lumina::ReadFile("res/shaders/Background.vert");
-        std::string fragmentShaderSource = Lumina::ReadFile("res/shaders/Background.frag");
+        std::string vertexShaderSource = "res/shaders/Background.vert";
+        std::string fragmentShaderSource = "res/shaders/Background.frag";
         Shared<Lumina::ShaderProgram> shader = Lumina::ShaderProgram::Create(vertexShaderSource, fragmentShaderSource);
 
         m_BackgroundAttributes.Shader = shader;
