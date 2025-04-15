@@ -1,6 +1,13 @@
 #pragma once
 
-#include "Layer.h"
+#include "Base.h"
+
+#include "Layers.h"
+#include "TextureSelection.h"
+
+#include "Lumina/Renderer/TextureAtlas.h"
+
+#include "../Commands/CommandHistory.h"
 
 namespace Tiles
 {
@@ -8,7 +15,9 @@ namespace Tiles
 	class Tools
 	{
 	public:
-		static void Fill(Layer& layer, int newTextureIndex, size_t y, size_t x);
+		static void Paint(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t layerIndex, size_t y, size_t x);
+		static void Erase(Shared<Layers>& layers, Shared<CommandHistory>& history, size_t layerIndex, size_t y, size_t x);
+		static void Fill(Shared<Layers>& layers, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t layerIndex, size_t y, size_t x);
 	};
 
 }

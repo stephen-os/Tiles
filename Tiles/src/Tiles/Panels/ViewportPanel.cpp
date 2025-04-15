@@ -7,6 +7,8 @@
 #include "../Commands/ReplaceTileCommand.h"
 #include "../Commands/ReplaceLayerCommand.h"
 
+#include "PanelUtilities.h"
+
 #include "Lumina/Utils/FileReader.h"
 
 #include <algorithm>
@@ -31,9 +33,12 @@ namespace Tiles
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::SetCursorPos({ 0.0f, 0.0f });
 
-        HandleMouseInput();
+        HandleInput();
+
 		TileRenderer::Render(m_ViewportCamera, m_Layers, m_Atlas, m_ViewportSize, m_Zoom);
+
         ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
+
         RenderPaintingOverlay();
 
         ImGui::End();
@@ -67,7 +72,7 @@ namespace Tiles
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
-                    HandleSelection(m_Layers->GetActiveLayer(), y, x);
+                    HandleSelection(y, x);
 
                     for (int texture : *m_TextureSelection)
                     {
@@ -91,15 +96,13 @@ namespace Tiles
         ImGui::PopStyleVar(2);
     }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// Input Handling
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    void ViewportPanel::HandleSelection(size_t l, size_t y, size_t x)
+    void ViewportPanel::HandleSelection(size_t y, size_t x)
     {
         // Dont select if no layer is selected
 		if (m_Layers->IsEmpty())
 			return;
+
+		uint32_t layerIndex = m_Layers->GetActiveLayer();
 
         static bool wasErasing = m_ToolSelection->Erase;
         static bool wasFilling = m_ToolSelection->Fill;
@@ -111,10 +114,6 @@ namespace Tiles
 
         wasErasing = m_ToolSelection->Erase;
         wasFilling = m_ToolSelection->Fill;
-
-        // Are we ont the active layer? 
-        if (l != m_Layers->GetActiveLayer())
-            return;
 
         // Is this a new click?
         glm::vec2 currentTilePos(y, x);
@@ -129,17 +128,7 @@ namespace Tiles
         // If we are erasing, that is all we will do in this method. 
         if (m_ToolSelection->Erase)
         {
-            Position position;
-            position.index = l;
-            position.y = y;
-            position.x = x;
-
-            Tile& oldTile = m_Layers->GetTile(l, y, x);
-
-            Tile newTile;
-
-            m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
-
+			Tools::Erase(m_Layers, m_CommandHistory, layerIndex, y, x);
             return;
         }
 
@@ -147,75 +136,30 @@ namespace Tiles
         if (!m_TextureSelection || m_TextureSelection->Empty())
             return;
 
-        // For now we are only going to fill what is the first texture in the selection
-        // otherwise paint with whole selection. 
         if (m_ToolSelection->Fill)
         {
-            Tile& tile = m_Layers->GetTile(l, y, x);
-
-            // Check tile to make sure its not the same. 
-            if (tile.GetTextureIndex() == m_TextureSelection->Front())
-                return;
-
-            // If the tiles are different, then we ill
-            Layer& oldLayer = m_Layers->GetLayer(l);
-            Layer newLayer = oldLayer;
-            Tools::Fill(newLayer, m_TextureSelection->Front(), y, x);
-            m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceLayerCommand>(l, oldLayer, newLayer));
+			Tools::Fill(m_Layers, m_TextureSelection, m_CommandHistory, layerIndex, y, x);
         }
         else
         {
-            int baseIndex = m_TextureSelection->Front();
-            glm::vec2 basePos = m_Atlas->GetPosition(baseIndex);
-
-            for (int texture : *m_TextureSelection)
-            {
-                glm::vec2 relativePos = m_Atlas->GetPosition(texture);
-                glm::vec2 normalizedPos = relativePos - basePos;
-
-                int targetX = x + (int)normalizedPos.x;
-                int targetY = y + (int)normalizedPos.y;
-
-                // Skip out-of-bounds tiles
-                if (targetX < 0 || targetY < 0 || targetX >= m_Layers->GetWidth() || targetY >= m_Layers->GetHeight())
-                    continue;
-
-                Position position;
-                position.index = l;
-                position.y = targetY;
-                position.x = targetX;
-
-                Tile& oldTile = m_Layers->GetTile(l, targetY, targetX);
-
-                // Check tile to make sure its not the same. 
-                if (oldTile.GetTextureIndex() == texture)
-                    return;
-
-                Tile newTile;
-                newTile.SetTextureIndex(texture);
-
-                m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
-            }
+			Tools::Paint(m_Layers, m_Atlas, m_TextureSelection, m_CommandHistory, layerIndex, y, x);
         }
     }
 
-    void ViewportPanel::HandleMouseInput()
+    void ViewportPanel::HandleInput()
     {
         ImVec2 windowPos = ImGui::GetWindowPos();
         ImVec2 windowSize = ImGui::GetWindowSize();
         ImVec2 mousePos = ImGui::GetMousePos();
 
-        if (!IsMouseInViewport(mousePos, windowPos, windowSize))
+		// Do nothing if we are not in the viewport and the viewport isnt focused
+        if (!PanelUtils::IsMouseInViewport(mousePos, windowPos, windowSize) && !ImGui::IsWindowFocused())
             return;
 
-        // The goal of this is to turn of viewport movement when we are in other menues and popups. 
-		// We could some flag to check if we are in a popup.
-		if (!ImGui::IsWindowFocused())
-		    return;
-
+        // Translate Camera with keys
         m_ViewportCamera.HandleKeyInput(0.01f);
 
-        // Translating Screen
+		// Transelate Camera with mouse
         if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
         {
             if (!m_IsMiddleMouseDown)
@@ -239,15 +183,13 @@ namespace Tiles
             m_IsMiddleMouseDown = false;
         }
 
-        // Zooming
-        float scrollDelta = ImGui::GetIO().MouseWheel;
-        if (scrollDelta != 0.0f)
-            m_Zoom += scrollDelta;
+        // Zoom Camera
+        float delta = ImGui::GetIO().MouseWheel;
+        if (delta != 0.0f)
+        {
+            m_Zoom += delta;
+        }
     }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Utils
-    /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     bool ViewportPanel::IsNewClick()
     {
@@ -258,11 +200,5 @@ namespace Tiles
     {
         return ImGui::IsMouseDown(0) && m_IsMouseDragging &&
             (currentTilePos.x != m_LastMousePos.x || currentTilePos.y != m_LastMousePos.y);
-    }
-
-    bool ViewportPanel::IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize)
-    {
-        return (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
-            mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
     }
 }

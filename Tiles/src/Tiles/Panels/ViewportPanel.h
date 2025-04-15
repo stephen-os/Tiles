@@ -38,12 +38,11 @@ namespace Tiles
     private:
         void RenderPaintingOverlay(); 
 
-        void HandleSelection(size_t l, size_t y, size_t x);
-		void HandleMouseInput();
+        void HandleSelection(size_t y, size_t x);
+		void HandleInput();
 
 		bool IsNewClick();
         bool IsNewTileDuringDrag(glm::vec2 currentTilePos);
-        bool IsMouseInViewport(const ImVec2& mousePos, const ImVec2& windowPos, const ImVec2& windowSize);
     private:
         Shared<Layers> m_Layers;
         Shared<Lumina::TextureAtlas> m_Atlas;
