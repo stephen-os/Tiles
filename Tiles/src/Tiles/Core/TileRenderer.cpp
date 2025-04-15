@@ -14,8 +14,9 @@ namespace Tiles
 	static glm::vec2 s_Resolution = { 0.0f, 0.0f };
 	static float s_Zoom = 10.0f;
 
-	static float s_TileSize = 0.04f;	// Size of the tile relative to background quad. 
-	static float s_TileOffset = 0.02f;	// Offset from origin or center of bacground quad.
+	static float s_TileSize = 0.02f;					// Size of the tile relative to background quad. 
+	static float s_TileOffset = 0.02f;					// Offset from origin or center of bacground quad.
+	static float s_TileArea = 0.04f;					// Area of the tile relative to background quad.
 	
 	void TileRenderer::Init()
 	{
@@ -98,7 +99,7 @@ namespace Tiles
 					if (tile.GetTextureIndex() == -1)
 						continue;
 
-					s_TileAttributes.Position = { x * s_TileSize + s_TileOffset, y * s_TileSize + s_TileOffset, 0.0f };
+					s_TileAttributes.Position = { x * s_TileArea + s_TileOffset, y * s_TileArea + s_TileOffset, 0.0f };
 					s_TileAttributes.TextureCoords = atlas->GetTextureCoords(tile.GetTextureIndex());
 					Lumina::Renderer::DrawQuad(s_TileAttributes);
 				}
@@ -123,7 +124,7 @@ namespace Tiles
 				if (tile.GetTextureIndex() == -1)
 					continue;
 
-				s_TileAttributes.Position = { x * s_TileSize + s_TileOffset, y * s_TileSize + s_TileOffset, 0.0f };
+				s_TileAttributes.Position = { x * s_TileArea + s_TileOffset, y * s_TileArea + s_TileOffset, 0.0f };
 				s_TileAttributes.TextureCoords = atlas->GetTextureCoords(tile.GetTextureIndex());
 
 				Lumina::Renderer::DrawQuad(s_TileAttributes);
@@ -139,7 +140,7 @@ namespace Tiles
 			return;
 
 		s_TileAttributes.Texture = atlas->GetTexture();
-		s_TileAttributes.Position = { position.x * s_TileSize + s_TileOffset, position.y * s_TileSize + s_TileOffset, 0.0f };
+		s_TileAttributes.Position = { position.x * s_TileArea + s_TileOffset, position.y * s_TileArea + s_TileOffset, 0.0f };
 		s_TileAttributes.TextureCoords = atlas->GetTextureCoords(tile.GetTextureIndex());
 
 		Lumina::Renderer::DrawQuad(s_TileAttributes);

@@ -3,6 +3,7 @@
 #include "../Core/Tools.h"
 #include "../Core/Color.h"
 #include "../Core/Base.h"
+#include "../Core/Tile.h"
 
 #include "../Commands/ReplaceTileCommand.h"
 #include "../Commands/ReplaceLayerCommand.h"
@@ -25,7 +26,6 @@ namespace Tiles
     void ViewportPanel::OnUIRender()
     {
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-        ImGui::SetCursorPos({ 0.0f, 0.0f });
 
         HandleInput();
 
@@ -35,9 +35,6 @@ namespace Tiles
         TileRenderer::Begin();
         TileRenderer::DrawGrid(m_Layers);
 		TileRenderer::DrawLayers(m_Layers, m_Atlas);
-        TileRenderer::End(); 
-
-        ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
         
         // Overlay
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));         // Fully transparent button
@@ -53,7 +50,6 @@ namespace Tiles
         Lumina::Camera& camera = TileRenderer::GetCamera();
         glm::vec2 cameraPos = { camera.GetPosition().x * viewportCenter.x, camera.GetPosition().y * viewportCenter.y };
 
-        ImGui::SetCursorPos(ImVec2(viewportCenter.x, viewportCenter.y));
         for (size_t y = 0; y < m_Layers->GetWidth(); y++)
         {
             for (size_t x = 0; x < m_Layers->GetHeight(); x++)
@@ -75,13 +71,11 @@ namespace Tiles
                         ImVec2 uvMin(texCoords.x, texCoords.y);
                         ImVec2 uvMax(texCoords.z, texCoords.w);
 
-                        ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR);
+                        ImGui::GetForegroundDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR, 0.0f, 0, 2.0f);
 
-                        if (m_Atlas->HasTexture())
-                        {
-                            uint32_t textureID = m_Atlas->GetTexture()->GetID();
-                            ImGui::GetWindowDrawList()->AddImage((void*)textureID, tileMin, tileMax, uvMin, uvMax, Color::FILL_COLOR);
-                        }
+                        Tile tile;
+						tile.SetTextureIndex(texture);
+						TileRenderer::DrawTile(tile, m_Atlas, { x, y });
                     }
                 }
             }
@@ -89,6 +83,12 @@ namespace Tiles
 
         ImGui::PopStyleColor(5);
         ImGui::PopStyleVar(2);
+
+        TileRenderer::End();
+
+        // Set cursor back to top left corner
+        ImGui::SetCursorPos({ 0.0f, 0.0f });
+        ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
 
         ImGui::End();
     }
