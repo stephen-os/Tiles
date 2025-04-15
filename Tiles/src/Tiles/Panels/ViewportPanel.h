@@ -24,7 +24,7 @@ namespace Tiles
     class ViewportPanel
     {
     public:
-        ViewportPanel();
+        ViewportPanel() = default;
         ~ViewportPanel() = default;
 
         void OnUIRender();
@@ -49,9 +49,6 @@ namespace Tiles
         Shared<ToolSelection> m_ToolSelection;
         Shared<TextureSelection> m_TextureSelection;
         Shared<CommandHistory> m_CommandHistory;
-
-        // Camera
-        Lumina::OrthographicCamera m_ViewportCamera; 
 
         // Ui State
         bool m_IsMouseDragging = false;

@@ -6,6 +6,7 @@
 
 #include "Base.h"
 #include "Layers.h"
+#include "Layer.h"
 
 namespace Tiles
 {
@@ -15,7 +16,19 @@ namespace Tiles
 		static void Init();
 		static void Shutdown();
 
-		static void Render(Lumina::Camera& camera, Shared<Layers>& layers, Shared<Lumina::TextureAtlas> atlas, glm::vec2& viewportSize, float& zoom);
+		static void Begin();
+		static void End();
+
+		static void SetResolution(glm::vec2 resolution);
+		static void SetZoom(float zoom); 
+
+		static void DrawGrid(Shared<Layers>& layers);
+		static void DrawLayers(Shared<Layers>& layers, Shared<Lumina::TextureAtlas> atlas);
+		static void DrawLayer(Layer& layer, Shared<Lumina::TextureAtlas> atlas);
+		static void DrawTile(Tile& tile, Shared<Lumina::TextureAtlas> atlas, glm::vec2 position);
+
+
 		static void* GetImage();
+		static Lumina::Camera& GetCamera();
 	};
 }

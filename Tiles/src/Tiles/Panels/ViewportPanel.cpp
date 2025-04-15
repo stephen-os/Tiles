@@ -22,12 +22,6 @@
 
 namespace Tiles
 {
-
-    ViewportPanel::ViewportPanel()
-    {
-        m_ViewportCamera.SetPosition({ 0.9f, 0.9f, -1.0f });
-    }
-
     void ViewportPanel::OnUIRender()
     {
         ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
@@ -35,17 +29,17 @@ namespace Tiles
 
         HandleInput();
 
-		TileRenderer::Render(m_ViewportCamera, m_Layers, m_Atlas, m_ViewportSize, m_Zoom);
+		TileRenderer::SetResolution(m_ViewportSize);
+		TileRenderer::SetZoom(m_Zoom);
+
+        TileRenderer::Begin();
+        TileRenderer::DrawGrid(m_Layers);
+		TileRenderer::DrawLayers(m_Layers, m_Atlas);
+        TileRenderer::End(); 
 
         ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
-
-        RenderPaintingOverlay();
-
-        ImGui::End();
-    }
-
-    void ViewportPanel::RenderPaintingOverlay()
-    {
+        
+        // Overlay
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));         // Fully transparent button
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));  // Transparent when hovered
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));   // Transparent when clicked
@@ -56,7 +50,8 @@ namespace Tiles
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);                       // Border thickness
 
         glm::vec2 viewportCenter = { m_ViewportSize.x * 0.5f, m_ViewportSize.y * 0.5f };
-        glm::vec2 cameraPos = { m_ViewportCamera.GetPosition().x * viewportCenter.x, m_ViewportCamera.GetPosition().y * viewportCenter.y };
+        Lumina::Camera& camera = TileRenderer::GetCamera();
+        glm::vec2 cameraPos = { camera.GetPosition().x * viewportCenter.x, camera.GetPosition().y * viewportCenter.y };
 
         ImGui::SetCursorPos(ImVec2(viewportCenter.x, viewportCenter.y));
         for (size_t y = 0; y < m_Layers->GetWidth(); y++)
@@ -81,7 +76,7 @@ namespace Tiles
                         ImVec2 uvMax(texCoords.z, texCoords.w);
 
                         ImGui::GetWindowDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR);
-                        
+
                         if (m_Atlas->HasTexture())
                         {
                             uint32_t textureID = m_Atlas->GetTexture()->GetID();
@@ -94,6 +89,8 @@ namespace Tiles
 
         ImGui::PopStyleColor(5);
         ImGui::PopStyleVar(2);
+
+        ImGui::End();
     }
 
     void ViewportPanel::HandleSelection(size_t y, size_t x)
@@ -117,6 +114,8 @@ namespace Tiles
         // If we are erasing, that is all we will do in this method. 
         if (m_ToolSelection->Erase)
         {
+
+            // TODO: We are passing the layer index here when we could just grab the active layer.
 			Tools::Erase(m_Layers, m_CommandHistory, layerIndex, y, x);
             return;
         }
@@ -145,8 +144,10 @@ namespace Tiles
         if (!PanelUtils::IsMouseInViewport(mousePos, windowPos, windowSize) && !ImGui::IsWindowFocused())
             return;
 
+		Lumina::Camera& camera = TileRenderer::GetCamera();
+
         // Translate Camera with keys
-        m_ViewportCamera.HandleKeyInput(0.01f);
+        camera.HandleKeyInput(0.01f);
 
 		// Transelate Camera with mouse
         if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
@@ -161,8 +162,8 @@ namespace Tiles
                 glm::vec2 currentMousePos(mousePos.x, mousePos.y);
                 glm::vec2 mouseDelta = currentMousePos - m_LastMousePos;
 
-				m_ViewportCamera.Advance(-mouseDelta.y * 0.002f);
-				m_ViewportCamera.Strafe(-mouseDelta.x * 0.002f);
+                camera.Advance(-mouseDelta.y * 0.002f);
+                camera.Strafe(-mouseDelta.x * 0.002f);
 
                 m_LastMousePos = currentMousePos;
             }
@@ -176,7 +177,7 @@ namespace Tiles
         float delta = ImGui::GetIO().MouseWheel;
         if (delta != 0.0f)
         {
-            m_Zoom += delta;
+            m_Zoom -= delta;
         }
     }
 
