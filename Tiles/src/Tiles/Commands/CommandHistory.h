@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+#include "Lumina/Core/Log.h"
+
 namespace Tiles
 {
 	class CommandHistory
@@ -17,6 +19,9 @@ namespace Tiles
 
 		void ExecuteCommand(Unique<Command> command)
 		{
+			if (!m_UndoStack.empty() && m_UndoStack.back()->Validate(*command))
+				return;
+
 			command->Execute(*m_Layers);
 			m_UndoStack.push_back(std::move(command));
 			m_RedoStack.clear();

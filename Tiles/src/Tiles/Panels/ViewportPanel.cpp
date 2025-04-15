@@ -11,8 +11,9 @@
 #include "PanelUtilities.h"
 
 #include "Lumina/Utils/FileReader.h"
+#include "Lumina/Renderer/RenderCommands.h"
 
-#include "../Core/TileRenderer.h"; 
+#include "../Core/TileRenderer.h"
 
 namespace Tiles
 {
@@ -27,7 +28,7 @@ namespace Tiles
         TileRenderer::Begin();
         TileRenderer::DrawGrid(m_Layers);
 		TileRenderer::DrawLayers(m_Layers, m_Atlas);
-        
+
         // Overlay
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));         // Fully transparent button
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));  // Transparent when hovered
@@ -42,11 +43,13 @@ namespace Tiles
         Lumina::Camera& camera = TileRenderer::GetCamera();
         glm::vec2 cameraPos = { camera.GetPosition().x * viewportCenter.x, camera.GetPosition().y * viewportCenter.y };
 
+        // TileRenderer::Begin(); 
         for (size_t y = 0; y < m_Layers->GetWidth(); y++)
         {
             for (size_t x = 0; x < m_Layers->GetHeight(); x++)
             {
-                ImVec2 buttonSize = ImVec2(m_TileSize / m_Zoom, m_TileSize / m_Zoom);
+                float zoom = TileRenderer::GetZoom(); 
+                ImVec2 buttonSize = ImVec2(m_TileSize / zoom, m_TileSize / zoom);
                 ImGui::SetCursorPos(ImVec2(viewportCenter.x - (cameraPos.x) + (x * buttonSize.x), viewportCenter.y - (cameraPos.y) + (y * buttonSize.y)));
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
 
@@ -55,32 +58,33 @@ namespace Tiles
 
                 if (ImGui::IsMouseHoveringRect(tileMin, tileMax))
                 {
-                    HandleSelection(y, x);
+                    if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+                        HandleSelection(y, x);
 
                     for (int texture : *m_TextureSelection)
                     {
-                        glm::vec4 texCoords = m_Atlas->GetTextureCoords(texture);
-                        ImVec2 uvMin(texCoords.x, texCoords.y);
-                        ImVec2 uvMax(texCoords.z, texCoords.w);
-
                         ImGui::GetForegroundDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR, 0.0f, 0, 2.0f);
 
                         Tile tile;
-						tile.SetTextureIndex(texture);
-						TileRenderer::DrawTile(tile, m_Atlas, { x, y });
+					    tile.SetTextureIndex(texture);
+					    // TileRenderer::DrawTile(tile, m_Atlas, { x, y });
                     }
+                    
                 }
             }
         }
+        // TileRenderer::End();
+
 
         ImGui::PopStyleColor(5);
         ImGui::PopStyleVar(2);
 
-        TileRenderer::End();
 
         // Set cursor back to top left corner
         ImGui::SetCursorPos({ 0.0f, 0.0f });
+
         ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
+        TileRenderer::End();
 
         ImGui::End();
     }
@@ -90,16 +94,6 @@ namespace Tiles
         // Dont select if no layer is selected
 		if (m_Layers->IsEmpty())
 			return;
-
-        // Is this a new click?
-        glm::vec2 currentTilePos(y, x);
-        if (!IsNewClick() && !IsNewTileDuringDrag(currentTilePos))
-            return;
-
-        // Are we dragging?
-        m_LastMousePos = currentTilePos;
-        m_IsMouseDragging = true;
-        // if (IsNewClick())
 
         // If we are erasing, that is all we will do in this method. 
         if (m_ToolSelection->Erase)
@@ -167,16 +161,5 @@ namespace Tiles
         {
             TileRenderer::Zoom(delta);
         }
-    }
-
-    bool ViewportPanel::IsNewClick()
-    {
-        return ImGui::IsMouseClicked(0) && !m_IsMouseDragging;
-    }
-
-    bool ViewportPanel::IsNewTileDuringDrag(glm::vec2 currentTilePos)
-    {
-        return ImGui::IsMouseDown(0) && m_IsMouseDragging &&
-            (currentTilePos.x != m_LastMousePos.x || currentTilePos.y != m_LastMousePos.y);
     }
 }

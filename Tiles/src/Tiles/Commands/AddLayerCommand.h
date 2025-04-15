@@ -1,14 +1,11 @@
 #pragma once
 
-#pragma once
-
 #include "Command.h"
 
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 
-#include <iostream>
-#include <string>
+#include "Lumina/Core/Log.h"
 
 namespace Tiles
 {
@@ -17,6 +14,8 @@ namespace Tiles
 	public:
 		AddLayerCommand(const size_t& index)
 		{
+			LUMINA_LOG_INFO("AddLayerCommand: {0}", index);
+
 			m_Index = index;
 		}
 
@@ -30,6 +29,18 @@ namespace Tiles
 		{
 			layers.RemoveLayer(m_Index);
 		}
+
+		virtual bool Validate(const Command& other) const override
+		{
+			return false;
+
+			if (auto otherCommand = dynamic_cast<const AddLayerCommand*>(&other))
+			{
+				return m_Index == otherCommand->m_Index;
+			}
+			return false;
+		}
+
 	private:
 		size_t m_Index;
 	};

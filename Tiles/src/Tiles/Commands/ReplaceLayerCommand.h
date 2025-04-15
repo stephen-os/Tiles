@@ -4,7 +4,8 @@
 
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
-#include <iostream>
+
+#include "Lumina/Core/Log.h"
 
 namespace Tiles
 {
@@ -13,6 +14,8 @@ namespace Tiles
 	public:
 		ReplaceLayerCommand(const size_t& index, const Layer& previousLayer, const Layer& newLayer)
 		{
+			LUMINA_LOG_INFO("ReplaceLayerCommand: {0}", index);
+
 			m_Index = index;
 			m_PreviousLayer = previousLayer;
 			m_NewLayer = newLayer;
@@ -27,6 +30,18 @@ namespace Tiles
 		{
 			layers.ReplaceLayer(m_Index, m_PreviousLayer);
 		}
+
+		virtual bool Validate(const Command& other) const override
+		{
+			return false; 
+
+			if (auto otherCommand = dynamic_cast<const ReplaceLayerCommand*>(&other))
+			{
+				return m_Index == otherCommand->m_Index;
+			}
+			return false;
+		}
+
 	private:
 		size_t m_Index;
 		Layer m_PreviousLayer;

@@ -75,9 +75,9 @@ namespace Tiles
 
 		Tile newTile;
 		Position position;
-		position.index = layerIndex;
-		position.y = y;
-		position.x = x;
+		position.L = layerIndex;
+		position.Y = y;
+		position.X = x;
 
 		history->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
     }
@@ -101,9 +101,9 @@ namespace Tiles
                 continue;
 
             Position position;
-            position.index = layerIndex;
-            position.y = targetY;
-            position.x = targetX;
+            position.L = layerIndex;
+            position.Y = targetY;
+            position.X = targetX;
 
             Tile& oldTile = layers->GetTile(layerIndex, targetY, targetX);
 
@@ -114,6 +114,7 @@ namespace Tiles
             Tile newTile;
             newTile.SetTextureIndex(texture);
 
+			LUMINA_LOG_INFO("Paint: {0}, {1}, {2}", position.L, position.Y, position.X);
             history->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
         }
 	}

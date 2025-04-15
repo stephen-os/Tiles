@@ -3,6 +3,7 @@
 #include "Lumina/Renderer/Renderer.h"
 
 #include "Lumina/Core/Assert.h"
+#include "Lumina/Core/Log.h"
 
 #include <algorithm>
 
@@ -49,6 +50,11 @@ namespace Tiles
 	void TileRenderer::Zoom(float delta)
 	{
 		s_Zoom = std::max(1.0f, std::min(20.0f, s_Zoom - delta));
+	}
+
+	float TileRenderer::GetZoom()
+	{
+		return s_Zoom;
 	}
 
 	void TileRenderer::Begin()
