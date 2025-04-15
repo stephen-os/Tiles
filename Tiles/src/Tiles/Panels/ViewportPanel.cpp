@@ -91,8 +91,6 @@ namespace Tiles
 		if (m_Layers->IsEmpty())
 			return;
 
-		uint32_t layerIndex = m_Layers->GetActiveLayer();
-
         // Is this a new click?
         glm::vec2 currentTilePos(y, x);
         if (!IsNewClick() && !IsNewTileDuringDrag(currentTilePos))
@@ -106,9 +104,7 @@ namespace Tiles
         // If we are erasing, that is all we will do in this method. 
         if (m_ToolSelection->Erase)
         {
-
-            // TODO: We are passing the layer index here when we could just grab the active layer.
-			Tools::Erase(m_Layers, m_CommandHistory, layerIndex, y, x);
+			Tools::Erase(m_Layers, m_CommandHistory, y, x);
             return;
         }
 
@@ -118,11 +114,11 @@ namespace Tiles
 
         if (m_ToolSelection->Fill)
         {
-			Tools::Fill(m_Layers, m_TextureSelection, m_CommandHistory, layerIndex, y, x);
+			Tools::Fill(m_Layers, m_TextureSelection, m_CommandHistory, y, x);
         }
         else
         {
-			Tools::Paint(m_Layers, m_Atlas, m_TextureSelection, m_CommandHistory, layerIndex, y, x);
+			Tools::Paint(m_Layers, m_Atlas, m_TextureSelection, m_CommandHistory, y, x);
         }
     }
 

@@ -3,7 +3,6 @@
 #include "Tile.h"
 
 #include <queue>
-#include <iostream>
 
 #include "../Commands/ReplaceTileCommand.h"
 #include "../Commands/ReplaceLayerCommand.h"
@@ -12,8 +11,9 @@ namespace Tiles
 {
     // This should be made more generic. We should maybe take in a tile we want to 
     // fill with instead of just the index.
-    void Tools::Fill(Shared<Layers>& layers, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t layerIndex, size_t y, size_t x)
+    void Tools::Fill(Shared<Layers>& layers, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t y, size_t x)
     {
+        size_t layerIndex = layers->GetActiveLayer(); 
         Tile& tile = layers->GetTile(layerIndex, y, x);
 
         // Check tile to make sure its not the same.
@@ -65,8 +65,9 @@ namespace Tiles
         history->ExecuteCommand(MakeUnique<ReplaceLayerCommand>(layerIndex, oldLayer, newLayer));
     }
 
-    void Tools::Erase(Shared<Layers>& layers, Shared<CommandHistory>& history, size_t layerIndex, size_t y, size_t x)
+    void Tools::Erase(Shared<Layers>& layers, Shared<CommandHistory>& history, size_t y, size_t x)
     {
+        size_t layerIndex = layers->GetActiveLayer();
 		Tile& oldTile = layers->GetTile(layerIndex, y, x);
 		
 		if (oldTile.GetTextureIndex() == 0)
@@ -81,8 +82,9 @@ namespace Tiles
 		history->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
     }
 
-	void Tools::Paint(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t layerIndex, size_t y, size_t x)
+	void Tools::Paint(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t y, size_t x)
 	{
+        size_t layerIndex = layers->GetActiveLayer();
         int baseIndex = selection->Front();
         glm::vec2 basePos = atlas->GetPosition(baseIndex);
 
