@@ -131,6 +131,7 @@ namespace Tiles
         }
         else
         {
+			spdlog::info("Painting at layer: {}, y: {}, x: {}", layerIndex, y, x);
 			Tools::Paint(m_Layers, m_Atlas, m_TextureSelection, m_CommandHistory, layerIndex, y, x);
         }
     }
