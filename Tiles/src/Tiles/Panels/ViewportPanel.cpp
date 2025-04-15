@@ -12,13 +12,6 @@
 
 #include "Lumina/Utils/FileReader.h"
 
-#include <algorithm>
-#include <array>
-
-#include <iostream>
-
-#include <spdlog/spdlog.h>
-
 #include "../Core/TileRenderer.h"; 
 
 namespace Tiles
@@ -30,7 +23,6 @@ namespace Tiles
         HandleInput();
 
 		TileRenderer::SetResolution(m_ViewportSize);
-		TileRenderer::SetZoom(m_Zoom);
 
         TileRenderer::Begin();
         TileRenderer::DrawGrid(m_Layers);
@@ -177,7 +169,7 @@ namespace Tiles
         float delta = ImGui::GetIO().MouseWheel;
         if (delta != 0.0f)
         {
-            m_Zoom = std::max(1.0f, std::min(20.0f, m_Zoom - delta));
+            TileRenderer::Zoom(delta);
         }
     }
 

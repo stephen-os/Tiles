@@ -20,7 +20,7 @@ namespace Tiles
 		static void End();
 
 		static void SetResolution(glm::vec2 resolution);
-		static void SetZoom(float zoom); 
+		static void Zoom(float delta); 
 
 		static void DrawGrid(Shared<Layers>& layers);
 		static void DrawLayers(Shared<Layers>& layers, Shared<Lumina::TextureAtlas> atlas);

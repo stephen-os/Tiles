@@ -4,6 +4,8 @@
 
 #include "Lumina/Core/Assert.h"
 
+#include <algorithm>
+
 namespace Tiles
 {
 	static Lumina::QuadAttributes s_BackgroundAttributes;
@@ -44,9 +46,9 @@ namespace Tiles
 		s_Resolution = resolution;
 	}
 
-	void TileRenderer::SetZoom(float zoom)
+	void TileRenderer::Zoom(float delta)
 	{
-		s_Zoom = zoom;
+		s_Zoom = std::max(1.0f, std::min(20.0f, s_Zoom - delta));
 	}
 
 	void TileRenderer::Begin()
