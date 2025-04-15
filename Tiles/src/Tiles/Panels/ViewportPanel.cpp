@@ -177,7 +177,7 @@ namespace Tiles
         float delta = ImGui::GetIO().MouseWheel;
         if (delta != 0.0f)
         {
-            m_Zoom -= delta;
+            m_Zoom = std::max(1.0f, std::min(20.0f, m_Zoom - delta));
         }
     }
 
