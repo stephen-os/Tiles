@@ -5,13 +5,10 @@
 
 #include "../Core/Project.h"
 
-#include <iostream>
-
 #include "GLFW/glfw3.h"
 
 namespace Tiles
 {
-
     void HeaderPanel::OnUIRender()
     {
         if (ImGui::BeginMainMenuBar())
@@ -44,8 +41,6 @@ namespace Tiles
 		{
 			RenderAboutPopup();
 		}
-
-        HandleShortcuts();
     }
 
     void HeaderPanel::RenderFile()
@@ -421,25 +416,4 @@ namespace Tiles
             ImGui::End();
         }
     }
-
-    void HeaderPanel::HandleShortcuts() 
-    {
-        if (ImGui::IsKeyPressed(ImGuiKey_Z, false) && ImGui::GetIO().KeyCtrl)
-        {
-            if (m_CommandHistory->CanUndo())
-			{
-				m_CommandHistory->Undo();
-			}
-        }
-
-        if (ImGui::IsKeyPressed(ImGuiKey_Y, false) && ImGui::GetIO().KeyCtrl)
-        {
-            if (m_CommandHistory->CanRedo())
-            {
-				m_CommandHistory->Redo();
-            }
-        }
-    }
-
-
 }

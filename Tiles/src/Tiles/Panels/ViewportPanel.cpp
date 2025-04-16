@@ -34,8 +34,7 @@ namespace Tiles
         ImGui::SetCursorPos({ 0.0f, 0.0f });
         ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
         TileRenderer::End();
-        // Set cursor back to top left corner
-        
+
         ImGui::End();
     }
 
@@ -89,7 +88,7 @@ namespace Tiles
                     {
                         Tile tile;
                         tile.SetTextureIndex(texture);
-                        // TileRenderer::DrawTile(tile, m_Atlas, { x, y });
+                        TileRenderer::DrawTile(tile, m_Atlas, { x, y });
                     }
 
                 }
@@ -135,6 +134,23 @@ namespace Tiles
         ImVec2 mousePos = ImGui::GetMousePos();
 
 		Lumina::Camera& camera = TileRenderer::GetCamera();
+
+        // Handle Shortcuts
+        if (ImGui::IsKeyPressed(ImGuiKey_Z, false) && ImGui::GetIO().KeyCtrl)
+        {
+            if (m_CommandHistory->CanUndo())
+            {
+                m_CommandHistory->Undo();
+            }
+        }
+
+        if (ImGui::IsKeyPressed(ImGuiKey_Y, false) && ImGui::GetIO().KeyCtrl)
+        {
+            if (m_CommandHistory->CanRedo())
+            {
+                m_CommandHistory->Redo();
+            }
+        }
 
         // Translate Camera with keys
         camera.HandleKeyInput(0.01f);

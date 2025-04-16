@@ -35,7 +35,6 @@ namespace Tiles
 		void RenderRenderMatrixPopup();
 		void RenderAboutPopup();
 
-		void HandleShortcuts();
 	private:
 		Shared<Layers> m_Layers;
 		Shared<Lumina::TextureAtlas> m_Atlas;
