@@ -22,6 +22,7 @@ namespace Tiles
 
 		// Operator
 		bool operator==(const Tile& other) const;
+		Tile& Tile::operator=(const Tile& other);
 	private:
 		int m_TextureIndex = -1;
 	};

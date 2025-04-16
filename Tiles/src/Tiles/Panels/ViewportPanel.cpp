@@ -28,6 +28,29 @@ namespace Tiles
         TileRenderer::Begin();
         TileRenderer::DrawGrid(m_Layers);
 		TileRenderer::DrawLayers(m_Layers, m_Atlas);
+ 
+		RenderOverlay();
+
+        ImGui::SetCursorPos({ 0.0f, 0.0f });
+        ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
+        TileRenderer::End();
+        // Set cursor back to top left corner
+        
+        ImGui::End();
+    }
+
+    void ViewportPanel::RenderOverlay()
+    {
+        if (ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId))
+            return;
+
+        ImVec2 windowPos = ImGui::GetWindowPos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
+        ImVec2 mousePos = ImGui::GetMousePos();
+
+        // Do nothing if we are not in the viewport and the viewport isnt focused
+        if (!PanelUtils::IsMouseInViewport(mousePos, windowPos, windowSize) && !ImGui::IsWindowFocused())
+            return;
 
         // Overlay
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.5f, 0.0f, 0.0f));         // Fully transparent button
@@ -43,12 +66,11 @@ namespace Tiles
         Lumina::Camera& camera = TileRenderer::GetCamera();
         glm::vec2 cameraPos = { camera.GetPosition().x * viewportCenter.x, camera.GetPosition().y * viewportCenter.y };
 
-        // TileRenderer::Begin(); 
         for (size_t y = 0; y < m_Layers->GetWidth(); y++)
         {
             for (size_t x = 0; x < m_Layers->GetHeight(); x++)
             {
-                float zoom = TileRenderer::GetZoom(); 
+                float zoom = TileRenderer::GetZoom();
                 ImVec2 buttonSize = ImVec2(m_TileSize / zoom, m_TileSize / zoom);
                 ImGui::SetCursorPos(ImVec2(viewportCenter.x - (cameraPos.x) + (x * buttonSize.x), viewportCenter.y - (cameraPos.y) + (y * buttonSize.y)));
                 ImVec2 cursorPos = ImGui::GetCursorScreenPos();
@@ -61,32 +83,21 @@ namespace Tiles
                     if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
                         HandleSelection(y, x);
 
+                    ImGui::GetForegroundDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR, 0.0f, 0, 2.0f);
+
                     for (int texture : *m_TextureSelection)
                     {
-                        ImGui::GetForegroundDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR, 0.0f, 0, 2.0f);
-
                         Tile tile;
-					    tile.SetTextureIndex(texture);
-					    // TileRenderer::DrawTile(tile, m_Atlas, { x, y });
+                        tile.SetTextureIndex(texture);
+                        // TileRenderer::DrawTile(tile, m_Atlas, { x, y });
                     }
-                    
+
                 }
             }
         }
-        // TileRenderer::End();
-
 
         ImGui::PopStyleColor(5);
         ImGui::PopStyleVar(2);
-
-
-        // Set cursor back to top left corner
-        ImGui::SetCursorPos({ 0.0f, 0.0f });
-
-        ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
-        TileRenderer::End();
-
-        ImGui::End();
     }
 
     void ViewportPanel::HandleSelection(size_t y, size_t x)
@@ -118,13 +129,7 @@ namespace Tiles
 
     void ViewportPanel::HandleInput()
     {
-        ImVec2 windowPos = ImGui::GetWindowPos();
-        ImVec2 windowSize = ImGui::GetWindowSize();
         ImVec2 mousePos = ImGui::GetMousePos();
-
-		// Do nothing if we are not in the viewport and the viewport isnt focused
-        if (!PanelUtils::IsMouseInViewport(mousePos, windowPos, windowSize) && !ImGui::IsWindowFocused())
-            return;
 
 		Lumina::Camera& camera = TileRenderer::GetCamera();
 

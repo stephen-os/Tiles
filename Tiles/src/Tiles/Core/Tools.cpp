@@ -70,7 +70,8 @@ namespace Tiles
         size_t layerIndex = layers->GetActiveLayer();
 		Tile& oldTile = layers->GetTile(layerIndex, y, x);
 		
-		if (oldTile.GetTextureIndex() == 0)
+        // Nothing to errase 
+		if (oldTile.GetTextureIndex() == -1)
 			return;
 
 		Tile newTile;
@@ -85,37 +86,21 @@ namespace Tiles
 	void Tools::Paint(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t y, size_t x)
 	{
         size_t layerIndex = layers->GetActiveLayer();
-        int baseIndex = selection->Front();
-        glm::vec2 basePos = atlas->GetPosition(baseIndex);
+        Tile& oldTile = layers->GetTile(layerIndex, y, x);
 
-        for (int texture : *selection)
-        {
-            glm::vec2 relativePos = atlas->GetPosition(texture);
-            glm::vec2 normalizedPos = relativePos - basePos;
+        int newTextureIndex = selection->Front();
+        
+		if (oldTile.GetTextureIndex() == newTextureIndex)
+			return;
 
-            int targetX = x + (int)normalizedPos.x;
-            int targetY = y + (int)normalizedPos.y;
+        Tile newTile;
+		newTile.SetTextureIndex(newTextureIndex);
 
-            // Skip out-of-bounds tiles
-            if (targetX < 0 || targetY < 0 || targetX >= layers->GetWidth() || targetY >= layers->GetHeight())
-                continue;
+        Position position;
+        position.L = layerIndex;
+        position.Y = y;
+        position.X = x;
 
-            Position position;
-            position.L = layerIndex;
-            position.Y = targetY;
-            position.X = targetX;
-
-            Tile& oldTile = layers->GetTile(layerIndex, targetY, targetX);
-
-            // Check tile to make sure its not the same. 
-            if (oldTile.GetTextureIndex() == texture)
-                return;
-
-            Tile newTile;
-            newTile.SetTextureIndex(texture);
-
-			LUMINA_LOG_INFO("Paint: {0}, {1}, {2}", position.L, position.Y, position.X);
-            history->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
-        }
+        history->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
 	}
 }

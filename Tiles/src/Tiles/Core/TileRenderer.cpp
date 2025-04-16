@@ -97,14 +97,14 @@ namespace Tiles
 			if (!layer.GetVisibility())
 				continue;
 
-			for (size_t y = 0; y < layer.GetHeight(); y++)
+			for (size_t y = 0; y < layers->GetHeight(); y++)
 			{
-				for (size_t x = 0; x < layer.GetWidth(); x++)
+				for (size_t x = 0; x < layers->GetWidth(); x++)
 				{
-					Tile& tile = layer.GetTile(y, x);
+					Tile& tile = layers->GetTile(layerIndex, y, x);
 
 					// Skip empty tiles
-					if (tile.GetTextureIndex() == -1)
+					if (!tile.UseTexture())
 						continue;
 
 					s_TileAttributes.Position = { x * s_TileArea + s_TileOffset, y * s_TileArea + s_TileOffset, 0.0f };

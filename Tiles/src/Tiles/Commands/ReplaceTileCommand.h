@@ -21,22 +21,16 @@ namespace Tiles
 
 		virtual void Execute(Layers& layers) override
 		{
-			LUMINA_LOG_INFO("Execute ReplaceTileCommand: {0}, {1}, {2}", m_Position.L, m_Position.Y, m_Position.X);
-
 			Tile& curretTile = layers.GetTile(m_Position.L, m_Position.Y, m_Position.X);
-			LUMINA_LOG_INFO("Replace {} With {}", curretTile.GetTextureIndex(), m_NewTile.GetTextureIndex());
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Replace {} With {}", m_Position.L, m_Position.Y, m_Position.X, curretTile.GetTextureIndex(), m_NewTile.GetTextureIndex());
 			curretTile = m_NewTile;
-
 		}
 
 		virtual void Undo(Layers& layers) override
 		{
-			LUMINA_LOG_INFO("Undo ReplaceTileCommand: {0}, {1}, {2}", m_Position.L, m_Position.Y, m_Position.X);
-
 			Tile& curretTile = layers.GetTile(m_Position.L, m_Position.Y, m_Position.X);
-			LUMINA_LOG_INFO("Replace {} With {}", curretTile.GetTextureIndex(), m_PreviousTile.GetTextureIndex());
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Replace {} With {}", m_Position.L, m_Position.Y, m_Position.X, curretTile.GetTextureIndex(), m_PreviousTile.GetTextureIndex());
 			curretTile = m_PreviousTile;
-
 		}
 
 		virtual bool Validate(const Command& other) const override

@@ -36,13 +36,10 @@ namespace Tiles
         void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
         void SetCommandHistory(const Shared<CommandHistory>& history) { m_CommandHistory = history; }
     private:
-        void RenderPaintingOverlay(); 
+        void RenderOverlay();
 
         void HandleSelection(size_t y, size_t x);
 		void HandleInput();
-
-		bool IsNewClick();
-        bool IsNewTileDuringDrag(glm::vec2 currentTilePos);
     private:
         Shared<Layers> m_Layers;
         Shared<Lumina::TextureAtlas> m_Atlas;
