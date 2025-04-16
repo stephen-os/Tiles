@@ -44,10 +44,6 @@ namespace Tiles
             ImGui::Text("FPS: %.1f", m_FPS);
             ImGui::End();
 
-            // ImGui::Begin("Debug Viewport Image");
-			// ImGui::Image(TileRenderer::GetImage(), ImVec2(900, 900));
-			// ImGui::End();
-
             ImGui::Begin("Statistic");
             Lumina::Renderer::Statistics stats = Lumina::Renderer::GetStats();
             ImGui::Text("Draw Calls: %d", stats.DrawCalls);

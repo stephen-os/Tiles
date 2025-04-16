@@ -17,8 +17,6 @@ namespace Tiles
 
     void Exporter::Export(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, std::string& filepath, std::string& filename, std::vector<size_t>& groupings)
     {
-        return; 
-
         if (!atlas->HasTexture())
         {
             LUMINA_LOG_WARN("No atlas has been created.");

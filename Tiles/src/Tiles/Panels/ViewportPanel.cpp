@@ -129,6 +129,9 @@ namespace Tiles
 
     void ViewportPanel::HandleInput()
     {
+        if (ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId))
+            return;
+
         ImVec2 mousePos = ImGui::GetMousePos();
 
 		Lumina::Camera& camera = TileRenderer::GetCamera();
