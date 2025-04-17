@@ -40,20 +40,22 @@ namespace Tiles
 
         virtual void OnUIRender() override
         {
+
+#ifdef LUMINA_DEBUG
             ImGui::Begin("FPS Counter");
             ImGui::Text("FPS: %.1f", m_FPS);
             ImGui::End();
 
-            ImGui::Begin("Statistic");
+            ImGui::Begin("Debug Data");
             Lumina::Renderer::Statistics stats = Lumina::Renderer::GetStats();
             ImGui::Text("Draw Calls: %d", stats.DrawCalls);
             ImGui::Text("Quad Count: %d", stats.QuadCount);
             ImGui::Text("Textures Used: %d", stats.TexturesUsed);
             ImGui::Text("Shaders Used: %d", stats.ShadersUsed);
-            ImGui::Text("Selection: %d", Selection::GetCurrentMode());
+            ImGui::Text("Mode Selection: %d", Selection::GetCurrentMode());
             Lumina::Renderer::ResetStats();
             ImGui::End();
-
+#endif
             m_HeaderPanel.OnUIRender();
             m_TextureSelectionPanel.OnUIRender();
             m_ViewportPanel.OnUIRender();
