@@ -2,7 +2,8 @@
 
 #include "../Core/ToolSelection.h"
 #include "../Core/TextureSelection.h"
-#include "../Core/Base.h"
+
+#include "Lumina/Core/Aliases.h"
 
 #include "Lumina/Renderer/Texture.h"
 

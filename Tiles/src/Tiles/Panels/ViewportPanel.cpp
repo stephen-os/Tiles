@@ -2,7 +2,6 @@
 
 #include "../Core/Tools.h"
 #include "../Core/Color.h"
-#include "../Core/Base.h"
 #include "../Core/Tile.h"
 
 #include "../Commands/ReplaceTileCommand.h"
@@ -11,6 +10,9 @@
 #include "PanelUtilities.h"
 
 #include "Lumina/Utils/FileReader.h"
+
+#include "Lumina/Core/Aliases.h"
+
 #include "Lumina/Renderer/RenderCommands.h"
 
 #include "../Core/TileRenderer.h"

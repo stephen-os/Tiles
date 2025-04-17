@@ -1,9 +1,10 @@
 #pragma once
 
 #include "../Core/Layers.h"
-#include "../Core/Base.h"
+
 #include "../Commands/CommandHistory.h"
 
+#include "Lumina/Core/Aliases.h"
 namespace Tiles
 {
 

@@ -9,6 +9,7 @@
 #include "Lumina/Utils/Timer.h"
 #include "Lumina/Utils/FileReader.h"
 #include "Lumina/Renderer/TextureAtlas.h"
+#include "Lumina/Core/Aliases.h"
 
 // Client
 #include "Panels/HeaderPanel.h"
@@ -22,7 +23,6 @@
 #include "Core/TileRenderer.h"
 #include "Core/Layers.h"
 #include "Core/Color.h"
-#include "Core/Base.h"
 
 #include "Commands/CommandHistory.h"
 

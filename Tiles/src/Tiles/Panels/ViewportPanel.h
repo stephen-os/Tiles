@@ -6,12 +6,13 @@
 #include "Lumina/Renderer/TextureAtlas.h"
 #include "Lumina/Renderer/VertexArray.h"
 
+#include "Lumina/Core/Aliases.h"
+
 #include "../Core/TextureSelection.h"
 #include "../Core/ToolSelection.h"
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 #include "../Core/Tile.h"
-#include "../Core/Base.h"
 #include "../Core/Camera.h"
 
 #include "../Commands/CommandHistory.h"

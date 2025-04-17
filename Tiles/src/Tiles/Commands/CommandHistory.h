@@ -1,14 +1,13 @@
 #pragma once
 
-#include <deque>
-#include <memory>
-#include "Command.h"
-#include "../Core/Layers.h"
-#include "../Core/Base.h"
-
-#include <iostream>
-
+#include "Lumina/Core/Aliases.h"
 #include "Lumina/Core/Log.h"
+
+#include <deque>
+#include "Command.h"
+
+#include "../Core/Layers.h"
+
 
 namespace Tiles
 {

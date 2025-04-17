@@ -6,7 +6,7 @@
 #include "../Core/Exporter.h"
 #include "../Core/TextureSelection.h"
 
-#include "../Core/Base.h"
+#include "Lumina/Core/Aliases.h"
 
 #include "../Commands/CommandHistory.h"
 

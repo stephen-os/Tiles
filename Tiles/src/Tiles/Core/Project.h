@@ -2,8 +2,10 @@
 
 #include "Lumina/Renderer/TextureAtlas.h"
 
+#include "Lumina/Core/Aliases.h"
+
 #include "Layers.h"
-#include "Base.h"
+
 
 namespace Tiles
 {

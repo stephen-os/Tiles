@@ -4,7 +4,8 @@
 #include "Lumina/Renderer/TextureAtlas.h"
 #include "Lumina/Renderer/Renderer.h"
 
-#include "Base.h"
+#include "Lumina/Core/Aliases.h"
+
 #include "Layers.h"
 #include "Layer.h"
 

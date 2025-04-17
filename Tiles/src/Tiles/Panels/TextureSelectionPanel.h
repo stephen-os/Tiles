@@ -4,7 +4,8 @@
 
 #include "../Core/TextureSelection.h"
 #include "../Core/ToolSelection.h"
-#include "../Core/Base.h"
+
+#include "Lumina/Core/Aliases.h"
 
 #include <string>
 
