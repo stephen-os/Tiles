@@ -2,6 +2,7 @@
 #include "TextureSelectionPanel.h"
 
 #include "../Core/Color.h"
+#include "../Core/Selection.h"
 
 #include "ImGuiFileDialog.h"
 
@@ -155,11 +156,12 @@ namespace Tiles
             if (m_TextureSelection->IsSelected(index))
             {
                 m_TextureSelection->Deselect(index);
+				Selection::SetCurrentMode(Selection::Mode::None);
             }
             else
             {
                 m_TextureSelection->Select(index);
-                m_ToolSelection->Erase = false;
+				Selection::SetCurrentMode(Selection::Mode::Paint);
             }
         }
 

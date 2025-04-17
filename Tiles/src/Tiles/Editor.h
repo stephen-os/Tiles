@@ -19,10 +19,10 @@
 #include "Panels/ToolSelectionPanel.h"
 
 #include "Core/TextureSelection.h"
-#include "Core/ToolSelection.h"
 #include "Core/TileRenderer.h"
 #include "Core/Layers.h"
 #include "Core/Color.h"
+#include "Core/Selection.h"
 
 #include "Commands/CommandHistory.h"
 
@@ -50,6 +50,7 @@ namespace Tiles
             ImGui::Text("Quad Count: %d", stats.QuadCount);
             ImGui::Text("Textures Used: %d", stats.TexturesUsed);
             ImGui::Text("Shaders Used: %d", stats.ShadersUsed);
+            ImGui::Text("Selection: %d", Selection::GetCurrentMode());
             Lumina::Renderer::ResetStats();
             ImGui::End();
 
@@ -69,7 +70,6 @@ namespace Tiles
             // References
             Shared<Layers> layers = MakeShared<Layers>();
             Shared<Lumina::TextureAtlas> atlas = MakeShared<Lumina::TextureAtlas>(16, 16);
-            Shared<ToolSelection> toolSelection = MakeShared<ToolSelection>();
             Shared<TextureSelection> textureSelection = MakeShared<TextureSelection>();
             Shared<CommandHistory> commandHistory = MakeShared<CommandHistory>(layers);
 
@@ -84,21 +84,18 @@ namespace Tiles
             // Viewport
             m_ViewportPanel.SetLayers(layers);
             m_ViewportPanel.SetTextureAtlas(atlas);
-            m_ViewportPanel.SetToolSelection(toolSelection);
             m_ViewportPanel.SetTextureSelection(textureSelection);
             m_ViewportPanel.SetCommandHistory(commandHistory);
 
             // Texture Selection
             m_TextureSelectionPanel.SetTextureAtlas(atlas);
             m_TextureSelectionPanel.SetTextureSelection(textureSelection);
-            m_TextureSelectionPanel.SetToolSelection(toolSelection);
 
             // Layer Selection
             m_LayerSelectionPanel.SetLayers(layers);
             m_LayerSelectionPanel.SetCommandHistory(commandHistory);
 
             // Tool Selection
-            m_ToolSelectionPanel.SetToolSelection(toolSelection);
             m_ToolSelectionPanel.SetTextureSelection(textureSelection);
         }
 

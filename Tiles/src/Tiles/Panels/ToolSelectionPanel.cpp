@@ -1,6 +1,7 @@
 #include "ToolSelectionPanel.h"
 
 #include "../Core/Color.h"
+#include "../Core/Selection.h"
 
 namespace Tiles
 {
@@ -24,14 +25,20 @@ namespace Tiles
 
         if (ImGui::ImageButton((void*)(intptr_t)m_EraserTexture->GetID(), imageSize))
         {
-            m_ToolSelection->Erase = !m_ToolSelection->Erase;
-            m_TextureSelection->Clear();
-
-            if (m_ToolSelection->Fill)
-                m_ToolSelection->Fill = !m_ToolSelection->Fill;
+            if (Selection::GetCurrentMode() == Selection::Mode::Erase)
+            {
+                if (m_TextureSelection->IsEmpty())
+                    Selection::SetCurrentMode(Selection::Mode::None);
+                else
+                    Selection::SetCurrentMode(Selection::Mode::Paint);
+            }
+            else
+            {
+				Selection::SetCurrentMode(Selection::Mode::Erase); 
+            }
         }
 
-        if (m_ToolSelection->Erase)
+        if (Selection::GetCurrentMode() == Selection::Mode::Erase)
         {
             ImVec2 min = ImGui::GetItemRectMin();
             ImVec2 max = ImGui::GetItemRectMax();
@@ -46,13 +53,20 @@ namespace Tiles
 
         if (ImGui::ImageButton((void*)(intptr_t)m_FillTexture->GetID(), imageSize))
         {
-            m_ToolSelection->Fill = !m_ToolSelection->Fill;
-
-            if (m_ToolSelection->Erase)
-                m_ToolSelection->Erase = !m_ToolSelection->Erase;
+            if (Selection::GetCurrentMode() == Selection::Mode::Fill)
+            {
+				if (m_TextureSelection->IsEmpty())
+                    Selection::SetCurrentMode(Selection::Mode::None);
+                else
+					Selection::SetCurrentMode(Selection::Mode::Paint);
+            }
+            else
+            {
+                Selection::SetCurrentMode(Selection::Mode::Fill);
+            }
         }
 
-        if (m_ToolSelection->Fill)
+        if (Selection::GetCurrentMode() == Selection::Mode::Fill)
         {
             ImVec2 min = ImGui::GetItemRectMin();
             ImVec2 max = ImGui::GetItemRectMax();
@@ -63,7 +77,7 @@ namespace Tiles
 
         ImGui::End();
 
-        if (m_ToolSelection->Erase)
+        if (Selection::GetCurrentMode() == Selection::Mode::Erase)
         {
             ImGui::SetMouseCursor(ImGuiMouseCursor_None);
             ImVec2 mousePos = ImGui::GetMousePos();
@@ -75,7 +89,7 @@ namespace Tiles
             );
         }
 
-        if (m_ToolSelection->Fill)
+        if (Selection::GetCurrentMode() == Selection::Mode::Fill)
         {
             ImGui::SetMouseCursor(ImGuiMouseCursor_None);
             ImVec2 mousePos = ImGui::GetMousePos();

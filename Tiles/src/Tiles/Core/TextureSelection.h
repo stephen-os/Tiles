@@ -19,7 +19,7 @@ namespace Tiles
 
         int Front() const { return *m_SelectedTextures.begin(); }
         size_t Size() const { return m_SelectedTextures.size(); }
-        bool Empty() const { return m_SelectedTextures.empty(); }
+        bool IsEmpty() const { return m_SelectedTextures.empty(); }
 
         auto begin() const { return m_SelectedTextures.begin(); }
         auto end() const { return m_SelectedTextures.end(); }

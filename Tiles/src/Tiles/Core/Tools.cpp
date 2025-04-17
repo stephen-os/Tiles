@@ -13,6 +13,12 @@ namespace Tiles
     // fill with instead of just the index.
     void Tools::Fill(Shared<Layers>& layers, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t y, size_t x)
     {
+        if (layers->IsEmpty())
+            return;
+
+		if (selection->IsEmpty())
+			return;
+
         size_t layerIndex = layers->GetActiveLayer(); 
         Tile& tile = layers->GetTile(layerIndex, y, x);
 
@@ -85,6 +91,12 @@ namespace Tiles
 
 	void Tools::Paint(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, Shared<TextureSelection>& selection, Shared<CommandHistory>& history, size_t y, size_t x)
 	{
+		if (layers->IsEmpty())
+			return;
+
+        if (selection->IsEmpty())
+            return;
+
         size_t layerIndex = layers->GetActiveLayer();
         Tile& oldTile = layers->GetTile(layerIndex, y, x);
 

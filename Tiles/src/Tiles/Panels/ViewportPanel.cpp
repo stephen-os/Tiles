@@ -3,6 +3,7 @@
 #include "../Core/Tools.h"
 #include "../Core/Color.h"
 #include "../Core/Tile.h"
+#include "../Core/Selection.h"
 
 #include "../Commands/ReplaceTileCommand.h"
 #include "../Commands/ReplaceLayerCommand.h"
@@ -86,13 +87,15 @@ namespace Tiles
 
                     ImGui::GetForegroundDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR, 0.0f, 0, 2.0f);
 
-                    for (int texture : *m_TextureSelection)
+                    if (Selection::GetCurrentMode() == Selection::Mode::Paint)
                     {
-                        Tile tile;
-                        tile.SetTextureIndex(texture);
-                        TileRenderer::DrawTile(tile, m_Atlas, { x, y });
+                        for (int texture : *m_TextureSelection)
+                        {
+                            Tile tile;
+                            tile.SetTextureIndex(texture);
+                            TileRenderer::DrawTile(tile, m_Atlas, { x, y });
+                        }
                     }
-
                 }
             }
         }
@@ -107,24 +110,12 @@ namespace Tiles
 		if (m_Layers->IsEmpty())
 			return;
 
-        // If we are erasing, that is all we will do in this method. 
-        if (m_ToolSelection->Erase)
+        switch (Selection::GetCurrentMode())
         {
-			Tools::Erase(m_Layers, m_CommandHistory, y, x);
-            return;
-        }
-
-        // Is there a selection?
-        if (!m_TextureSelection || m_TextureSelection->Empty())
-            return;
-
-        if (m_ToolSelection->Fill)
-        {
-			Tools::Fill(m_Layers, m_TextureSelection, m_CommandHistory, y, x);
-        }
-        else
-        {
-			Tools::Paint(m_Layers, m_Atlas, m_TextureSelection, m_CommandHistory, y, x);
+        case Selection::Mode::Paint: Tools::Paint(m_Layers, m_Atlas, m_TextureSelection, m_CommandHistory, y, x); break;
+        case Selection::Mode::Erase: Tools::Erase(m_Layers, m_CommandHistory, y, x); break;
+        case Selection::Mode::Fill: Tools::Fill(m_Layers, m_TextureSelection, m_CommandHistory, y, x); break;
+		default: break;
         }
     }
 

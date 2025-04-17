@@ -9,7 +9,6 @@
 #include "Lumina/Core/Aliases.h"
 
 #include "../Core/TextureSelection.h"
-#include "../Core/ToolSelection.h"
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 #include "../Core/Tile.h"
@@ -33,7 +32,6 @@ namespace Tiles
         // Setters
         void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
         void SetTextureAtlas(const Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
-        void SetToolSelection(const Shared<ToolSelection>& toolSelection) { m_ToolSelection = toolSelection; }
         void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
         void SetCommandHistory(const Shared<CommandHistory>& history) { m_CommandHistory = history; }
     private:
@@ -44,7 +42,6 @@ namespace Tiles
     private:
         Shared<Layers> m_Layers;
         Shared<Lumina::TextureAtlas> m_Atlas;
-        Shared<ToolSelection> m_ToolSelection;
         Shared<TextureSelection> m_TextureSelection;
         Shared<CommandHistory> m_CommandHistory;
 
