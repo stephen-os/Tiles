@@ -4,18 +4,6 @@
 
 namespace Tiles
 {
-	struct Position
-	{
-		int L; 
-		int Y;
-		int X;
-
-		bool operator==(const Position& other) const
-		{
-			return L == other.L && Y == other.Y && X == other.X;
-		}
-	};
-
 	class Command
 	{
 	public:

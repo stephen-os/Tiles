@@ -12,7 +12,7 @@ namespace Tiles
 	class ReplaceTileCommand : public Command
 	{
 	public:
-		ReplaceTileCommand(const Position& position, const Tile& oldTile, const Tile& newTile)
+		ReplaceTileCommand(const TilePosition& position, const Tile& oldTile, const Tile& newTile)
 		{
 			m_Position = position;
 			m_PreviousTile = oldTile; 
@@ -21,15 +21,15 @@ namespace Tiles
 
 		virtual void Execute(Layers& layers) override
 		{
-			Tile& curretTile = layers.GetTile(m_Position.L, m_Position.Y, m_Position.X);
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Replace {} With {}", m_Position.L, m_Position.Y, m_Position.X, curretTile.GetTextureIndex(), m_NewTile.GetTextureIndex());
+			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Replace {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_NewTile.GetTextureIndex());
 			curretTile = m_NewTile;
 		}
 
 		virtual void Undo(Layers& layers) override
 		{
-			Tile& curretTile = layers.GetTile(m_Position.L, m_Position.Y, m_Position.X);
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Replace {} With {}", m_Position.L, m_Position.Y, m_Position.X, curretTile.GetTextureIndex(), m_PreviousTile.GetTextureIndex());
+			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Replace {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_PreviousTile.GetTextureIndex());
 			curretTile = m_PreviousTile;
 		}
 
@@ -43,7 +43,7 @@ namespace Tiles
 		}
 
 	private:
-		Position m_Position;
+		TilePosition m_Position;
 		Tile m_PreviousTile;
 		Tile m_NewTile;
 	};

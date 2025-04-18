@@ -4,6 +4,17 @@
 
 namespace Tiles
 {
+	struct TilePosition
+	{
+		size_t LayerIndex;
+		size_t RowIndex;
+		size_t ColIndex;
+
+		bool operator==(const TilePosition& other) const
+		{
+			return LayerIndex == other.LayerIndex && RowIndex == other.RowIndex && ColIndex == other.ColIndex;
+		}
+	};
 
 	class Tile
 	{
@@ -26,5 +37,4 @@ namespace Tiles
 	private:
 		int m_TextureIndex = -1;
 	};
-
 }

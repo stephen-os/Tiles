@@ -81,10 +81,10 @@ namespace Tiles
 			return;
 
 		Tile newTile;
-		Position position;
-		position.L = layerIndex;
-		position.Y = y;
-		position.X = x;
+		TilePosition position;
+		position.LayerIndex = layerIndex;
+		position.RowIndex = y;
+		position.ColIndex = x;
 
 		history->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
     }
@@ -108,10 +108,10 @@ namespace Tiles
         Tile newTile;
 		newTile.SetTextureIndex(newTextureIndex);
 
-        Position position;
-        position.L = layerIndex;
-        position.Y = y;
-        position.X = x;
+        TilePosition position;
+        position.LayerIndex = layerIndex;
+        position.RowIndex = y;
+        position.ColIndex = x;
 
         history->ExecuteCommand(MakeUnique<ReplaceTileCommand>(position, oldTile, newTile));
 	}
