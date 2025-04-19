@@ -11,6 +11,8 @@
 
 namespace Tiles
 {
+	static const size_t MAX_UNDO_STACK_SIZE = 1000;
+
 	class CommandHistory
 	{
 	public:
@@ -23,6 +25,11 @@ namespace Tiles
 
 			command->Execute(*m_Layers);
 			m_UndoStack.push_back(std::move(command));
+
+			if (m_UndoStack.size() > MAX_UNDO_STACK_SIZE)
+				m_UndoStack.pop_front();
+
+
 			m_RedoStack.clear();
 		}
 
@@ -35,6 +42,9 @@ namespace Tiles
 
 			command->Undo(*m_Layers);
 			m_RedoStack.push_back(std::move(command));
+
+			if (m_RedoStack.size() > MAX_UNDO_STACK_SIZE)
+				m_RedoStack.pop_front();
 		}
 
 		void Redo()
@@ -46,6 +56,9 @@ namespace Tiles
 
 			command->Execute(*m_Layers);
 			m_UndoStack.push_back(std::move(command));
+
+			if (m_UndoStack.size() > MAX_UNDO_STACK_SIZE)
+				m_UndoStack.pop_front();
 		}
 
 		bool CanUndo() const { return !m_UndoStack.empty(); }

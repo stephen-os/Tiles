@@ -9,10 +9,10 @@
 
 namespace Tiles
 {
-	class ReplaceTileCommand : public Command
+	class PaintTileCommand : public Command
 	{
 	public:
-		ReplaceTileCommand(const TilePosition& position, const Tile& oldTile, const Tile& newTile)
+		PaintTileCommand(const TilePosition& position, const Tile& oldTile, const Tile& newTile)
 		{
 			m_Position = position;
 			m_PreviousTile = oldTile; 
@@ -22,20 +22,20 @@ namespace Tiles
 		virtual void Execute(Layers& layers) override
 		{
 			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Replace {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_NewTile.GetTextureIndex());
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Paint {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_NewTile.GetTextureIndex());
 			curretTile = m_NewTile;
 		}
 
 		virtual void Undo(Layers& layers) override
 		{
 			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Replace {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_PreviousTile.GetTextureIndex());
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Paint {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_PreviousTile.GetTextureIndex());
 			curretTile = m_PreviousTile;
 		}
 
 		virtual bool Validate(const Command& other) const override
 		{
-			const ReplaceTileCommand* otherCmd = dynamic_cast<const ReplaceTileCommand*>(&other);
+			const PaintTileCommand* otherCmd = dynamic_cast<const PaintTileCommand*>(&other);
 			if (!otherCmd)
 				return false;
 

@@ -10,6 +10,11 @@ namespace Tiles
 		size_t RowIndex;
 		size_t ColIndex;
 
+		TilePosition() = default;
+
+		TilePosition(size_t layerIndex, size_t rowIndex, size_t colIndex)
+			: LayerIndex(layerIndex), RowIndex(rowIndex), ColIndex(colIndex) {}
+
 		bool operator==(const TilePosition& other) const
 		{
 			return LayerIndex == other.LayerIndex && RowIndex == other.RowIndex && ColIndex == other.ColIndex;
@@ -20,6 +25,7 @@ namespace Tiles
 	{
 	public:
 		Tile() = default;
+		Tile(int textureIndex) : m_TextureIndex(textureIndex) {}
 		~Tile() = default;
 
 		void Reset();

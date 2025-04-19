@@ -1,11 +1,14 @@
 #include "ViewportPanel.h"
 
-#include "../Core/Tools.h"
+#include "../Core/Tile.h"
 #include "../Core/Color.h"
 #include "../Core/Tile.h"
 #include "../Core/Selection.h"
+#include "../Core/TileRenderer.h"
 
-#include "../Commands/ReplaceTileCommand.h"
+#include "../Commands/EraseTileCommand.h"
+#include "../Commands/PaintTileCommand.h"
+#include "../Commands/FillTileCommand.h"
 #include "../Commands/ReplaceLayerCommand.h"
 
 #include "PanelUtilities.h"
@@ -13,10 +16,10 @@
 #include "Lumina/Utils/FileReader.h"
 
 #include "Lumina/Core/Aliases.h"
+#include "Lumina/Core/Log.h"
 
 #include "Lumina/Renderer/RenderCommands.h"
 
-#include "../Core/TileRenderer.h"
 
 namespace Tiles
 {
@@ -104,17 +107,54 @@ namespace Tiles
         ImGui::PopStyleVar(2);
     }
 
-    void ViewportPanel::HandleSelection(size_t y, size_t x)
+    void ViewportPanel::HandleSelection(size_t row, size_t col)
     {
         // Dont select if no layer is selected
 		if (m_Layers->IsEmpty())
 			return;
 
+		size_t layerIndex = m_Layers->GetActiveLayer();
+
         switch (Selection::GetCurrentMode())
         {
-        case Selection::Mode::Paint: Tools::Paint(m_Layers, m_Atlas, m_TextureSelection, m_CommandHistory, y, x); break;
-        case Selection::Mode::Erase: Tools::Erase(m_Layers, m_CommandHistory, y, x); break;
-        case Selection::Mode::Fill: Tools::Fill(m_Layers, m_TextureSelection, m_CommandHistory, y, x); break;
+        case Selection::Mode::Paint:
+        {
+			Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
+			Tile newTile(m_TextureSelection->Front());
+
+			if (oldTile == newTile)
+				return;
+
+			TilePosition position(layerIndex, row, col);
+
+            m_CommandHistory->ExecuteCommand(MakeUnique<PaintTileCommand>(position, oldTile, newTile));
+            break;
+        }
+        case Selection::Mode::Erase:
+        {
+            Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
+
+			if (oldTile.GetTextureIndex() == -1)
+				return;
+
+            TilePosition position(layerIndex, row, col);
+
+            m_CommandHistory->ExecuteCommand(MakeUnique<EraseTileCommand>(position, oldTile));
+            break;
+        }
+		case Selection::Mode::Fill:
+        {
+            Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
+            Tile newTile(m_TextureSelection->Front());
+
+            if (oldTile == newTile)
+                return;
+
+            TilePosition position(layerIndex, row, col);
+
+            m_CommandHistory->ExecuteCommand(MakeUnique<FillTileCommand>(position, newTile));
+            break;
+        }
 		default: break;
         }
     }
