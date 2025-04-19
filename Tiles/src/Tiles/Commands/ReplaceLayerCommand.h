@@ -14,8 +14,6 @@ namespace Tiles
 	public:
 		ReplaceLayerCommand(const size_t& index, const Layer& previousLayer, const Layer& newLayer)
 		{
-			LUMINA_LOG_INFO("ReplaceLayerCommand: {0}", index);
-
 			m_Index = index;
 			m_PreviousLayer = previousLayer;
 			m_NewLayer = newLayer;
@@ -23,18 +21,18 @@ namespace Tiles
 
 		virtual void Execute(Layers& layers) override
 		{
+			LUMINA_LOG_INFO("Replacing layer at index: {0}", m_Index);
 			layers.ReplaceLayer(m_Index, m_NewLayer);
 		}
 
 		virtual void Undo(Layers& layers) override
 		{
+			LUMINA_LOG_INFO("Undoing replace layer at index: {0}", m_Index);
 			layers.ReplaceLayer(m_Index, m_PreviousLayer);
 		}
 
 		virtual bool Validate(const Command& other) const override
 		{
-			return false; 
-
 			if (auto otherCommand = dynamic_cast<const ReplaceLayerCommand*>(&other))
 			{
 				return m_Index == otherCommand->m_Index;

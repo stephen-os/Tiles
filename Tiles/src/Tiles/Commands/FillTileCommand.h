@@ -55,13 +55,14 @@ namespace Tiles
 				}
 			}
 			
-			LUMINA_LOG_INFO("Filling layer at index: {}", m_Position.LayerIndex); 
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Execute Fill {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, oldTextureIndex, m_FillTile.GetTextureIndex());
 			layers.ReplaceLayer(m_Position.LayerIndex, m_NewLayer);
 		}
 
 		void Undo(Layers& layers) override
 		{
-			LUMINA_LOG_INFO("Undo Fill"); 
+			Tile& oldTile = m_OldLayer.GetTile(m_Position.RowIndex, m_Position.ColIndex);
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Fill {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, m_FillTile.GetTextureIndex(), oldTile.GetTextureIndex());
 			layers.ReplaceLayer(m_Position.LayerIndex, m_OldLayer);
 		}
 

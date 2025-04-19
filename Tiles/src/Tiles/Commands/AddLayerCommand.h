@@ -32,8 +32,6 @@ namespace Tiles
 
 		virtual bool Validate(const Command& other) const override
 		{
-			return false; 
-
 			const AddLayerCommand* otherCmd = dynamic_cast<const AddLayerCommand*>(&other);
 			if (!otherCmd)
 				return false;
