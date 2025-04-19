@@ -109,7 +109,6 @@ namespace Tiles
 
     void ViewportPanel::HandleSelection(size_t row, size_t col)
     {
-        // Dont select if no layer is selected
 		if (m_Layers->IsEmpty())
 			return;
 
@@ -119,6 +118,9 @@ namespace Tiles
         {
         case Selection::Mode::Paint:
         {
+            if (m_TextureSelection->IsEmpty())
+                return;
+
 			Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
 			Tile newTile(m_TextureSelection->Front());
 
@@ -144,6 +146,9 @@ namespace Tiles
         }
 		case Selection::Mode::Fill:
         {
+			if (m_TextureSelection->IsEmpty())
+				return;
+
             Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
             Tile newTile(m_TextureSelection->Front());
 
