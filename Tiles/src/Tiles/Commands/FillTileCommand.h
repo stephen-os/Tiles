@@ -2,6 +2,8 @@
 
 #include "../Core/Tile.h"
 
+#include "Lumina/Core/Log.h"
+
 #include "Command.h"
 
 #include <queue>
@@ -52,18 +54,20 @@ namespace Tiles
 					tileQueue.push({ ny, nx });
 				}
 			}
-
+			
+			LUMINA_LOG_INFO("Filling layer at index: {}", m_Position.LayerIndex); 
 			layers.ReplaceLayer(m_Position.LayerIndex, m_NewLayer);
 		}
 
 		void Undo(Layers& layers) override
 		{
+			LUMINA_LOG_INFO("Undo Fill"); 
 			layers.ReplaceLayer(m_Position.LayerIndex, m_OldLayer);
 		}
 
 		virtual bool Validate(const Command& other) const override
 		{
-			return true; 
+			return false; 
 		}
 	private:
 		TilePosition m_Position;

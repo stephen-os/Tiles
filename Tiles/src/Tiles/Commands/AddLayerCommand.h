@@ -14,31 +14,31 @@ namespace Tiles
 	public:
 		AddLayerCommand(const size_t& index)
 		{
-			LUMINA_LOG_INFO("AddLayerCommand: {0}", index);
-
 			m_Index = index;
 		}
 
 		virtual void Execute(Layers& layers) override
 		{
 			Layer layer(layers.GetWidth(), layers.GetHeight(), std::string("Layer " + std::to_string(m_Index)));
+			LUMINA_LOG_INFO("Adding layer at index: {0}", m_Index);
 			layers.InsertLayer(m_Index, layer);
 		}
 
 		virtual void Undo(Layers& layers) override
 		{
+			LUMINA_LOG_INFO("Removing layer at index: {0}", m_Index);
 			layers.RemoveLayer(m_Index);
 		}
 
 		virtual bool Validate(const Command& other) const override
 		{
-			return false;
+			return false; 
 
-			if (auto otherCommand = dynamic_cast<const AddLayerCommand*>(&other))
-			{
-				return m_Index == otherCommand->m_Index;
-			}
-			return false;
+			const AddLayerCommand* otherCmd = dynamic_cast<const AddLayerCommand*>(&other);
+			if (!otherCmd)
+				return false;
+
+			return m_Index == otherCmd->m_Index;
 		}
 
 	private:

@@ -8,7 +8,7 @@
 
 #include "imgui.h"
 
-#include <iostream>
+#include "Lumina/Core/Log.h"
 
 namespace Tiles
 {
