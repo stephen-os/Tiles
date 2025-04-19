@@ -26,12 +26,15 @@ namespace Tiles
 		const Tile& GetTile(size_t y, size_t x) const { return m_Tiles[y * m_Width + x]; }
 		Tile& GetTile(size_t y, size_t x) { return m_Tiles[y * m_Width + x]; }
 
+		// Render Group
+		const int GetRenderGroup() const { return m_RenderGroup; }
+		void SetRenderGroup(int group) { m_RenderGroup = group; }
 	private:
 		std::string m_Name;			// Layer name
 		size_t m_Width;				// Layer width
 		size_t m_Height; 			// Layer height	
 		bool m_Visible = true;		// Layer visibility
+		int m_RenderGroup = 0;		// By default, all groups are set to 0. -1 is reserved for no group. 
 		std::vector<Tile> m_Tiles;	// Flat vector of tiles
 	};
-
 }

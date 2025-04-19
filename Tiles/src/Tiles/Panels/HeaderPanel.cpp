@@ -5,6 +5,8 @@
 
 #include "../Core/Project.h"
 
+#include "Lumina/Core/Log.h"
+
 #include "GLFW/glfw3.h"
 
 namespace Tiles
@@ -72,17 +74,6 @@ namespace Tiles
             if (ImGui::MenuItem("Export"))
             {
                 m_ShowRenderMatrixPopup = true;
-
-                size_t rows = m_Layers->GetSize();
-                size_t cols = m_Layers->GetSize();
-
-                m_Checkboxes.clear();
-                m_Checkboxes.resize(rows * cols, false);
-
-                for (size_t row = 0; row < rows; row++)
-				{
-				    m_Checkboxes[row * cols] = true;
-				}
             }
             if (ImGui::MenuItem("Exit"))
             {
@@ -262,21 +253,26 @@ namespace Tiles
                     ImGui::TableSetColumnIndex(0);
                     ImGui::Text("Layer %d", row + 1);
 
+					Layer& layer = m_Layers->GetLayer(row);
+
                     for (int col = 0; col < cols; col++)
                     {
                         ImGui::TableSetColumnIndex(col + 1);
                         std::string label = "##chk" + std::to_string(row) + "_" + std::to_string(col);
 
-                        bool checked = m_Checkboxes[row * cols + col];
+                        Layer& layer = m_Layers->GetLayer(row);
+						bool checked = (layer.GetRenderGroup() == col);
+
                         if (ImGui::Checkbox(label.c_str(), &checked))
                         {
-                            m_Checkboxes[row * cols + col] = checked;
-
-                            for (size_t otherCol = 0; otherCol < cols; otherCol++)
-                            {
-                                if (otherCol != col)
-                                    m_Checkboxes[row * cols + otherCol] = false;
-                            }
+							if (checked)
+							{
+								layer.SetRenderGroup(col);
+							}
+							else
+							{
+								layer.SetRenderGroup(-1);
+							}
                         }
                     }
                 }
@@ -321,23 +317,9 @@ namespace Tiles
 
             if (ImGui::Button("Export"))
             {
-                std::vector<size_t> groupings;
-                groupings.clear();
-                groupings.resize(m_Layers->GetSize(), 0);
-
-                for (int row = 0; row < rows; row++)
-                {
-                    for (int col = 0; col < cols; col++)
-                    {
-                        if (m_Checkboxes[row * cols + col])
-                            groupings[col]++;
-                    }
-                }
-
-                Exporter exporter;
-                std::string path(m_ExportFilePath);
-                std::string name(m_ExportFileName);
-                exporter.Export(m_Layers, m_Atlas, path, name, groupings);
+				m_ExportAttributes.Filepath = m_ExportFilePath;
+				m_ExportAttributes.Filename = m_ExportFileName;
+				TileRenderer::ExportLayers(m_Layers, m_Atlas, m_ExportAttributes);
             }
 
             ImGui::SameLine();

@@ -3,8 +3,8 @@
 #include "Lumina/Renderer/TextureAtlas.h"
 
 #include "../Core/Layers.h"
-#include "../Core/Exporter.h"
 #include "../Core/TextureSelection.h"
+#include "../Core/TileRenderer.h"
 
 #include "Lumina/Core/Aliases.h"
 
@@ -48,7 +48,8 @@ namespace Tiles
 		int m_NewWidth = 10;
 		int m_NewHeight = 10;
 
-		std::vector<bool> m_Checkboxes;
+		ExportAttributes m_ExportAttributes;
+
 		char m_ExportFileName[256] = "";
 		char m_ExportFilePath[256] = "";
 	};

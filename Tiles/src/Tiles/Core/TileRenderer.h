@@ -6,11 +6,21 @@
 
 #include "Lumina/Core/Aliases.h"
 
+#include <vector>
+#include <string>
+
 #include "Layers.h"
 #include "Layer.h"
 
 namespace Tiles
 {
+	struct ExportAttributes
+	{
+		std::string Filename;
+		std::string Filepath;
+		size_t Resolution = 200;
+	};
+
 	class TileRenderer
 	{
 	public:
@@ -30,6 +40,7 @@ namespace Tiles
 		static void DrawLayer(Layer& layer, Shared<Lumina::TextureAtlas> atlas);
 		static void DrawTile(Tile& tile, Shared<Lumina::TextureAtlas> atlas, glm::vec2 position);
 
+		static void ExportLayers(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, ExportAttributes& exportAttributes);
 
 		static void* GetImage();
 		static Lumina::Camera& GetCamera();

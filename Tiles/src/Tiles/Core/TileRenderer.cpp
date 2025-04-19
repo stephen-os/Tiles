@@ -154,6 +154,81 @@ namespace Tiles
 		Lumina::Renderer::DrawQuad(s_TileAttributes);
 	}
 
+	void TileRenderer::ExportLayers(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, ExportAttributes& exportAttributes)
+	{
+		LUMINA_ASSERT(atlas, "Atlas is null!");
+		LUMINA_ASSERT(layers, "Layers is null!");
+
+		if (!atlas->HasTexture())
+		{
+			LUMINA_LOG_WARN("No atlas has been created.");
+			return;
+		}
+
+		LUMINA_LOG_INFO("Exporting layers: ");
+		LUMINA_LOG_INFO("Filepath: {}", exportAttributes.Filepath);
+		LUMINA_LOG_INFO("Filename: {}", exportAttributes.Filename);
+		LUMINA_LOG_INFO("Resolution: {}", exportAttributes.Resolution);
+
+		int outputWidth = static_cast<int>(layers->GetWidth() * exportAttributes.Resolution);
+		int outputHeight = static_cast<int>(layers->GetHeight() * exportAttributes.Resolution);
+
+		Lumina::OrthographicCamera camera(0.0f, layers->GetWidth(), 0.0f, layers->GetHeight(), -1.0f, 2.0f);
+
+		Lumina::QuadAttributes tileAttributes;
+		tileAttributes.Size = { 0.5f, 0.5f };
+		tileAttributes.Texture = atlas->GetTexture();
+
+		size_t decorator = 1;
+		size_t layersRendered = 0; 
+
+		LUMINA_LOG_INFO("Groupings: ");
+		for (size_t group = 0; group < layers->GetSize(); group++)
+		{
+			Lumina::Renderer::Begin(camera);
+			Lumina::Renderer::SetResolution(outputWidth, outputHeight);
+
+			for (size_t layerIndex = 0; layerIndex < layers->GetSize(); layerIndex++)
+			{
+				Layer& layer = layers->GetLayer(layerIndex);
+				if (layer.GetRenderGroup() != group)
+					continue;
+
+				LUMINA_LOG_INFO("- Rendering Layer {} On Group {}", layerIndex, group); 
+				for (size_t y = 0; y < layer.GetHeight(); y++)
+				{
+					for (size_t x = 0; x < layer.GetWidth(); x++)
+					{
+						Tile& tile = layer.GetTile(y, x);
+						if (tile.GetTextureIndex() != -1)
+						{
+							tileAttributes.Position = { x + 0.5f, y + 0.5f, 0.0f };
+							tileAttributes.TextureCoords = atlas->GetTextureCoords(tile.GetTextureIndex());
+
+							Lumina::Renderer::DrawQuad(tileAttributes);
+						}
+					}
+				}
+
+				layersRendered++;
+			}
+
+			Lumina::Renderer::End();
+
+			if (layersRendered != 0)
+			{
+				Lumina::Renderer::SaveFrameBufferToFile(exportAttributes.Filepath + "/" + exportAttributes.Filename + "-" + std::to_string(decorator) + ".png");
+				layersRendered = 0; 
+				decorator++;
+			}
+			else
+			{
+				LUMINA_LOG_INFO("- 0 Layers On Group {}", group);
+			}
+		}
+		LUMINA_LOG_INFO("Export completed.");
+	}
+
 	void* TileRenderer::GetImage()
 	{
 		return (void*)(intptr_t)Lumina::Renderer::GetImage();
