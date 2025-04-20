@@ -92,12 +92,10 @@ namespace Tiles
 
                     if (Selection::GetCurrentMode() == Selection::Mode::Paint)
                     {
-                        for (int texture : *m_TextureSelection)
-                        {
-                            Tile tile;
-                            tile.SetTextureIndex(texture);
-                            TileRenderer::DrawTile(tile, m_Atlas, { x, y });
-                        }
+                        Tile tile;
+                        tile.SetTextureIndex(m_TileAttributes->GetTextureIndex());
+						tile.SetTintColor(m_TileAttributes->GetTintColor());
+                        TileRenderer::DrawTile(tile, m_Atlas, { x, y });
                     }
                 }
             }
@@ -118,11 +116,11 @@ namespace Tiles
         {
         case Selection::Mode::Paint:
         {
-            if (m_TextureSelection->IsEmpty())
+            if (m_TileAttributes->GetTextureIndex() == -1)
                 return;
 
 			Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
-			Tile newTile(m_TextureSelection->Front());
+			Tile newTile(m_TileAttributes->GetTextureIndex(), m_TileAttributes->GetTintColor());
 
 			if (oldTile == newTile)
 				return;
@@ -146,11 +144,11 @@ namespace Tiles
         }
 		case Selection::Mode::Fill:
         {
-			if (m_TextureSelection->IsEmpty())
+			if (m_TileAttributes->GetTextureIndex() == -1)
 				return;
 
             Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
-            Tile newTile(m_TextureSelection->Front());
+            Tile newTile(m_TileAttributes->GetTextureIndex(), m_TileAttributes->GetTintColor());
 
             if (oldTile == newTile)
                 return;

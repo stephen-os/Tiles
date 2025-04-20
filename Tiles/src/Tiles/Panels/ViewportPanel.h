@@ -8,7 +8,7 @@
 
 #include "Lumina/Core/Aliases.h"
 
-#include "../Core/TextureSelection.h"
+#include "../Core/TileAttributes.h"
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 #include "../Core/Tile.h"
@@ -32,7 +32,7 @@ namespace Tiles
         // Setters
         void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
         void SetTextureAtlas(const Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
-        void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
+        void SetTileAttributes(const Shared<TileAttributes>& tileAttributes) { m_TileAttributes = tileAttributes; }
         void SetCommandHistory(const Shared<CommandHistory>& history) { m_CommandHistory = history; }
     private:
         void RenderOverlay();
@@ -42,7 +42,7 @@ namespace Tiles
     private:
         Shared<Layers> m_Layers;
         Shared<Lumina::TextureAtlas> m_Atlas;
-        Shared<TextureSelection> m_TextureSelection;
+        Shared<TileAttributes> m_TileAttributes;
         Shared<CommandHistory> m_CommandHistory;
 
         // Ui State

@@ -17,8 +17,9 @@
 #include "Panels/ViewportPanel.h"
 #include "Panels/LayerSelectionPanel.h"
 #include "Panels/ToolSelectionPanel.h"
+#include "Panels/TintSelectionPanel.h"
 
-#include "Core/TextureSelection.h"
+#include "Core/TileAttributes.h"
 #include "Core/TileRenderer.h"
 #include "Core/Layers.h"
 #include "Core/Color.h"
@@ -61,6 +62,7 @@ namespace Tiles
             m_ViewportPanel.OnUIRender();
             m_ToolSelectionPanel.Render();
             m_LayerSelectionPanel.OnUIRender();
+            m_TintSelectionPanel.OnUIRender(); 
         }
 
         virtual void OnAttach() override
@@ -72,7 +74,7 @@ namespace Tiles
             // References
             Shared<Layers> layers = MakeShared<Layers>();
             Shared<Lumina::TextureAtlas> atlas = MakeShared<Lumina::TextureAtlas>(16, 16);
-            Shared<TextureSelection> textureSelection = MakeShared<TextureSelection>();
+            Shared<TileAttributes> tileAttributes = MakeShared<TileAttributes>();
             Shared<CommandHistory> commandHistory = MakeShared<CommandHistory>(layers);
 
             layers->Resize(16, 16);
@@ -80,25 +82,27 @@ namespace Tiles
             // Header
             m_HeaderPanel.SetLayers(layers);
             m_HeaderPanel.SetTextureAtlas(atlas);
-            m_HeaderPanel.SetTextureSelection(textureSelection);
             m_HeaderPanel.SetCommandHistory(commandHistory);
 
             // Viewport
             m_ViewportPanel.SetLayers(layers);
             m_ViewportPanel.SetTextureAtlas(atlas);
-            m_ViewportPanel.SetTextureSelection(textureSelection);
+            m_ViewportPanel.SetTileAttributes(tileAttributes);
             m_ViewportPanel.SetCommandHistory(commandHistory);
 
             // Texture Selection
             m_TextureSelectionPanel.SetTextureAtlas(atlas);
-            m_TextureSelectionPanel.SetTextureSelection(textureSelection);
+            m_TextureSelectionPanel.SetTileAttributes(tileAttributes);
 
             // Layer Selection
             m_LayerSelectionPanel.SetLayers(layers);
             m_LayerSelectionPanel.SetCommandHistory(commandHistory);
 
             // Tool Selection
-            m_ToolSelectionPanel.SetTextureSelection(textureSelection);
+            m_ToolSelectionPanel.SetTileAttributes(tileAttributes);
+
+			// Tint Selection
+			m_TintSelectionPanel.SetTileAttributes(tileAttributes);
         }
 
         virtual void OnDetach() override
@@ -113,6 +117,7 @@ namespace Tiles
         ViewportPanel m_ViewportPanel;
         LayerSelectionPanel m_LayerSelectionPanel;
         ToolSelectionPanel m_ToolSelectionPanel;
+		TintSelectionPanel m_TintSelectionPanel;
 
         // Util
         Lumina::Timer m_FrameTimer;

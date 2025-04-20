@@ -27,7 +27,7 @@ namespace Tiles
         {
             if (Selection::GetCurrentMode() == Selection::Mode::Erase)
             {
-                if (m_TextureSelection->IsEmpty())
+                if (m_TileAttributes->GetTextureIndex() == -1)
                     Selection::SetCurrentMode(Selection::Mode::None);
                 else
                     Selection::SetCurrentMode(Selection::Mode::Paint);
@@ -55,7 +55,7 @@ namespace Tiles
         {
             if (Selection::GetCurrentMode() == Selection::Mode::Fill)
             {
-				if (m_TextureSelection->IsEmpty())
+				if (m_TileAttributes->GetTextureIndex() == -1)
                     Selection::SetCurrentMode(Selection::Mode::None);
                 else
 					Selection::SetCurrentMode(Selection::Mode::Paint);

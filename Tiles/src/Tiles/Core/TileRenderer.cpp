@@ -109,6 +109,8 @@ namespace Tiles
 
 					s_TileAttributes.Position = { x * s_TileArea + s_TileOffset, y * s_TileArea + s_TileOffset, 0.0f };
 					s_TileAttributes.TextureCoords = atlas->GetTextureCoords(tile.GetTextureIndex());
+					s_TileAttributes.TintColor = tile.GetTintColor();
+
 					Lumina::Renderer::DrawQuad(s_TileAttributes);
 				}
 			}
@@ -134,6 +136,7 @@ namespace Tiles
 
 				s_TileAttributes.Position = { x * s_TileArea + s_TileOffset, y * s_TileArea + s_TileOffset, 0.0f };
 				s_TileAttributes.TextureCoords = atlas->GetTextureCoords(tile.GetTextureIndex());
+				s_TileAttributes.TintColor = tile.GetTintColor();
 
 				Lumina::Renderer::DrawQuad(s_TileAttributes);
 			}
@@ -149,6 +152,7 @@ namespace Tiles
 
 		s_TileAttributes.Texture = atlas->GetTexture();
 		s_TileAttributes.Position = { position.x * s_TileArea + s_TileOffset, position.y * s_TileArea + s_TileOffset, 0.0f };
+		s_TileAttributes.TintColor = tile.GetTintColor();
 		s_TileAttributes.TextureCoords = atlas->GetTextureCoords(tile.GetTextureIndex());
 
 		Lumina::Renderer::DrawQuad(s_TileAttributes);

@@ -3,7 +3,6 @@
 #include "Lumina/Renderer/TextureAtlas.h"
 
 #include "../Core/Layers.h"
-#include "../Core/TextureSelection.h"
 #include "../Core/TileRenderer.h"
 
 #include "Lumina/Core/Aliases.h"
@@ -22,7 +21,6 @@ namespace Tiles
 
 		void SetTextureAtlas(const Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
 		void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
-		void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
 		void SetCommandHistory(const Shared<CommandHistory>& commandHistory) { m_CommandHistory = commandHistory; }
 	private:
 		void RenderFile();
@@ -38,7 +36,6 @@ namespace Tiles
 	private:
 		Shared<Layers> m_Layers;
 		Shared<Lumina::TextureAtlas> m_Atlas;
-		Shared<TextureSelection> m_TextureSelection;
 		Shared<CommandHistory> m_CommandHistory;
 
 		bool m_ShowNewPopup = false;

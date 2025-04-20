@@ -153,14 +153,14 @@ namespace Tiles
         // Handle selection
         if (ImGui::IsItemClicked())
         {
-            if (m_TextureSelection->IsSelected(index))
+            if (m_TileAttributes->GetTextureIndex() == index)
             {
-                m_TextureSelection->Deselect(index);
+                m_TileAttributes->SetTextureIndex(-1);
 				Selection::SetCurrentMode(Selection::Mode::None);
             }
             else
             {
-                m_TextureSelection->Select(index);
+                m_TileAttributes->SetTextureIndex(index);
 				if (Selection::GetCurrentMode() != Selection::Mode::Fill)
 				    Selection::SetCurrentMode(Selection::Mode::Paint);
             }
@@ -170,7 +170,7 @@ namespace Tiles
         ImVec2 max = ImGui::GetItemRectMax();
 
         // Highlight selected texture or default grid
-        if (m_TextureSelection->IsSelected(index))
+        if (m_TileAttributes->GetTextureIndex() == index)
             ImGui::GetWindowDrawList()->AddRect(min, max, Color::SELECTION_BORDER_COLOR, 0.0f, 0, 2.5f);
         else
             ImGui::GetWindowDrawList()->AddRect(min, max, Color::DEAULT_BORDER_COLOR, 0.0f, 0, 0.0f);

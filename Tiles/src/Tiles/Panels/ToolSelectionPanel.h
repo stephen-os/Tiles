@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Core/TextureSelection.h"
+#include "../Core/TileAttributes.h"
 
 #include "Lumina/Core/Aliases.h"
 
@@ -19,10 +19,10 @@ namespace Tiles
 
         void Render();
 
-        void SetTextureSelection(const Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; };
+        void SetTileAttributes(const Shared<TileAttributes>& tileAttributes) { m_TileAttributes = tileAttributes; };
 
     private:
-        Shared<TextureSelection> m_TextureSelection;
+        Shared<TileAttributes> m_TileAttributes;
 
         Shared<Lumina::Texture> m_EraserTexture;
         Shared<Lumina::Texture> m_FillTexture;

@@ -4,6 +4,7 @@
 #include "ImGuiFileDialog.h"
 
 #include "../Core/Project.h"
+#include "../Core/Selection.h"
 
 #include "Lumina/Core/Log.h"
 
@@ -25,17 +26,13 @@ namespace Tiles
 
         if (m_ShowNewPopup)
         {
-            // Clearing texture selection to prevent drawing to viewport when in header menues. 
-            // We may want to manage drawing states a differnt way instead of clearing selection. 
-            m_TextureSelection->Clear();
-
+			Selection::SetCurrentMode(Selection::Mode::None);
             RenderNewPopup();
         }
 
         if (m_ShowRenderMatrixPopup)
         {
-            m_TextureSelection->Clear();
-
+            Selection::SetCurrentMode(Selection::Mode::None);
             RenderRenderMatrixPopup();
         }
 

@@ -25,16 +25,21 @@ namespace Tiles
 	{
 	public:
 		Tile() = default;
-		Tile(int textureIndex) : m_TextureIndex(textureIndex) {}
+		Tile(int textureIndex, const glm::vec4& tintColor)
+			: m_TextureIndex(textureIndex), m_TintColor(tintColor) {
+		}
 		~Tile() = default;
 
 		void Reset();
 
 		// Setters
 		void SetTextureIndex(int textureIndex) { m_TextureIndex = textureIndex; }
+		void SetTintColor(const glm::vec4& color) { m_TintColor = color; }
 
 		// Getters
 		int GetTextureIndex() const { return m_TextureIndex; }
+		const glm::vec4& GetTintColor() const { return m_TintColor; }
+		
 		bool UseTexture() const { return m_TextureIndex != -1; }
 
 		// Operator
@@ -42,5 +47,6 @@ namespace Tiles
 		Tile& Tile::operator=(const Tile& other);
 	private:
 		int m_TextureIndex = -1;
+		glm::vec4 m_TintColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	};
 }

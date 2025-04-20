@@ -2,7 +2,7 @@
 
 #include "Lumina/Renderer/TextureAtlas.h"
 
-#include "../Core/TextureSelection.h"
+#include "../Core/TileAttributes.h"
 
 #include "Lumina/Core/Aliases.h"
 
@@ -23,7 +23,7 @@ namespace Tiles
 
         // Setters
         void SetTextureAtlas(Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
-        void SetTextureSelection(Shared<TextureSelection>& textureSelection) { m_TextureSelection = textureSelection; }
+        void SetTileAttributes(Shared<TileAttributes>& tileAttributes) { m_TileAttributes = tileAttributes; }
     private:
         // UI Rendering Methods
         void RenderAtlasPathSection();
@@ -39,7 +39,7 @@ namespace Tiles
 
     private:
         Shared<Lumina::TextureAtlas> m_Atlas;
-        Shared<TextureSelection> m_TextureSelection;
+        Shared<TileAttributes> m_TileAttributes;
 
         float m_TextureButtonSize = 40.0f;
         float m_CheckerboardSize = 10.0f;
