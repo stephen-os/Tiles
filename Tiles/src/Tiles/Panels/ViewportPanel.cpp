@@ -116,7 +116,7 @@ namespace Tiles
         {
         case Selection::Mode::Paint:
         {
-            if (m_TileAttributes->GetTextureIndex() == -1)
+            if (m_TileAttributes->IsTextureSelected())
                 return;
 
 			Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
@@ -144,7 +144,7 @@ namespace Tiles
         }
 		case Selection::Mode::Fill:
         {
-			if (m_TileAttributes->GetTextureIndex() == -1)
+			if (m_TileAttributes->IsTextureSelected())
 				return;
 
             Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
