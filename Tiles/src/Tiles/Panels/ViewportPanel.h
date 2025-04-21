@@ -45,15 +45,8 @@ namespace Tiles
         Shared<CommandHistory> m_CommandHistory;
 
         // Ui State
-        bool m_IsMouseDragging = false;
-        bool m_IsMiddleMouseDown = false;
-        bool m_ProcessClick = false;
-
-        glm::vec2 m_CursorPos = { 60.0f, 60.0f }; 
-
         glm::vec2 m_LastMousePos = { 0.0f, 0.0f };
-        glm::vec2 m_LastTilePos = { 0.0f, 0.0f };
-
+        
         // Viewport Specifications
         glm::vec2 m_ViewportSize = { 1200.0f, 1200.0f };
         float m_TileSize = 480.0f;

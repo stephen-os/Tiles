@@ -194,25 +194,17 @@ namespace Tiles
 		// Transelate Camera with mouse
         if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))
         {
-            if (!m_IsMiddleMouseDown)
-            {
-                m_IsMiddleMouseDown = true;
-                m_LastMousePos = glm::vec2(mousePos.x, mousePos.y);
-            }
-            else
-            {
-                glm::vec2 currentMousePos(mousePos.x, mousePos.y);
-                glm::vec2 mouseDelta = currentMousePos - m_LastMousePos;
+            glm::vec2 currentMousePos(mousePos.x, mousePos.y);
+            glm::vec2 mouseDelta = currentMousePos - m_LastMousePos;
 
-                camera.Advance(-mouseDelta.y * 0.002f);
-                camera.Strafe(-mouseDelta.x * 0.002f);
+            camera.Advance(-mouseDelta.y * 0.002f);
+            camera.Strafe(-mouseDelta.x * 0.002f);
 
-                m_LastMousePos = currentMousePos;
-            }
+            m_LastMousePos = currentMousePos;
         }
         else
         {
-            m_IsMiddleMouseDown = false;
+            m_LastMousePos = glm::vec2(mousePos.x, mousePos.y);
         }
 
         // Zoom Camera
