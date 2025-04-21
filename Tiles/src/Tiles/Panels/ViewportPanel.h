@@ -12,7 +12,6 @@
 #include "../Core/Layers.h"
 #include "../Core/Layer.h"
 #include "../Core/Tile.h"
-#include "../Core/Camera.h"
 
 #include "../Commands/CommandHistory.h"
 
