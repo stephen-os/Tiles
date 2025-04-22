@@ -81,6 +81,22 @@ namespace Tiles
             }
             if (ImGui::MenuItem("Save"))
             {
+                if (Project::HasPath())
+                {
+                    const std::string& path = Project::GetPath();
+                    Project::Save(path, *m_Layers, *m_Atlas);
+                }
+                else
+                {
+                    IGFD::FileDialogConfig config;
+                    config.path = ".";
+                    config.flags = ImGuiFileDialogFlags_Modal;
+                    config.countSelectionMax = 1;
+                    ImGuiFileDialog::Instance()->OpenDialog("SaveProject", "Save Project", ".json", config);
+                }
+            }
+            if (ImGui::MenuItem("Save As"))
+            {
                 IGFD::FileDialogConfig config;
                 config.path = ".";
                 config.flags = ImGuiFileDialogFlags_Modal;
