@@ -54,7 +54,7 @@ namespace Tiles
         ImVec2 mousePos = ImGui::GetMousePos();
 
         // Do nothing if we are not in the viewport and the viewport isnt focused
-        if (!PanelUtils::IsMouseInViewport(mousePos, windowPos, windowSize) && !ImGui::IsWindowFocused())
+        if (!PanelUtils::IsMouseInViewport(mousePos, windowPos, windowSize))
             return;
 
         // Overlay
@@ -167,7 +167,13 @@ namespace Tiles
         if (ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId))
             return;
 
+        ImVec2 windowPos = ImGui::GetWindowPos();
+        ImVec2 windowSize = ImGui::GetWindowSize();
         ImVec2 mousePos = ImGui::GetMousePos();
+
+        // Do nothing if we are not in the viewport and the viewport isnt focused
+        if (!PanelUtils::IsMouseInViewport(mousePos, windowPos, windowSize))
+            return;
 
 		Lumina::Camera& camera = TileRenderer::GetCamera();
 
