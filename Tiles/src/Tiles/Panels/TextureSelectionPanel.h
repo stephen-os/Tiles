@@ -19,7 +19,7 @@ namespace Tiles
         TextureSelectionPanel() = default;
         ~TextureSelectionPanel() = default;
 
-        void OnUIRender();
+        void Render();
 
         // Setters
         void SetTextureAtlas(Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
@@ -40,10 +40,6 @@ namespace Tiles
     private:
         Shared<Lumina::TextureAtlas> m_Atlas;
         Shared<TileAttributes> m_TileAttributes;
-
-        float m_Rotation = 0.0f;
-        bool m_RotationLocked = true;
-
 
         float m_TextureButtonSize = 40.0f;
         float m_CheckerboardSize = 10.0f;

@@ -10,23 +10,18 @@
 
 #include "../Core/TileAttributes.h"
 #include "../Core/Layers.h"
-#include "../Core/Layer.h"
-#include "../Core/Tile.h"
 
 #include "../Commands/CommandHistory.h"
 
-#include "imgui.h"
-
 namespace Tiles
 {
-
     class ViewportPanel
     {
     public:
         ViewportPanel() = default;
         ~ViewportPanel() = default;
 
-        void OnUIRender();
+        void Render();
 
         // Setters
         void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
@@ -50,7 +45,5 @@ namespace Tiles
         // Viewport Specifications
         glm::vec2 m_ViewportSize = { 1200.0f, 1200.0f };
         float m_TileSize = 480.0f;
-        float m_Zoom = 10.0f;
     };
-
 }

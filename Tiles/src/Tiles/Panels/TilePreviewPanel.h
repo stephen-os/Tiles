@@ -16,7 +16,7 @@ namespace Tiles
 		TilePreviewPanel() = default;
 		~TilePreviewPanel() = default;
 
-		void OnUIRender();
+		void Render();
 
 		void SetTileAttributes(Shared<TileAttributes>& tileAttributes) { m_TileAttributes = tileAttributes; }
 		void SetTextureAtlas(Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }

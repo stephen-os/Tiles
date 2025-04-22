@@ -13,11 +13,10 @@
 
 namespace Tiles
 {
-
 	class HeaderPanel
 	{
 	public:
-		void OnUIRender();
+		void Render();
 
 		void SetTextureAtlas(const Shared<Lumina::TextureAtlas>& atlas) { m_Atlas = atlas; }
 		void SetLayers(const Shared<Layers>& layers) { m_Layers = layers; }
@@ -50,5 +49,4 @@ namespace Tiles
 		char m_ExportFileName[256] = "";
 		char m_ExportFilePath[256] = "";
 	};
-
 }

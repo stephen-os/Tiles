@@ -40,8 +40,10 @@ namespace Tiles
 		const std::string GetName() const { return m_Name; }
 		
 		Layer& GetLayer(size_t index) { return m_Layers[index]; }
-		const Tile& GetTile(size_t index, size_t y, size_t x) const { return m_Layers[index].GetTile(y, x); }
+		const Layer& GetLayer(size_t index) const { return m_Layers[index]; }
+
 		Tile& GetTile(size_t index, size_t y, size_t x) { return m_Layers[index].GetTile(y, x); }
+		const Tile& GetTile(size_t index, size_t y, size_t x) const { return m_Layers[index].GetTile(y, x); }
 
 	private:
 		size_t ResolveLayerIndex(size_t index) const;

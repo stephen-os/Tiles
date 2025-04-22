@@ -35,12 +35,12 @@ namespace Tiles
 		static void Zoom(float delta); 
 		static float GetZoom(); 
 
-		static void DrawGrid(Shared<Layers>& layers);
-		static void DrawLayers(Shared<Layers>& layers, Shared<Lumina::TextureAtlas> atlas);
-		static void DrawLayer(Layer& layer, Shared<Lumina::TextureAtlas> atlas);
-		static void DrawTile(Tile& tile, Shared<Lumina::TextureAtlas> atlas, glm::vec2 position);
+		static void DrawGrid(const Layers& layers);
+		static void DrawLayers(const Layers& layers, const Lumina::TextureAtlas& atlas);
+		static void DrawLayer(const Layer& layer, const Lumina::TextureAtlas& atlas);
+		static void DrawTile(const Tile& tile, const Lumina::TextureAtlas& atlas, size_t row, size_t col);
 
-		static void ExportLayers(Shared<Layers>& layers, Shared<Lumina::TextureAtlas>& atlas, ExportAttributes& exportAttributes);
+		static void ExportLayers(const Layers& layers, const Lumina::TextureAtlas& atlas, const ExportAttributes& exportAttributes);
 
 		static void* GetImage();
 		static Lumina::Camera& GetCamera();

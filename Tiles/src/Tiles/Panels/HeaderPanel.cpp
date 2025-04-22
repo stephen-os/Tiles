@@ -12,7 +12,7 @@
 
 namespace Tiles
 {
-    void HeaderPanel::OnUIRender()
+    void HeaderPanel::Render()
     {
         if (ImGui::BeginMainMenuBar())
         {
@@ -316,7 +316,7 @@ namespace Tiles
             {
 				m_ExportAttributes.Filepath = m_ExportFilePath;
 				m_ExportAttributes.Filename = m_ExportFileName;
-				TileRenderer::ExportLayers(m_Layers, m_Atlas, m_ExportAttributes);
+				TileRenderer::ExportLayers(*m_Layers, *m_Atlas, m_ExportAttributes);
             }
 
             ImGui::SameLine();

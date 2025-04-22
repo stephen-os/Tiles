@@ -7,7 +7,7 @@
 
 namespace Tiles
 {
-	void TilePreviewPanel::OnUIRender()
+	void TilePreviewPanel::Render()
 	{
 		ImGui::Begin("Tile Preview", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 

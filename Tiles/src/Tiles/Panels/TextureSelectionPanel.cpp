@@ -14,9 +14,9 @@
 namespace Tiles
 {
 
-    void TextureSelectionPanel::OnUIRender()
+    void TextureSelectionPanel::Render()
     {
-        ImGui::Begin("Texture Selection");
+        ImGui::Begin("1. Texture Selection");
 
         RenderAtlasPathSection();
         RenderFileDialog();
@@ -28,43 +28,6 @@ namespace Tiles
         ImGui::BeginChild("TextureSelection", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
         RenderTextureGrid();
         ImGui::EndChild();
-
-        // Rotation UI
-        ImGui::Text("Rotation");
-
-        ImGui::Checkbox("Lock to 90°", &m_RotationLocked);
-
-        if (m_RotationLocked)
-        {
-            // Degrees for easier user input
-            int currentDegrees = static_cast<int>(glm::degrees(m_Rotation));
-
-            // Snap to nearest 90 degree step
-            int stepOptions[] = { 0, 90, 180, 270 };
-            const char* labels[] = { "0°", "90°", "180°", "270°" };
-
-            // Get closest step index
-            int currentStep = (currentDegrees + 45) / 90 % 4;
-
-            if (ImGui::Combo("Rotation", &currentStep, labels, IM_ARRAYSIZE(labels)))
-            {
-                m_Rotation = glm::radians(static_cast<float>(stepOptions[currentStep]));
-                // SetRotation(m_Rotation); // You handle this
-                m_TileAttributes->SetRotation(m_Rotation);
-				LUMINA_LOG_INFO("Rotation set to: {}", currentDegrees);
-            }
-        }
-        else
-        {
-            float degrees = glm::degrees(m_Rotation);
-            if (ImGui::SliderFloat("Rotation (°)", &degrees, 0.0f, 360.0f))
-            {
-                m_Rotation = glm::radians(degrees);
-                // SetRotation(m_Rotation); // You handle this
-				m_TileAttributes->SetRotation(m_Rotation);
-            }
-        }
-
 
         ImGui::End();
     }

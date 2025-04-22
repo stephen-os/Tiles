@@ -5,16 +5,18 @@
 
 namespace Tiles
 {
-	class TintSelectionPanel
+	class AttributeSelectionPanel
 	{
 	public:
-		TintSelectionPanel() = default;
-		~TintSelectionPanel() = default;
+		AttributeSelectionPanel() = default;
+		~AttributeSelectionPanel() = default;
 
-		void OnUIRender();
+		void Render();
 
 		void SetTileAttributes(const Shared<TileAttributes>& tileAttributes) { m_TileAttributes = tileAttributes; }
 	private:
 		Shared<TileAttributes> m_TileAttributes;
+
+		bool m_RotationLocked = true;
 	};
 }
