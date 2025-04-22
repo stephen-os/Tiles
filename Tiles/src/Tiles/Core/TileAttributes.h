@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "Tile.h"
+
 namespace Tiles
 {
 	class TileAttributes
@@ -15,6 +17,11 @@ namespace Tiles
 
 		void SetRotation(float rotation) { m_Rotation = rotation; }
 		float GetRotation() const { return m_Rotation; }
+
+		Tile GetTile() const
+		{
+			return Tile(m_TextureIndex, m_TintColor, m_Rotation);
+		}
 	private:
 		int m_TextureIndex = -1; 
 		glm::vec4 m_TintColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);

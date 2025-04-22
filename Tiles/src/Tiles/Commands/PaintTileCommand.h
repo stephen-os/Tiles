@@ -12,16 +12,21 @@ namespace Tiles
 	class PaintTileCommand : public Command
 	{
 	public:
-		PaintTileCommand(const TilePosition& position, const Tile& oldTile, const Tile& newTile)
+		PaintTileCommand(const TilePosition& position, const Layers& layers, const TileAttributes& tileAttributes)
 		{
 			m_Position = position;
-			m_PreviousTile = oldTile; 
-			m_NewTile = newTile;
+			m_PreviousTile = layers.GetTile(position.LayerIndex, position.RowIndex, position.ColIndex); 
+			m_NewTile = tileAttributes.GetTile();
 		}
 
 		virtual void Execute(Layers& layers) override
 		{
 			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
+			
+			// Dont execute if the tile is already the same
+			if (curretTile == m_NewTile)
+				return;
+
 			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Paint {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_NewTile.GetTextureIndex());
 			curretTile = m_NewTile;
 		}

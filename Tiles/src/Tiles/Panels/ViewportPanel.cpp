@@ -2,7 +2,6 @@
 
 #include "../Core/Tile.h"
 #include "../Core/Color.h"
-#include "../Core/Tile.h"
 #include "../Core/Selection.h"
 #include "../Core/TileRenderer.h"
 
@@ -13,13 +12,12 @@
 
 #include "PanelUtilities.h"
 
-#include "Lumina/Utils/FileReader.h"
-
 #include "Lumina/Core/Aliases.h"
 #include "Lumina/Core/Log.h"
 
-#include "Lumina/Renderer/RenderCommands.h"
+#include "Lumina/Utils/FileReader.h"
 
+#include "Lumina/Renderer/RenderCommands.h"
 
 namespace Tiles
 {
@@ -34,12 +32,11 @@ namespace Tiles
         TileRenderer::Begin();
         TileRenderer::DrawGrid(m_Layers);
 		TileRenderer::DrawLayers(m_Layers, m_Atlas);
- 
 		RenderOverlay();
+        TileRenderer::End();
 
         ImGui::SetCursorPos({ 0.0f, 0.0f });
         ImGui::Image(TileRenderer::GetImage(), ImVec2(m_ViewportSize.x, m_ViewportSize.y));
-        TileRenderer::End();
 
         ImGui::End();
     }
@@ -71,9 +68,9 @@ namespace Tiles
         Lumina::Camera& camera = TileRenderer::GetCamera();
         glm::vec2 cameraPos = { camera.GetPosition().x * viewportCenter.x, camera.GetPosition().y * viewportCenter.y };
 
-        for (size_t y = 0; y < m_Layers->GetWidth(); y++)
+        for (size_t y = 0; y < m_Layers->GetHeight(); y++)
         {
-            for (size_t x = 0; x < m_Layers->GetHeight(); x++)
+            for (size_t x = 0; x < m_Layers->GetWidth(); x++)
             {
                 float zoom = TileRenderer::GetZoom();
                 ImVec2 buttonSize = ImVec2(m_TileSize / zoom, m_TileSize / zoom);
@@ -117,46 +114,20 @@ namespace Tiles
         {
         case Selection::Mode::Paint:
         {
-            if (!m_TileAttributes->IsTextureSelected())
-                return;
-
-			Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
-			Tile newTile(m_TileAttributes->GetTextureIndex(), m_TileAttributes->GetTintColor(), m_TileAttributes->GetRotation());
-
-			if (oldTile == newTile)
-				return;
-
 			TilePosition position(layerIndex, row, col);
-
-            m_CommandHistory->ExecuteCommand(MakeUnique<PaintTileCommand>(position, oldTile, newTile));
+            m_CommandHistory->ExecuteCommand(MakeUnique<PaintTileCommand>(position, *m_Layers, *m_TileAttributes));
             break;
         }
         case Selection::Mode::Erase:
         {
-            Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
-
-			if (oldTile.GetTextureIndex() == -1)
-				return;
-
             TilePosition position(layerIndex, row, col);
-
-            m_CommandHistory->ExecuteCommand(MakeUnique<EraseTileCommand>(position, oldTile));
+            m_CommandHistory->ExecuteCommand(MakeUnique<EraseTileCommand>(position, *m_Layers));
             break;
         }
 		case Selection::Mode::Fill:
         {
-			if (!m_TileAttributes->IsTextureSelected())
-				return;
-
-            Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
-            Tile newTile(m_TileAttributes->GetTextureIndex(), m_TileAttributes->GetTintColor(), m_TileAttributes->GetRotation());
-
-            if (oldTile == newTile)
-                return;
-
             TilePosition position(layerIndex, row, col);
-
-            m_CommandHistory->ExecuteCommand(MakeUnique<FillTileCommand>(position, newTile));
+            m_CommandHistory->ExecuteCommand(MakeUnique<FillTileCommand>(position, *m_TileAttributes));
             break;
         }
 		default: break;

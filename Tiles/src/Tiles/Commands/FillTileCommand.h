@@ -13,10 +13,10 @@ namespace Tiles
 	class FillTileCommand : public Command
 	{
 	public:
-		FillTileCommand(TilePosition& position, Tile& newTile)
+		FillTileCommand(TilePosition& position, const TileAttributes& tileAttributes)
 		{
 			m_Position = position;
-			m_FillTile = newTile;
+			m_FillTile = tileAttributes.GetTile();
 		}
 
 		virtual void Execute(Layers& layers) override
@@ -25,6 +25,10 @@ namespace Tiles
 			m_NewLayer = m_OldLayer;
 
 			Tile& oldTile = m_NewLayer.GetTile(m_Position.RowIndex, m_Position.ColIndex);
+
+			if (oldTile == m_FillTile)
+				return;
+
 			int oldTextureIndex = oldTile.GetTextureIndex();
 
 			std::queue<std::pair<size_t, size_t>> tileQueue;

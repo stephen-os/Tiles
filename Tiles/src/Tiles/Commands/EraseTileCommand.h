@@ -12,15 +12,19 @@ namespace Tiles
 	class EraseTileCommand : public Command
 	{
 	public:
-		EraseTileCommand(const TilePosition& position, const Tile& oldTile)
+		EraseTileCommand(const TilePosition& position, const Layers& layers)
 		{
 			m_Position = position;
-			m_PreviousTile = oldTile;
+			m_PreviousTile = layers.GetTile(position.LayerIndex, position.RowIndex, position.ColIndex);
 		}
 
 		virtual void Execute(Layers& layers) override
 		{
 			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
+
+			if (curretTile.GetTextureIndex() == -1)
+				return;
+
 			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Replace {} With -1", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex());
 			curretTile.Reset();
 		}
