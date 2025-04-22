@@ -128,7 +128,8 @@ namespace Tiles
         }
 
         // Translate Camera with keys
-        camera.HandleKeyInput(0.01f);
+        if (!ImGui::GetIO().KeyCtrl)
+            camera.HandleKeyInput(0.01f);
 
 		// Transelate Camera with mouse
         if (ImGui::IsMouseDown(ImGuiMouseButton_Middle))

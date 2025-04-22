@@ -1,0 +1,2607 @@
+{
+    "atlas_height": 16,
+    "atlas_path": "res\\atlas\\factory_atlas.png",
+    "atlas_width": 16,
+    "layers": [
+        {
+            "name": "Layer 0",
+            "tiles": [
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 1,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "rotation": 0.0,
+                        "texture_index": 2,
+                        "tint_color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "layers_height": 16,
+    "layers_name": "New Project",
+    "layers_width": 16
+}

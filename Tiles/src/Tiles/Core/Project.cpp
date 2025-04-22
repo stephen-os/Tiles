@@ -13,6 +13,8 @@
 
 namespace Tiles
 {
+	std::string s_Path = "";
+
     void Project::Save(const std::string& path, const Layers& layers, const Lumina::TextureAtlas& atlas)
     {
         nlohmann::json jsonProject;
@@ -70,6 +72,8 @@ namespace Tiles
         }
 
         size_t totalTiles = layers.GetSize() * layers.GetWidth() * layers.GetHeight();
+
+        s_Path = path; 
 
         LUMINA_LOG_INFO("[Project::Save] Saved project to '{}'", path);
         LUMINA_LOG_INFO("Atlas Path: '{}', Size: {}x{}", atlas.GetTexture()->GetPath(), atlas.GetWidth(), atlas.GetHeight());
@@ -133,9 +137,21 @@ namespace Tiles
 
         size_t totalTiles = layers.GetSize() * layers.GetWidth() * layers.GetHeight();
 
+        s_Path = path;
+
         LUMINA_LOG_INFO("[Project::Load] Loaded project from '{}'", path);
         LUMINA_LOG_INFO("Atlas Path: '{}', Size: {}x{}", atlas.GetTexture()->GetPath(), atlas.GetWidth(), atlas.GetHeight());
         LUMINA_LOG_INFO("Layers Name: '{}', Size: {}x{}, Layer Count: {}, Total Tiles: {}",
             layers.GetName(), layers.GetWidth(), layers.GetHeight(), layers.GetSize(), totalTiles);
     }
+
+	const std::string& Project::GetPath()
+	{
+		return s_Path;
+	}
+
+	bool Project::HasPath()
+	{
+		return !s_Path.empty();
+	}
 }

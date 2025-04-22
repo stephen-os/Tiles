@@ -40,7 +40,36 @@ namespace Tiles
 		{
 			RenderAboutPopup();
 		}
+
+        HandleInput();
     }
+
+    void HeaderPanel::HandleInput()
+    {
+        
+        if (ImGui::IsKeyPressed(ImGuiKey_N, false) && ImGui::GetIO().KeyCtrl)
+        {
+            m_ShowNewPopup = true;
+        }
+
+        if (ImGui::IsKeyPressed(ImGuiKey_S, false))
+        {
+            if (Project::HasPath()) 
+            {
+                const std::string& path = Project::GetPath();
+                Project::Save(path, *m_Layers, *m_Atlas);
+            }
+            else
+            {
+                IGFD::FileDialogConfig config;
+                config.path = ".";
+                config.flags = ImGuiFileDialogFlags_Modal;
+                config.countSelectionMax = 1;
+                ImGuiFileDialog::Instance()->OpenDialog("SaveProject", "Save Project", ".json", config);
+            }
+        }
+    }
+
 
     void HeaderPanel::RenderFile()
     {
@@ -283,7 +312,23 @@ namespace Tiles
 
             ImGui::Text("Export Settings:");
 
-            ImGui::InputText("Export Filepath", m_ExportFilePath, IM_ARRAYSIZE(m_ExportFilePath));
+            int resolution = static_cast<int>(m_ExportAttributes.Resolution);
+            if (ImGui::InputInt("Resolution", &resolution))
+            {
+                if (resolution > 0)
+                    m_ExportAttributes.Resolution = static_cast<size_t>(resolution);
+            }
+
+            {
+                char buffer[256];
+                strncpy_s(buffer, m_ExportAttributes.Filepath.c_str(), sizeof(buffer) - 1);
+                buffer[sizeof(buffer) - 1] = '\0';
+
+                if (ImGui::InputText("Export Filepath", buffer, sizeof(buffer)))
+                {
+                    m_ExportAttributes.Filepath = std::string(buffer);
+                }
+            }
 
             ImGui::SameLine();
 
@@ -297,26 +342,40 @@ namespace Tiles
                 ImGuiFileDialog::Instance()->OpenDialog("ExportDir", "Select Export Directory", nullptr, config);
             }
 
-            // Process file dialog selection
             if (ImGuiFileDialog::Instance()->Display("ExportDir", ImGuiWindowFlags_NoCollapse, ImVec2(800, 600)))
             {
                 if (ImGuiFileDialog::Instance()->IsOk())
                 {
                     std::string path = ImGuiFileDialog::Instance()->GetCurrentPath();
-                    strncpy_s(m_ExportFilePath, path.c_str(), sizeof(m_ExportFilePath) - 1);
+                    m_ExportAttributes.Filepath = path;
                 }
                 ImGuiFileDialog::Instance()->Close();
             }
 
-            ImGui::InputText("Export Filename", m_ExportFileName, IM_ARRAYSIZE(m_ExportFileName));
+            {
+                char buffer[256];
+                strncpy_s(buffer, m_ExportAttributes.Filename.c_str(), sizeof(buffer) - 1);
+                buffer[sizeof(buffer) - 1] = '\0'; 
+
+                if (ImGui::InputText("Export Filename", buffer, sizeof(buffer)))
+                {
+                    m_ExportAttributes.Filename = std::string(buffer);
+                }
+            }
 
 			ImGui::Separator();
 
+            if (m_ExportMessageTimer > 0.0f)
+            {
+                ImGui::Text("Exporting...");
+                m_ExportMessageTimer -= ImGui::GetIO().DeltaTime;
+                ImGui::Separator();
+            }
+
             if (ImGui::Button("Export"))
             {
-				m_ExportAttributes.Filepath = m_ExportFilePath;
-				m_ExportAttributes.Filename = m_ExportFileName;
 				TileRenderer::ExportLayers(*m_Layers, *m_Atlas, m_ExportAttributes);
+                m_ExportMessageTimer = 7.0f;
             }
 
             ImGui::SameLine();
@@ -379,8 +438,14 @@ namespace Tiles
             ImGui::Text("Shortcuts:");
             ImGui::Text("CTRL + Z - Undo");
             ImGui::Text("CTRL + Y - Redo");
-            ImGui::Text("MIDDLE MOUSE - Drag");
-            ImGui::Text("SCROLL WHEEL - Scroll");
+			ImGui::Text("CTRL + N - New Project");
+			ImGui::Text("CTRL + S - Save Project");
+			ImGui::Text("W - Move Up (Viewport Only)");
+			ImGui::Text("A - Move Left (Viewport Only)");
+			ImGui::Text("S - Move Down (Viewport Only)");
+			ImGui::Text("D - Move Right (Viewport Only)");
+            ImGui::Text("MIDDLE MOUSE - Drag (Viewport Only)");
+            ImGui::Text("SCROLL WHEEL - Scroll (Viewport Only)");
 
             ImGui::Separator();
 

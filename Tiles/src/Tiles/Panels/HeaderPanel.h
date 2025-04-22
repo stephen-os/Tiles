@@ -9,8 +9,6 @@
 
 #include "../Commands/CommandHistory.h"
 
-#include <string>
-
 namespace Tiles
 {
 	class HeaderPanel
@@ -26,6 +24,8 @@ namespace Tiles
 		void RenderEdit();
 		void RenderExample();
 		void RenderHelp();
+
+		void HandleInput();
 
 		// Popups
 		void RenderNewPopup();
@@ -45,8 +45,6 @@ namespace Tiles
 		int m_NewHeight = 10;
 
 		ExportAttributes m_ExportAttributes;
-
-		char m_ExportFileName[256] = "";
-		char m_ExportFilePath[256] = "";
+		float m_ExportMessageTimer = 0.0f;
 	};
 }
