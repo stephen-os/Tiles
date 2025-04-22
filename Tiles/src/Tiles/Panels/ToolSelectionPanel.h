@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Core/TileAttributes.h"
-#include "../Core/Selection.h"
+#include "../Core/Modes.h"
 
 #include "Lumina/Core/Aliases.h"
 
@@ -20,8 +20,8 @@ namespace Tiles
 
         void SetTileAttributes(const Shared<TileAttributes>& tileAttributes) { m_TileAttributes = tileAttributes; };
     private: 
-        void RenderToolButton(const char* id, const Shared<Lumina::Texture>& texture, Selection::Mode mode);
-        void DrawCursorForMode(Selection::Mode mode, const Shared<Lumina::Texture>& texture);
+        void RenderToolButton(const char* id, const Shared<Lumina::Texture>& texture, Modes::Mode mode);
+        void DrawCursorForMode(Modes::Mode mode, const Shared<Lumina::Texture>& texture);
     private:
         Shared<TileAttributes> m_TileAttributes;
 

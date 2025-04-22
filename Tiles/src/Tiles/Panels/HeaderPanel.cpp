@@ -4,7 +4,7 @@
 #include "ImGuiFileDialog.h"
 
 #include "../Core/Project.h"
-#include "../Core/Selection.h"
+#include "../Core/Modes.h"
 
 #include "Lumina/Core/Log.h"
 
@@ -26,13 +26,13 @@ namespace Tiles
 
         if (m_ShowNewPopup)
         {
-			Selection::SetCurrentMode(Selection::Mode::None);
+            Modes::SetCurrentMode(Modes::Mode::None);
             RenderNewPopup();
         }
 
         if (m_ShowRenderMatrixPopup)
         {
-            Selection::SetCurrentMode(Selection::Mode::None);
+            Modes::SetCurrentMode(Modes::Mode::None);
             RenderRenderMatrixPopup();
         }
 

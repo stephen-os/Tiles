@@ -24,7 +24,7 @@
 #include "Core/TileRenderer.h"
 #include "Core/Layers.h"
 #include "Core/Color.h"
-#include "Core/Selection.h"
+#include "Core/Modes.h"
 
 #include "Commands/CommandHistory.h"
 
@@ -54,7 +54,7 @@ namespace Tiles
             ImGui::Text("Quad Count: %d", stats.QuadCount);
             ImGui::Text("Textures Used: %d", stats.TexturesUsed);
             ImGui::Text("Shaders Used: %d", stats.ShadersUsed);
-            ImGui::Text("Mode Selection: %d", Selection::GetCurrentMode());
+            ImGui::Text("Mode Selection: %d", Modes::GetCurrentMode());
             Lumina::Renderer::ResetStats();
             ImGui::End();
 #endif

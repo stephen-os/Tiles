@@ -2,7 +2,7 @@
 #include "TextureSelectionPanel.h"
 
 #include "../Core/Color.h"
-#include "../Core/Selection.h"
+#include "../Core/Modes.h"
 
 #include "ImGuiFileDialog.h"
 
@@ -158,13 +158,13 @@ namespace Tiles
             if (m_TileAttributes->GetTextureIndex() == index)
             {
                 m_TileAttributes->SetTextureIndex(-1);
-				Selection::SetCurrentMode(Selection::Mode::None);
+                Modes::SetCurrentMode(Modes::Mode::None);
             }
             else
             {
                 m_TileAttributes->SetTextureIndex(index);
-				if (Selection::GetCurrentMode() != Selection::Mode::Fill)
-				    Selection::SetCurrentMode(Selection::Mode::Paint);
+				if (Modes::GetCurrentMode() != Modes::Mode::Fill)
+                    Modes::SetCurrentMode(Modes::Mode::Paint);
             }
         }
 

@@ -18,36 +18,36 @@ namespace Tiles
     {
         ImGui::Begin("Tools");
 
-        RenderToolButton("EraserMode", m_EraserTexture, Selection::Mode::Erase);
+        RenderToolButton("EraserMode", m_EraserTexture, Modes::Mode::Erase);
         ImGui::SameLine();
-        RenderToolButton("FillMode", m_FillTexture, Selection::Mode::Fill);
+        RenderToolButton("FillMode", m_FillTexture, Modes::Mode::Fill);
 
         ImGui::End();
 
-        DrawCursorForMode(Selection::Mode::Erase, m_EraserTexture);
-        DrawCursorForMode(Selection::Mode::Fill, m_FillTexture);
+        DrawCursorForMode(Modes::Mode::Erase, m_EraserTexture);
+        DrawCursorForMode(Modes::Mode::Fill, m_FillTexture);
     }
 
-    void ToolSelectionPanel::RenderToolButton(const char* id, const Shared<Lumina::Texture>& texture, Selection::Mode mode)
+    void ToolSelectionPanel::RenderToolButton(const char* id, const Shared<Lumina::Texture>& texture, Modes::Mode mode)
     {
         ImGui::PushID(id);
 
         if (ImGui::ImageButton((void*)(intptr_t)texture->GetID(), TOOL_IMAGE_SIZE))
         {
-            if (Selection::GetCurrentMode() == mode)
+            if (Modes::GetCurrentMode() == mode)
             {
                 if (true)
-                    Selection::SetCurrentMode(Selection::Mode::None);
+                    Modes::SetCurrentMode(Modes::Mode::None);
                 else
-                    Selection::SetCurrentMode(Selection::Mode::Paint);
+                    Modes::SetCurrentMode(Modes::Mode::Paint);
             }
             else
             {
-                Selection::SetCurrentMode(mode);
+                Modes::SetCurrentMode(mode);
             }
         }
 
-        if (Selection::GetCurrentMode() == mode)
+        if (Modes::GetCurrentMode() == mode)
         {
             ImVec2 min = ImGui::GetItemRectMin();
             ImVec2 max = ImGui::GetItemRectMax();
@@ -57,9 +57,9 @@ namespace Tiles
         ImGui::PopID();
     }
 
-    void ToolSelectionPanel::DrawCursorForMode(Selection::Mode mode, const Shared<Lumina::Texture>& texture)
+    void ToolSelectionPanel::DrawCursorForMode(Modes::Mode mode, const Shared<Lumina::Texture>& texture)
     {
-        if (Selection::GetCurrentMode() != mode)
+        if (Modes::GetCurrentMode() != mode)
             return;
 
         ImGui::SetMouseCursor(ImGuiMouseCursor_None);

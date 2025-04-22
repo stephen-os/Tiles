@@ -2,7 +2,7 @@
 
 #include "../Core/Tile.h"
 #include "../Core/Color.h"
-#include "../Core/Selection.h"
+#include "../Core/Modes.h"
 #include "../Core/TileRenderer.h"
 
 #include "../Commands/EraseTileCommand.h"
@@ -72,7 +72,7 @@ namespace Tiles
 
                     ImGui::GetForegroundDrawList()->AddRect(tileMin, tileMax, Color::SELECTION_BORDER_COLOR, 0.0f, 0, 2.0f);
 
-                    if (Selection::GetCurrentMode() == Selection::Mode::Paint)
+                    if (Modes::GetCurrentMode() == Modes::Mode::Paint)
                     {
                         TileRenderer::DrawTile(m_TileAttributes->GetTile(), *m_Atlas, row, col );
                     }
@@ -84,19 +84,19 @@ namespace Tiles
     void ViewportPanel::HandleSelection(size_t row, size_t col)
     {
 	    TilePosition position(m_Layers->GetActiveLayer(), row, col);
-        switch (Selection::GetCurrentMode())
+        switch (Modes::GetCurrentMode())
         {
-        case Selection::Mode::Paint:
+        case Modes::Mode::Paint:
         {
             m_CommandHistory->ExecuteCommand(MakeUnique<PaintTileCommand>(position, *m_Layers, *m_TileAttributes));
             break;
         }
-        case Selection::Mode::Erase:
+        case Modes::Mode::Erase:
         {
             m_CommandHistory->ExecuteCommand(MakeUnique<EraseTileCommand>(position, *m_Layers));
             break;
         }
-		case Selection::Mode::Fill:
+		case Modes::Mode::Fill:
         {
             m_CommandHistory->ExecuteCommand(MakeUnique<FillTileCommand>(position, *m_TileAttributes));
             break;

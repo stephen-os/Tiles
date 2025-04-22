@@ -2,7 +2,7 @@
 
 namespace Tiles
 {
-	class Selection
+	class Modes
 	{
 	public:
 		enum class Mode
