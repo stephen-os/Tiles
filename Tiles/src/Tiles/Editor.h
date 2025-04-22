@@ -18,6 +18,7 @@
 #include "Panels/LayerSelectionPanel.h"
 #include "Panels/ToolSelectionPanel.h"
 #include "Panels/TintSelectionPanel.h"
+#include "Panels/TilePreviewPanel.h"
 
 #include "Core/TileAttributes.h"
 #include "Core/TileRenderer.h"
@@ -62,7 +63,8 @@ namespace Tiles
             m_ViewportPanel.OnUIRender();
             m_ToolSelectionPanel.Render();
             m_LayerSelectionPanel.OnUIRender();
-            m_TintSelectionPanel.OnUIRender(); 
+            m_TintSelectionPanel.OnUIRender();
+			m_TilePreviewPanel.OnUIRender();
         }
 
         virtual void OnAttach() override
@@ -103,6 +105,10 @@ namespace Tiles
 
 			// Tint Selection
 			m_TintSelectionPanel.SetTileAttributes(tileAttributes);
+
+			// Tile Preview
+			m_TilePreviewPanel.SetTextureAtlas(atlas);
+			m_TilePreviewPanel.SetTileAttributes(tileAttributes);
         }
 
         virtual void OnDetach() override
@@ -118,6 +124,7 @@ namespace Tiles
         LayerSelectionPanel m_LayerSelectionPanel;
         ToolSelectionPanel m_ToolSelectionPanel;
 		TintSelectionPanel m_TintSelectionPanel;
+		TilePreviewPanel m_TilePreviewPanel;
 
         // Util
         Lumina::Timer m_FrameTimer;
