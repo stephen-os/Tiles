@@ -95,6 +95,7 @@ namespace Tiles
                         Tile tile;
                         tile.SetTextureIndex(m_TileAttributes->GetTextureIndex());
 						tile.SetTintColor(m_TileAttributes->GetTintColor());
+						tile.SetRotation(m_TileAttributes->GetRotation());
                         TileRenderer::DrawTile(tile, m_Atlas, { x, y });
                     }
                 }
@@ -116,11 +117,11 @@ namespace Tiles
         {
         case Selection::Mode::Paint:
         {
-            if (m_TileAttributes->IsTextureSelected())
+            if (!m_TileAttributes->IsTextureSelected())
                 return;
 
 			Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
-			Tile newTile(m_TileAttributes->GetTextureIndex(), m_TileAttributes->GetTintColor());
+			Tile newTile(m_TileAttributes->GetTextureIndex(), m_TileAttributes->GetTintColor(), m_TileAttributes->GetRotation());
 
 			if (oldTile == newTile)
 				return;
@@ -144,11 +145,11 @@ namespace Tiles
         }
 		case Selection::Mode::Fill:
         {
-			if (m_TileAttributes->IsTextureSelected())
+			if (!m_TileAttributes->IsTextureSelected())
 				return;
 
             Tile& oldTile = m_Layers->GetTile(layerIndex, row, col);
-            Tile newTile(m_TileAttributes->GetTextureIndex(), m_TileAttributes->GetTintColor());
+            Tile newTile(m_TileAttributes->GetTextureIndex(), m_TileAttributes->GetTintColor(), m_TileAttributes->GetRotation());
 
             if (oldTile == newTile)
                 return;

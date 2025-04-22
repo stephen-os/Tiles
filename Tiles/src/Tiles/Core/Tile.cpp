@@ -11,7 +11,8 @@ namespace Tiles
 	bool Tile::operator==(const Tile& other) const
 	{
 		return m_TextureIndex == other.m_TextureIndex &&
-			m_TintColor == other.m_TintColor;
+			m_TintColor == other.m_TintColor &&
+			m_Rotation == other.m_Rotation;
 	}
 
 	Tile& Tile::operator=(const Tile& other)
@@ -20,6 +21,7 @@ namespace Tiles
 		{
 			m_TextureIndex = other.m_TextureIndex;
 			m_TintColor = other.m_TintColor;
+			m_Rotation = other.m_Rotation;
 		}
 		return *this;
 	}
