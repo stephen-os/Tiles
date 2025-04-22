@@ -67,11 +67,11 @@ namespace Tiles
             ImFont* customFont = io.Fonts->AddFontFromFileTTF("res/assets/fonts/Modeseven-L3n5.ttf", 12.0f);
             if (!customFont)
             {
-				LUMINA_LOG_ERROR("Failed to load custom font: {}", "res/assets/fonts/Modeseven-L3n5.ttf");
+                LUMINA_LOG_ERROR("Failed to load custom font: {}", "res/assets/fonts/Modeseven-L3n5.ttf");
                 return;
             }
 
             io.FontDefault = customFont;
-
+        }
     }
 }
