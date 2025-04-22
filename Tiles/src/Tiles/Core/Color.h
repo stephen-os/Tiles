@@ -1,8 +1,7 @@
 #pragma once
 
 #include "imgui.h"
-
-#include "spdlog/spdlog.h"
+#include "Lumina/Core/Log.h"
 
 namespace Tiles
 {
@@ -63,18 +62,16 @@ namespace Tiles
             }
 
             // Load and set a custom font
-            io.Fonts->Clear();  // Clear existing fonts if any
+            io.Fonts->Clear();
 
             ImFont* customFont = io.Fonts->AddFontFromFileTTF("res/assets/fonts/Modeseven-L3n5.ttf", 12.0f);
             if (!customFont)
             {
-                spdlog::error("[Color] -> Failed to load custom font.");
+				LUMINA_LOG_ERROR("Failed to load custom font: {}", "res/assets/fonts/Modeseven-L3n5.ttf");
                 return;
             }
 
-            io.FontDefault = customFont;  // Set as default font
-        }
+            io.FontDefault = customFont;
 
     }
-    
 }
