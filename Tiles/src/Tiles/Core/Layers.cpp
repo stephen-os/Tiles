@@ -1,6 +1,7 @@
 #include "Layers.h"
 
-#include "spdlog/spdlog.h"
+#include "Lumina/Core/Log.h"
+#include "Lumina/Core/Assert.h"
 
 namespace Tiles
 {
@@ -13,27 +14,21 @@ namespace Tiles
 	void Layers::RemoveLayer(size_t index)
 	{
 		index = ResolveLayerIndex(index);
-		if (index < m_Layers.size())
+		LUMINA_ASSERT(index < m_Layers.size(), "Error: Attempted to remove an out-of-bounds layer.");
+
+		m_Layers.erase(m_Layers.begin() + index);
+		if (m_ActiveLayer >= m_Layers.size() && !m_Layers.empty())
 		{
-			m_Layers.erase(m_Layers.begin() + index);
-			if (m_ActiveLayer >= m_Layers.size() && !m_Layers.empty())
-			{
-				m_ActiveLayer = m_Layers.size() - 1;
-			}
-		}
-		else
-		{
-			spdlog::error("Error: Attempted to remove an out-of-bounds layer.");
+			m_ActiveLayer = m_Layers.size() - 1;
 		}
 	}
 
 	void Layers::ClearLayer(size_t index)
 	{
 		index = ResolveLayerIndex(index);
-		if (index < m_Layers.size())
-			m_Layers[index].Clear();
-		else
-			spdlog::error("Error: Attempted to clear an out - of - bounds layer.");
+		LUMINA_ASSERT(index < m_Layers.size(), "Error: Attempted to clear an out-of-bounds layer.");
+
+		m_Layers[index].Clear();
 	}
 
 	void Layers::InsertLayer(Layer& layer) 
@@ -44,39 +39,35 @@ namespace Tiles
 	void Layers::InsertLayer(size_t index, Layer& layer)
 	{
 		index = ResolveLayerIndex(index);
-		if (index <= m_Layers.size())
-			m_Layers.insert(m_Layers.begin() + index, std::move(layer));
-		else
-			spdlog::error("Error: Attempted to insert layer at an invalid index.");
+		LUMINA_ASSERT(index <= m_Layers.size(), "Error: Attempted to insert an out-of-bounds layer.");
+
+		m_Layers.insert(m_Layers.begin() + index, std::move(layer));
 	}
 
 	void Layers::ReplaceLayer(size_t index, Layer& layer)
 	{
 		index = ResolveLayerIndex(index);
-		if (index < m_Layers.size())
-			m_Layers[index] = std::move(layer);
-		else
-			spdlog::error("Error: Attempted to replace an out-of-bounds layer.");
+		LUMINA_ASSERT(index < m_Layers.size(), "Error: Attempted to replace an out-of-bounds layer.");
+
+		m_Layers[index] = std::move(layer);
 	}
 
-	void Layers::ShiftLayerUp(size_t index)
+	void Layers::ShiftLayerUp()
 	{
-		index = ResolveLayerIndex(index);
-		if (index > 0 && index < m_Layers.size())
-		{
-			std::swap(m_Layers[index], m_Layers[index - 1]);
-			m_ActiveLayer = index - 1;
-		}
+		if (m_Layers.size() <= 1 || m_ActiveLayer == 0)
+			return;
+
+		std::swap(m_Layers[m_ActiveLayer], m_Layers[m_ActiveLayer - 1]);
+		m_ActiveLayer--;
 	}
 
-	void Layers::ShiftLayerDown(size_t index)
+	void Layers::ShiftLayerDown()
 	{
-		index = ResolveLayerIndex(index);
-		if (index >= 0 && index < m_Layers.size() - 1)
-		{
-			std::swap(m_Layers[index], m_Layers[index + 1]);
-			m_ActiveLayer = index + 1;
-		}
+		if (m_Layers.size() <= 1 || m_ActiveLayer >= m_Layers.size() - 1)
+			return;
+
+		std::swap(m_Layers[m_ActiveLayer], m_Layers[m_ActiveLayer + 1]);
+		m_ActiveLayer++;
 	}
 
 	size_t Layers::ResolveLayerIndex(size_t index) const

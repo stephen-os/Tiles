@@ -9,18 +9,19 @@
 
 namespace Tiles
 {
-	class ReplaceLayerCommand : public Command
+	class ClearLayerCommand : public Command
 	{
 	public:
-		ReplaceLayerCommand(const size_t& index, const Layer& previousLayer, const Layer& newLayer)
+		ClearLayerCommand(const Layers& layers)
 		{
-			m_Index = index;
-			m_PreviousLayer = previousLayer;
-			m_NewLayer = newLayer;
+			m_Index = layers.GetActiveLayer();
+			m_PreviousLayer = layers.GetLayer(m_Index);
+			m_NewLayer = layers.GetLayer(m_Index);
 		}
 
 		virtual void Execute(Layers& layers) override
 		{
+			m_NewLayer.Clear();
 			LUMINA_LOG_INFO("Replacing layer at index: {0}", m_Index);
 			layers.ReplaceLayer(m_Index, m_NewLayer);
 		}
@@ -33,10 +34,6 @@ namespace Tiles
 
 		virtual bool Validate(const Command& other) const override
 		{
-			if (auto otherCommand = dynamic_cast<const ReplaceLayerCommand*>(&other))
-			{
-				return m_Index == otherCommand->m_Index;
-			}
 			return false;
 		}
 

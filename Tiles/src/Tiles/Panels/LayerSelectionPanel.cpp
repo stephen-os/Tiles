@@ -3,8 +3,8 @@
 #include "../Core/Layer.h"
 
 #include "../Commands/AddLayerCommand.h"
-#include "../Commands/RemoveLayerCommand.h"
-#include "../Commands/ReplaceLayerCommand.h"
+#include "../Commands/DeleteLayerCommand.h"
+#include "../Commands/ClearLayerCommand.h"
 
 #include "imgui.h"
 
@@ -69,51 +69,41 @@ namespace Tiles
 
         if (ImGui::Button("Move Up"))
         {
-            if (m_Layers->GetSize() > 1 && m_Layers->GetActiveLayer() > 0)
-            {
-                m_Layers->ShiftLayerUp(m_Layers->GetActiveLayer());
-            }
+            m_Layers->ShiftLayerUp();
         }
 
         ImGui::SameLine();
         
         if (ImGui::Button("Move Down"))
         {
-            if (m_Layers->GetSize() > 1 && m_Layers->GetActiveLayer() + 1 < m_Layers->GetSize())
-            {
-                m_Layers->ShiftLayerDown(m_Layers->GetActiveLayer());
-            }
+            m_Layers->ShiftLayerDown();
         }
 
         ImGui::Separator();
 
         if (ImGui::Button("Add Layer"))
         {
-            m_CommandHistory->ExecuteCommand(MakeUnique<AddLayerCommand>(m_Layers->GetSize()));
+            m_CommandHistory->ExecuteCommand(MakeUnique<AddLayerCommand>(*m_Layers));
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Delete Layer"))
         {
-            if (m_Layers->GetSize() != 0)
-            {
-                Layer& layer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
-                m_CommandHistory->ExecuteCommand(MakeUnique<RemoveLayerCommand>(m_Layers->GetActiveLayer(), layer));
-            }
+			if (m_Layers->GetSize() != 0)
+			{
+                m_CommandHistory->ExecuteCommand(MakeUnique<DeleteLayerCommand>(*m_Layers));
+			}
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Clear Layer"))
         {
-            if (m_Layers->GetSize() != 0)
-            {
-                Layer& oldLayer = m_Layers->GetLayer(m_Layers->GetActiveLayer());
-                Layer newLayer = oldLayer;
-                newLayer.Clear();
-                m_CommandHistory->ExecuteCommand(MakeUnique<ReplaceLayerCommand>(m_Layers->GetActiveLayer(), oldLayer, newLayer));
-            }
+			if (m_Layers->GetSize() != 0)
+			{
+                m_CommandHistory->ExecuteCommand(MakeUnique<ClearLayerCommand>(*m_Layers));
+			}
         }
 
         ImGui::Separator();

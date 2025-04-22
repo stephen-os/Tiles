@@ -8,7 +8,6 @@
 
 namespace Tiles
 {
-
 	class Layers
 	{
 	public:
@@ -22,8 +21,8 @@ namespace Tiles
 		void ReplaceLayer(size_t index, Layer& layer);
 		void ClearAllLayers() { m_Layers.clear(); }
 
-		void ShiftLayerUp(size_t index);
-		void ShiftLayerDown(size_t index);
+		void ShiftLayerUp();
+		void ShiftLayerDown();
 
 		void Resize(size_t width, size_t height);
 		bool IsEmpty() const { return m_Layers.empty(); }
@@ -54,5 +53,4 @@ namespace Tiles
 		size_t m_ActiveLayer = 0;			// Working layer
 		std::vector<Layer> m_Layers;		// Layers
 	};
-
 }

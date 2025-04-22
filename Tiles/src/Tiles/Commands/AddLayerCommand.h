@@ -12,9 +12,9 @@ namespace Tiles
 	class AddLayerCommand : public Command
 	{
 	public:
-		AddLayerCommand(const size_t& index)
+		AddLayerCommand(const Layers& layers)
 		{
-			m_Index = index;
+			m_Index = layers.GetSize();
 		}
 
 		virtual void Execute(Layers& layers) override
@@ -32,11 +32,7 @@ namespace Tiles
 
 		virtual bool Validate(const Command& other) const override
 		{
-			const AddLayerCommand* otherCmd = dynamic_cast<const AddLayerCommand*>(&other);
-			if (!otherCmd)
-				return false;
-
-			return m_Index == otherCmd->m_Index;
+			return false; 
 		}
 
 	private:

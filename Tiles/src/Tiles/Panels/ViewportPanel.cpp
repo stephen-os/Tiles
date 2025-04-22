@@ -8,7 +8,6 @@
 #include "../Commands/EraseTileCommand.h"
 #include "../Commands/PaintTileCommand.h"
 #include "../Commands/FillTileCommand.h"
-#include "../Commands/ReplaceLayerCommand.h"
 
 #include "PanelUtilities.h"
 

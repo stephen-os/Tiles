@@ -9,13 +9,13 @@
 
 namespace Tiles
 {
-	class RemoveLayerCommand : public Command
+	class DeleteLayerCommand : public Command
 	{
 	public:
-		RemoveLayerCommand(const size_t& index, Layer& previousLayer)
+		DeleteLayerCommand(const Layers& layer)
 		{
-			m_Index = index;
-			m_PreviousLayer = previousLayer;
+			m_Index = layer.GetActiveLayer();
+			m_PreviousLayer = layer.GetLayer(m_Index);
 		}
 
 		virtual void Execute(Layers& layers) override
@@ -32,10 +32,6 @@ namespace Tiles
 
 		virtual bool Validate(const Command& other) const override
 		{
-			if (auto otherCommand = dynamic_cast<const RemoveLayerCommand*>(&other))
-			{
-				return m_Index == otherCommand->m_Index;
-			}
 			return false;
 		}
 
