@@ -85,7 +85,7 @@ namespace Tiles
             if (ImGuiFileDialog::Instance()->IsOk())
             {
                 std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-                Project::Save(filePath, m_Layers, m_Atlas);
+                Project::Save(filePath, *m_Layers, *m_Atlas);
             }
             ImGuiFileDialog::Instance()->Close();
         }
@@ -96,7 +96,7 @@ namespace Tiles
             if (ImGuiFileDialog::Instance()->IsOk())
             {
                 std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
-                Project::Load(filePath, m_Layers, m_Atlas);
+                Project::Load(filePath, *m_Layers, *m_Atlas);
             }
             ImGuiFileDialog::Instance()->Close();
         }
@@ -132,11 +132,11 @@ namespace Tiles
 		{
             if (ImGui::MenuItem("Example Project 1"))
             {
-                Project::Load("res/maps/example_map1.json", m_Layers, m_Atlas);
+                Project::Load("res/maps/example_map1.json", *m_Layers, *m_Atlas);
             }
             if (ImGui::MenuItem("Example Project 2"))
             {
-                Project::Load("res/maps/example_map2.json", m_Layers, m_Atlas);
+                Project::Load("res/maps/example_map2.json", *m_Layers, *m_Atlas);
             }
             ImGui::EndMenu();
 		}
