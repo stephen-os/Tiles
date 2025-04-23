@@ -22,17 +22,19 @@ namespace Tiles
 		{
 			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
 
-			if (curretTile.GetTextureIndex() == -1)
+			Tile emptyTile;
+
+			if (curretTile == emptyTile)
 				return;
 
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Replace {} With -1", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex());
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Erase {} with {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, emptyTile.ToString(), curretTile.ToString());
 			curretTile.Reset();
 		}
 
 		virtual void Undo(Layers& layers) override
 		{
 			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Replace {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_PreviousTile.GetTextureIndex());
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Erase {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.ToString(), m_PreviousTile.ToString());
 			curretTile = m_PreviousTile;
 		}
 

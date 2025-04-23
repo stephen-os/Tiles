@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include <string>
 
 namespace Tiles
 {
@@ -44,8 +45,12 @@ namespace Tiles
 
 		bool UseTexture() const { return m_TextureIndex != -1; }
 
+		std::string ToString() const;
+
 		// Operator
 		bool operator==(const Tile& other) const;
+		bool operator!=(const Tile& other) const;
+
 		Tile& Tile::operator=(const Tile& other);
 	private:
 		int m_TextureIndex = -1;

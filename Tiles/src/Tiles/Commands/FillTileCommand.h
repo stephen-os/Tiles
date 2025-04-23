@@ -24,12 +24,11 @@ namespace Tiles
 			m_OldLayer = layers.GetLayer(m_Position.LayerIndex);
 			m_NewLayer = m_OldLayer;
 
-			Tile& oldTile = m_NewLayer.GetTile(m_Position.RowIndex, m_Position.ColIndex);
+			// Cannont be a ref
+			Tile oldTile = m_NewLayer.GetTile(m_Position.RowIndex, m_Position.ColIndex);
 
 			if (oldTile == m_FillTile)
 				return;
-
-			int oldTextureIndex = oldTile.GetTextureIndex();
 
 			std::queue<std::pair<size_t, size_t>> tileQueue;
 			tileQueue.push({ m_Position.RowIndex, m_Position.ColIndex });
@@ -45,10 +44,10 @@ namespace Tiles
 					continue;
 
 				Tile& tile = m_NewLayer.GetTile(cy, cx);
-				if (tile.GetTextureIndex() != oldTextureIndex)
+				if (tile != oldTile)
 					continue;
 
-				tile.SetTextureIndex(m_FillTile.GetTextureIndex());
+				tile = m_FillTile;
 
 				for (const auto& [dy, dx] : directions)
 				{
@@ -59,14 +58,14 @@ namespace Tiles
 				}
 			}
 			
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Execute Fill {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, oldTextureIndex, m_FillTile.GetTextureIndex());
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Execute Fill {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, oldTile.ToString(), m_FillTile.ToString());
 			layers.ReplaceLayer(m_Position.LayerIndex, m_NewLayer);
 		}
 
 		void Undo(Layers& layers) override
 		{
 			Tile& oldTile = m_OldLayer.GetTile(m_Position.RowIndex, m_Position.ColIndex);
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Fill {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, m_FillTile.GetTextureIndex(), oldTile.GetTextureIndex());
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Fill {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, m_FillTile.ToString(), oldTile.ToString());
 			layers.ReplaceLayer(m_Position.LayerIndex, m_OldLayer);
 		}
 

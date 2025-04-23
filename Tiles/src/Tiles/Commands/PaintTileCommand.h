@@ -21,21 +21,21 @@ namespace Tiles
 
 		virtual void Execute(Layers& layers) override
 		{
-			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
+			Tile& currentTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
 			
 			// Dont execute if the tile is already the same
-			if (curretTile == m_NewTile)
+			if (currentTile == m_NewTile)
 				return;
 
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Paint {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_NewTile.GetTextureIndex());
-			curretTile = m_NewTile;
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Exectute Paint {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, currentTile.ToString(), m_NewTile.ToString());
+			currentTile = m_NewTile;
 		}
 
 		virtual void Undo(Layers& layers) override
 		{
-			Tile& curretTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
-			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Paint {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, curretTile.GetTextureIndex(), m_PreviousTile.GetTextureIndex());
-			curretTile = m_PreviousTile;
+			Tile& currentTile = layers.GetTile(m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex);
+			LUMINA_LOG_INFO("Position: ({}, {}, {}) Undo Paint {} With {}", m_Position.LayerIndex, m_Position.RowIndex, m_Position.ColIndex, currentTile.ToString(), m_PreviousTile.ToString());
+			currentTile = m_PreviousTile;
 		}
 
 		virtual bool Validate(const Command& other) const override
