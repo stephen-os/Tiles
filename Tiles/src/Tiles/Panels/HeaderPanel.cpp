@@ -52,7 +52,7 @@ namespace Tiles
             m_ShowNewPopup = true;
         }
 
-        if (ImGui::IsKeyPressed(ImGuiKey_S, false))
+        if (ImGui::IsKeyPressed(ImGuiKey_S, false) && ImGui::GetIO().KeyCtrl)
         {
             if (Project::HasPath()) 
             {
