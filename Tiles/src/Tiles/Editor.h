@@ -43,6 +43,7 @@ namespace Tiles
         virtual void OnUIRender() override
         {
 
+
 #ifdef LUMINA_DEBUG
             ImGui::Begin("FPS Counter");
             ImGui::Text("FPS: %.1f", m_FPS);
