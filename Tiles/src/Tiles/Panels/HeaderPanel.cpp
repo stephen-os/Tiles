@@ -183,6 +183,10 @@ namespace Tiles
             {
                 Project::Load("res/maps/example_map2.json", *m_Layers, *m_Atlas);
             }
+            if (ImGui::MenuItem("Dev Start 1"))
+            {
+                Project::Load("res/maps/dev_start1.json", *m_Layers, *m_Atlas);
+            }
             ImGui::EndMenu();
 		}
     }
