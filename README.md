@@ -21,11 +21,11 @@ Tiles was inspired by the popular framework Tiled, which provides a structured a
 ## 🔧 Technical Dependencies
 Tiles is built using several key libraries:
 
-- **[Lumina](https://github.com/Resetss/Lumina)** – A custom rendering and application framework.  
-- **[ImGui](https://github.com/Resetss/imgui)** – A GUI library for in-application UI controls.  
-- **[ImGuiFileDialog](https://github.com/Resetss/ImGuiFileDialog)** – A file dialog extension for ImGui, allowing easy texture selection.  
-- **[GLFW](https://github.com/Resetss/glfw)** – Handles window management and input handling.  
-- **[Glad](https://github.com/Resetss/glad)** – An OpenGL loader that manages API function pointers.  
+- **[Lumina](https://github.com/stephen-os/Lumina)** – A custom rendering and application framework.  
+- **[ImGui](https://github.com/stephen-os/imgui)** – A GUI library for in-application UI controls.  
+- **[ImGuiFileDialog](https://github.com/stephen-os/ImGuiFileDialog)** – A file dialog extension for ImGui, allowing easy texture selection.  
+- **[GLFW](https://github.com/stephen-os/glfw)** – Handles window management and input handling.  
+- **[Glad](https://github.com/stephen-os/glad)** – An OpenGL loader that manages API function pointers.  
 - **[GLM](https://github.com/g-truc/glm)** – A C++ mathematics library optimized for graphics applications.  
 
 ## 🎨 Font
@@ -45,7 +45,7 @@ ModeSeven by Andrew Bulhak.
 ### 🛠️ Setup Instructions
 1. Clone the repository with all dependencies:
    ```sh
-   git clone --recursive https://github.com/Resetss/Tiles.git
+   git clone --recursive https://github.com/stephen-os/Tiles.git
    ```
 2. Navigate to the `scripts` folder and run the `Setup` script.
 3. Open the `.sln` file in Visual Studio 2017 or later.
