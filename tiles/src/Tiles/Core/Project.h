@@ -1,0 +1,70 @@
+#pragma once
+
+#include <string>
+#include <memory>
+#include <chrono>
+#include <vector>
+#include <filesystem>
+
+#include "json.hpp"
+
+#include "Tile.h"
+#include "TileLayer.h"
+#include "LayerStack.h"
+
+#include "Lumina/Graphics/TextureAtlas.h"
+
+using namespace Lumina;
+
+namespace Tiles
+{
+    class Project
+    {
+    public:
+        Project(uint32_t width, uint32_t height, const std::string& name = "Untitled Project");
+        ~Project() = default;
+
+		static void Serialize(const Project& project, const std::filesystem::path& filePath);
+		static std::unique_ptr<Project> Deserialize(const std::filesystem::path& filePath);
+
+        const std::string& GetProjectName() const { return m_ProjectName; }
+        const std::filesystem::path& GetFilePath() const { return m_FilePath; }
+        auto GetLastAccessed() const { return m_LastAccessed; }
+        auto GetLastSaved() const { return m_LastSaved; }
+
+        void SetProjectName(const std::string& name) { m_ProjectName = name; MarkAsModified(); }
+        void SetFilePath(const std::string& path) { m_FilePath = path; }
+        void UpdateLastAccessed() { m_LastAccessed = std::chrono::steady_clock::now(); }
+        void UpdateLastSaved() { m_LastSaved = std::chrono::steady_clock::now(); }
+
+        void MarkAsModified() { m_HasUnsavedChanges = true; }
+        void MarkAsSaved() { m_HasUnsavedChanges = false; UpdateLastSaved(); }
+        bool IsNew() const { return m_FilePath.empty(); }
+        bool HasUnsavedChanges() const { return m_HasUnsavedChanges; }
+
+        std::vector<Ref<TextureAtlas>>& GetTextureAtlases() { return m_TextureAtlases; }
+        const std::vector<Ref<TextureAtlas>>& GetTextureAtlases() const { return m_TextureAtlases; }
+
+        LayerStack& GetLayerStack() { return m_LayerStack; }
+        const LayerStack& GetLayerStack() const { return m_LayerStack; }
+
+        void AddTextureAtlas(Ref<TextureAtlas> atlas);
+        Ref<TextureAtlas> GetTextureAtlas(size_t index); 
+        void RemoveTextureAtlas(size_t index);
+        void ClearTextureAtlases();
+        size_t GetTextureAtlasCount() const { return m_TextureAtlases.size(); }
+
+        nlohmann::json ToJSON() const;
+        static Project FromJSON(const nlohmann::json& jsonProject);
+
+    private:
+        std::string m_ProjectName;
+        std::filesystem::path m_FilePath;
+        std::chrono::steady_clock::time_point m_LastAccessed;
+        std::chrono::steady_clock::time_point m_LastSaved;
+        bool m_HasUnsavedChanges = false;
+
+        std::vector<Ref<TextureAtlas>> m_TextureAtlases;
+        LayerStack m_LayerStack;
+    };
+}

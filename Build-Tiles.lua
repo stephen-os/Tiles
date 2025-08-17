@@ -6,8 +6,8 @@ workspace "Tiles"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-include "Lumina/LuminaExternal.lua"
+include "lumina/lumina-external.lua"
 
 group "App"
-   include "Tiles/Tiles.lua"
+   include "tiles"
 group ""
