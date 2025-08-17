@@ -2,8 +2,7 @@
 
 #include "Panel.h"
 
-#include "Lumina/Graphics/TextureAtlas.h"
-#include "Lumina/Graphics/Texture.h"
+#include "Lumina/Lumina.h"
 
 #include "imgui.h"
 

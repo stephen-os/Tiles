@@ -1,6 +1,5 @@
 #include "PanelBrushPreview.h"
 
-#include "Lumina/Graphics/Renderer2D.h"
 #include "Lumina/Core/Log.h"
 
 #include <algorithm>
@@ -51,11 +50,12 @@ namespace Tiles
 
     PanelBrushPreview::PanelBrushPreview()
     {
-		auto bounds = CameraSettings::DEFAULT_BOUNDS;
-        m_Camera.SetBounds(-bounds, bounds, -bounds, bounds);
+        m_Camera = CreateRef<OrthographicCamera>();
 
-        m_Camera.SetPosition({ 0.0f, 0.0f, 1.0f });
-        m_Camera.LookAt({ 0.0f, 0.0f, 0.0f });
+        auto bounds = CameraSettings::DEFAULT_BOUNDS;
+        m_Camera->SetBounds(-bounds, bounds, -bounds, bounds);
+        m_Camera->SetPosition({ 0.0f, 0.0f, 1.0f });
+        m_Camera->LookAt({ 0.0f, 0.0f, 0.0f });
 
         m_PreviewRenderTarget = Renderer2D::CreateRenderTarget(512, 512);
     }
@@ -75,7 +75,6 @@ namespace Tiles
 
         Tile& brush = m_Context->GetBrush();
 
-        // Calculate square preview dimensions
         auto windowSize = ImGui::GetContentRegionAvail();
         windowSize.x = std::max(windowSize.x, UILayout::MIN_WINDOW_SIZE);
         windowSize.y = std::max(windowSize.y, UILayout::MIN_WINDOW_SIZE);
@@ -83,16 +82,14 @@ namespace Tiles
         float previewSize = std::min(windowSize.x, windowSize.y);
         ImVec2 previewDimensions(previewSize, previewSize);
 
-        // Update camera based on zoom and pan
         float bounds = CameraSettings::DEFAULT_BOUNDS / m_ZoomLevel;
-        m_Camera.SetBounds(
-            -bounds + m_PanOffset.x, 
-             bounds + m_PanOffset.x,
-             bounds + m_PanOffset.y, 
+        m_Camera->SetBounds(
+            -bounds + m_PanOffset.x,
+            bounds + m_PanOffset.x,
+            bounds + m_PanOffset.y,
             -bounds + m_PanOffset.y
         );
 
-        // Render the preview
         uint32_t resolutionX = static_cast<uint32_t>(previewDimensions.x);
         uint32_t resolutionY = static_cast<uint32_t>(previewDimensions.y);
 
@@ -117,13 +114,10 @@ namespace Tiles
         Renderer2D::End();
         Renderer2D::SetRenderTarget(nullptr);
 
-        // Handle mouse interaction
         HandleMouseInteraction(previewDimensions);
 
-        // Display rendered preview
         ImGui::Image(reinterpret_cast<void*>(static_cast<uintptr_t>(m_PreviewRenderTarget->GetTexture())), previewDimensions);
 
-        // Brush information panel
         ImGui::Spacing();
         ImGui::Separator();
         RenderBrushInfo();
@@ -133,8 +127,7 @@ namespace Tiles
 
     void PanelBrushPreview::Update()
     {
-        // This panel does not require any specific update logic
-	}
+    }
 
     void PanelBrushPreview::RenderPreviewControls()
     {
@@ -162,65 +155,58 @@ namespace Tiles
 
     void PanelBrushPreview::RenderBackground()
     {
-        QuadAttributes backgroundQuad;
-        backgroundQuad.Position = { 0.0f, 0.0f, RenderDepths::BACKGROUND };
-        backgroundQuad.Size = { RenderSettings::BACKGROUND_SIZE, RenderSettings::BACKGROUND_SIZE };
-        backgroundQuad.TintColor = { m_BackgroundBrightness, m_BackgroundBrightness, m_BackgroundBrightness, 1.0f };
-        Renderer2D::DrawQuad(backgroundQuad);
+        Renderer2D::SetQuadPosition({ 0.0f, 0.0f, RenderDepths::BACKGROUND });
+        Renderer2D::SetQuadSize({ RenderSettings::BACKGROUND_SIZE, RenderSettings::BACKGROUND_SIZE });
+        Renderer2D::SetQuadTintColor({ m_BackgroundBrightness, m_BackgroundBrightness, m_BackgroundBrightness, 1.0f });
+        Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
+        Renderer2D::DrawQuad();
     }
 
     void PanelBrushPreview::RenderGrid()
     {
-        // Vertical lines
+        Renderer2D::SetLineColor(Colors::GRID_COLOR);
+        Renderer2D::SetLineThickness(RenderSettings::GRID_LINE_THICKNESS);
+
         for (float x = -CameraSettings::DEFAULT_BOUNDS; x <= CameraSettings::DEFAULT_BOUNDS; x += RenderSettings::GRID_SPACING)
         {
-            LineAttributes verticalLine;
-            verticalLine.Start = { x, -CameraSettings::DEFAULT_BOUNDS, RenderDepths::GRID };
-            verticalLine.End = { x, CameraSettings::DEFAULT_BOUNDS, RenderDepths::GRID };
-            verticalLine.Color = Colors::GRID_COLOR;
-            verticalLine.Thickness = RenderSettings::GRID_LINE_THICKNESS;
-            Renderer2D::DrawLine(verticalLine);
+            Renderer2D::SetLineStart({ x, -CameraSettings::DEFAULT_BOUNDS, RenderDepths::GRID });
+            Renderer2D::SetLineEnd({ x, CameraSettings::DEFAULT_BOUNDS, RenderDepths::GRID });
+            Renderer2D::DrawLine();
         }
 
-        // Horizontal lines
         for (float y = -CameraSettings::DEFAULT_BOUNDS; y <= CameraSettings::DEFAULT_BOUNDS; y += RenderSettings::GRID_SPACING)
         {
-            LineAttributes horizontalLine;
-            horizontalLine.Start = { -CameraSettings::DEFAULT_BOUNDS, y, RenderDepths::GRID };
-            horizontalLine.End = { CameraSettings::DEFAULT_BOUNDS, y, RenderDepths::GRID };
-            horizontalLine.Color = Colors::GRID_COLOR;
-            horizontalLine.Thickness = RenderSettings::GRID_LINE_THICKNESS;
-            Renderer2D::DrawLine(horizontalLine);
+            Renderer2D::SetLineStart({ -CameraSettings::DEFAULT_BOUNDS, y, RenderDepths::GRID });
+            Renderer2D::SetLineEnd({ CameraSettings::DEFAULT_BOUNDS, y, RenderDepths::GRID });
+            Renderer2D::DrawLine();
         }
     }
 
     void PanelBrushPreview::RenderBrush(const Tile& brush)
     {
-        QuadAttributes brushAttributes;
-        brushAttributes.Position = { 0.0f, 0.0f, RenderDepths::BRUSH };
-        brushAttributes.Size = brush.GetSize();
-        brushAttributes.Rotation = brush.GetRotation();
-        brushAttributes.TextureCoords = brush.GetTextureCoords();
-        brushAttributes.TintColor = brush.GetTint();
+        Renderer2D::SetQuadPosition({ 0.0f, 0.0f, RenderDepths::BRUSH });
+        Renderer2D::SetQuadSize(brush.GetSize());
+        Renderer2D::SetQuadRotation(brush.GetRotation());
+        Renderer2D::SetQuadTextureCoords(brush.GetTextureCoords());
+        Renderer2D::SetQuadTintColor(brush.GetTint());
 
-        // Set texture if brush is textured and has valid atlas
         if (brush.IsTextured() && brush.HasValidAtlas())
         {
             auto texture = m_Context->GetProject().GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
-            brushAttributes.Texture = texture;
+            Renderer2D::SetQuadTexture(texture);
         }
 
-        Renderer2D::DrawQuad(brushAttributes);
+        Renderer2D::DrawQuad();
     }
 
     void PanelBrushPreview::RenderBounds(const Tile& brush)
     {
-        QuadAttributes boundsQuad;
-        boundsQuad.Position = { 0.0f, 0.0f, RenderDepths::BOUNDS };
-        boundsQuad.Size = { brush.GetSize().x + RenderSettings::BOUNDS_OFFSET,
-                          brush.GetSize().y + RenderSettings::BOUNDS_OFFSET };
-        boundsQuad.TintColor = Colors::BOUNDS_COLOR;
-        Renderer2D::DrawQuad(boundsQuad);
+        Renderer2D::SetQuadPosition({ 0.0f, 0.0f, RenderDepths::BOUNDS });
+        Renderer2D::SetQuadSize({ brush.GetSize().x + RenderSettings::BOUNDS_OFFSET,
+                                  brush.GetSize().y + RenderSettings::BOUNDS_OFFSET });
+        Renderer2D::SetQuadTintColor(Colors::BOUNDS_COLOR);
+        Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
+        Renderer2D::DrawQuad();
     }
 
     void PanelBrushPreview::HandleMouseInteraction(const ImVec2& previewSize)
@@ -229,7 +215,6 @@ namespace Tiles
 
         ImGui::InvisibleButton("PreviewCanvas", previewSize);
 
-        // Handle panning with left mouse drag
         if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
         {
             ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
@@ -242,7 +227,6 @@ namespace Tiles
             ImGui::ResetMouseDragDelta(ImGuiMouseButton_Left);
         }
 
-        // Handle zooming with mouse wheel
         if (ImGui::IsItemHovered())
         {
             float wheel = ImGui::GetIO().MouseWheel;
@@ -253,7 +237,6 @@ namespace Tiles
             }
         }
 
-        // Restore cursor position for image display
         ImGui::SetCursorScreenPos(canvasPos);
     }
 
@@ -269,7 +252,6 @@ namespace Tiles
             ImGui::TableSetupColumn("Property", ImGuiTableColumnFlags_WidthFixed, UILayout::PROPERTY_COLUMN_WIDTH);
             ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
-            // Textured status
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::Text("Textured:");
@@ -279,7 +261,6 @@ namespace Tiles
                 ImGui::TextColored(color, brush.IsTextured() ? "Yes" : "No");
             }
 
-            // Atlas index (if textured)
             if (brush.IsTextured())
             {
                 ImGui::TableNextRow();
@@ -296,7 +277,6 @@ namespace Tiles
                 }
             }
 
-            // Size
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::Text("Size:");
@@ -306,7 +286,6 @@ namespace Tiles
                 ImGui::Text("%.2f x %.2f", size.x, size.y);
             }
 
-            // Rotation
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::Text("Rotation:");
@@ -316,7 +295,6 @@ namespace Tiles
                 ImGui::Text("%.1f\u00B0, %.1f\u00B0, %.1f\u00B0", rotation.x, rotation.y, rotation.z);
             }
 
-            // Tint
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::Text("Tint:");
@@ -326,7 +304,6 @@ namespace Tiles
                 ImGui::Text("R:%.2f G:%.2f B:%.2f A:%.2f", tint.r, tint.g, tint.b, tint.a);
             }
 
-            // UV Coordinates
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::Text("UV Coords:");

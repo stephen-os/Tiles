@@ -1,6 +1,8 @@
 #pragma once
 #include "Panel.h"
-#include "Lumina/Graphics/Texture.h"
+
+#include "Lumina/Lumina.h"
+
 #include <glm/glm.hpp>
 
 using namespace Lumina;

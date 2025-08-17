@@ -2,11 +2,11 @@
 
 #include "imgui.h"
 
-#include "Panels/PanelLayerSelection.h"
-#include "Panels/PanelToolSelection.h"
-#include "Panels/PanelTextureSelection.h"
-#include "Panels/PanelBrushPreview.h"
-#include "Panels/PanelTileAttributes.h"
+// #include "Panels/PanelLayerSelection.h"
+// #include "Panels/PanelToolSelection.h"
+// #include "Panels/PanelTextureSelection.h"
+// #include "Panels/PanelBrushPreview.h"
+// #include "Panels/PanelTileAttributes.h"
 #include "Panels/PanelViewport.h"
 
 #include "Lumina/Core/Log.h"
@@ -29,11 +29,11 @@ namespace Tiles
         m_PanelManager.SetContext(activeContext);
 
         // Initialize panels
-        m_PanelManager.RegisterPanel<PanelLayerSelection>();
-        m_PanelManager.RegisterPanel<PanelToolSelection>();
-        m_PanelManager.RegisterPanel<PanelTextureSelection>(); 
-        m_PanelManager.RegisterPanel<PanelBrushPreview>(); 
-		m_PanelManager.RegisterPanel<PanelTileAttributes>();
+        // m_PanelManager.RegisterPanel<PanelLayerSelection>();
+        // m_PanelManager.RegisterPanel<PanelToolSelection>();
+        // m_PanelManager.RegisterPanel<PanelTextureSelection>(); 
+        // m_PanelManager.RegisterPanel<PanelBrushPreview>(); 
+		// m_PanelManager.RegisterPanel<PanelTileAttributes>();
         m_PanelManager.RegisterPanel<PanelViewport>();
     }
 

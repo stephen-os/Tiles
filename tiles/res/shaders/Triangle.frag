@@ -3,12 +3,9 @@
 layout(location = 0) out vec4 o_Color;
 
 in vec3 v_WorldPos;
-in vec3 v_LocalPosition;
 in vec4 v_Color;
 in vec2 v_TexCoord;
 flat in float v_TexIndex;
-in float v_Thickness;
-in float v_Fade;
 
 uniform int u_EnableLighting;
 uniform vec3 u_AmbientColor;
@@ -176,29 +173,12 @@ void main()
         return; 
     }
     
-    float dist = length(v_LocalPosition.xy);
-    
-    if (dist > 1.0) {
-        discard;
-    }
-    
-    float innerRadius = max(0.0, 1.0 - v_Thickness);
-    if (dist < innerRadius)
-        discard;
-    
-    float alpha = 1.0;
-    if (v_Fade > 0.0) 
-    {
-        alpha *= 1.0 - smoothstep(1.0 - v_Fade, 1.0, dist);
-        if (v_Thickness < 1.0)
-            alpha *= smoothstep(innerRadius, innerRadius + v_Fade, dist);
-    }
-    
     vec4 texColor = vec4(1.0);
-    int texIndex = int(v_TexIndex + 0.5);
+    int index = int(v_TexIndex);
+    texColor = texture(u_Textures[index], v_TexCoord);
     
-    if (texIndex >= 0 && texIndex < 32)
-        texColor = texture(u_Textures[texIndex], v_TexCoord);
+    if (texColor.a < 0.001)
+        discard; 
     
     vec4 finalColor = texColor * v_Color;
     
@@ -226,6 +206,5 @@ void main()
         }
     }
     
-    finalColor.a *= alpha;
     o_Color = finalColor;
 }

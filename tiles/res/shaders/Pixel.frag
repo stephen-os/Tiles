@@ -3,12 +3,7 @@
 layout(location = 0) out vec4 o_Color;
 
 in vec3 v_WorldPos;
-in vec3 v_LocalPosition;
 in vec4 v_Color;
-in vec2 v_TexCoord;
-flat in float v_TexIndex;
-in float v_Thickness;
-in float v_Fade;
 
 uniform int u_EnableLighting;
 uniform vec3 u_AmbientColor;
@@ -50,9 +45,6 @@ layout(std140, binding = 1) uniform PointLights
 {
     PointLight u_PointLights[32];
 };
-
-uniform int u_WireframeMode;
-layout(binding = 0) uniform sampler2D u_Textures[32];
 
 float CalculateAttenuation(float distance, float radius, int falloffType, float falloffParam)
 {
@@ -170,37 +162,7 @@ vec3 CalculatePointLight(int lightIndex, vec3 worldPos)
 
 void main()
 {
-    if (u_WireframeMode == 1)
-    {
-        o_Color = v_Color; 
-        return; 
-    }
-    
-    float dist = length(v_LocalPosition.xy);
-    
-    if (dist > 1.0) {
-        discard;
-    }
-    
-    float innerRadius = max(0.0, 1.0 - v_Thickness);
-    if (dist < innerRadius)
-        discard;
-    
-    float alpha = 1.0;
-    if (v_Fade > 0.0) 
-    {
-        alpha *= 1.0 - smoothstep(1.0 - v_Fade, 1.0, dist);
-        if (v_Thickness < 1.0)
-            alpha *= smoothstep(innerRadius, innerRadius + v_Fade, dist);
-    }
-    
-    vec4 texColor = vec4(1.0);
-    int texIndex = int(v_TexIndex + 0.5);
-    
-    if (texIndex >= 0 && texIndex < 32)
-        texColor = texture(u_Textures[texIndex], v_TexCoord);
-    
-    vec4 finalColor = texColor * v_Color;
+    vec4 finalColor = v_Color;
     
     if (u_EnableLighting == 1)
     {
@@ -226,6 +188,5 @@ void main()
         }
     }
     
-    finalColor.a *= alpha;
     o_Color = finalColor;
 }

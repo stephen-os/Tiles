@@ -1,11 +1,7 @@
 #pragma once
-
 #include "Panel.h"
-
 #include "glm/glm.hpp"
-
 #include "imgui.h"
-
 #include <functional>
 
 namespace Tiles
@@ -15,16 +11,14 @@ namespace Tiles
     public:
         PanelTileAttributes() = default;
         ~PanelTileAttributes() = default;
-
         void Render() override;
-		void Update() override;
+        void Update() override;
 
     private:
         void RenderRotationControls();
         void RenderSizeControls();
         void RenderTintControls();
         void RenderResetButtons();
-
         void RenderSeparator();
         void RenderSectionHeader(const char* title, const ImVec4& color);
         void RenderRotationSlider(const char* label, float& value);
@@ -37,10 +31,9 @@ namespace Tiles
         void RenderIndividualResetButtons(float buttonWidth);
         void RenderStyledButton(const char* label, const ImVec2& size, std::function<void()> onClick);
         void RenderResetAllButton();
-
         float CalculateResetButtonWidth();
-    
-    private: 
+
+    private:
         float m_SliderWidth = 200.0f;
         bool m_LinkSizeComponents = true;
         glm::vec3 m_TempRotation = { 0.0f, 0.0f, 0.0f };

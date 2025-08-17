@@ -79,7 +79,7 @@ namespace Tiles
         RenderToolButton(ToolIDs::FILL_MODE, m_FillTexture, PaintingMode::Fill);
     }
 
-    void PanelToolSelection::RenderToolButton(const char* id, const Ref<Lumina::Texture>& texture, PaintingMode mode)
+    void PanelToolSelection::RenderToolButton(const char* id, const Ref<Texture>& texture, PaintingMode mode)
     {
         if (!texture)
         {

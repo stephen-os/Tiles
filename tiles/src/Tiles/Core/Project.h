@@ -12,7 +12,7 @@
 #include "TileLayer.h"
 #include "LayerStack.h"
 
-#include "Lumina/Graphics/TextureAtlas.h"
+#include "Lumina/Lumina.h"
 
 using namespace Lumina;
 

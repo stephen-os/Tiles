@@ -2,11 +2,11 @@
 
 #include "Panel.h"
 
-#include "Lumina/Graphics/Cameras/OrthographicCamera.h"
-
-#include "Lumina/Graphics/RenderTarget.h"
+#include "Lumina/Lumina.h"
 
 #include "imgui.h"
+
+using namespace Lumina;
 
 namespace Tiles
 {
@@ -15,9 +15,9 @@ namespace Tiles
     public:
         PanelBrushPreview();
         ~PanelBrushPreview() = default;
-        
+
         void Render() override;
-		void Update() override; 
+        void Update() override;
 
     private:
         void RenderPreviewControls();
@@ -29,9 +29,8 @@ namespace Tiles
         void HandleMouseInteraction(const ImVec2& previewSize);
 
     private:
-        OrthographicCamera m_Camera;
+        Ref<OrthographicCamera> m_Camera;
         Ref<RenderTarget> m_PreviewRenderTarget;
-
         bool m_ShowGrid = true;
         bool m_ShowBounds = false;
         float m_BackgroundBrightness = 0.2f;

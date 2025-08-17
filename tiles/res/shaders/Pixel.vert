@@ -7,12 +7,11 @@ out vec3 v_WorldPos;
 out vec4 v_Color;
 
 uniform mat4 u_ViewProjection;
-uniform int u_WireframeMode;
-uniform vec3 u_WireframeColor;
 
 void main()
 {
     v_WorldPos = a_Position;
-    v_Color = (u_WireframeMode == 1) ? vec4(u_WireframeColor, 1.0f) : a_Color;
+    v_Color = a_Color;
     gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
+    gl_PointSize = 1.0;
 }
