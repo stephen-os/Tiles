@@ -22,10 +22,10 @@ namespace Tiles
 		void SetAtlasIndex(size_t index) { m_AtlasIndex = index; }
 		bool HasValidAtlas() const { return m_AtlasIndex != INVALID_ATLAS_INDEX; }
 
-		glm::vec3 GetRotation() { return m_Rotation; };
-		glm::vec2 GetSize() { return m_Size; };
-		glm::vec4 GetTint() { return TintColor; };
-		glm::vec4 GetTextureCoords() { return m_TextureCoords; };
+		glm::vec3& GetRotation() { return m_Rotation; };
+		glm::vec2& GetSize() { return m_Size; };
+		glm::vec4& GetTint() { return TintColor; };
+		glm::vec4& GetTextureCoords() { return m_TextureCoords; };
 
 		const glm::vec3& GetRotation() const { return m_Rotation; }
 		const glm::vec2& GetSize() const { return m_Size; }
