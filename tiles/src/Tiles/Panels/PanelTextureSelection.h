@@ -9,7 +9,7 @@ namespace Tiles
     class PanelTextureSelection : public Panel
     {
     public:
-        PanelTextureSelection();
+        PanelTextureSelection(Ref<Context> context);
         ~PanelTextureSelection() = default;
 
         void Render() override;

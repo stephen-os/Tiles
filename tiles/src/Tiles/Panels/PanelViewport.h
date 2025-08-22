@@ -11,7 +11,7 @@ namespace Tiles
     class PanelViewport : public Panel
     {
     public:
-        PanelViewport();
+        PanelViewport(Ref<Context> context);
         ~PanelViewport() = default;
 
         void Render() override;

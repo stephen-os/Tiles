@@ -17,7 +17,7 @@ namespace Tiles
     class PanelToolSelection : public Panel
     {
     public:
-        PanelToolSelection();
+        PanelToolSelection(Ref<Context> context);
         ~PanelToolSelection() = default;
 
         void Render() override;

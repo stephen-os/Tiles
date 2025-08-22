@@ -10,7 +10,7 @@ namespace Tiles
 	class PanelManager
 	{
 	public:
-		PanelManager() = default; 
+		PanelManager() = default;
 		~PanelManager() = default;
 
 		template<typename TPanel, typename... Args>
@@ -24,8 +24,6 @@ namespace Tiles
 
 		void Render();
 		void Update();
-
-		void SetContext(Context* context);
 
 	private:
 		std::vector<std::unique_ptr<Panel>> m_Panels;

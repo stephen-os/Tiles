@@ -6,7 +6,7 @@
 
 namespace Tiles
 {
-    PanelViewport::PanelViewport() : m_TileSize(Viewport::Render::DefaultTileSize)
+    PanelViewport::PanelViewport(Ref<Context> context) : Panel(context), m_TileSize(Viewport::Render::DefaultTileSize)
     {
         m_RenderTarget = Lumina::Renderer2D::CreateRenderTarget(512, 512);
         m_Camera = Lumina::CreateRef<Lumina::OrthographicCamera>();

@@ -18,7 +18,7 @@ namespace Tiles
     class PanelLayerSelection : public Panel
     {
     public:
-        PanelLayerSelection() = default;
+        PanelLayerSelection(Ref<Context> context) : Panel(context) {}
         ~PanelLayerSelection() = default;
 
         void Render() override;

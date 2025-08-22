@@ -4,7 +4,7 @@
 
 namespace Tiles
 {
-    PanelBrushPreview::PanelBrushPreview()
+    PanelBrushPreview::PanelBrushPreview(Ref<Context> context) : Panel(context)
     {
         m_Camera = Lumina::CreateRef<Lumina::OrthographicCamera>();
 

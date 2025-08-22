@@ -4,7 +4,7 @@
 
 namespace Tiles
 {
-    PanelToolSelection::PanelToolSelection()
+    PanelToolSelection::PanelToolSelection(Ref<Context> context) : Panel(context)
     {
         LoadTextures();
     }

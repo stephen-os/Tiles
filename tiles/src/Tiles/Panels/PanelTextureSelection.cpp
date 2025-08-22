@@ -7,8 +7,8 @@
 
 namespace Tiles
 {
-    PanelTextureSelection::PanelTextureSelection()
-    {
+    PanelTextureSelection::PanelTextureSelection(Ref<Context> context) : Panel(context)
+    { 
         m_CheckerboardTexture = Lumina::Texture::Create(AssetPath::Checkerboard);
     }
 

@@ -14,7 +14,7 @@ namespace Tiles
     class PanelBrushPreview : public Panel
     {
     public:
-        PanelBrushPreview();
+        PanelBrushPreview(Ref<Context> context);
         ~PanelBrushPreview() = default;
 
         void Render() override;

@@ -20,6 +20,19 @@ namespace Tiles
     class Context
     {
     public:
+
+        static Ref<Context> Create(Ref<Project> project)
+        {
+            return CreateRef<Context>(project);
+		}
+
+		// For default project
+        static Ref<Context> Create()
+        {
+			auto project = CreateRef<Project>(16, 16, "Untitled");
+            return CreateRef<Context>(project);
+        }
+
         Context(std::shared_ptr<Project> project);
         ~Context() = default;
 

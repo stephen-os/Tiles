@@ -10,7 +10,7 @@ namespace Tiles
     class PanelBrushAttributes : public Panel
     {
     public:
-        PanelBrushAttributes() = default;
+        PanelBrushAttributes(Ref<Context> context) : Panel(context) {}
         ~PanelBrushAttributes() = default;
 
         void Render() override;

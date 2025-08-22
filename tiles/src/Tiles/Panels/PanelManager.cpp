@@ -22,12 +22,4 @@ namespace Tiles
 	{
 		m_Panels.clear(); 
 	}
-
-	void PanelManager::SetContext(Context* context)
-	{
-		for (auto& panel : m_Panels)
-		{
-			panel->SetContext(context);
-		}
-	}
 }

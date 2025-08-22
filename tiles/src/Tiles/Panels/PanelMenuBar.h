@@ -10,7 +10,7 @@ namespace Tiles
     class PanelMenuBar : public Panel
     {
     public:
-        PanelMenuBar() = default;
+        PanelMenuBar(Ref<Context> context) : Panel(context) {}
         ~PanelMenuBar() = default;
 
         void Render() override;

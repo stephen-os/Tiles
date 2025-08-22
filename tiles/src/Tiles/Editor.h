@@ -6,8 +6,6 @@
 #include "Lumina/Core/Layer.h"
 #include "Lumina/Utils/Timer.h"
 
-#include "Core/ContextManager.h"
-
 #include "Panels/PanelManager.h"
 
 namespace Tiles
@@ -21,7 +19,6 @@ namespace Tiles
         virtual void OnUIRender() override;
 
     private:
-        ContextManager m_ContextManager;
         PanelManager m_PanelManager;
 
         Lumina::Timer m_FrameTimer;
