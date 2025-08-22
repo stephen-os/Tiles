@@ -98,6 +98,43 @@ namespace Tiles
         constexpr const char* Fill = "res/assets/bucket.png";
     }
 
+    namespace Viewport
+    {
+        namespace Render
+        {
+            constexpr float DefaultTileSize = 64.0f;
+            constexpr float MinZoom = 0.5f;
+            constexpr float MaxZoom = 3.0f;
+            constexpr float ZoomSensitivity = 0.01f;
+            constexpr float PanSensitivity = 2.0f;
+        }
+
+        namespace Depth
+        {
+            constexpr float Grid = -1.0f;
+            constexpr float Outline = -0.5f;
+            constexpr float Tile = 0.0f;
+            constexpr float Overlay = 0.1f;
+            constexpr float HoverTile = 0.2f;
+        }
+
+        namespace Input
+        {
+            constexpr float CameraMoveSpeed = 0.5f;
+            constexpr float MousePanSensitivity = 0.002f;
+        }
+
+        namespace Grid
+        {
+            constexpr float HoverOutlineThickness = 2.0f;
+            constexpr glm::vec4 GridColor = { 0.5f, 0.5f, 0.5f, 0.8f };
+            constexpr glm::vec4 CheckerColor1 = { 0.27f, 0.27f, 0.27f, 1.0f };
+            constexpr glm::vec4 CheckerColor2 = { 0.15f, 0.15f, 0.15f, 1.0f };
+            constexpr glm::vec4 BoundaryColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+            constexpr glm::vec4 HoverColor = { 0.0f, 1.0f, 0.0f, 0.6f };
+        }
+    }
+
     namespace Texture
     {
         namespace Tile

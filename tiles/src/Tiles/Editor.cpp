@@ -7,6 +7,7 @@
 #include "Panels/PanelTextureSelection.h"
 #include "Panels/PanelBrushPreview.h"
 #include "Panels/PanelBrushAttributes.h"
+#include "Panels/PanelMenuBar.h"
 #include "Panels/PanelViewport.h"
 
 #include "Lumina/Core/Log.h"
@@ -33,6 +34,7 @@ namespace Tiles
         m_PanelManager.RegisterPanel<PanelTextureSelection>(); 
         m_PanelManager.RegisterPanel<PanelBrushPreview>(); 
 		m_PanelManager.RegisterPanel<PanelBrushAttributes>();
+		m_PanelManager.RegisterPanel<PanelMenuBar>();   
         m_PanelManager.RegisterPanel<PanelViewport>();
     }
 

@@ -17,6 +17,8 @@ namespace Tiles
 
 	void Tile::Reset()
 	{
+        m_IsPainted = false; 
+
 		m_IsTexture = false;
 		m_AtlasIndex = INVALID_ATLAS_INDEX;
 
@@ -28,12 +30,13 @@ namespace Tiles
 
 	bool Tile::operator==(const Tile& other) const
 	{
-		return m_IsTexture == other.m_IsTexture
-			&& m_AtlasIndex == other.m_AtlasIndex
-			&& glm::all(glm::epsilonEqual(m_Rotation, other.m_Rotation, EPSILON))
-			&& glm::all(glm::epsilonEqual(m_Size, other.m_Size, EPSILON))
-			&& glm::all(glm::epsilonEqual(TintColor, other.TintColor, EPSILON))
-			&& glm::all(glm::epsilonEqual(m_TextureCoords, other.m_TextureCoords, EPSILON));
+        return m_IsPainted == other.m_IsPainted
+            && m_IsTexture == other.m_IsTexture
+            && m_AtlasIndex == other.m_AtlasIndex
+            && glm::all(glm::epsilonEqual(m_Rotation, other.m_Rotation, EPSILON))
+            && glm::all(glm::epsilonEqual(m_Size, other.m_Size, EPSILON))
+            && glm::all(glm::epsilonEqual(TintColor, other.TintColor, EPSILON))
+            && glm::all(glm::epsilonEqual(m_TextureCoords, other.m_TextureCoords, EPSILON));
 	}
 
 	bool Tile::operator!=(const Tile& other) const

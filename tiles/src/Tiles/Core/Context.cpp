@@ -14,6 +14,8 @@ namespace Tiles
         LUMINA_ASSERT(m_Project, "Project cannot be null");
         ValidateWorkingLayer();
         UpdateLastAccessed();
+
+		m_Brush.SetPainted(true);
     }
 
     void Context::SetWorkingLayer(size_t index)

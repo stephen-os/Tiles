@@ -15,6 +15,9 @@ namespace Tiles
 
 		void Reset();
 
+		bool IsPainted() const { return m_IsPainted; }
+		void SetPainted(bool painted) { m_IsPainted = painted; }
+
 		bool IsTextured() const { return m_IsTexture; }
 		void SetTextured(bool textured) { m_IsTexture = textured; }
 
@@ -46,6 +49,7 @@ namespace Tiles
 		static Tile FromJSON(const nlohmann::json& j);
 
 	private:
+		bool m_IsPainted = false;
 		bool m_IsTexture = false;
 
 		glm::vec3 m_Rotation = { 0.0f, 0.0f, 0.0f };

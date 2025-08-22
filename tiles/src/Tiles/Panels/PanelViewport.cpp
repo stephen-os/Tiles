@@ -1,68 +1,45 @@
 #include "PanelViewport.h"
-
+#include "Constants.h"
 #include "Lumina/Core/Log.h"
 #include "Lumina/Core/Input.h"
-
 #include <algorithm>
 
 namespace Tiles
 {
-    namespace RenderSettings
+    PanelViewport::PanelViewport() : m_TileSize(Viewport::Render::DefaultTileSize)
     {
-        static constexpr float DEFAULT_TILE_SIZE = 64.0f;
-        static constexpr float MIN_ZOOM = 0.5f;
-        static constexpr float MAX_ZOOM = 3.0f;
-        static constexpr float ZOOM_SENSITIVITY = 0.01f;
-        static constexpr float PAN_SENSITIVITY = 2.0f;
-        static constexpr float GRID_Z_DEPTH = -1.0f;
-        static constexpr float OUTLNE_Z_DEPTH = -0.5f;
-        static constexpr float TILE_Z_DEPTH = 0.0f;
-        static constexpr float OVERLAY_Z_DEPTH = 0.1f;
-        static constexpr float HOVER_OUTLINE_THICKNESS = 2.0f;
-    }
+        m_RenderTarget = Lumina::Renderer2D::CreateRenderTarget(512, 512);
+        m_Camera = Lumina::CreateRef<Lumina::OrthographicCamera>();
 
-    namespace InputSettings
-    {
-        static constexpr float CAMERA_MOVE_SPEED = 0.5f;
-        static constexpr float MOUSE_PAN_SENSITIVITY = 0.002f;
-    }
-
-    namespace ColorScheme
-    {
-        static constexpr ImU32 GRID_COLOR = IM_COL32(80, 80, 80, 128);
-        static constexpr ImU32 TILE_OUTLINE_COLOR = IM_COL32(255, 0, 0, 255);
-        static constexpr ImU32 HOVER_OUTLINE_COLOR = IM_COL32(255, 165, 0, 255);
-        static constexpr ImU32 NO_PROJECT_COLOR = IM_COL32(179, 179, 179, 255);
-    }
-
-    namespace UIText
-    {
-        static constexpr const char* WINDOW_TITLE = "Viewport";
-        static constexpr const char* NO_PROJECT_MESSAGE = "No project loaded";
-    }
-
-    PanelViewport::PanelViewport() : m_TileSize(RenderSettings::DEFAULT_TILE_SIZE)
-    {
-        m_RenderTarget = Renderer2D::CreateRenderTarget(512, 512);
-        m_Camera = CreateRef<OrthographicCamera>();
-
+        // Initialize camera position to center of a default 16x16 grid
         const float gridWidth = 16.0f;
         const float gridHeight = 16.0f;
 
-        m_Camera->SetPosition({ m_TileSize * (gridWidth * 0.5f) + m_TileSize * 0.5f,
-                               m_TileSize * (gridHeight * 0.5f) + m_TileSize * 0.5f,
-                               1.0f });
+        m_Camera->SetPosition({
+            m_TileSize * (gridWidth * 0.5f) + m_TileSize * 0.5f,
+            m_TileSize * (gridHeight * 0.5f) + m_TileSize * 0.5f,
+            1.0f
+            });
         m_Camera->SetZoom(1.0f);
 
+        // Initialize hover tile appearance
         m_MouseFollowQuadSize = { m_TileSize * 0.5f, m_TileSize * 0.5f };
-        m_MouseFollowQuadColor = { 0.0f, 1.0f, 0.0f, 0.6f };
+        m_MouseFollowQuadColor = Viewport::Grid::HoverColor;
     }
 
     void PanelViewport::Render()
     {
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-        ImGui::Begin(UIText::WINDOW_TITLE, nullptr, flags);
+        ImGui::Begin("Viewport", nullptr, flags);
 
+        if (!m_Context)
+        {
+            ImGui::TextColored(UI::Color::TextError, "No project loaded");
+            ImGui::End();
+            return;
+        }
+
+        // Update viewport state
         m_MousePosition = ImGui::GetMousePos();
         m_ViewportPosition = ImGui::GetCursorScreenPos();
         m_ViewportSize = ImGui::GetContentRegionAvail();
@@ -71,114 +48,23 @@ namespace Tiles
 
         m_Camera->SetSize(m_ViewportSize.x, m_ViewportSize.y);
 
-        ImDrawList* drawList = ImGui::GetForegroundDrawList();
-        drawList->AddCircleFilled(m_MousePosition, 10.0f, IM_COL32(255, 255, 0, 200));
+        // Begin 3D rendering
+        Lumina::Renderer2D::SetRenderTarget(m_RenderTarget);
+        Lumina::Renderer2D::SetResolution(m_ViewportSize.x, m_ViewportSize.y);
+        Lumina::Renderer2D::Begin(m_Camera);
 
-        {
-            auto worldPosition = ScreenToWorld();
-            glm::vec3 cameraPos = m_Camera->GetPosition();
-            m_MouseFollowQuadPosition = { worldPosition.x + cameraPos.x, worldPosition.y + cameraPos.y, 0.2f };
-        }
+        RenderGrid();
+        RenderLayers();
+        RenderHoverTile();
+        HandleInput();
 
-        Renderer2D::SetRenderTarget(m_RenderTarget);
-        Renderer2D::SetResolution(m_ViewportSize.x, m_ViewportSize.y);
-        Renderer2D::Begin(m_Camera);
+        Lumina::Renderer2D::End();
+        Lumina::Renderer2D::SetRenderTarget(nullptr);
 
-        {
-            glm::vec3 cameraPos = m_Camera->GetPosition();
-
-            Renderer2D::SetGridPosition({ cameraPos.x + m_TileSize / 2, cameraPos.y + m_TileSize / 2, 0.0f });
-            Renderer2D::SetGridSize({ 4096.0f, 4096.0f });
-            Renderer2D::SetGridCellSize(m_TileSize / 2);
-            Renderer2D::SetGridColor({ 0.5f, 0.5f, 0.5f, 0.8f });
-            Renderer2D::SetGridLineWidth(2.0f);
-            Renderer2D::SetGridShowCheckerboard(true);
-            Renderer2D::SetGridCheckerColor1({ 0.27f, 0.27f, 0.27f, 1.0f });
-            Renderer2D::SetGridCheckerColor2({ 0.15f, 0.15f, 0.15f, 1.0f });
-            Renderer2D::DrawGrid();
-
-            const float gridWidth = m_Context->GetProject().GetLayerStack().GetWidth();
-            const float gridHeight = m_Context->GetProject().GetLayerStack().GetHeight();
-            const float offset = m_TileSize * 0.5f;
-
-            Renderer2D::SetLineColor({ 1.0f, 0.0f, 0.0f, 1.0f });
-            Renderer2D::SetLineThickness(2.0f);
-
-            Renderer2D::SetLineStart({ offset + cameraPos.x, offset + cameraPos.y, 0.5f });
-            Renderer2D::SetLineEnd({ m_TileSize * gridWidth + offset + cameraPos.x, offset + cameraPos.y, 0.5f });
-            Renderer2D::DrawLine();
-
-            Renderer2D::SetLineStart({ offset + cameraPos.x, offset + cameraPos.y, 0.5f });
-            Renderer2D::SetLineEnd({ offset + cameraPos.x, m_TileSize * gridHeight + offset + cameraPos.y, 0.5f });
-            Renderer2D::DrawLine();
-
-            Renderer2D::SetLineStart({ m_TileSize * gridWidth + offset + cameraPos.x, m_TileSize * gridHeight + offset + cameraPos.y, 0.5f });
-            Renderer2D::SetLineEnd({ offset + cameraPos.x, m_TileSize * gridHeight + offset + cameraPos.y, 0.5f });
-            Renderer2D::DrawLine();
-
-            Renderer2D::SetLineStart({ m_TileSize * gridWidth + offset + cameraPos.x, m_TileSize * gridHeight + offset + cameraPos.y, 0.5f });
-            Renderer2D::SetLineEnd({ m_TileSize * gridWidth + offset + cameraPos.x, offset + cameraPos.y, 0.5f });
-            Renderer2D::DrawLine();
-        }
-
-        if (ImGui::IsWindowHovered())
-        {
-            Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
-            Renderer2D::SetQuadSize(m_MouseFollowQuadSize);
-            Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
-            Renderer2D::SetQuadTintColor(m_MouseFollowQuadColor);
-            Renderer2D::DrawQuad();
-        }
-
-        if (ImGui::IsWindowHovered())
-        {
-            const float gridWidth = m_Context->GetProject().GetLayerStack().GetWidth();
-            const float gridHeight = m_Context->GetProject().GetLayerStack().GetHeight();
-
-            auto worldPosition = ScreenToWorld();
-            glm::vec3 cameraPos = m_Camera->GetPosition();
-            glm::ivec2 gridPos = { (int)round(worldPosition.x / m_TileSize), (int)round(worldPosition.y / m_TileSize) };
-
-            if (gridPos.x >= 1 && gridPos.x <= gridWidth && gridPos.y >= 1 && gridPos.y <= gridHeight)
-            {
-                glm::vec2 gridCenter = { gridPos.x * m_TileSize, gridPos.y * m_TileSize };
-
-                if (Input::IsMouseButtonPressed(MouseCode::Left))
-                {
-                    LUMINA_LOG_INFO("Painting Tile");
-                    m_Context->PaintTile(gridPos.x, gridPos.y);
-                }
-
-                auto tile = m_Context->GetBrush();
-
-                Renderer2D::SetQuadPosition({ gridCenter.x + cameraPos.x, gridCenter.y + cameraPos.y, 0.1f });
-                Renderer2D::SetQuadRotation(tile.GetRotation());
-                Renderer2D::SetQuadTintColor(tile.GetTint());
-                auto scaler = tile.GetSize();
-                Renderer2D::SetQuadSize({ m_TileSize * scaler.x, m_TileSize * scaler.y });
-
-                if (m_Context->GetProject().GetTextureAtlasCount() > 0)
-                {
-                    if (tile.HasValidAtlas())
-                    {
-                        auto atlas = m_Context->GetProject().GetTextureAtlas(tile.GetAtlasIndex());
-                        if (atlas->HasTexture())
-                        {
-                            Renderer2D::SetQuadTexture(atlas->GetTexture());
-                            Renderer2D::SetQuadTextureCoords(tile.GetTextureCoords());
-                        }
-                    }
-                }
-
-                Renderer2D::DrawQuad();
-            }
-        }
-
-        Renderer2D::End();
-        Renderer2D::SetRenderTarget(nullptr);
-
+        // Display the rendered viewport
         ImGui::Image((void*)m_RenderTarget->GetTexture(), m_ViewportSize);
 
+        // Update mouse wheel delta for zoom
         m_MouseDelta = ImGui::GetIO().MouseWheel;
 
         ImGui::End();
@@ -186,21 +72,353 @@ namespace Tiles
 
     void PanelViewport::Update()
     {
-        if (Input::IsKeyPressed(KeyCode::W))
-            m_Camera->MoveUp(-InputSettings::CAMERA_MOVE_SPEED);
-        if (Input::IsKeyPressed(KeyCode::S))
-            m_Camera->MoveUp(InputSettings::CAMERA_MOVE_SPEED);
-        if (Input::IsKeyPressed(KeyCode::A))
-            m_Camera->MoveRight(InputSettings::CAMERA_MOVE_SPEED);
-        if (Input::IsKeyPressed(KeyCode::D))
-            m_Camera->MoveRight(-InputSettings::CAMERA_MOVE_SPEED);
+        if (!m_Context) return;
 
+        // Camera movement with WASD
+        if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::W))
+            m_Camera->MoveUp(-Viewport::Input::CameraMoveSpeed);
+        if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::S))
+            m_Camera->MoveUp(Viewport::Input::CameraMoveSpeed);
+        if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::A))
+            m_Camera->MoveRight(Viewport::Input::CameraMoveSpeed);
+        if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::D))
+            m_Camera->MoveRight(-Viewport::Input::CameraMoveSpeed);
+
+        // Handle zoom with mouse wheel
         if (m_MouseDelta != 0)
         {
-            float zoomChange = m_MouseDelta * RenderSettings::ZOOM_SENSITIVITY;
-            float newZoom = std::clamp(m_Camera->GetZoom() + zoomChange, RenderSettings::MIN_ZOOM, RenderSettings::MAX_ZOOM);
+            float zoomChange = m_MouseDelta * Viewport::Render::ZoomSensitivity;
+            float newZoom = std::clamp(
+                m_Camera->GetZoom() + zoomChange,
+                Viewport::Render::MinZoom,
+                Viewport::Render::MaxZoom
+            );
             m_Camera->SetZoom(newZoom);
         }
+    }
+
+    void PanelViewport::RenderGrid()
+    {
+        glm::vec3 cameraPos = m_Camera->GetPosition();
+        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+
+        // Render infinite checkerboard pattern
+        Lumina::Renderer2D::SetGridPosition({
+            cameraPos.x + m_TileSize / 2,
+            cameraPos.y + m_TileSize / 2,
+            Viewport::Depth::Grid
+            });
+        Lumina::Renderer2D::SetGridSize({ 4096.0f, 4096.0f });
+        Lumina::Renderer2D::SetGridCellSize(m_TileSize / 2);
+        Lumina::Renderer2D::SetGridColor(Viewport::Grid::GridColor);
+        Lumina::Renderer2D::SetGridLineWidth(2.0f);
+        Lumina::Renderer2D::SetGridShowCheckerboard(true);
+        Lumina::Renderer2D::SetGridCheckerColor1(Viewport::Grid::CheckerColor1);
+        Lumina::Renderer2D::SetGridCheckerColor2(Viewport::Grid::CheckerColor2);
+        Lumina::Renderer2D::DrawGrid();
+
+        // Render layer boundaries
+        RenderLayerBoundaries();
+    }
+
+    void PanelViewport::RenderLayerBoundaries()
+    {
+        glm::vec3 cameraPos = m_Camera->GetPosition();
+        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+
+        const float gridWidth = layerStack.GetWidth();
+        const float gridHeight = layerStack.GetHeight();
+        const float offset = m_TileSize * 0.5f;
+
+        Lumina::Renderer2D::SetLineColor(Viewport::Grid::BoundaryColor);
+        Lumina::Renderer2D::SetLineThickness(2.0f);
+
+        // Top boundary
+        Lumina::Renderer2D::SetLineStart({
+            offset + cameraPos.x,
+            offset + cameraPos.y,
+            Viewport::Depth::Outline
+            });
+        Lumina::Renderer2D::SetLineEnd({
+            m_TileSize * gridWidth + offset + cameraPos.x,
+            offset + cameraPos.y,
+            Viewport::Depth::Outline
+            });
+        Lumina::Renderer2D::DrawLine();
+
+        // Left boundary
+        Lumina::Renderer2D::SetLineStart({
+            offset + cameraPos.x,
+            offset + cameraPos.y,
+            Viewport::Depth::Outline
+            });
+        Lumina::Renderer2D::SetLineEnd({
+            offset + cameraPos.x,
+            m_TileSize * gridHeight + offset + cameraPos.y,
+            Viewport::Depth::Outline
+            });
+        Lumina::Renderer2D::DrawLine();
+
+        // Bottom boundary
+        Lumina::Renderer2D::SetLineStart({
+            m_TileSize * gridWidth + offset + cameraPos.x,
+            m_TileSize * gridHeight + offset + cameraPos.y,
+            Viewport::Depth::Outline
+            });
+        Lumina::Renderer2D::SetLineEnd({
+            offset + cameraPos.x,
+            m_TileSize * gridHeight + offset + cameraPos.y,
+            Viewport::Depth::Outline
+            });
+        Lumina::Renderer2D::DrawLine();
+
+        // Right boundary
+        Lumina::Renderer2D::SetLineStart({
+            m_TileSize * gridWidth + offset + cameraPos.x,
+            m_TileSize * gridHeight + offset + cameraPos.y,
+            Viewport::Depth::Outline
+            });
+        Lumina::Renderer2D::SetLineEnd({
+            m_TileSize * gridWidth + offset + cameraPos.x,
+            offset + cameraPos.y,
+            Viewport::Depth::Outline
+            });
+        Lumina::Renderer2D::DrawLine();
+    }
+
+    void PanelViewport::RenderLayers()
+    {
+        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        glm::vec3 cameraPos = m_Camera->GetPosition();
+
+        // Render layers from bottom to top (reverse iteration for proper layering)
+        for (size_t layerIdx = 0; layerIdx < layerStack.GetLayerCount(); ++layerIdx)
+        {
+            const TileLayer& layer = layerStack.GetLayer(layerIdx);
+
+            // Skip invisible layers
+            if (!layer.GetVisibility()) continue;
+
+            RenderLayer(layer, layerIdx, cameraPos);
+        }
+    }
+
+    void PanelViewport::RenderLayer(const TileLayer& layer, size_t layerIndex, const glm::vec3& cameraPos)
+    {
+        const auto& textureAtlases = m_Context->GetProject().GetTextureAtlases();
+
+        for (size_t y = 0; y < layer.GetHeight(); ++y)
+        {
+            for (size_t x = 0; x < layer.GetWidth(); ++x)
+            {
+                const Tile& tile = layer.GetTile(x, y);
+
+				// Skip unpainted tiles
+                if (!tile.IsPainted()) continue;
+
+                // Calculate world position for this tile
+                glm::vec2 tileWorldPos = {
+                    (x + 1) * m_TileSize + cameraPos.x,
+                    (y + 1) * m_TileSize + cameraPos.y
+                };
+
+                // Set tile properties
+                Lumina::Renderer2D::SetQuadPosition({
+                    tileWorldPos.x,
+                    tileWorldPos.y,
+                    Viewport::Depth::Tile + layerIndex * 0.01f // Slight depth offset per layer
+                    });
+                Lumina::Renderer2D::SetQuadRotation(tile.GetRotation());
+                Lumina::Renderer2D::SetQuadTintColor(tile.GetTint());
+
+                glm::vec2 tileSize = tile.GetSize();
+                Lumina::Renderer2D::SetQuadSize({
+                    m_TileSize * tileSize.x,
+                    m_TileSize * tileSize.y
+                    });
+
+                // Set texture if available
+                if (tile.IsTextured())
+                {
+                    if (tile.GetAtlasIndex() < textureAtlases.size())
+                    {
+                        auto atlas = textureAtlases[tile.GetAtlasIndex()];
+                        if (atlas && atlas->HasTexture())
+                        {
+
+                            Lumina::Renderer2D::SetQuadTexture(atlas->GetTexture());
+                            Lumina::Renderer2D::SetQuadTextureCoords(tile.GetTextureCoords());
+                        }
+                    }
+                }
+                else
+                {
+                    Lumina::Renderer2D::SetQuadTexture(nullptr);
+                    Lumina::Renderer2D::SetQuadTextureCoords({ 0.0f, 0.0f, 1.0f, 1.0f });
+                }
+
+                Lumina::Renderer2D::DrawQuad();
+            }
+        }
+    }
+
+    void PanelViewport::RenderHoverTile()
+    {
+        if (!ImGui::IsWindowHovered()) return;
+
+        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        glm::vec3 cameraPos = m_Camera->GetPosition();
+
+        // Get grid position under mouse
+        glm::ivec2 gridPos = GetGridPositionUnderMouse();
+
+        // Check if mouse is within valid grid bounds
+        if (!IsValidGridPosition(gridPos)) return;
+
+        // Calculate world position for hover tile
+        glm::vec2 gridCenter = {
+            gridPos.x * m_TileSize + cameraPos.x,
+            gridPos.y * m_TileSize + cameraPos.y
+        };
+
+        // Update mouse follow quad position
+        m_MouseFollowQuadPosition = {
+            gridCenter.x,
+            gridCenter.y,
+            Viewport::Depth::HoverTile
+        };
+
+        // Get current brush for preview
+        const Tile& brush = m_Context->GetBrush();
+
+        // Render hover tile based on current painting mode
+        PaintingMode mode = m_Context->GetPaintingMode();
+
+        switch (mode)
+        {
+        case PaintingMode::Brush:
+            RenderBrushPreview(brush, cameraPos);
+            break;
+        case PaintingMode::Eraser:
+            RenderEraserPreview();
+            break;
+        case PaintingMode::Fill:
+            RenderFillPreview();
+            break;
+        default:
+            // Show basic hover outline for no tool selected
+            RenderBasicHover();
+            break;
+        }
+    }
+
+    void PanelViewport::RenderBrushPreview(const Tile& brush, const glm::vec3& cameraPos)
+    {
+        Lumina::Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
+        Lumina::Renderer2D::SetQuadRotation(brush.GetRotation());
+        Lumina::Renderer2D::SetQuadTintColor(brush.GetTint());
+
+        glm::vec2 brushSize = brush.GetSize();
+        Lumina::Renderer2D::SetQuadSize({
+            m_TileSize * brushSize.x,
+            m_TileSize * brushSize.y
+            });
+
+        // Set texture if brush has one
+        const auto& textureAtlases = m_Context->GetProject().GetTextureAtlases();
+        if (brush.IsTextured() && brush.HasValidAtlas() &&
+            brush.GetAtlasIndex() < textureAtlases.size())
+        {
+            auto atlas = textureAtlases[brush.GetAtlasIndex()];
+            if (atlas && atlas->HasTexture())
+            {
+                Lumina::Renderer2D::SetQuadTexture(atlas->GetTexture());
+                Lumina::Renderer2D::SetQuadTextureCoords(brush.GetTextureCoords());
+            }
+        }
+
+        Lumina::Renderer2D::DrawQuad();
+    }
+
+    void PanelViewport::RenderEraserPreview()
+    {
+        // Show a semi-transparent red square to indicate eraser
+        Lumina::Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
+        Lumina::Renderer2D::SetQuadSize({ m_TileSize, m_TileSize });
+        Lumina::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
+        Lumina::Renderer2D::SetQuadTintColor({ 1.0f, 0.0f, 0.0f, 0.3f }); // Red, semi-transparent
+        Lumina::Renderer2D::DrawQuad();
+    }
+
+    void PanelViewport::RenderFillPreview()
+    {
+        // Show a semi-transparent blue square to indicate fill
+        Lumina::Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
+        Lumina::Renderer2D::SetQuadSize({ m_TileSize, m_TileSize });
+        Lumina::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
+        Lumina::Renderer2D::SetQuadTintColor({ 0.0f, 0.0f, 1.0f, 0.3f }); // Blue, semi-transparent
+        Lumina::Renderer2D::DrawQuad();
+    }
+
+    void PanelViewport::RenderBasicHover()
+    {
+        // Show the basic green hover indicator
+        Lumina::Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
+        Lumina::Renderer2D::SetQuadSize(m_MouseFollowQuadSize);
+        Lumina::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
+        Lumina::Renderer2D::SetQuadTintColor(m_MouseFollowQuadColor);
+        Lumina::Renderer2D::DrawQuad();
+    }
+
+    void PanelViewport::HandleInput()
+    {
+        if (!ImGui::IsWindowHovered()) return;
+
+        glm::ivec2 gridPos = GetGridPositionUnderMouse();
+        if (!IsValidGridPosition(gridPos)) return;
+
+        // Handle painting input
+        if (Lumina::Input::IsMouseButtonPressed(Lumina::MouseCode::Left))
+        {
+            ExecutePaintAction(gridPos);
+        }
+    }
+
+    void PanelViewport::ExecutePaintAction(const glm::ivec2& gridPos)
+    {
+        PaintingMode mode = m_Context->GetPaintingMode();
+
+        switch (mode)
+        {
+        case PaintingMode::Brush:
+            m_Context->PaintTile(gridPos.x - 1, gridPos.y - 1); // Convert to 0-based coordinates
+            break;
+        case PaintingMode::Eraser:
+            m_Context->EraseTile(gridPos.x - 1, gridPos.y - 1);
+            break;
+        case PaintingMode::Fill:
+            m_Context->FillLayer(gridPos.x - 1, gridPos.y - 1);
+            break;
+        default:
+            // No action for PaintingMode::None
+            break;
+        }
+    }
+
+    glm::ivec2 PanelViewport::GetGridPositionUnderMouse() const
+    {
+        auto worldPosition = ScreenToWorld();
+        return {
+            static_cast<int>(round(worldPosition.x / m_TileSize)),
+            static_cast<int>(round(worldPosition.y / m_TileSize))
+        };
+    }
+
+    bool PanelViewport::IsValidGridPosition(const glm::ivec2& gridPos) const
+    {
+        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        return gridPos.x >= 1 && gridPos.x <= static_cast<int>(layerStack.GetWidth()) &&
+            gridPos.y >= 1 && gridPos.y <= static_cast<int>(layerStack.GetHeight());
     }
 
     glm::vec2 PanelViewport::ScreenToWorld() const
@@ -208,8 +426,7 @@ namespace Tiles
         glm::vec3 cameraPosition = m_Camera->GetPosition();
         float zoom = m_Camera->GetZoom();
 
-        ImVec2 relativeMousePosition =
-        {
+        ImVec2 relativeMousePosition = {
             m_MousePosition.x - m_ViewportPosition.x,
             m_MousePosition.y - m_ViewportPosition.y
         };
