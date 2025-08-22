@@ -10,6 +10,7 @@ Lumina::Application* Lumina::CreateApplication(int argc, char** argv)
     spec.Width = 1920;
     spec.Height = 1080;
 	spec.Use2DRenderer = true;
+	spec.Maximized = true;
 
     Lumina::Application* app = new Lumina::Application(spec);
     app->PushLayer<Tiles::Editor>();

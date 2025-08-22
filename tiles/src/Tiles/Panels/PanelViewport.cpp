@@ -159,11 +159,14 @@ namespace Tiles
 
                 if (m_Context->GetProject().GetTextureAtlasCount() > 0)
                 {
-                    auto atlas = m_Context->GetProject().GetTextureAtlas(tile.GetAtlasIndex());
-                    if (atlas->HasTexture())
+                    if (tile.HasValidAtlas())
                     {
-                        Renderer2D::SetQuadTexture(atlas->GetTexture());
-                        Renderer2D::SetQuadTextureCoords(tile.GetTextureCoords());
+                        auto atlas = m_Context->GetProject().GetTextureAtlas(tile.GetAtlasIndex());
+                        if (atlas->HasTexture())
+                        {
+                            Renderer2D::SetQuadTexture(atlas->GetTexture());
+                            Renderer2D::SetQuadTextureCoords(tile.GetTextureCoords());
+                        }
                     }
                 }
 
@@ -215,7 +218,7 @@ namespace Tiles
         float centeredY = relativeMousePosition.y - m_ViewportSize.y / 2.0f;
 
         float worldX = cameraPosition.x + centeredX / zoom;
-        float worldY = cameraPosition.y + centeredY / zoom;
+        float worldY = cameraPosition.y - centeredY / zoom;
 
         return { worldX, worldY };
     }

@@ -1,5 +1,7 @@
 #include "PanelLayerSelection.h"
 
+#include "Constants.h"
+
 #include "Lumina/Core/Log.h"
 
 #include "../Core/Commands/LayerAddCommand.h"
@@ -12,254 +14,425 @@
 
 namespace Tiles
 {
-    // UI layout constants
-    namespace UILayout
-    {
-        static constexpr float LAYER_LIST_HEIGHT = 300.0f;
-        static constexpr float CHILD_ROUNDING = 5.0f;
-        static constexpr size_t PROJECT_NAME_BUFFER_SIZE = 256;
-        static constexpr size_t LAYER_NAME_BUFFER_SIZE = 128;
-    }
-
-    // UI text constants
-    namespace UIText
-    {
-        static constexpr const char* WINDOW_TITLE = "Layer Selection";
-        static constexpr const char* NO_ACTIVE_PROJECT = "No active project";
-        static constexpr const char* PROJECT_NAME_LABEL = "Project Name";
-        static constexpr const char* LAYERS_LABEL = "Layers";
-        static constexpr const char* LAYER_NAME_LABEL = "Layer Name";
-        static constexpr const char* MOVE_UP_BUTTON = "Move Up";
-        static constexpr const char* MOVE_DOWN_BUTTON = "Move Down";
-        static constexpr const char* ADD_LAYER_BUTTON = "Add Layer";
-        static constexpr const char* DELETE_LAYER_BUTTON = "Delete Layer";
-        static constexpr const char* CLEAR_LAYER_BUTTON = "Clear Layer";
-    }
-
-    // Color scheme
-    namespace ColorScheme
-    {
-        static const ImVec4 NO_PROJECT_COLOR = { 0.7f, 0.7f, 0.7f, 1.0f };
-    }
-
     void PanelLayerSelection::Render()
     {
-        ImGui::Begin(UIText::WINDOW_TITLE);
+        ImGui::Begin("Layer Selection");
 
-        if (!HasContext())
+        if (!m_Context)
         {
-            ImGui::TextColored(ColorScheme::NO_PROJECT_COLOR, UIText::NO_ACTIVE_PROJECT);
+            ImGui::TextColored(UI::Color::TextHint, "No active project");
             ImGui::End();
             return;
         }
 
-        RenderProjectInfo();
+        ImGui::PushID("LayerSelection");
+
+        RenderBlockProjectInfo();
         ImGui::Separator();
+        RenderBlockLayerList();
+        RenderBlockLayerControls();
+        RenderBlockSelectedLayerInfo();
 
-        RenderLayerList();
-        RenderLayerControls();
-        RenderSelectedLayerInfo();
-
+        ImGui::PopID();
         ImGui::End();
     }
 
     void PanelLayerSelection::Update()
     {
-        // This panel does not require any specific update logic
-	}
+        // No specific update logic required for this panel
+    }
 
-    void PanelLayerSelection::RenderProjectInfo()
+    void PanelLayerSelection::RenderBlockProjectInfo()
     {
         Project& project = m_Context->GetProject();
 
-        ImGui::Text(UIText::PROJECT_NAME_LABEL);
+        // Section title
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+        ImGui::Button("Project Name", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight));
+        ImGui::PopStyleColor(4);
+        ImGui::PopStyleVar();
 
-        // Project name input field
-        char buffer[UILayout::PROJECT_NAME_BUFFER_SIZE];
-        strncpy_s(buffer, project.GetProjectName().c_str(), sizeof(buffer) - 1);
-        buffer[sizeof(buffer) - 1] = '\0';
-
-        if (ImGui::InputText("###ProjectName", buffer, sizeof(buffer)))
-        {
-            project.SetProjectName(std::string(buffer));
-        }
+        RenderComponentProjectNameInput("ProjectName", project.GetProjectName());
     }
 
-    void PanelLayerSelection::RenderLayerList()
+    void PanelLayerSelection::RenderComponentProjectNameInput(const char* id, const std::string& projectName)
+    {
+        char buffer[128];
+
+        size_t copySize = std::min(projectName.size(), sizeof(buffer) - 1);
+        std::copy(projectName.begin(), projectName.begin() + copySize, buffer);
+        buffer[copySize] = '\0';
+
+        std::string inputId = std::string("##") + id + "_Input";
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, UI::Layer::ItemBackground);
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, UI::Layer::ItemHover);
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, UI::Layer::ItemHover);
+        ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+
+        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+
+        if (ImGui::InputText(inputId.c_str(), buffer, sizeof(buffer)))
+        {
+            m_Context->GetProject().SetProjectName(std::string(buffer));
+        }
+
+        ImGui::PopStyleColor(4);
+        ImGui::PopStyleVar();
+    }
+
+    void PanelLayerSelection::RenderBlockLayerList()
     {
         LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
 
-        ImGui::Text(UIText::LAYERS_LABEL);
+        // Section title
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+        ImGui::Button("Layers", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight));
+        ImGui::PopStyleColor(4);
+        ImGui::PopStyleVar();
 
-        // Style the layer list container
-        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyle().Colors[ImGuiCol_FrameBg]);
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, UILayout::CHILD_ROUNDING);
+        // Layer list container - no rounding
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, UI::Layer::ItemBackground);
 
-        ImVec2 listSize(0, UILayout::LAYER_LIST_HEIGHT);
-        ImGui::BeginChild("LayerBox", listSize, true, ImGuiWindowFlags_None);
-
-        // Style layer items
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImGui::GetStyle().Colors[ImGuiCol_FrameBgHovered]);
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImGui::GetStyle().Colors[ImGuiCol_FrameBgActive]);
+        ImVec2 listSize(0, UI::List::LayerListHeight);
+        ImGui::BeginChild("##LayerListChild", listSize, true, ImGuiWindowFlags_None);
 
         // Render each layer
         for (size_t i = 0; i < layerStack.GetLayerCount(); i++)
         {
-            RenderLayerItem(i, layerStack);
+            std::string itemId = "LayerItem_" + std::to_string(i);
+            RenderComponentLayerItem(itemId.c_str(), i, layerStack);
         }
 
-        ImGui::PopStyleColor(3);
         ImGui::EndChild();
+        ImGui::PopStyleColor();
         ImGui::PopStyleVar();
     }
 
-    void PanelLayerSelection::RenderLayerItem(size_t layerIndex, LayerStack& layerStack)
+    void PanelLayerSelection::RenderComponentLayerItem(const char* id, size_t layerIndex, LayerStack& layerStack)
     {
-        ImGui::PushID(static_cast<int>(layerIndex));
-
         TileLayer& layer = layerStack.GetLayer(layerIndex);
+        bool isSelected = (layerIndex == m_Context->GetWorkingLayer());
 
-        // Visibility checkbox
+        ImGui::PushID(id);
+
+        // Visibility checkbox with orange styling and border
         bool isVisible = layer.GetVisibility();
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+        ImGui::PushStyleColor(ImGuiCol_CheckMark, UI::Layer::OrangeAccent);
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, UI::Layer::ItemBackground);
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, UI::Layer::ItemHover);
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, UI::Layer::ItemHover);
+        ImGui::PushStyleColor(ImGuiCol_Border, UI::Layer::OrangeAccent);
+
         if (ImGui::Checkbox("##Visible", &isVisible))
         {
             layer.SetVisibility(isVisible);
             m_Context->GetProject().MarkAsModified();
         }
 
+        ImGui::PopStyleColor(5);
+        ImGui::PopStyleVar(2);
         ImGui::SameLine();
 
-        // Layer selection
-        bool isSelected = (layerIndex == m_Context->GetWorkingLayer());
+        // Layer selection with orange selection color
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+
+        if (isSelected)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Header, UI::Layer::OrangeAccent);
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, UI::Layer::OrangeAccent);
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, UI::Layer::OrangeAccent);
+        }
+        else
+        {
+            ImGui::PushStyleColor(ImGuiCol_Header, UI::Layer::ItemBackground);
+            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, UI::Layer::ItemHover);
+            ImGui::PushStyleColor(ImGuiCol_HeaderActive, UI::Layer::ItemHover);
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+
         if (ImGui::Selectable(layer.GetName().c_str(), isSelected))
         {
             m_Context->SetWorkingLayer(layerIndex);
         }
 
+        ImGui::PopStyleColor(4);
+        ImGui::PopStyleVar();
         ImGui::PopID();
     }
 
-    void PanelLayerSelection::RenderLayerControls()
+    void PanelLayerSelection::RenderBlockLayerControls()
     {
-        RenderLayerMovementControls();
+        RenderComponentLayerMovementControls("LayerMovement");
         ImGui::Separator();
-        RenderLayerOperationControls();
+        RenderComponentLayerOperationControls("LayerOperations");
     }
 
-    void PanelLayerSelection::RenderLayerMovementControls()
+    void PanelLayerSelection::RenderComponentLayerMovementControls(const char* id)
     {
-        bool hasWorkingLayer = m_Context->HasWorkingLayer();
+        bool hasWorkingLayer = HasWorkingLayer();
 
-        // Move Up button
+        // Style for buttons
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween / 2.0f, 0.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, UI::Layer::ItemBackground);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Layer::ItemHover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Layer::OrangeAccent);
+        ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+
         if (!hasWorkingLayer)
         {
             ImGui::BeginDisabled();
         }
 
-        if (ImGui::Button(UIText::MOVE_UP_BUTTON))
+        // Movement buttons in table
+        ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX;
+        if (ImGui::BeginTable("##MovementButtons", 2, tableFlags))
         {
-            auto command = std::make_unique<LayerMoveUpCommand>(m_Context->GetWorkingLayer());
-            ExecuteLayerCommand(std::move(command));
-        }
+            ImGui::TableSetupColumn("MoveUp", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("MoveDown", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableNextRow();
 
-        ImGui::SameLine();
+            ImGui::TableNextColumn();
+            if (ImGui::Button("Move Up", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
+            {
+                auto command = std::make_unique<LayerMoveUpCommand>(m_Context->GetWorkingLayer());
+                ExecuteLayerCommand(std::move(command));
+            }
 
-        // Move Down button
-        if (ImGui::Button(UIText::MOVE_DOWN_BUTTON))
-        {
-            auto command = std::make_unique<LayerMoveDownCommand>(m_Context->GetWorkingLayer());
-            ExecuteLayerCommand(std::move(command));
+            ImGui::TableNextColumn();
+            if (ImGui::Button("Move Down", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
+            {
+                auto command = std::make_unique<LayerMoveDownCommand>(m_Context->GetWorkingLayer());
+                ExecuteLayerCommand(std::move(command));
+            }
+
+            ImGui::EndTable();
         }
 
         if (!hasWorkingLayer)
         {
             ImGui::EndDisabled();
         }
+
+        ImGui::PopStyleColor(4);
+        ImGui::PopStyleVar(2);
     }
 
-    void PanelLayerSelection::RenderLayerOperationControls()
+    void PanelLayerSelection::RenderComponentLayerOperationControls(const char* id)
     {
-        LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
-        bool hasWorkingLayer = m_Context->HasWorkingLayer();
-        bool hasLayers = !layerStack.IsEmpty();
+        bool hasWorkingLayer = HasWorkingLayer();
+        bool hasLayers = HasLayers();
 
-        // Add Layer button (always enabled)
-        if (ImGui::Button(UIText::ADD_LAYER_BUTTON))
+        // Style for buttons
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween / 2.0f, 0.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, UI::Layer::ItemBackground);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Layer::ItemHover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Layer::OrangeAccent);
+        ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+
+        // Operation buttons in table
+        ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX;
+        if (ImGui::BeginTable("##OperationButtons", 3, tableFlags))
         {
-            auto command = std::make_unique<LayerAddCommand>();
-            ExecuteLayerCommand(std::move(command));
+            ImGui::TableSetupColumn("Add", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Delete", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Clear", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableNextRow();
+
+            // Add Layer button (always enabled)
+            ImGui::TableNextColumn();
+            if (ImGui::Button("Add Layer", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
+            {
+                auto command = std::make_unique<LayerAddCommand>();
+                ExecuteLayerCommand(std::move(command));
+            }
+
+            // Delete and Clear buttons (conditionally enabled)
+            if (!hasLayers || !hasWorkingLayer)
+            {
+                ImGui::BeginDisabled();
+            }
+
+            ImGui::TableNextColumn();
+            if (ImGui::Button("Delete Layer", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
+            {
+                auto command = std::make_unique<LayerDeleteCommand>(m_Context->GetWorkingLayer());
+                ExecuteLayerCommand(std::move(command));
+            }
+
+            ImGui::TableNextColumn();
+            if (ImGui::Button("Clear Layer", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
+            {
+                auto command = std::make_unique<LayerClearCommand>(m_Context->GetWorkingLayer());
+                ExecuteLayerCommand(std::move(command));
+            }
+
+            if (!hasLayers || !hasWorkingLayer)
+            {
+                ImGui::EndDisabled();
+            }
+
+            ImGui::EndTable();
         }
 
-        ImGui::SameLine();
-
-        // Delete Layer button
-        if (!hasLayers || !hasWorkingLayer)
-        {
-            ImGui::BeginDisabled();
-        }
-
-        if (ImGui::Button(UIText::DELETE_LAYER_BUTTON))
-        {
-            auto command = std::make_unique<LayerDeleteCommand>(m_Context->GetWorkingLayer());
-            ExecuteLayerCommand(std::move(command));
-        }
-
-        ImGui::SameLine();
-
-        // Clear Layer button
-        if (ImGui::Button(UIText::CLEAR_LAYER_BUTTON))
-        {
-            auto command = std::make_unique<LayerClearCommand>(m_Context->GetWorkingLayer());
-            ExecuteLayerCommand(std::move(command));
-        }
-
-        if (!hasLayers || !hasWorkingLayer)
-        {
-            ImGui::EndDisabled();
-        }
+        ImGui::PopStyleColor(4);
+        ImGui::PopStyleVar(2);
     }
 
-    void PanelLayerSelection::RenderSelectedLayerInfo()
+    void PanelLayerSelection::RenderBlockSelectedLayerInfo()
     {
-        if (!m_Context->HasWorkingLayer())
+        if (!HasWorkingLayer())
         {
             return;
         }
 
         LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
-        ImGui::Separator();
-
         TileLayer& layer = layerStack.GetLayer(m_Context->GetWorkingLayer());
 
-        // Layer name input field
-        char buffer[UILayout::LAYER_NAME_BUFFER_SIZE];
-        strncpy_s(buffer, layer.GetName().c_str(), sizeof(buffer) - 1);
-        buffer[sizeof(buffer) - 1] = '\0';
+        ImGui::Separator();
 
-        if (ImGui::InputText(UIText::LAYER_NAME_LABEL, buffer, sizeof(buffer)))
-        {
-            layer.SetName(std::string(buffer));
-            m_Context->GetProject().MarkAsModified();
-        }
+        // Section title
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+        ImGui::Button("Layer Properties", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight));
+        ImGui::PopStyleColor(4);
+        ImGui::PopStyleVar();
 
-        // Additional layer information
-        RenderLayerProperties(layer);
+        RenderComponentLayerNameInput("LayerName", layer.GetName());
+        RenderComponentLayerProperties("LayerProperties", layer);
     }
 
-    void PanelLayerSelection::RenderLayerProperties(const TileLayer& layer)
+    void PanelLayerSelection::RenderComponentLayerNameInput(const char* id, const std::string& layerName)
     {
-        ImGui::Spacing();
+        char buffer[64];
+        size_t copySize = std::min(layerName.size(), sizeof(buffer) - 1);
+        std::copy(layerName.begin(), layerName.begin() + copySize, buffer);
+        buffer[copySize] = '\0';
 
-        // Layer statistics
-        ImGui::Text("Layer Properties:");
-        ImGui::Indent();
+        // Use table for consistent alignment and spacing
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween * 0.5f, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
 
-        ImGui::Text("Dimensions: %dx%d", layer.GetWidth(), layer.GetHeight());
-        ImGui::Text("Tile Count: %zu", layer.GetTileCount());
-        ImGui::Text("Render Group: %d", layer.GetRenderGroup());
-        ImGui::Text("Visible: %s", layer.GetVisibility() ? "Yes" : "No");
+        ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX;
 
-        ImGui::Unindent();
+        if (ImGui::BeginTable("##LayerNameInput", 2, tableFlags))
+        {
+            ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+            ImGui::TableSetupColumn("Input", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableNextRow();
+
+            // Label column
+            ImGui::TableNextColumn();
+            ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::BackgroundMedium);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::BackgroundMedium);
+            ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+            ImGui::Button("Layer Name", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight));
+            ImGui::PopStyleColor(4);
+
+            // Input column
+            ImGui::TableNextColumn();
+            std::string inputId = std::string("##") + id + "_Input";
+            float framePaddingY = (UI::Component::ButtonHeight - ImGui::GetTextLineHeight()) * 0.5f;
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(UI::Component::FramePadding, framePaddingY));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, UI::Layer::ItemBackground);
+            ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, UI::Layer::ItemHover);
+            ImGui::PushStyleColor(ImGuiCol_FrameBgActive, UI::Layer::ItemHover);
+            ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+
+            if (ImGui::InputText(inputId.c_str(), buffer, sizeof(buffer)))
+            {
+                LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+                TileLayer& layer = layerStack.GetLayer(m_Context->GetWorkingLayer());
+                layer.SetName(std::string(buffer));
+                m_Context->GetProject().MarkAsModified();
+            }
+
+            ImGui::PopStyleColor(4);
+            ImGui::PopStyleVar();
+
+            ImGui::EndTable();
+        }
+
+        ImGui::PopStyleVar(2);
+    }
+
+    void PanelLayerSelection::RenderComponentLayerProperties(const char* id, const TileLayer& layer)
+    {
+        // Enhanced styling with background colors and borders - increased padding
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween * 2.5f, UI::Component::SpaceBetween * 1.5f));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+        ImGui::PushStyleColor(ImGuiCol_TableRowBg, UI::Layer::ItemBackground);
+        ImGui::PushStyleColor(ImGuiCol_TableRowBgAlt, ImVec4(0.18f, 0.18f, 0.18f, 1.0f)); // Slightly lighter alternate rows
+
+        ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit |
+            ImGuiTableFlags_NoHostExtendX |
+            ImGuiTableFlags_RowBg |           // Enable row backgrounds
+            ImGuiTableFlags_BordersInnerV;    // Add vertical borders
+
+        if (ImGui::BeginTable("##LayerProperties", 2, tableFlags))
+        {
+            ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+            ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+            // Dimensions
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), " Dimensions:");
+            ImGui::TableNextColumn();
+            ImGui::TextColored(UI::Layer::OrangeAccent, "%dx%d", layer.GetWidth(), layer.GetHeight());
+
+            // Tile Count
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), " Tile Count:");
+            ImGui::TableNextColumn();
+            ImGui::TextColored(UI::Layer::OrangeAccent, "%zu", layer.GetTileCount());
+
+            // Render Group
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), " Render Group:");
+            ImGui::TableNextColumn();
+            ImGui::TextColored(UI::Layer::OrangeAccent, "%d", layer.GetRenderGroup());
+
+            // Visible - with colored indicator
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), " Visible:");
+            ImGui::TableNextColumn();
+            if (layer.GetVisibility()) {
+                ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "Yes");  // Green for visible
+            }
+            else {
+                ImGui::TextColored(ImVec4(0.8f, 0.2f, 0.2f, 1.0f), "No");   // Red for hidden
+            }
+
+            ImGui::EndTable();
+        }
+
+        ImGui::PopStyleColor(3);
+        ImGui::PopStyleVar(2);
     }
 
     void PanelLayerSelection::ExecuteLayerCommand(std::unique_ptr<Command> command)
@@ -268,5 +441,15 @@ namespace Tiles
         {
             m_Context->ExecuteCommand(std::move(command));
         }
+    }
+
+    bool PanelLayerSelection::HasWorkingLayer() const
+    {
+        return m_Context && m_Context->HasWorkingLayer();
+    }
+
+    bool PanelLayerSelection::HasLayers() const
+    {
+        return m_Context && !m_Context->GetProject().GetLayerStack().IsEmpty();
     }
 }

@@ -5,6 +5,8 @@ project "Tiles"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
+   flags { "MultiProcessorCompile" }
+
    files { "src/**.h", "src/**.cpp" }
 
    includedirs

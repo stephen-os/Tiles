@@ -1,46 +1,12 @@
 #include "PanelToolSelection.h"
-
+#include "Constants.h"
 #include "imgui.h"
 
 namespace Tiles
 {
-    // Asset paths
-    namespace AssetPaths
-    {
-        static constexpr const char* BRUSH_TEXTURE = "res/assets/brush.png";
-        static constexpr const char* ERASER_TEXTURE = "res/assets/eraser.png";
-        static constexpr const char* FILL_TEXTURE = "res/assets/bucket.png";
-    }
-
-    // UI layout constants
-    namespace UILayout
-    {
-        static constexpr float DEFAULT_BUTTON_SIZE = 32.0f;
-        static constexpr float SELECTION_BORDER_RADIUS = 5.0f;
-        static constexpr float SELECTION_BORDER_THICKNESS = 1.0f;
-    }
-
-    // Tool identifiers
-    namespace ToolIDs
-    {
-        static constexpr const char* BRUSH_MODE = "BrushMode";
-        static constexpr const char* ERASER_MODE = "EraserMode";
-        static constexpr const char* FILL_MODE = "FillMode";
-    }
-
-    namespace ColorScheme
-    {
-        static constexpr ImU32 SELECTED_BORDER = IM_COL32(255, 165, 0, 255);
-        static constexpr ImU32 DEFAULT_BORDER = IM_COL32(51, 51, 51, 255);
-    }
-
     PanelToolSelection::PanelToolSelection()
-        : m_ButtonSize(UILayout::DEFAULT_BUTTON_SIZE, UILayout::DEFAULT_BUTTON_SIZE)
     {
-        // Load tool textures
-        m_BrushTexture = Texture::Create(AssetPaths::BRUSH_TEXTURE);
-        m_EraserTexture = Texture::Create(AssetPaths::ERASER_TEXTURE);
-        m_FillTexture = Texture::Create(AssetPaths::FILL_TEXTURE);
+        LoadTextures();
     }
 
     void PanelToolSelection::Render()
@@ -49,82 +15,113 @@ namespace Tiles
 
         if (!m_Context)
         {
-            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No project loaded");
+            ImGui::TextColored(UI::Color::TextError, "No project loaded");
             ImGui::End();
             return;
         }
 
-        RenderToolButtons();
-
+        RenderBlockToolButtons();
         ImGui::End();
 
-        // Render custom cursor overlay
-        RenderCustomCursor();
+        RenderBlockCustomCursor();
     }
 
     void PanelToolSelection::Update()
     {
-        // This panel does not require any specific update logic
-	}
-
-    void PanelToolSelection::RenderToolButtons()
-    {
-        // Render tool buttons in a horizontal layout
-        RenderToolButton(ToolIDs::BRUSH_MODE, m_BrushTexture, PaintingMode::Brush);
-        ImGui::SameLine();
-
-        RenderToolButton(ToolIDs::ERASER_MODE, m_EraserTexture, PaintingMode::Eraser);
-        ImGui::SameLine();
-
-        RenderToolButton(ToolIDs::FILL_MODE, m_FillTexture, PaintingMode::Fill);
     }
 
-    void PanelToolSelection::RenderToolButton(const char* id, const Ref<Texture>& texture, PaintingMode mode)
+    void PanelToolSelection::RenderBlockToolButtons()
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Tool::ButtonSpacing, 0.0f));
+
+        ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX;
+        if (ImGui::BeginTable("##ToolButtonsTable", 3, tableFlags))
+        {
+            // Setup columns
+            ImGui::TableSetupColumn("Brush", ImGuiTableColumnFlags_WidthFixed, UI::Tool::ButtonSize);
+            ImGui::TableSetupColumn("Eraser", ImGuiTableColumnFlags_WidthFixed, UI::Tool::ButtonSize);
+            ImGui::TableSetupColumn("Fill", ImGuiTableColumnFlags_WidthFixed, UI::Tool::ButtonSize);
+            ImGui::TableNextRow();
+
+            // Brush tool
+            ImGui::TableNextColumn();
+            RenderComponentToolButton("BrushTool", ToolType::Brush, m_BrushTexture, PaintingMode::Brush, "Brush Tool");
+
+            // Eraser tool
+            ImGui::TableNextColumn();
+            RenderComponentToolButton("EraserTool", ToolType::Eraser, m_EraserTexture, PaintingMode::Eraser, "Eraser Tool");
+
+            // Fill tool
+            ImGui::TableNextColumn();
+            RenderComponentToolButton("FillTool", ToolType::Fill, m_FillTexture, PaintingMode::Fill, "Fill Tool");
+
+            ImGui::EndTable();
+        }
+
+        ImGui::PopStyleVar();
+    }
+
+    void PanelToolSelection::RenderComponentToolButton(const char* id, ToolType toolType, const Lumina::Ref<Lumina::Texture>& texture, PaintingMode mode, const char* tooltip)
     {
         if (!texture)
         {
-            return; // Skip if texture failed to load
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+            ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::Hover);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::Active);
+            ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::TextHint);
+            ImGui::Button("?", ImVec2(UI::Tool::ButtonSize, UI::Tool::ButtonSize));
+            ImGui::PopStyleColor(4);
+            ImGui::PopStyleVar();
+            return;
         }
 
-        ImGui::PushID(id);
+        std::string buttonId = std::string("##") + id + "ToolButton";
 
-        // Create image button
-        bool isPressed = ImGui::ImageButton(reinterpret_cast<void*>(static_cast<uintptr_t>(texture->GetID())), { m_ButtonSize.x, m_ButtonSize.y });
+        bool isSelected = IsToolSelected(mode);
 
-        // Handle button press
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 2.0f));
+
+        if (isSelected)
+        {
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
+            ImGui::PushStyleColor(ImGuiCol_Border, UI::Selection::BorderColor);
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::Hover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::Active);
+
+        ImVec2 buttonSize(UI::Tool::ButtonSize, UI::Tool::ButtonSize);
+        bool isPressed = ImGui::ImageButton(
+            buttonId.c_str(),
+            reinterpret_cast<void*>(static_cast<uintptr_t>(texture->GetID())),
+            buttonSize
+        );
+
+        ImGui::PopStyleColor(3);
+
+        if (isSelected)
+        {
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+        }
+
+        ImGui::PopStyleVar(2);
+
         if (isPressed)
         {
-            // Toggle: if this mode is already selected, switch to None; otherwise switch to this mode
-            if (m_Context->GetPaintingMode() == mode)
-            {
-                m_Context->SetPaintingMode(PaintingMode::None);
-            }
-            else
-            {
-                m_Context->SetPaintingMode(mode);
-            }
+            SetToolSelection(mode);
         }
 
-        // Draw selection border if this tool is active
-        if (m_Context->GetPaintingMode() == mode)
+        if (ImGui::IsItemHovered())
         {
-            ImVec2 buttonMin = ImGui::GetItemRectMin();
-            ImVec2 buttonMax = ImGui::GetItemRectMax();
-
-            ImGui::GetWindowDrawList()->AddRect(
-                buttonMin,
-                buttonMax,
-				ColorScheme::SELECTED_BORDER,
-                UILayout::SELECTION_BORDER_RADIUS,
-                0,
-                UILayout::SELECTION_BORDER_THICKNESS
-            );
+            ImGui::SetTooltip("%s", tooltip);
         }
-
-        ImGui::PopID();
     }
 
-    void PanelToolSelection::RenderCustomCursor()
+    void PanelToolSelection::RenderBlockCustomCursor()
     {
         if (!m_Context)
         {
@@ -133,44 +130,68 @@ namespace Tiles
 
         PaintingMode currentMode = m_Context->GetPaintingMode();
 
-        // Only render custom cursor for non-None modes
         if (currentMode == PaintingMode::None)
         {
-            // Use default mouse cursor for None mode
             ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
             return;
         }
 
-        // Draw custom cursor for active painting modes
-        DrawCursorForMode(PaintingMode::Brush, m_BrushTexture);
-        DrawCursorForMode(PaintingMode::Eraser, m_EraserTexture);
-        DrawCursorForMode(PaintingMode::Fill, m_FillTexture);
+        RenderComponentCursorForMode("BrushCursor", PaintingMode::Brush, m_BrushTexture);
+        RenderComponentCursorForMode("EraserCursor", PaintingMode::Eraser, m_EraserTexture);
+        RenderComponentCursorForMode("FillCursor", PaintingMode::Fill, m_FillTexture);
     }
 
-    void PanelToolSelection::DrawCursorForMode(PaintingMode mode, const Ref<Lumina::Texture>& texture)
+    void PanelToolSelection::RenderComponentCursorForMode(const char* id, PaintingMode mode, const Lumina::Ref<Lumina::Texture>& texture)
     {
-        // Only draw cursor for the currently active mode
         if (m_Context->GetPaintingMode() != mode || !texture)
         {
             return;
         }
 
-        // Hide default mouse cursor and draw custom cursor
         ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 
-        // Get current mouse position
         ImVec2 mousePos = ImGui::GetMousePos();
 
-        // Calculate cursor image bounds (centered on mouse)
-        ImVec2 halfSize = ImVec2(m_ButtonSize.x * 0.5f, m_ButtonSize.y * 0.5f);
-        ImVec2 cursorMin = ImVec2(mousePos.x - halfSize.x, mousePos.y - halfSize.y);
-        ImVec2 cursorMax = ImVec2(mousePos.x + halfSize.x, mousePos.y + halfSize.y);
+        float halfSize = UI::Tool::CursorSize * 0.5f;
+        ImVec2 cursorMin = ImVec2(mousePos.x - halfSize, mousePos.y - halfSize);
+        ImVec2 cursorMax = ImVec2(mousePos.x + halfSize, mousePos.y + halfSize);
 
-        // Draw cursor image on foreground layer
         ImGui::GetForegroundDrawList()->AddImage(
             reinterpret_cast<void*>(static_cast<uintptr_t>(texture->GetID())),
             cursorMin,
-            cursorMax
+            cursorMax,
+            ImVec2(0, 0),
+            ImVec2(1, 1),
+            IM_COL32(255, 255, 255, 200)
         );
+    }
+
+    void PanelToolSelection::LoadTextures()
+    {
+        m_BrushTexture = Lumina::Texture::Create(AssetPath::Brush);
+        m_EraserTexture = Lumina::Texture::Create(AssetPath::Eraser);
+        m_FillTexture = Lumina::Texture::Create(AssetPath::Fill);
+    }
+
+    bool PanelToolSelection::IsToolSelected(PaintingMode mode) const
+    {
+        return m_Context && m_Context->GetPaintingMode() == mode;
+    }
+
+    void PanelToolSelection::SetToolSelection(PaintingMode mode)
+    {
+        if (!m_Context)
+        {
+            return;
+        }
+
+        if (m_Context->GetPaintingMode() == mode)
+        {
+            m_Context->SetPaintingMode(PaintingMode::None);
+        }
+        else
+        {
+            m_Context->SetPaintingMode(mode);
+        }
     }
 }

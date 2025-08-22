@@ -1,9 +1,14 @@
 #pragma once
+
 #include "Panel.h"
+
 
 #include "Lumina/Lumina.h"
 
-#include <glm/glm.hpp>
+#include "imgui.h"
+
+#include <vector>
+#include <string>
 
 using namespace Lumina;
 
@@ -14,22 +19,29 @@ namespace Tiles
     public:
         PanelToolSelection();
         ~PanelToolSelection() = default;
-        
+
         void Render() override;
-		void Update() override;
+        void Update() override;
 
     private:
-        // Rendering methods
-        void RenderToolButtons();
-        void RenderToolButton(const char* id, const Ref<Lumina::Texture>& texture, PaintingMode mode);
-        void RenderCustomCursor();
-        void DrawCursorForMode(PaintingMode mode, const Ref<Lumina::Texture>& texture);
+        enum class ToolType
+        {
+            Brush,
+            Eraser,
+            Fill
+        };
 
-	private:
-        // UI state
-        Ref<Texture> m_BrushTexture = nullptr;
-        Ref<Texture> m_EraserTexture = nullptr;
-        Ref<Texture> m_FillTexture = nullptr;
-        glm::vec2 m_ButtonSize = { 32.0f, 32.0f };
+        void RenderBlockToolButtons();
+        void RenderBlockCustomCursor();
+        void RenderComponentToolButton(const char* id, ToolType toolType, const Ref<Lumina::Texture>& texture, PaintingMode mode, const char* tooltip);
+        void RenderComponentCursorForMode(const char* id, PaintingMode mode, const Ref<Lumina::Texture>& texture);
+        void LoadTextures();
+        bool IsToolSelected(PaintingMode mode) const;
+        void SetToolSelection(PaintingMode mode);
+
+    private:
+        Ref<Lumina::Texture> m_BrushTexture = nullptr;
+        Ref<Lumina::Texture> m_EraserTexture = nullptr;
+        Ref<Lumina::Texture> m_FillTexture = nullptr;
     };
 }
