@@ -3,6 +3,8 @@
 #include "imgui.h"
 #include <string>
 
+#include "Popups/PopupRenderMatrix.h"
+
 namespace Tiles
 {
     class PanelMenuBar : public Panel
@@ -35,6 +37,11 @@ namespace Tiles
         void SaveProjectAs();
         void CreateNewProject();
         void ResizeCurrentProject();
+
+        void ShowExportDialog();
+
+    private:
+		PopupRenderMatrix m_PopupRenderMatrix;
 
     private:
         // Dialog state

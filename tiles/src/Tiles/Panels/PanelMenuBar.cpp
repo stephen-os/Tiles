@@ -58,6 +58,11 @@ namespace Tiles
         {
             ShowFileDialog();
         }
+
+        if (m_PopupRenderMatrix.IsVisible())
+        {
+            m_PopupRenderMatrix.Render();
+        }
     }
 
     void PanelMenuBar::Update()
@@ -135,6 +140,13 @@ namespace Tiles
             if (ImGui::MenuItem("Save As", "Ctrl+Shift+S", false, hasProject))
             {
                 SaveProjectAs();
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Export...", "Ctrl+E", false, hasProject))
+            {
+                ShowExportDialog();
             }
 
             ImGui::Separator();
@@ -520,6 +532,14 @@ namespace Tiles
             config.path = ".";
             ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Save Project As", ".tiles", config);
             m_ShowSaveAsDialog = false; // Only show once
+        }
+    }
+
+    void PanelMenuBar::ShowExportDialog()
+    {
+        if (m_Context && m_Context->HasProject())
+        {
+            m_PopupRenderMatrix.Show(m_Context);
         }
     }
 }
