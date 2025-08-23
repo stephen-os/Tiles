@@ -20,7 +20,7 @@ namespace Tiles
 
         if (!m_Context)
         {
-            ImGui::TextColored(UI::Color::TextHint, "No active project");
+            ImGui::TextColored(UI::Color::TextHint, "No active project->");
             ImGui::End();
             return;
         }
@@ -44,7 +44,7 @@ namespace Tiles
 
     void PanelLayerSelection::RenderBlockProjectInfo()
     {
-        Project& project = m_Context->GetProject();
+        auto project = m_Context->GetProject();
 
         // Section title
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
@@ -52,11 +52,11 @@ namespace Tiles
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::BackgroundMedium);
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::BackgroundMedium);
         ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
-        ImGui::Button("Project Name", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight));
+        ImGui::Button("project-> Name", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight));
         ImGui::PopStyleColor(4);
         ImGui::PopStyleVar();
 
-        RenderComponentProjectNameInput("ProjectName", project.GetProjectName());
+        RenderComponentProjectNameInput("ProjectName", project->GetProjectName());
     }
 
     void PanelLayerSelection::RenderComponentProjectNameInput(const char* id, const std::string& projectName)
@@ -78,7 +78,7 @@ namespace Tiles
 
         if (ImGui::InputText(inputId.c_str(), buffer, sizeof(buffer)))
         {
-            m_Context->GetProject().SetProjectName(std::string(buffer));
+            m_Context->GetProject()->SetProjectName(std::string(buffer));
         }
 
         ImGui::PopStyleColor(4);
@@ -87,7 +87,7 @@ namespace Tiles
 
     void PanelLayerSelection::RenderBlockLayerList()
     {
-        LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
 
         // Section title
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
@@ -138,7 +138,7 @@ namespace Tiles
         if (ImGui::Checkbox("##Visible", &isVisible))
         {
             layer.SetVisibility(isVisible);
-            m_Context->GetProject().MarkAsModified();
+            m_Context->GetProject()->MarkAsModified();
         }
 
         ImGui::PopStyleColor(5);
@@ -300,7 +300,7 @@ namespace Tiles
             return;
         }
 
-        LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
         TileLayer& layer = layerStack.GetLayer(m_Context->GetWorkingLayer());
 
         ImGui::Separator();
@@ -361,10 +361,10 @@ namespace Tiles
 
             if (ImGui::InputText(inputId.c_str(), buffer, sizeof(buffer)))
             {
-                LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+                LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
                 TileLayer& layer = layerStack.GetLayer(m_Context->GetWorkingLayer());
                 layer.SetName(std::string(buffer));
-                m_Context->GetProject().MarkAsModified();
+                m_Context->GetProject()->MarkAsModified();
             }
 
             ImGui::PopStyleColor(4);
@@ -450,6 +450,6 @@ namespace Tiles
 
     bool PanelLayerSelection::HasLayers() const
     {
-        return m_Context && !m_Context->GetProject().GetLayerStack().IsEmpty();
+        return m_Context && !m_Context->GetProject()->GetLayerStack().IsEmpty();
     }
 }

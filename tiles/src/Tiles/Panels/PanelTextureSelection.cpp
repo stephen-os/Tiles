@@ -43,7 +43,7 @@ namespace Tiles
 
     void PanelTextureSelection::RenderBlockAtlasTabs()
     {
-        auto& atlases = m_Context->GetProject().GetTextureAtlases();
+        auto& atlases = m_Context->GetProject()->GetTextureAtlases();
 
         if (atlases.empty())
         {
@@ -110,7 +110,7 @@ namespace Tiles
 
     void PanelTextureSelection::RenderSectionAtlasPath()
     {
-        auto atlas = m_Context->GetProject().GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
 
         ImGui::AlignTextToFramePadding();
         ImGui::Text("Atlas:");
@@ -136,7 +136,7 @@ namespace Tiles
             if (ImGui::Button("Remove"))
             {
                 atlas->RemoveTexture();
-                m_Context->GetProject().MarkAsModified();
+                m_Context->GetProject()->MarkAsModified();
             }
         }
     }
@@ -150,7 +150,7 @@ namespace Tiles
 
     void PanelTextureSelection::RenderSectionAtlasDimensions()
     {
-        auto atlas = m_Context->GetProject().GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
 
         ImGui::Text("Atlas Dimensions");
         ImGui::PushItemWidth(UI::Component::InputWidth);
@@ -160,7 +160,7 @@ namespace Tiles
         if (width != atlas->GetWidth())
         {
             atlas->Resize(std::max(1, width), atlas->GetHeight());
-            m_Context->GetProject().MarkAsModified();
+            m_Context->GetProject()->MarkAsModified();
         }
 
         int height = atlas->GetHeight();
@@ -168,7 +168,7 @@ namespace Tiles
         if (height != atlas->GetHeight())
         {
             atlas->Resize(atlas->GetWidth(), std::max(1, height));
-            m_Context->GetProject().MarkAsModified();
+            m_Context->GetProject()->MarkAsModified();
         }
 
         ImGui::PopItemWidth();
@@ -182,7 +182,7 @@ namespace Tiles
 
     void PanelTextureSelection::RenderSectionTextureGrid()
     {
-        auto atlas = m_Context->GetProject().GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
 
         // Set up grid styling for seamless tiles
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -227,7 +227,7 @@ namespace Tiles
 
     void PanelTextureSelection::RenderComponentTextureGridItem(const char* id, int index, int x, int y, size_t atlasIndex, float tileSize)
     {
-        auto atlas = m_Context->GetProject().GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
 
         ImVec2 buttonSize(tileSize, tileSize);
 
@@ -266,7 +266,7 @@ namespace Tiles
 
     void PanelTextureSelection::RenderComponentSelectionBorder(const char* id, int index, size_t atlasIndex, float tileSize)
     {
-        auto atlas = m_Context->GetProject().GetTextureAtlas(atlasIndex);
+        auto atlas = m_Context->GetProject()->GetTextureAtlas(atlasIndex);
         auto& brush = m_Context->GetBrush();
 
         ImVec2 itemMin = ImGui::GetItemRectMin();
@@ -333,19 +333,19 @@ namespace Tiles
     {
         if (std::filesystem::exists(newPath))
         {
-            auto atlas = m_Context->GetProject().GetTextureAtlas(m_CurrentAtlasIndex);
+            auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
             if (atlas)
             {
                 std::filesystem::path relativePath = std::filesystem::relative(newPath, std::filesystem::current_path());
                 atlas->SetTexture(relativePath.string());
-                m_Context->GetProject().MarkAsModified();
+                m_Context->GetProject()->MarkAsModified();
             }
         }
     }
 
     void PanelTextureSelection::HandleTextureSelection(int index, size_t atlasIndex)
     {
-        auto atlas = m_Context->GetProject().GetTextureAtlas(atlasIndex);
+        auto atlas = m_Context->GetProject()->GetTextureAtlas(atlasIndex);
         auto& brush = m_Context->GetBrush();
         glm::vec4 texCoords = atlas->GetTextureCoords(index);
 
@@ -372,7 +372,7 @@ namespace Tiles
             m_Context->SetBrush(newBrush);
         }
 
-        m_Context->GetProject().MarkAsModified();
+        m_Context->GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::OpenFileDialog()
@@ -402,20 +402,20 @@ namespace Tiles
     void PanelTextureSelection::AddNewAtlas()
     {
         auto newAtlas = TextureAtlas::Create(Texture::Atlas::DefaultWidth, Texture::Atlas::DefaultHeight);
-        m_Context->GetProject().AddTextureAtlas(newAtlas);
-        SetCurrentAtlasIndex(m_Context->GetProject().GetTextureAtlasCount() - 1);
-        m_Context->GetProject().MarkAsModified();
+        m_Context->GetProject()->AddTextureAtlas(newAtlas);
+        SetCurrentAtlasIndex(m_Context->GetProject()->GetTextureAtlasCount() - 1);
+        m_Context->GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::RemoveCurrentAtlas()
     {
-        auto& atlases = m_Context->GetProject().GetTextureAtlases();
+        auto& atlases = m_Context->GetProject()->GetTextureAtlases();
         if (atlases.empty())
         {
             return;
         }
 
-        m_Context->GetProject().RemoveTextureAtlas(m_CurrentAtlasIndex);
+        m_Context->GetProject()->RemoveTextureAtlas(m_CurrentAtlasIndex);
 
         // Adjust current index if necessary
         if (m_CurrentAtlasIndex >= atlases.size() && !atlases.empty())
@@ -427,12 +427,12 @@ namespace Tiles
             m_CurrentAtlasIndex = 0;
         }
 
-        m_Context->GetProject().MarkAsModified();
+        m_Context->GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::SetCurrentAtlasIndex(size_t index)
     {
-        auto& atlases = m_Context->GetProject().GetTextureAtlases();
+        auto& atlases = m_Context->GetProject()->GetTextureAtlases();
         if (index < atlases.size())
         {
             m_CurrentAtlasIndex = index;
@@ -441,7 +441,7 @@ namespace Tiles
 
     bool PanelTextureSelection::HasValidCurrentAtlas() const
     {
-        auto& atlases = m_Context->GetProject().GetTextureAtlases();
+        auto& atlases = m_Context->GetProject()->GetTextureAtlases();
         return m_CurrentAtlasIndex < atlases.size();
     }
 }

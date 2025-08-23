@@ -1,9 +1,17 @@
 #include "PanelMenuBar.h"
 #include "Constants.h"
 #include "ImGuiFileDialog.h"
+#include <filesystem>
+
+#include "Lumina/Core/Application.h"
 
 namespace Tiles
 {
+    PanelMenuBar::PanelMenuBar(Ref<Context> context)
+        : Panel(context)
+    {
+    }
+
     void PanelMenuBar::Render()
     {
         if (ImGui::BeginMainMenuBar())
@@ -15,10 +23,10 @@ namespace Tiles
             RenderHelpMenu();
 
             // Show project name in the menu bar
-            if (IsProjectLoaded())
+            if (m_Context && m_Context->HasProject())
             {
                 ImGui::Separator();
-                ImGui::TextColored(UI::Color::Text, "%s", GetProjectDisplayName().c_str());
+                ImGui::TextColored(UI::Color::Text, "%s", m_Context->GetProjectDisplayName().c_str());
 
                 if (m_Context->IsDirty())
                 {
@@ -45,11 +53,22 @@ namespace Tiles
         {
             ShowAboutDialog();
         }
+
+        if (m_ShowOpenDialog || m_ShowSaveAsDialog)
+        {
+            ShowFileDialog();
+        }
     }
 
     void PanelMenuBar::Update()
     {
-        // Handle keyboard shortcuts
+        HandleKeyboardShortcuts();
+    }
+
+    void PanelMenuBar::HandleKeyboardShortcuts()
+    {
+        if (!m_Context) return;
+
         ImGuiIO& io = ImGui::GetIO();
 
         if (io.KeyCtrl)
@@ -60,22 +79,22 @@ namespace Tiles
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_O, false))
             {
-                if (m_OpenProjectCallback) m_OpenProjectCallback();
+                OpenProject();
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_S, false))
             {
                 if (io.KeyShift)
                 {
-                    if (m_SaveAsProjectCallback) m_SaveAsProjectCallback();
+                    SaveProjectAs();
                 }
                 else
                 {
-                    if (m_SaveProjectCallback) m_SaveProjectCallback();
+                    SaveProject();
                 }
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_Z, false))
             {
-                if (m_Context && m_Context->CanUndo())
+                if (m_Context->CanUndo())
                 {
                     m_Context->Undo();
                 }
@@ -83,7 +102,7 @@ namespace Tiles
             else if (ImGui::IsKeyPressed(ImGuiKey_Y, false) ||
                 (io.KeyShift && ImGui::IsKeyPressed(ImGuiKey_Z, false)))
             {
-                if (m_Context && m_Context->CanRedo())
+                if (m_Context->CanRedo())
                 {
                     m_Context->Redo();
                 }
@@ -102,20 +121,20 @@ namespace Tiles
 
             if (ImGui::MenuItem("Open Project", "Ctrl+O"))
             {
-                if (m_OpenProjectCallback) m_OpenProjectCallback();
+                OpenProject();
             }
 
             ImGui::Separator();
 
-            bool hasProject = IsProjectLoaded();
+            bool hasProject = m_Context && m_Context->HasProject();
             if (ImGui::MenuItem("Save", "Ctrl+S", false, hasProject))
             {
-                if (m_SaveProjectCallback) m_SaveProjectCallback();
+                SaveProject();
             }
 
             if (ImGui::MenuItem("Save As", "Ctrl+Shift+S", false, hasProject))
             {
-                if (m_SaveAsProjectCallback) m_SaveAsProjectCallback();
+                SaveProjectAs();
             }
 
             ImGui::Separator();
@@ -130,7 +149,10 @@ namespace Tiles
 
             if (ImGui::MenuItem("Exit", "Alt+F4"))
             {
-                if (m_ExitCallback) m_ExitCallback();
+                if (m_Context)
+                {
+					Application::GetInstance().Shutdown();
+                }
             }
 
             ImGui::EndMenu();
@@ -141,7 +163,7 @@ namespace Tiles
     {
         if (ImGui::BeginMenu("Edit"))
         {
-            bool hasProject = IsProjectLoaded();
+            bool hasProject = m_Context && m_Context->HasProject();
             bool canUndo = hasProject && m_Context->CanUndo();
             bool canRedo = hasProject && m_Context->CanRedo();
 
@@ -170,14 +192,14 @@ namespace Tiles
     {
         if (ImGui::BeginMenu("Project"))
         {
-            bool hasProject = IsProjectLoaded();
+            bool hasProject = m_Context && m_Context->HasProject();
 
             if (ImGui::MenuItem("Resize Project", nullptr, false, hasProject))
             {
                 if (hasProject)
                 {
                     // Initialize resize dialog with current dimensions
-                    const auto& layerStack = m_Context->GetProject().GetLayerStack();
+                    const auto& layerStack = m_Context->GetProject()->GetLayerStack();
                     m_ResizeWidth = layerStack.GetWidth();
                     m_ResizeHeight = layerStack.GetHeight();
                     m_ShowResizeProjectDialog = true;
@@ -191,14 +213,14 @@ namespace Tiles
                 if (hasProject)
                 {
                     const auto& project = m_Context->GetProject();
-                    const auto& layerStack = project.GetLayerStack();
+                    const auto& layerStack = project->GetLayerStack();
 
-                    ImGui::Text("Name: %s", project.GetProjectName().c_str());
+                    ImGui::Text("Name: %s", project->GetProjectName().c_str());
                     ImGui::Text("Dimensions: %dx%d", layerStack.GetWidth(), layerStack.GetHeight());
                     ImGui::Text("Layers: %zu", layerStack.GetLayerCount());
-                    ImGui::Text("Atlases: %zu", project.GetTextureAtlasCount());
+                    ImGui::Text("Atlases: %zu", project->GetTextureAtlasCount());
 
-                    if (project.HasUnsavedChanges())
+                    if (project->HasUnsavedChanges())
                     {
                         ImGui::TextColored(UI::Color::TextError, "Unsaved Changes");
                     }
@@ -234,6 +256,7 @@ namespace Tiles
                 ImGui::MenuItem("Brush Attributes", nullptr, true);
                 ImGui::MenuItem("Brush Preview", nullptr, true);
                 ImGui::MenuItem("Tool Selection", nullptr, true);
+                ImGui::MenuItem("Debug Panel", nullptr, true);
                 ImGui::EndMenu();
             }
 
@@ -257,6 +280,57 @@ namespace Tiles
 
             ImGui::EndMenu();
         }
+    }
+
+    void PanelMenuBar::OpenProject()
+    {
+        m_FileDialogMode = FileDialogMode::Open;
+        m_ShowOpenDialog = true;
+    }
+
+    void PanelMenuBar::SaveProject()
+    {
+        if (!m_Context || !m_Context->HasProject())
+            return;
+
+        // Try to save current project
+        if (!m_Context->SaveProject())
+        {
+            // If save failed (probably because it's a new project), show Save As dialog
+            SaveProjectAs();
+        }
+    }
+
+    void PanelMenuBar::SaveProjectAs()
+    {
+        if (!m_Context || !m_Context->HasProject())
+            return;
+
+        m_FileDialogMode = FileDialogMode::SaveAs;
+        m_ShowSaveAsDialog = true;
+    }
+
+    void PanelMenuBar::CreateNewProject()
+    {
+        if (!m_Context)
+            return;
+
+        m_Context->NewProject(
+            std::string(m_NewProjectName),
+            static_cast<uint32_t>(m_NewProjectWidth),
+            static_cast<uint32_t>(m_NewProjectHeight)
+        );
+    }
+
+    void PanelMenuBar::ResizeCurrentProject()
+    {
+        if (!m_Context || !m_Context->HasProject())
+            return;
+
+        m_Context->ResizeProject(
+            static_cast<uint32_t>(m_ResizeWidth),
+            static_cast<uint32_t>(m_ResizeHeight)
+        );
     }
 
     void PanelMenuBar::ShowNewProjectDialog()
@@ -295,11 +369,7 @@ namespace Tiles
 
             if (ImGui::Button("Create", ImVec2(buttonWidth, 0)))
             {
-                if (m_NewProjectCallback)
-                {
-                    // TODO: Pass project parameters to callback
-                    m_NewProjectCallback();
-                }
+                CreateNewProject();
                 m_ShowNewProjectDialog = false;
             }
 
@@ -346,11 +416,7 @@ namespace Tiles
 
             if (ImGui::Button("Resize", ImVec2(buttonWidth, 0)))
             {
-                if (m_Context)
-                {
-                    m_Context->GetProject().GetLayerStack().Resize(m_ResizeWidth, m_ResizeHeight);
-                    m_Context->GetProject().MarkAsModified();
-                }
+                ResizeCurrentProject();
                 m_ShowResizeProjectDialog = false;
             }
 
@@ -401,23 +467,59 @@ namespace Tiles
         ImGui::End();
     }
 
-    bool PanelMenuBar::IsProjectLoaded() const
+    void PanelMenuBar::ShowFileDialog()
     {
-        return m_Context != nullptr;
-    }
-
-    std::string PanelMenuBar::GetProjectDisplayName() const
-    {
-        if (!IsProjectLoaded()) return "";
-
-        const auto& project = m_Context->GetProject();
-        std::string name = project.GetProjectName();
-
-        if (project.IsNew())
+        if (m_FileDialogMode == FileDialogMode::Open)
         {
-            return name + " (Unsaved)";
+            // Using ImGuiFileDialog library
+            if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+            {
+                if (ImGuiFileDialog::Instance()->IsOk())
+                {
+                    std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+                    if (m_Context)
+                    {
+                        m_Context->LoadProject(filePath);
+                    }
+                }
+                ImGuiFileDialog::Instance()->Close();
+                m_ShowOpenDialog = false;
+                m_FileDialogMode = FileDialogMode::None;
+            }
+        }
+        else if (m_FileDialogMode == FileDialogMode::SaveAs)
+        {
+            if (ImGuiFileDialog::Instance()->Display("SaveFileDlgKey"))
+            {
+                if (ImGuiFileDialog::Instance()->IsOk())
+                {
+                    std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
+                    if (m_Context)
+                    {
+                        m_Context->SaveProjectAs(filePath);
+                    }
+                }
+                ImGuiFileDialog::Instance()->Close();
+                m_ShowSaveAsDialog = false;
+                m_FileDialogMode = FileDialogMode::None;
+            }
         }
 
-        return name;
+        // Initialize file dialogs when needed
+        if (m_ShowOpenDialog && m_FileDialogMode == FileDialogMode::Open)
+        {
+            IGFD::FileDialogConfig config;
+            config.path = ".";
+            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Open Project", ".tiles", config);
+            m_ShowOpenDialog = false; // Only show once
+        }
+
+        if (m_ShowSaveAsDialog && m_FileDialogMode == FileDialogMode::SaveAs)
+        {
+            IGFD::FileDialogConfig config;
+            config.path = ".";
+            ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Save Project As", ".tiles", config);
+            m_ShowSaveAsDialog = false; // Only show once
+        }
     }
 }

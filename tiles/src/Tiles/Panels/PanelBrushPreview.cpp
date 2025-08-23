@@ -129,7 +129,7 @@ namespace Tiles
 
         if (brush.IsTextured() && brush.HasValidAtlas())
         {
-            auto texture = m_Context->GetProject().GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
+            auto texture = m_Context->GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
             Lumina::Renderer2D::SetQuadTexture(texture);
         }
 

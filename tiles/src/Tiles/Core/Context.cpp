@@ -139,4 +139,141 @@ namespace Tiles
             m_WorkingLayer = layerStack.GetLayerCount() - 1;
         }
     }
+
+    // Add these implementations to your Context.cpp file:
+
+    void Context::NewProject(const std::string& name, uint32_t width, uint32_t height)
+    {
+        // Clear command history for new project
+        ClearHistory();
+
+        // Create new project
+        m_Project = CreateRef<Project>(width, height, name);
+
+        // Reset working layer to 0 (the default layer)
+        m_WorkingLayer = 0;
+
+        // Reset painting state
+        m_PaintingMode = PaintingMode::None;
+        m_Brush = Tile(); // Reset to default tile
+
+        // Update access time
+        UpdateLastAccessed();
+    }
+
+    bool Context::LoadProject(const std::filesystem::path& filePath)
+    {
+        try
+        {
+            // Clear command history before loading
+            ClearHistory();
+
+            // Load project from file
+            auto loadedProject = Project::Deserialize(filePath);
+            if (!loadedProject)
+            {
+                return false;
+            }
+
+            // Replace current project
+            m_Project = std::shared_ptr<Project>(std::move(loadedProject));
+
+            // Reset context state for loaded project
+            m_WorkingLayer = 0;
+            m_PaintingMode = PaintingMode::None;
+            m_Brush = Tile();
+
+            // Validate working layer
+            ValidateWorkingLayer();
+
+            // Update access time
+            UpdateLastAccessed();
+
+            return true;
+        }
+        catch (const std::exception&)
+        {
+            return false;
+        }
+    }
+
+    bool Context::SaveProject()
+    {
+        if (!m_Project)
+            return false;
+
+        // If project is new (no file path), we need to save as
+        if (m_Project->IsNew())
+        {
+            // You might want to trigger a file dialog here
+            // For now, return false to indicate "Save As" is needed
+            return false;
+        }
+
+        try
+        {
+            Project::Serialize(*m_Project, m_Project->GetFilePath());
+            m_Project->MarkAsSaved();
+            return true;
+        }
+        catch (const std::exception&)
+        {
+            return false;
+        }
+    }
+
+    bool Context::SaveProjectAs(const std::filesystem::path& filePath)
+    {
+        if (!m_Project)
+            return false;
+
+        try
+        {
+            // Update project file path
+            m_Project->SetFilePath(filePath.string());
+
+            // Save to the new location
+            Project::Serialize(*m_Project, filePath);
+            m_Project->MarkAsSaved();
+
+            return true;
+        }
+        catch (const std::exception&)
+        {
+            return false;
+        }
+    }
+
+    void Context::ResizeProject(uint32_t width, uint32_t height)
+    {
+        if (!m_Project)
+            return;
+
+        // Resize the layer stack
+        m_Project->GetLayerStack().Resize(width, height);
+
+        // Mark project as modified
+        m_Project->MarkAsModified();
+
+        // Validate working layer after resize
+        ValidateWorkingLayer();
+
+        // Update access time
+        UpdateLastAccessed();
+    }
+
+    std::string Context::GetProjectDisplayName() const
+    {
+        if (!m_Project)
+            return "No Project";
+
+        std::string name = m_Project->GetProjectName();
+
+        if (m_Project->IsNew())
+        {
+            name += " (Unsaved)";
+        }
+
+        return name;
+    }
 }

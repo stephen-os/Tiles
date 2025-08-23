@@ -105,8 +105,8 @@ namespace Tiles
             constexpr float DefaultTileSize = 64.0f;
             constexpr float MinZoom = 0.5f;
             constexpr float MaxZoom = 3.0f;
-            constexpr float ZoomSensitivity = 0.01f;
-            constexpr float PanSensitivity = 2.0f;
+            constexpr float ZoomSensitivity = 0.05f;
+            constexpr float PanSensitivity = 20.0f;
         }
 
         namespace Depth
@@ -120,7 +120,7 @@ namespace Tiles
 
         namespace Input
         {
-            constexpr float CameraMoveSpeed = 0.5f;
+            constexpr float CameraMoveSpeed = 5.0f;
             constexpr float MousePanSensitivity = 0.002f;
         }
 

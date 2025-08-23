@@ -1,56 +1,48 @@
 #pragma once
-
 #include "Panel.h"
 #include "imgui.h"
 #include <string>
-#include <functional>
 
 namespace Tiles
 {
     class PanelMenuBar : public Panel
     {
     public:
-        PanelMenuBar(Ref<Context> context) : Panel(context) {}
+        PanelMenuBar(Ref<Context> context);
         ~PanelMenuBar() = default;
 
         void Render() override;
         void Update() override;
 
-        // Callback setters for external handling
-        void SetNewProjectCallback(std::function<void()> callback) { m_NewProjectCallback = callback; }
-        void SetOpenProjectCallback(std::function<void()> callback) { m_OpenProjectCallback = callback; }
-        void SetSaveProjectCallback(std::function<void()> callback) { m_SaveProjectCallback = callback; }
-        void SetSaveAsProjectCallback(std::function<void()> callback) { m_SaveAsProjectCallback = callback; }
-        void SetExitCallback(std::function<void()> callback) { m_ExitCallback = callback; }
-        void SetResizeProjectCallback(std::function<void()> callback) { m_ResizeProjectCallback = callback; }
-
     private:
+        // Menu rendering methods
         void RenderFileMenu();
         void RenderEditMenu();
         void RenderProjectMenu();
         void RenderViewMenu();
         void RenderHelpMenu();
 
+        // Dialog rendering methods
         void ShowNewProjectDialog();
         void ShowResizeProjectDialog();
         void ShowAboutDialog();
+        void ShowFileDialog();
 
-        bool IsProjectLoaded() const;
-        std::string GetProjectDisplayName() const;
+        // Helper methods
+        void HandleKeyboardShortcuts();
+        void OpenProject();
+        void SaveProject();
+        void SaveProjectAs();
+        void CreateNewProject();
+        void ResizeCurrentProject();
 
     private:
-        // Callbacks for external handling
-        std::function<void()> m_NewProjectCallback;
-        std::function<void()> m_OpenProjectCallback;
-        std::function<void()> m_SaveProjectCallback;
-        std::function<void()> m_SaveAsProjectCallback;
-        std::function<void()> m_ExitCallback;
-        std::function<void()> m_ResizeProjectCallback;
-
         // Dialog state
         bool m_ShowNewProjectDialog = false;
         bool m_ShowResizeProjectDialog = false;
         bool m_ShowAboutDialog = false;
+        bool m_ShowOpenDialog = false;
+        bool m_ShowSaveAsDialog = false;
 
         // New project dialog state
         char m_NewProjectName[128] = "New Project";
@@ -60,5 +52,14 @@ namespace Tiles
         // Resize project dialog state
         int m_ResizeWidth = 32;
         int m_ResizeHeight = 32;
+
+        // File dialog state
+        std::string m_CurrentFilePath;
+        enum class FileDialogMode
+        {
+            None,
+            Open,
+            SaveAs
+        } m_FileDialogMode = FileDialogMode::None;
     };
 }

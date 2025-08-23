@@ -9,6 +9,7 @@
 #include "Panels/PanelBrushAttributes.h"
 #include "Panels/PanelMenuBar.h"
 #include "Panels/PanelViewport.h"
+#include "Panels/PanelDebug.h"
 
 #include "Lumina/Core/Log.h"
 
@@ -28,7 +29,7 @@ namespace Tiles
 		m_PanelManager.RegisterPanel<PanelMenuBar>(context);
         m_PanelManager.RegisterPanel<PanelViewport>(context);
 #ifdef LUMINA_DEBUG
-
+		m_PanelManager.RegisterPanel<PanelDebug>(context);
 #endif
     }
 

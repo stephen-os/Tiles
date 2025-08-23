@@ -76,9 +76,9 @@ namespace Tiles
 
         // Camera movement with WASD
         if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::W))
-            m_Camera->MoveUp(-Viewport::Input::CameraMoveSpeed);
-        if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::S))
             m_Camera->MoveUp(Viewport::Input::CameraMoveSpeed);
+        if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::S))
+            m_Camera->MoveUp(-Viewport::Input::CameraMoveSpeed);
         if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::A))
             m_Camera->MoveRight(Viewport::Input::CameraMoveSpeed);
         if (Lumina::Input::IsKeyPressed(Lumina::KeyCode::D))
@@ -100,7 +100,7 @@ namespace Tiles
     void PanelViewport::RenderGrid()
     {
         glm::vec3 cameraPos = m_Camera->GetPosition();
-        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
 
         // Render infinite checkerboard pattern
         Lumina::Renderer2D::SetGridPosition({
@@ -108,7 +108,7 @@ namespace Tiles
             cameraPos.y + m_TileSize / 2,
             Viewport::Depth::Grid
             });
-        Lumina::Renderer2D::SetGridSize({ 4096.0f, 4096.0f });
+        Lumina::Renderer2D::SetGridSize({ 16384.0f, 16384.0f });
         Lumina::Renderer2D::SetGridCellSize(m_TileSize / 2);
         Lumina::Renderer2D::SetGridColor(Viewport::Grid::GridColor);
         Lumina::Renderer2D::SetGridLineWidth(2.0f);
@@ -124,7 +124,7 @@ namespace Tiles
     void PanelViewport::RenderLayerBoundaries()
     {
         glm::vec3 cameraPos = m_Camera->GetPosition();
-        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
 
         const float gridWidth = layerStack.GetWidth();
         const float gridHeight = layerStack.GetHeight();
@@ -188,7 +188,7 @@ namespace Tiles
 
     void PanelViewport::RenderLayers()
     {
-        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
         glm::vec3 cameraPos = m_Camera->GetPosition();
 
         // Render layers from bottom to top (reverse iteration for proper layering)
@@ -205,7 +205,7 @@ namespace Tiles
 
     void PanelViewport::RenderLayer(const TileLayer& layer, size_t layerIndex, const glm::vec3& cameraPos)
     {
-        const auto& textureAtlases = m_Context->GetProject().GetTextureAtlases();
+        const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
 
         for (size_t y = 0; y < layer.GetHeight(); ++y)
         {
@@ -266,7 +266,7 @@ namespace Tiles
     {
         if (!ImGui::IsWindowHovered()) return;
 
-        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
         glm::vec3 cameraPos = m_Camera->GetPosition();
 
         // Get grid position under mouse
@@ -325,7 +325,7 @@ namespace Tiles
             });
 
         // Set texture if brush has one
-        const auto& textureAtlases = m_Context->GetProject().GetTextureAtlases();
+        const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
         if (brush.IsTextured() && brush.HasValidAtlas() &&
             brush.GetAtlasIndex() < textureAtlases.size())
         {
@@ -416,7 +416,7 @@ namespace Tiles
 
     bool PanelViewport::IsValidGridPosition(const glm::ivec2& gridPos) const
     {
-        const LayerStack& layerStack = m_Context->GetProject().GetLayerStack();
+        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
         return gridPos.x >= 1 && gridPos.x <= static_cast<int>(layerStack.GetWidth()) &&
             gridPos.y >= 1 && gridPos.y <= static_cast<int>(layerStack.GetHeight());
     }

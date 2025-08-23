@@ -37,9 +37,8 @@ namespace Tiles
         ~Context() = default;
 
         // Project access
-        Project& GetProject() { return *m_Project; }
-        const Project& GetProject() const { return *m_Project; }
-        std::shared_ptr<Project> GetProjectPtr() { return m_Project; }
+        Ref<Project> GetProject() { return m_Project; }
+        const Ref<Project> GetProject() const { return m_Project; }
 
         // Working layer management
         void SetWorkingLayer(size_t index);
@@ -75,6 +74,18 @@ namespace Tiles
         bool IsDirty() const { return m_Project->HasUnsavedChanges(); }
         void UpdateLastAccessed() { m_Project->UpdateLastAccessed(); }
 
+        // Project lifecycle management
+        void NewProject(const std::string& name, uint32_t width, uint32_t height);
+        bool LoadProject(const std::filesystem::path& filePath);
+        bool SaveProject();
+        bool SaveProjectAs(const std::filesystem::path& filePath);
+
+        // Project operations
+        void ResizeProject(uint32_t width, uint32_t height);
+        bool HasProject() const { return m_Project != nullptr; }
+
+        // Project display info
+        std::string GetProjectDisplayName() const;
     private:
         void ValidateWorkingLayer();
 
