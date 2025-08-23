@@ -4,25 +4,92 @@
 #include "Commands/TileEraseCommand.h"
 #include "Commands/LayerFillCommand.h"
 
-#include "Lumina/Core/Assert.h"
+#include <algorithm>
 
 namespace Tiles
 {
+    Lumina::Ref<Context> Context::Create(Lumina::Ref<Project> project)
+    {
+        return Lumina::CreateRef<Context>(project);
+    }
+
+    Lumina::Ref<Context> Context::Create()
+    {
+        auto project = Lumina::CreateRef<Project>(16, 16, "Untitled");
+        return Lumina::CreateRef<Context>(project);
+    }
+
     Context::Context(std::shared_ptr<Project> project)
         : m_Project(project), m_WorkingLayer(0), m_PaintingMode(PaintingMode::None)
     {
-        LUMINA_ASSERT(m_Project, "Project cannot be null");
+        m_ViewportCamera = Lumina::CreateRef<Lumina::OrthographicCamera>();
+        InitializeSceneCamera();
         ValidateWorkingLayer();
         UpdateLastAccessed();
 
-		m_Brush.SetPainted(true);
+        m_Brush.SetPainted(true);
+    }
+
+    void Context::InitializeSceneCamera()
+    {
+        const auto& layerStack = m_Project->GetLayerStack();
+        const float gridWidth = static_cast<float>(layerStack.GetWidth());
+        const float gridHeight = static_cast<float>(layerStack.GetHeight());
+
+        m_ViewportCamera->SetPosition({
+            Viewport::Render::DefaultTileSize * (gridWidth * 0.5f),
+            Viewport::Render::DefaultTileSize * (gridHeight * 0.5f),
+            1.0f
+            });
+
+        m_ViewportCamera->SetZoom(1.0f);
+    }
+
+    void Context::ResetViewportCamera()
+    {
+        InitializeSceneCamera();
+    }
+
+    void Context::FitViewportCameraToProject()
+    {
+        const auto& layerStack = m_Project->GetLayerStack();
+        const float projectWidth = layerStack.GetWidth() * Viewport::Render::DefaultTileSize;
+        const float projectHeight = layerStack.GetHeight() * Viewport::Render::DefaultTileSize;
+
+        CenterViewportCameraOnProject();
+
+        const float viewportWidth = 800.0f;
+        const float viewportHeight = 600.0f;
+
+        const float zoomX = viewportWidth / projectWidth;
+        const float zoomY = viewportHeight / projectHeight;
+        const float fitZoom = std::min(zoomX, zoomY) * 0.9f;
+
+        const float clampedZoom = std::clamp(fitZoom, Viewport::Render::MinZoom, Viewport::Render::MaxZoom);
+        m_ViewportCamera->SetZoom(clampedZoom);
+    }
+
+    void Context::CenterViewportCameraOnProject()
+    {
+        const auto& layerStack = m_Project->GetLayerStack();
+        const float gridWidth = static_cast<float>(layerStack.GetWidth());
+        const float gridHeight = static_cast<float>(layerStack.GetHeight());
+
+        glm::vec3 currentPos = m_ViewportCamera->GetPosition();
+        m_ViewportCamera->SetPosition({
+            Viewport::Render::DefaultTileSize * (gridWidth * 0.5f),
+            Viewport::Render::DefaultTileSize * (gridHeight * 0.5f),
+            currentPos.z
+            });
     }
 
     void Context::SetWorkingLayer(size_t index)
     {
         LayerStack& layerStack = m_Project->GetLayerStack();
-        LUMINA_ASSERT(layerStack.IsValidLayerIndex(index), "Invalid working layer index");
-        m_WorkingLayer = index;
+        if (layerStack.IsValidLayerIndex(index))
+        {
+            m_WorkingLayer = index;
+        }
     }
 
     bool Context::HasWorkingLayer() const
@@ -32,32 +99,35 @@ namespace Tiles
 
     TileLayer& Context::GetWorkingLayerRef()
     {
-        LUMINA_ASSERT(HasWorkingLayer(), "No valid working layer");
         return m_Project->GetLayerStack().GetLayer(m_WorkingLayer);
     }
 
     const TileLayer& Context::GetWorkingLayerRef() const
     {
-        LUMINA_ASSERT(HasWorkingLayer(), "No valid working layer");
         return m_Project->GetLayerStack().GetLayer(m_WorkingLayer);
     }
 
     void Context::PaintTile(size_t x, size_t y)
     {
-        LUMINA_ASSERT(HasWorkingLayer(), "No valid working layer for painting");
-        PaintTileOnLayer(m_WorkingLayer, x, y, m_Brush);
+        if (HasWorkingLayer())
+        {
+            PaintTileOnLayer(m_WorkingLayer, x, y, m_Brush);
+        }
     }
 
     void Context::PaintTileWithBrush(size_t x, size_t y, const Tile& brush)
     {
-        LUMINA_ASSERT(HasWorkingLayer(), "No valid working layer for painting");
-        PaintTileOnLayer(m_WorkingLayer, x, y, brush);
+        if (HasWorkingLayer())
+        {
+            PaintTileOnLayer(m_WorkingLayer, x, y, brush);
+        }
     }
 
     void Context::PaintTileOnLayer(size_t layerIndex, size_t x, size_t y, const Tile& tile)
     {
         LayerStack& layerStack = m_Project->GetLayerStack();
-        LUMINA_ASSERT(layerStack.IsValidLayerIndex(layerIndex), "Invalid layer index for painting");
+        if (!layerStack.IsValidLayerIndex(layerIndex))
+            return;
 
         switch (m_PaintingMode)
         {
@@ -84,21 +154,25 @@ namespace Tiles
 
     void Context::EraseTile(size_t x, size_t y)
     {
-        LUMINA_ASSERT(HasWorkingLayer(), "No valid working layer for erasing");
-        auto command = std::make_unique<TileEraseCommand>(x, y, m_WorkingLayer);
-        ExecuteCommand(std::move(command));
+        if (HasWorkingLayer())
+        {
+            auto command = std::make_unique<TileEraseCommand>(x, y, m_WorkingLayer);
+            ExecuteCommand(std::move(command));
+        }
     }
 
     void Context::FillLayer(size_t x, size_t y)
     {
-        LUMINA_ASSERT(HasWorkingLayer(), "No valid working layer for filling");
-        auto command = std::make_unique<LayerFillCommand>(x, y, m_WorkingLayer, m_Brush);
-        ExecuteCommand(std::move(command));
+        if (HasWorkingLayer())
+        {
+            auto command = std::make_unique<LayerFillCommand>(x, y, m_WorkingLayer, m_Brush);
+            ExecuteCommand(std::move(command));
+        }
     }
 
     void Context::ExecuteCommand(std::unique_ptr<Command> command)
     {
-        if (command)
+        if (command && m_Project)
         {
             m_CommandHistory.Execute(std::move(command), m_Project->GetLayerStack());
             m_Project->MarkAsModified();
@@ -140,24 +214,15 @@ namespace Tiles
         }
     }
 
-    // Add these implementations to your Context.cpp file:
-
     void Context::NewProject(const std::string& name, uint32_t width, uint32_t height)
     {
-        // Clear command history for new project
         ClearHistory();
-
-        // Create new project
-        m_Project = CreateRef<Project>(width, height, name);
-
-        // Reset working layer to 0 (the default layer)
+        m_Project = Lumina::CreateRef<Project>(width, height, name);
         m_WorkingLayer = 0;
-
-        // Reset painting state
         m_PaintingMode = PaintingMode::None;
-        m_Brush = Tile(); // Reset to default tile
-
-        // Update access time
+        m_Brush = Tile();
+        m_Brush.SetPainted(true);
+        InitializeSceneCamera();
         UpdateLastAccessed();
     }
 
@@ -165,30 +230,20 @@ namespace Tiles
     {
         try
         {
-            // Clear command history before loading
             ClearHistory();
-
-            // Load project from file
             auto loadedProject = Project::Deserialize(filePath);
             if (!loadedProject)
             {
                 return false;
             }
-
-            // Replace current project
             m_Project = std::shared_ptr<Project>(std::move(loadedProject));
-
-            // Reset context state for loaded project
             m_WorkingLayer = 0;
             m_PaintingMode = PaintingMode::None;
             m_Brush = Tile();
-
-            // Validate working layer
+            m_Brush.SetPainted(true);
             ValidateWorkingLayer();
-
-            // Update access time
+            InitializeSceneCamera();
             UpdateLastAccessed();
-
             return true;
         }
         catch (const std::exception&)
@@ -199,17 +254,10 @@ namespace Tiles
 
     bool Context::SaveProject()
     {
-        if (!m_Project)
-            return false;
-
-        // If project is new (no file path), we need to save as
-        if (m_Project->IsNew())
+        if (!m_Project || m_Project->IsNew())
         {
-            // You might want to trigger a file dialog here
-            // For now, return false to indicate "Save As" is needed
             return false;
         }
-
         try
         {
             Project::Serialize(*m_Project, m_Project->GetFilePath());
@@ -229,13 +277,9 @@ namespace Tiles
 
         try
         {
-            // Update project file path
             m_Project->SetFilePath(filePath.string());
-
-            // Save to the new location
             Project::Serialize(*m_Project, filePath);
             m_Project->MarkAsSaved();
-
             return true;
         }
         catch (const std::exception&)
@@ -249,16 +293,27 @@ namespace Tiles
         if (!m_Project)
             return;
 
-        // Resize the layer stack
+        const auto& layerStack = m_Project->GetLayerStack();
+        const float oldWidth = static_cast<float>(layerStack.GetWidth());
+        const float oldHeight = static_cast<float>(layerStack.GetHeight());
+
         m_Project->GetLayerStack().Resize(width, height);
-
-        // Mark project as modified
         m_Project->MarkAsModified();
-
-        // Validate working layer after resize
         ValidateWorkingLayer();
 
-        // Update access time
+        glm::vec3 currentPos = m_ViewportCamera->GetPosition();
+        const float relativeX = currentPos.x / (oldWidth * Viewport::Render::DefaultTileSize);
+        const float relativeY = currentPos.y / (oldHeight * Viewport::Render::DefaultTileSize);
+
+        const float clampedX = std::clamp(relativeX, 0.0f, 1.0f);
+        const float clampedY = std::clamp(relativeY, 0.0f, 1.0f);
+
+        m_ViewportCamera->SetPosition({
+            clampedX * width * Viewport::Render::DefaultTileSize,
+            clampedY * height * Viewport::Render::DefaultTileSize,
+            currentPos.z
+            });
+
         UpdateLastAccessed();
     }
 
@@ -268,12 +323,10 @@ namespace Tiles
             return "No Project";
 
         std::string name = m_Project->GetProjectName();
-
         if (m_Project->IsNew())
         {
             name += " (Unsaved)";
         }
-
         return name;
     }
 }

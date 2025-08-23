@@ -4,6 +4,8 @@
 #include "Lumina/Lumina.h"
 #include "imgui.h"
 
+#include "../Core/Base.h"
+
 using namespace Lumina;
 
 namespace Tiles
@@ -18,12 +20,10 @@ namespace Tiles
         void Update() override;
 
     private:
-        // Coordinate transformation
         glm::vec2 ScreenToWorld() const;
         glm::ivec2 GetGridPositionUnderMouse() const;
         bool IsValidGridPosition(const glm::ivec2& gridPos) const;
 
-        // Rendering methods
         void RenderGrid();
         void RenderLayerBoundaries();
         void RenderLayers();
@@ -34,9 +34,11 @@ namespace Tiles
         void RenderFillPreview();
         void RenderBasicHover();
 
-        // Input handling
-        void HandleInput();
         void ExecutePaintAction(const glm::ivec2& gridPos);
+
+        void HandleInput();
+        void HandleCameraMovement();
+        void HandleZoom();
 
     private:
         Ref<OrthographicCamera> m_Camera;
