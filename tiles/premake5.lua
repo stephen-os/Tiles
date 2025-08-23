@@ -11,6 +11,8 @@ project "Tiles"
 
    includedirs
    {
+      "src/Tiles",
+
       "../lumina/lumina/src",
 
       "../lumina/dependencies/imgui",
