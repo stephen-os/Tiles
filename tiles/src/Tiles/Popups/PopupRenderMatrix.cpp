@@ -1,7 +1,11 @@
 #include "PopupRenderMatrix.h"
-#include "Panels/Constants.h"
+
+#include "Core/Constants.h"
+
 #include "Lumina/Lumina.h"
+
 #include "ImGuiFileDialog.h"
+
 #include <algorithm>
 #include <sstream>
 #include <set>

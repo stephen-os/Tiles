@@ -54,15 +54,15 @@ namespace Tiles
             ShowAboutDialog();
         }
 
-        if (m_ShowOpenDialog || m_ShowSaveAsDialog)
-        {
-            ShowFileDialog();
-        }
+        m_PopupSave.Render();
+        m_PopupSaveAs.Render();
+        m_PopupOpenProject.Render();
 
         if (m_PopupRenderMatrix.IsVisible())
         {
             m_PopupRenderMatrix.Render();
         }
+        
     }
 
     void PanelMenuBar::Update()
@@ -84,17 +84,18 @@ namespace Tiles
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_O, false))
             {
-                OpenProject();
+				m_PopupOpenProject.Show(m_Context); 
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_S, false))
             {
-                if (io.KeyShift)
+                auto project = m_Context->GetProject();
+                if (project->IsNew() && project->HasUnsavedChanges())
                 {
-                    SaveProjectAs();
+                    m_PopupSaveAs.Show(m_Context);
                 }
                 else
                 {
-                    SaveProject();
+                    m_Context->SaveProject(); 
                 }
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_Z, false))
@@ -126,7 +127,7 @@ namespace Tiles
 
             if (ImGui::MenuItem("Open Project", "Ctrl+O"))
             {
-                OpenProject();
+				m_PopupOpenProject.Show(m_Context);
             }
 
             ImGui::Separator();
@@ -134,12 +135,20 @@ namespace Tiles
             bool hasProject = m_Context && m_Context->HasProject();
             if (ImGui::MenuItem("Save", "Ctrl+S", false, hasProject))
             {
-                SaveProject();
+                auto project = m_Context->GetProject();
+                if (project->IsNew() && project->HasUnsavedChanges())
+                {
+                    m_PopupSaveAs.Show(m_Context);
+                }
+                else
+                {
+                    m_Context->SaveProject();
+                }
             }
 
             if (ImGui::MenuItem("Save As", "Ctrl+Shift+S", false, hasProject))
             {
-                SaveProjectAs();
+				m_PopupSaveAs.Show(m_Context);
             }
 
             ImGui::Separator();
@@ -292,34 +301,6 @@ namespace Tiles
 
             ImGui::EndMenu();
         }
-    }
-
-    void PanelMenuBar::OpenProject()
-    {
-        m_FileDialogMode = FileDialogMode::Open;
-        m_ShowOpenDialog = true;
-    }
-
-    void PanelMenuBar::SaveProject()
-    {
-        if (!m_Context || !m_Context->HasProject())
-            return;
-
-        // Try to save current project
-        if (!m_Context->SaveProject())
-        {
-            // If save failed (probably because it's a new project), show Save As dialog
-            SaveProjectAs();
-        }
-    }
-
-    void PanelMenuBar::SaveProjectAs()
-    {
-        if (!m_Context || !m_Context->HasProject())
-            return;
-
-        m_FileDialogMode = FileDialogMode::SaveAs;
-        m_ShowSaveAsDialog = true;
     }
 
     void PanelMenuBar::CreateNewProject()

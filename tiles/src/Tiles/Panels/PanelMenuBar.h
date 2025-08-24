@@ -4,6 +4,9 @@
 #include <string>
 
 #include "Popups/PopupRenderMatrix.h"
+#include "Popups/PopupSave.h"          
+#include "Popups/PopupSaveAs.h"
+#include "Popups/PopupOpenProject.h"
 
 namespace Tiles
 {
@@ -32,9 +35,6 @@ namespace Tiles
 
         // Helper methods
         void HandleKeyboardShortcuts();
-        void OpenProject();
-        void SaveProject();
-        void SaveProjectAs();
         void CreateNewProject();
         void ResizeCurrentProject();
 
@@ -42,6 +42,9 @@ namespace Tiles
 
     private:
 		PopupRenderMatrix m_PopupRenderMatrix;
+        PopupSave m_PopupSave;
+        PopupSaveAs m_PopupSaveAs;
+        PopupOpenProject m_PopupOpenProject;
 
     private:
         // Dialog state
