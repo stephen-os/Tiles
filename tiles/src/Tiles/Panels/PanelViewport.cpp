@@ -55,6 +55,9 @@ namespace Tiles
         Renderer2D::End();
         Renderer2D::SetRenderTarget(nullptr);
 
+        Lumina::Renderer2D::ResetQuadState();
+		Lumina::Renderer2D::ResetLineState();
+
         ImGui::Image((void*)m_RenderTarget->GetTexture(), m_ViewportSize);
 
         m_MouseDelta = ImGui::GetIO().MouseWheel;

@@ -151,6 +151,9 @@ namespace Tiles
         Lumina::Renderer2D::End();
         Lumina::Renderer2D::SetRenderTarget(nullptr);
 
+		Lumina::Renderer2D::ResetQuadState();
+        Lumina::Renderer2D::ResetLineState();
+
         // Handle mouse interaction
         ImGui::InvisibleButton("PreviewCanvas", previewDimensions);
         bool isCanvasHovered = ImGui::IsItemHovered();
