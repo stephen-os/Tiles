@@ -145,7 +145,7 @@ namespace Tiles
     void PanelBrushAttributes::RenderSectionTint()
     {
         auto& brush = m_Context->GetBrush();
-        auto tint = brush.GetTint();
+        auto& tint = brush.GetTint();
 
         RenderComponentTitle("Tint");
 
@@ -466,7 +466,7 @@ namespace Tiles
             ImGuiColorEditFlags_AlphaPreview |
             ImGuiColorEditFlags_DisplayRGB |
             ImGuiColorEditFlags_NoLabel;
-        ImGui::ColorEdit4("##ColorPicker", glm::value_ptr(color), flags);
+        ImGui::ColorEdit4("##ColorPicker", glm::value_ptr(color), flags, UI::Component::SpaceBetween);
 
         ImGui::PopStyleColor(3);
         ImGui::PopStyleVar(2);
