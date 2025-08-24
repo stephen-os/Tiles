@@ -6,7 +6,7 @@
 #include "Project.h"
 #include "CommandHistory.h"
 
-#include "../Panels/Constants.h"
+#include "Constants.h"
 
 #include "Lumina/Lumina.h"
 

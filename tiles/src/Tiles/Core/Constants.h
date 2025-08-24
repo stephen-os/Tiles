@@ -231,4 +231,28 @@ namespace Tiles
             constexpr glm::vec4 Blue = { 0.3f, 0.3f, 1.0f, 1.0f };
         }
     }
+
+    namespace JSON
+    {
+        namespace Tile
+        {
+			constexpr const char* Rotation = "rotation";
+			constexpr const char* TintColor = "tint_color";
+			constexpr const char* Size = "size";
+			constexpr const char* TextureCoords = "texture_coords";
+			constexpr const char* AtlasIndex = "atlas_index";
+			constexpr const char* Textured = "is_textured";
+			constexpr const char* Painted = "is_painted";
+        }
+
+        namespace project
+        {
+
+        }
+        
+        namespace Layer
+        {
+
+        }
+    }
 }

@@ -1,6 +1,6 @@
 #include "PanelBrushAttributes.h"
 
-#include "Constants.h"
+#include "Core/Constants.h"
 
 namespace Tiles
 {
