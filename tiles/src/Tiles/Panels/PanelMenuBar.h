@@ -3,8 +3,7 @@
 #include "imgui.h"
 #include <string>
 
-#include "Popups/PopupRenderMatrix.h"
-#include "Popups/PopupSave.h"          
+#include "Popups/PopupRenderMatrix.h"       
 #include "Popups/PopupSaveAs.h"
 #include "Popups/PopupOpenProject.h"
 
@@ -42,7 +41,6 @@ namespace Tiles
 
     private:
 		PopupRenderMatrix m_PopupRenderMatrix;
-        PopupSave m_PopupSave;
         PopupSaveAs m_PopupSaveAs;
         PopupOpenProject m_PopupOpenProject;
 

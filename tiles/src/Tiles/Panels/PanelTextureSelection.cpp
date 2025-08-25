@@ -401,7 +401,7 @@ namespace Tiles
 
     void PanelTextureSelection::AddNewAtlas()
     {
-        auto newAtlas = TextureAtlas::Create(Texture::Atlas::DefaultWidth, Texture::Atlas::DefaultHeight);
+        auto newAtlas = Lumina::TextureAtlas::Create(Texture::Atlas::DefaultWidth, Texture::Atlas::DefaultHeight);
         m_Context->GetProject()->AddTextureAtlas(newAtlas);
         SetCurrentAtlasIndex(m_Context->GetProject()->GetTextureAtlasCount() - 1);
         m_Context->GetProject()->MarkAsModified();

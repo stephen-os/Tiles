@@ -1,84 +1,31 @@
 #include "PopupSaveAs.h"
 
+#include "Core/Constants.h"
+
 #include "ImGuiFileDialog.h"
+
 #include <filesystem>
 
 namespace Tiles
 {
-    PopupSaveAs::PopupSaveAs()
+    PopupSaveAs::PopupSaveAs(Ref<Context> context) : Popup(context) {}
+
+    void PopupSaveAs::OnRender()
     {
-        strcpy_s(m_FileName, sizeof(m_FileName), "Untitled");
-        m_Directory = ".";
-    }
-
-    void PopupSaveAs::Show(Ref<Context> context)
-    {
-        if (!context || !context->HasProject())
-            return;
-
-        m_Context = context;
-        m_IsVisible = true;
-        m_ShowMessage = false;
-        m_MessageTimer = 0.0f;
-
-        // Initialize with current project name and directory
-        auto project = m_Context->GetProject();
-        std::string projectName = project->GetProjectName();
-
-        // Remove any existing extension from project name
-        size_t extensionPos = projectName.find_last_of('.');
-        if (extensionPos != std::string::npos)
+        if (m_FirstShow)
         {
-            projectName = projectName.substr(0, extensionPos);
+            m_ShowMessage = false;
+            m_MessageTimer = 0.0f;
+            m_ShowDirectorySelector = false;
+            InitializeFromCurrentProject();
+            ValidateFileName();
+            m_FirstShow = false;
         }
 
-        strncpy_s(m_FileName, sizeof(m_FileName), projectName.c_str(), _TRUNCATE);
-
-        // Set directory based on current file path or use current directory
-        if (!project->IsNew())
-        {
-            std::filesystem::path currentPath = project->GetFilePath();
-            m_Directory = currentPath.parent_path().string();
-        }
-        else
-        {
-            m_Directory = ".";
-        }
-
-        ValidateFileName();
-    }
-
-    void PopupSaveAs::Render()
-    {
-        if (!m_IsVisible)
-            return;
-
-        // Update message timer
-        if (m_ShowMessage)
-        {
-            m_MessageTimer += ImGui::GetIO().DeltaTime;
-            if (m_MessageTimer >= MESSAGE_DISPLAY_TIME)
-            {
-                m_ShowMessage = false;
-                m_MessageTimer = 0.0f;
-            }
-        }
-
-        RenderSaveAsDialog();
-
-        if (m_ShowDirectorySelector)
-        {
-            ShowDirectoryDialog();
-        }
-    }
-
-    void PopupSaveAs::RenderSaveAsDialog()
-    {
-        ImGui::SetNextWindowSize(ImVec2(500, 250), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(600, 250), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-        if (ImGui::Begin("Save Project As", &m_IsVisible,
-            ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize))
+        if (ImGui::Begin("Save Project As", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize))
         {
             if (!m_Context || !m_Context->HasProject())
             {
@@ -90,12 +37,13 @@ namespace Tiles
             ImGui::Text("Save project as new file:");
             ImGui::Separator();
 
-            RenderFileSettings();
+            RenderBlockFileSettings();
 
             // Show full path preview
             ImGui::Spacing();
             ImGui::Text("Full path:");
-            ImGui::TextColored(UI::Color::TextHint, "%s", GetFullFilePath().c_str());
+			std::string fullPath = GetFullFilePath();
+            ImGui::TextColored(UI::Color::TextHint, "%s", fullPath.c_str());
 
             // Show message if present
             if (m_ShowMessage)
@@ -115,22 +63,80 @@ namespace Tiles
             ImGui::Spacing();
             ImGui::Separator();
 
-            RenderActionButtons();
+            RenderBlockActionButtons();
         }
         ImGui::End();
+
+        // Handle directory selector dialog
+        if (m_ShowDirectorySelector)
+        {
+            ShowDirectoryDialog();
+        }
+
+        // Reset first show flag when hidden
+        if (!m_IsVisible)
+        {
+            m_FirstShow = true;
+        }
     }
 
-    void PopupSaveAs::RenderFileSettings()
+    void PopupSaveAs::OnUpdate()
+    {
+        // Update message timer
+        if (m_ShowMessage)
+        {
+            m_MessageTimer += ImGui::GetIO().DeltaTime;
+            if (m_MessageTimer >= MESSAGE_DISPLAY_TIME)
+            {
+                m_ShowMessage = false;
+                m_MessageTimer = 0.0f;
+            }
+        }
+    }
+
+    void PopupSaveAs::InitializeFromCurrentProject()
+    {
+        if (!m_Context || !m_Context->HasProject())
+            return;
+
+        auto project = m_Context->GetProject();
+        std::string projectName = project->GetProjectName();
+
+        // Remove any existing extension from project name
+        size_t extensionPos = projectName.find_last_of('.');
+        if (extensionPos != std::string::npos)
+        {
+            projectName = projectName.substr(0, extensionPos);
+        }
+
+        m_FileName = projectName;
+
+        // Set directory based on current file path or use current directory
+        if (!project->IsNew())
+        {
+            m_Directory = project->GetFilePath().parent_path();
+        }
+        else
+        {
+            m_Directory = ".";
+        }
+    }
+
+    void PopupSaveAs::RenderBlockFileSettings()
     {
         // Directory input
         ImGui::Text("Directory:");
         ImGui::SetNextItemWidth(-80);
-        ImGui::InputText("##Directory", m_Directory.data(), m_Directory.capacity(), ImGuiInputTextFlags_ReadOnly);
+        std::string directoryStr = m_Directory.string();
+        if (ImGui::InputText("##Directory", directoryStr.data(), directoryStr.capacity() + 1, ImGuiInputTextFlags_ReadOnly))
+        {
+            // Read-only, so no need to update m_Directory
+        }
         ImGui::SameLine();
         if (ImGui::Button("Browse..."))
         {
             IGFD::FileDialogConfig config;
-            config.path = m_Directory.empty() ? "." : m_Directory.c_str();
+            config.path = m_Directory.empty() ? "." : m_Directory.string().c_str();
             config.flags = ImGuiFileDialogFlags_Modal;
             config.countSelectionMax = 1;
 
@@ -149,12 +155,14 @@ namespace Tiles
         // File name input
         ImGui::Text("File name:");
         ImGui::SetNextItemWidth(-80);
-        if (ImGui::InputText("##FileName", m_FileName, sizeof(m_FileName)))
+        if (ImGui::InputText("##FileName", m_FileName.data(), m_FileName.capacity() + 1))
         {
+            // Resize string if needed and update
+            m_FileName.resize(strlen(m_FileName.data()));
             ValidateFileName();
         }
         ImGui::SameLine();
-        ImGui::Text("%s", DEFAULT_EXTENSION);
+        ImGui::Text("%s", File::ProjectExtension);
 
         if (!m_FileNameValid)
         {
@@ -162,16 +170,26 @@ namespace Tiles
         }
     }
 
-    void PopupSaveAs::RenderActionButtons()
+    void PopupSaveAs::RenderBlockActionButtons()
     {
         float buttonWidth = 80.0f;
         float spacing = ImGui::GetContentRegionAvail().x - (buttonWidth * 2 + UI::Component::SpaceBetween);
 
-        bool canSave = m_FileNameValid && strlen(m_FileName) > 0;
+        bool canSave = m_FileNameValid && !m_FileName.empty();
 
         if (ImGui::Button("Save", ImVec2(buttonWidth, 0)) && canSave)
         {
-            ExecuteSaveAs();
+            std::filesystem::path fullPath = GetFullFilePath();
+            auto result = m_Context->SaveProjectAs(fullPath);
+
+            m_SaveMessage = result.Message;
+            m_ShowMessage = true;
+            m_MessageTimer = 0.0f;
+
+            if (result.Success)
+            {
+                ImGui::SetWindowFocus(nullptr);
+            }
         }
 
         if (!canSave)
@@ -183,64 +201,7 @@ namespace Tiles
 
         if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
         {
-            Close();
-        }
-    }
-
-    void PopupSaveAs::ExecuteSaveAs()
-    {
-        if (!m_Context || !m_Context->HasProject())
-        {
-            m_SaveMessage = "No project to save!";
-            m_ShowMessage = true;
-            m_MessageTimer = 0.0f;
-            return;
-        }
-
-        try
-        {
-            std::string fullPath = GetFullFilePath();
-            std::filesystem::path filePath(fullPath);
-
-            // Create directory if it doesn't exist
-            std::filesystem::path parentDir = filePath.parent_path();
-            if (!parentDir.empty() && !std::filesystem::exists(parentDir))
-            {
-                std::filesystem::create_directories(parentDir);
-            }
-
-            // Check if file already exists
-            if (std::filesystem::exists(filePath))
-            {
-                m_SaveMessage = "File already exists! Choose a different name or confirm overwrite.";
-                m_ShowMessage = true;
-                m_MessageTimer = 0.0f;
-                return;
-            }
-
-            bool success = m_Context->SaveProjectAs(filePath);
-
-            if (success)
-            {
-                m_SaveMessage = "Project saved successfully!";
-                m_ShowMessage = true;
-                m_MessageTimer = 0.0f;
-
-                // Close after showing success message briefly
-                ImGui::SetWindowFocus(nullptr);
-            }
-            else
-            {
-                m_SaveMessage = "Failed to save project. Check file permissions and path.";
-                m_ShowMessage = true;
-                m_MessageTimer = 0.0f;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            m_SaveMessage = std::string("Save error: ") + e.what();
-            m_ShowMessage = true;
-            m_MessageTimer = 0.0f;
+            Hide();
         }
     }
 
@@ -257,10 +218,9 @@ namespace Tiles
         std::filesystem::path dir(m_Directory);
         std::string fileName(m_FileName);
 
-        // Add extension if not present
-        if (fileName.find(DEFAULT_EXTENSION) == std::string::npos)
+        if (fileName.find(File::ProjectExtension) == std::string::npos)
         {
-            fileName += DEFAULT_EXTENSION;
+            fileName += File::ProjectExtension;
         }
 
         return (dir / fileName).string();

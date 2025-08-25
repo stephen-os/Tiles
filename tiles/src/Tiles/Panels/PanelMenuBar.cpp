@@ -7,8 +7,8 @@
 
 namespace Tiles
 {
-    PanelMenuBar::PanelMenuBar(Ref<Context> context)
-        : Panel(context)
+    PanelMenuBar::PanelMenuBar(Ref<Context> context) : Panel(context), 
+		m_PopupSaveAs(context), m_PopupOpenProject(context)
     {
     }
 
@@ -54,7 +54,6 @@ namespace Tiles
             ShowAboutDialog();
         }
 
-        m_PopupSave.Render();
         m_PopupSaveAs.Render();
         m_PopupOpenProject.Render();
 
@@ -84,14 +83,14 @@ namespace Tiles
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_O, false))
             {
-				m_PopupOpenProject.Show(m_Context); 
+				m_PopupOpenProject.Toggle(); 
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_S, false))
             {
                 auto project = m_Context->GetProject();
                 if (project->IsNew() && project->HasUnsavedChanges())
                 {
-                    m_PopupSaveAs.Show(m_Context);
+                    m_PopupSaveAs.Toggle();
                 }
                 else
                 {
@@ -127,7 +126,7 @@ namespace Tiles
 
             if (ImGui::MenuItem("Open Project", "Ctrl+O"))
             {
-				m_PopupOpenProject.Show(m_Context);
+				m_PopupOpenProject.Toggle();
             }
 
             ImGui::Separator();
@@ -138,7 +137,7 @@ namespace Tiles
                 auto project = m_Context->GetProject();
                 if (project->IsNew() && project->HasUnsavedChanges())
                 {
-                    m_PopupSaveAs.Show(m_Context);
+                    m_PopupSaveAs.Show();
                 }
                 else
                 {
@@ -148,7 +147,7 @@ namespace Tiles
 
             if (ImGui::MenuItem("Save As", "Ctrl+Shift+S", false, hasProject))
             {
-				m_PopupSaveAs.Show(m_Context);
+				m_PopupSaveAs.Show();
             }
 
             ImGui::Separator();
@@ -172,7 +171,7 @@ namespace Tiles
             {
                 if (m_Context)
                 {
-					Application::GetInstance().Shutdown();
+					// Application::GetInstance().Shutdown();
                 }
             }
 
@@ -308,7 +307,7 @@ namespace Tiles
         if (!m_Context)
             return;
 
-        m_Context->NewProject(
+        m_Context->CreateProject(
             std::string(m_NewProjectName),
             static_cast<uint32_t>(m_NewProjectWidth),
             static_cast<uint32_t>(m_NewProjectHeight)
