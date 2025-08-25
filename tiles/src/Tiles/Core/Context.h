@@ -22,18 +22,19 @@ namespace Tiles
         Fill
     };
 
+    struct ProjectResult
+    {
+		bool Success = false;
+		std::string Message;
+    };
+
     class Context
     {
     public:   
-
-        static Ref<Context> Create(Ref<Project> project);
         static Ref<Context> Create();
 
-        Context(Ref<Project> project);
+        Context();
         ~Context() = default;
-
-        Ref<Project> GetProject() { return m_Project; }
-        const Ref<Project> GetProject() const { return m_Project; }
 
         Ref<Lumina::OrthographicCamera> GetViewportCamera() { return m_ViewportCamera; }
         const Ref<Lumina::OrthographicCamera> GetViewportCamera() const { return m_ViewportCamera; }
@@ -64,18 +65,22 @@ namespace Tiles
         bool CanRedo() const { return m_CommandHistory.CanRedo(); }
         void Undo();
         void Redo();
-        void ClearHistory() { m_CommandHistory.Clear(); }
 
         bool IsDirty() const { return m_Project->HasUnsavedChanges(); }
-        void UpdateLastAccessed() { m_Project->UpdateLastAccessed(); }
 
-        void NewProject(const std::string& name, uint32_t width, uint32_t height);
-        bool LoadProject(const std::filesystem::path& filePath);
-        bool SaveProject();
-        bool SaveProjectAs(const std::filesystem::path& filePath);
+		void ClearHistory() { m_CommandHistory.Clear(); }   
+
+		// Project Management
+        void CreateProject(const std::string& name, uint32_t width, uint32_t height);
+        ProjectResult SaveProject();
+        ProjectResult SaveProjectAs(const std::filesystem::path& path);
+        ProjectResult LoadProject(const std::filesystem::path& path);
         void ResizeProject(uint32_t width, uint32_t height);
         bool HasProject() const { return m_Project != nullptr; }
         std::string GetProjectDisplayName() const;
+        Ref<Project> GetProject() { return m_Project; }
+        const Ref<Project> GetProject() const { return m_Project; }
+
 
     private:
         void ValidateWorkingLayer();

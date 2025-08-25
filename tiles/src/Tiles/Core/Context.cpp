@@ -6,26 +6,23 @@
 
 #include <algorithm>
 
+#include "json.hpp"
+
 namespace Tiles
 {
-    Lumina::Ref<Context> Context::Create(Lumina::Ref<Project> project)
-    {
-        return Lumina::CreateRef<Context>(project);
-    }
-
     Lumina::Ref<Context> Context::Create()
     {
-        auto project = Lumina::CreateRef<Project>(16, 16, "Untitled");
-        return Lumina::CreateRef<Context>(project);
+        return CreateRef<Context>();
     }
 
-    Context::Context(std::shared_ptr<Project> project)
-        : m_Project(project), m_WorkingLayer(0), m_PaintingMode(PaintingMode::None)
+    Context::Context()
     {
+		m_Project = CreateRef<Project>(16, 16, "Untitled");
+
         m_ViewportCamera = Lumina::CreateRef<Lumina::OrthographicCamera>();
         InitializeSceneCamera();
-        ValidateWorkingLayer();
-        UpdateLastAccessed();
+      
+        m_Project->UpdateLastAccessed();
 
         m_Brush.SetPainted(true);
     }
@@ -214,78 +211,142 @@ namespace Tiles
         }
     }
 
-    void Context::NewProject(const std::string& name, uint32_t width, uint32_t height)
+    void Context::CreateProject(const std::string& name, uint32_t width, uint32_t height)
     {
-        ClearHistory();
+		m_CommandHistory.Clear();
         m_Project = Lumina::CreateRef<Project>(width, height, name);
         m_WorkingLayer = 0;
         m_PaintingMode = PaintingMode::None;
         m_Brush = Tile();
         m_Brush.SetPainted(true);
         InitializeSceneCamera();
-        UpdateLastAccessed();
+        m_Project->UpdateLastAccessed();
     }
 
-    bool Context::LoadProject(const std::filesystem::path& filePath)
-    {
-        try
-        {
-            ClearHistory();
-            auto loadedProject = Project::Deserialize(filePath);
-            if (!loadedProject)
-            {
-                return false;
-            }
-            m_Project = std::shared_ptr<Project>(std::move(loadedProject));
-            m_WorkingLayer = 0;
-            m_PaintingMode = PaintingMode::None;
-            m_Brush = Tile();
-            m_Brush.SetPainted(true);
-            ValidateWorkingLayer();
-            InitializeSceneCamera();
-            UpdateLastAccessed();
-            return true;
-        }
-        catch (const std::exception&)
-        {
-            return false;
-        }
-    }
-
-    bool Context::SaveProject()
-    {
-        if (!m_Project || m_Project->IsNew())
-        {
-            return false;
-        }
-        try
-        {
-            Project::Serialize(*m_Project, m_Project->GetFilePath());
-            m_Project->MarkAsSaved();
-            return true;
-        }
-        catch (const std::exception&)
-        {
-            return false;
-        }
-    }
-
-    bool Context::SaveProjectAs(const std::filesystem::path& filePath)
+    ProjectResult Context::SaveProject()
     {
         if (!m_Project)
-            return false;
+            return { false, "No project loaded." };
+
+        if (m_Project->IsNew())
+            return { false, "Project has no file path. Use 'Save As' to specify a location." };
+
+        auto path = m_Project->GetFilePath();
+
+        auto directory = path.parent_path();
+        if (!directory.empty() && !std::filesystem::exists(directory))
+        {
+            std::filesystem::create_directories(directory);
+        }
 
         try
         {
-            m_Project->SetFilePath(filePath.string());
-            Project::Serialize(*m_Project, filePath);
+            nlohmann::json projectJSON = m_Project->ToJSON();
+
+            std::ofstream file(path);
+
+            if (!file.is_open())
+            {
+                return { false, "Failed to open file for writing." };
+            }
+
+            file << projectJSON.dump(4);
+            file.close();
+
             m_Project->MarkAsSaved();
-            return true;
+            m_Project->UpdateLastAccessed();
+
+            return { true, "Project saved successfully." };
         }
-        catch (const std::exception&)
+        catch (const std::exception& e)
         {
-            return false;
+            return { false, std::string("Failed to save project: ") + e.what() };
         }
+    }
+
+    ProjectResult Context::SaveProjectAs(const std::filesystem::path& path)
+    {
+        if (!m_Project)
+            return { false, "No project loaded." };
+
+        if (path.empty())
+            return { false, "Invalid file path." };
+
+        auto directory = path.parent_path();
+        if (!directory.empty() && !std::filesystem::exists(directory))
+        {
+            std::filesystem::create_directories(directory);
+        }
+
+        try
+        {
+            nlohmann::json projectJSON = m_Project->ToJSON();
+
+            std::ofstream file(path);
+
+            if (!file.is_open())
+            {
+                return { false, "Failed to open file for writing." };
+            }
+
+            file << projectJSON.dump(4);
+            file.close();
+
+            m_Project->SetFilePath(path.string());
+            m_Project->MarkAsSaved();
+            m_Project->UpdateLastAccessed();
+
+            return { true, "Project saved successfully." };
+        }
+        catch (const std::exception& e)
+        {
+            return { false, std::string("Failed to save project: ") + e.what() };
+        }
+    }
+
+    ProjectResult Context::LoadProject(const std::filesystem::path& path)
+    {
+        if (!std::filesystem::exists(path))
+        {
+            return { false, "File does not exist." };
+        }
+
+
+        Ref<Project> project;
+
+        try
+        {
+			std::ifstream file(path);
+            if (!file.is_open())
+            {
+                return { false, "Failed to open file for reading." };
+            }
+
+            nlohmann::json jsonProject;
+            file >> jsonProject;
+            file.close();
+            
+            project = Project::FromJSON(jsonProject);
+            
+            project->SetFilePath(path.string());
+            project->MarkAsSaved();
+            project->UpdateLastAccessed();
+        }
+        catch (const std::exception& e)
+        {
+            return { false, std::string("Failed to load project: ") + e.what() };
+        }
+
+		m_Project = project;
+
+        m_CommandHistory.Clear();
+
+        m_WorkingLayer = 0;
+        m_PaintingMode = PaintingMode::None;
+        m_Brush = Tile();
+        m_Brush.SetPainted(true);
+        InitializeSceneCamera();
+        return { true, "Project loaded successfully." };
     }
 
     void Context::ResizeProject(uint32_t width, uint32_t height)
@@ -314,7 +375,7 @@ namespace Tiles
             currentPos.z
             });
 
-        UpdateLastAccessed();
+		m_Project->UpdateLastAccessed();
     }
 
     std::string Context::GetProjectDisplayName() const

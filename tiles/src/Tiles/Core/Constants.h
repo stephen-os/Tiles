@@ -245,14 +245,30 @@ namespace Tiles
 			constexpr const char* Painted = "is_painted";
         }
 
-        namespace project
+        namespace Project
         {
+            static constexpr const char* Name = "project_name";
+        }
 
+        namespace Atlas
+        {
+            static constexpr const char* Array = "atlas_array";
+			static constexpr const char* Path = "atlas_path";
+			static constexpr const char* Width = "atlas_width";
+			static constexpr const char* Height = "atlas_height";
         }
         
         namespace Layer
         {
-
+            static constexpr const char* Stack = "layer_stack";
         }
+    }
+
+    namespace File
+    {
+        constexpr const char* ProjectExtension = ".tiles";
+        constexpr const char* ProjectFilesFilter = "*.tiles";
+        constexpr const char* AllFilesFilter = "*.*";
+		constexpr const char* TextureFilesFilter = "*.png;*.jpg;*.jpeg";
     }
 }
