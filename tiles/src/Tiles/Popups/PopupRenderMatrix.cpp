@@ -1,11 +1,7 @@
 #include "PopupRenderMatrix.h"
-
 #include "Core/Constants.h"
-
 #include "Lumina/Lumina.h"
-
 #include "ImGuiFileDialog.h"
-
 #include <algorithm>
 #include <sstream>
 #include <set>
@@ -14,38 +10,28 @@ using namespace Lumina;
 
 namespace Tiles
 {
-    PopupRenderMatrix::PopupRenderMatrix()
-    {
-    }
+    PopupRenderMatrix::PopupRenderMatrix(Ref<Context> context) : Popup(context) {}
 
-    void PopupRenderMatrix::Show(Ref<Context> context)
+    void PopupRenderMatrix::OnRender()
     {
-        m_Context = context;
-        m_IsVisible = true;
-
-        if (m_Context && m_Context->HasProject())
+        if (m_FirstShow)
         {
-            const auto& project = m_Context->GetProject();
-            std::string projectName = project->GetProjectName();
-            std::transform(projectName.begin(), projectName.end(), projectName.begin(), ::tolower);
-            std::replace(projectName.begin(), projectName.end(), ' ', '_');
-
-            strncpy(m_ExportFileName, projectName.c_str(), sizeof(m_ExportFileName) - 1);
-            m_ExportFileName[sizeof(m_ExportFileName) - 1] = '\0';
-
-            ResetToDefaults();
+            InitializeDialog();
+            m_FirstShow = false;
         }
-    }
 
-    void PopupRenderMatrix::Render()
-    {
-        if (!m_IsVisible || !m_Context || !m_Context->HasProject())
-            return;
-
+        ImGui::SetNextWindowSizeConstraints(ImVec2(600, 0), ImVec2(600, FLT_MAX));
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-        if (ImGui::Begin("Export Render Matrix", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize))
+        if (ImGui::Begin("Export Render Matrix", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
         {
+            if (!m_Context || !m_Context->HasProject())
+            {
+                ImGui::Text("No project loaded!");
+                ImGui::End();
+                return;
+            }
+
             RenderLayerMatrix();
             ImGui::Separator();
             RenderExportSettings();
@@ -57,6 +43,30 @@ namespace Tiles
         if (m_ShowDirectorySelector)
         {
             ShowDirectoryDialog();
+        }
+
+        if (!m_IsVisible)
+        {
+            m_FirstShow = true;
+        }
+    }
+
+    void PopupRenderMatrix::OnUpdate()
+    {
+        // No periodic updates needed for this popup
+    }
+
+    void PopupRenderMatrix::InitializeDialog()
+    {
+        if (m_Context && m_Context->HasProject())
+        {
+            const auto& project = m_Context->GetProject();
+            std::string projectName = project->GetProjectName();
+            std::transform(projectName.begin(), projectName.end(), projectName.begin(), ::tolower);
+            std::replace(projectName.begin(), projectName.end(), ' ', '_');
+
+            m_ExportFileName = projectName;
+            ResetToDefaults();
         }
     }
 
@@ -76,7 +86,7 @@ namespace Tiles
 
         float cell_width = 0.0f;
         float item_width = 0.0f;
-        float cursor_x = 0.0f; 
+        float cursor_x = 0.0f;
 
         if (ImGui::BeginTable("RenderMatrix", RENDER_GROUPS + 2, tableFlags))
         {
@@ -99,7 +109,7 @@ namespace Tiles
                 item_width = ImGui::CalcTextSize(header).x;
                 cursor_x = ImGui::GetCursorPosX() + (cell_width - item_width) * 0.5f - ImGui::GetStyle().CellPadding.x;
                 ImGui::SetCursorPosX(cursor_x);
-                ImGui::TableHeader(header); 
+                ImGui::TableHeader(header);
             }
 
             ImGui::TableSetColumnIndex(1);
@@ -169,53 +179,6 @@ namespace Tiles
             ImGui::EndTable();
         }
         ImGui::PopStyleVar();
-#if 0 
-
-        float availableWidth = ImGui::GetContentRegionAvail().x - 200.0f;
-        float groupColumnWidth = availableWidth / RENDER_GROUPS;
-        float tableHeight = (layerCount + 1) * ImGui::GetTextLineHeightWithSpacing();
-
-        if (ImGui::BeginTable("RenderMatrix", RENDER_GROUPS + 2,
-            ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg, ImVec2(0.0f, tableHeight)))
-        {
-            ImGui::TableSetupColumn("Layer Name", ImGuiTableColumnFlags_WidthFixed, 150.0f);
-            ImGui::TableSetupColumn("Vis", ImGuiTableColumnFlags_WidthFixed, 25.0f);
-
-            for (int group = 0; group < RENDER_GROUPS; ++group)
-            {
-                ImGui::TableSetupColumn(std::to_string(group).c_str(),
-                    ImGuiTableColumnFlags_WidthFixed, groupColumnWidth);
-            }
-            ImGui::TableHeadersRow();
-
-            for (size_t layerIdx = 0; layerIdx < layerCount; ++layerIdx)
-            {
-                const auto& layer = layerStack.GetLayer(layerIdx);
-                ImGui::TableNextRow();
-
-                ImGui::TableSetColumnIndex(0);
-                ImGui::Text("%s", layer.GetName().c_str());
-
-                ImGui::TableSetColumnIndex(1);
-                bool visible = layer.GetVisibility();
-                ImGui::BeginDisabled(true);
-                ImGui::Checkbox(("##vis" + std::to_string(layerIdx)).c_str(), &visible);
-                ImGui::EndDisabled();
-
-                for (int group = 0; group < RENDER_GROUPS; ++group)
-                {
-                    ImGui::TableSetColumnIndex(2 + group);
-
-                    bool isInGroup = m_LayerToRenderGroup[layerIdx] == group;
-                    if (ImGui::RadioButton(("##" + std::to_string(layerIdx) + "_" + std::to_string(group)).c_str(), isInGroup))
-                    {
-                        m_LayerToRenderGroup[layerIdx] = group;
-                    }
-                }
-            }
-            ImGui::EndTable();
-        }
-#endif
     }
 
     void PopupRenderMatrix::RenderExportSettings()
@@ -225,8 +188,8 @@ namespace Tiles
 
         ImGui::Text("Export Directory:");
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(400.0f);
-        ImGui::InputText("##ExportDir", m_ExportDirectory.data(), m_ExportDirectory.capacity(), ImGuiInputTextFlags_ReadOnly);
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s", m_ExportDirectory.string().c_str());
         ImGui::SameLine();
         if (ImGui::Button("Browse##Dir"))
         {
@@ -242,13 +205,16 @@ namespace Tiles
                 config
             );
 
-			m_ShowDirectorySelector = true;
+            m_ShowDirectorySelector = true;
         }
 
         ImGui::Text("Base File Name:");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(200.0f);
-        ImGui::InputText("##FileName", m_ExportFileName, sizeof(m_ExportFileName));
+        if (ImGui::InputText("##FileName", m_ExportFileName.data(), m_ExportFileName.capacity() + 1))
+        {
+            m_ExportFileName.resize(strlen(m_ExportFileName.data()));
+        }
 
         ImGui::Text("Format:");
         ImGui::SameLine();
@@ -292,7 +258,7 @@ namespace Tiles
         ImGui::SameLine();
         if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
         {
-            Close();
+            Hide();
         }
     }
 
@@ -305,6 +271,7 @@ namespace Tiles
                 m_ExportDirectory = ImGuiFileDialog::Instance()->GetCurrentPath();
             }
             ImGuiFileDialog::Instance()->Close();
+            m_ShowDirectorySelector = false;
         }
     }
 
@@ -381,7 +348,7 @@ namespace Tiles
             }
         }
 
-        Close();
+        Hide();
     }
 
     std::vector<std::string> PopupRenderMatrix::GetUsedRenderGroups() const
@@ -415,14 +382,9 @@ namespace Tiles
         return baseName + extension;
     }
 
-    std::string PopupRenderMatrix::GetFullExportPath(const std::string& fileName) const
+    std::filesystem::path PopupRenderMatrix::GetFullExportPath(const std::string& fileName) const
     {
-        std::string directory = m_ExportDirectory;
-        if (!directory.empty() && directory.back() != '/' && directory.back() != '\\')
-        {
-            directory += "/";
-        }
-        return directory + fileName;
+        return m_ExportDirectory / fileName;
     }
 
     const char* PopupRenderMatrix::GetFormatExtension() const
@@ -437,7 +399,7 @@ namespace Tiles
         }
     }
 
-    void PopupRenderMatrix::ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::string& fileName)
+    void PopupRenderMatrix::ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName)
     {
         if (layerIndices.empty() || !m_Context || !m_Context->HasProject())
             return;
@@ -521,6 +483,6 @@ namespace Tiles
         Renderer2D::End();
         Renderer2D::SetRenderTarget(nullptr);
 
-        renderTarget->SaveToFile(fileName);
+        renderTarget->SaveToFile(fileName.string());
     }
 }

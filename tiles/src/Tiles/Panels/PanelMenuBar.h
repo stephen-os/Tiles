@@ -37,8 +37,6 @@ namespace Tiles
         void CreateNewProject();
         void ResizeCurrentProject();
 
-        void ShowExportDialog();
-
     private:
 		PopupRenderMatrix m_PopupRenderMatrix;
         PopupSaveAs m_PopupSaveAs;

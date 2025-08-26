@@ -1,10 +1,9 @@
 #pragma once
-#include "imgui.h"
-#include "../Core/Context.h"
-#include "../Core/Base.h"
+#include "Popup.h"
 #include <string>
 #include <vector>
 #include <map>
+#include <filesystem>
 
 namespace Tiles
 {
@@ -16,15 +15,16 @@ namespace Tiles
         TGA
     };
 
-    class PopupRenderMatrix
+    class PopupRenderMatrix : public Popup
     {
     public:
-        PopupRenderMatrix();
+        PopupRenderMatrix(Ref<Context> context);
         ~PopupRenderMatrix() = default;
-        void Show(Ref<Context> context);
-        void Render();
-        bool IsVisible() const { return m_IsVisible; }
-        void Close() { m_IsVisible = false; }
+
+    protected:
+        void OnRender() override;
+        void OnUpdate() override;
+
     private:
         void RenderLayerMatrix();
         void RenderExportSettings();
@@ -34,23 +34,21 @@ namespace Tiles
         void ExecuteExport();
         std::vector<std::string> GetUsedRenderGroups() const;
         std::string GetExportFileName(int groupIndex = -1) const;
-        std::string GetFullExportPath(const std::string& fileName) const;
+        std::filesystem::path GetFullExportPath(const std::string& fileName) const;
         const char* GetFormatExtension() const;
-        void ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::string& fileName);
+        void ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName);
+        void InitializeDialog();
+
     private:
-        bool m_IsVisible = false;
-        Ref<Context> m_Context;
-
-        char m_ExportFileName[256] = "export";
-        std::string m_ExportDirectory = ".";
+        std::string m_ExportFileName = "export";
+        std::filesystem::path m_ExportDirectory = ".";
         ExportFormat m_ExportFormat = ExportFormat::PNG;
-
         std::map<size_t, int> m_LayerToRenderGroup;
-
         bool m_ExportVisible = true;
         bool m_ExportInvisible = false;
         bool m_UseProjectBounds = true;
         bool m_ShowDirectorySelector = false;
+        bool m_FirstShow = true;
 
         static constexpr int RENDER_GROUPS = 8;
     };
