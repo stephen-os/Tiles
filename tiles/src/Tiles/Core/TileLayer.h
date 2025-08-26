@@ -1,67 +1,90 @@
 #pragma once
-
 #include <string>
 #include <vector>
 
 #include "Tile.h"
-
 #include "json.hpp"
+
+#include "Constants.h" 
 
 namespace Tiles
 {
-	class TileLayer
-	{
-	public:
-		static constexpr int NO_RENDER_GROUP = -1;
-		static constexpr int DEFAULT_RENDER_GROUP = 0;
+    enum class RenderGroup : int32_t
+    {
+        Disabled = -1,      // Layer is not rendered
+        Background = 0,     // Default background layer
+        Midground = 1,      // Middle layer for objects
+        Foreground = 2,     // Front layer for UI/overlays
+        Debug = 99          // Debug/temporary rendering
+    };
 
-		TileLayer() = default; 
-		TileLayer(uint32_t width, uint32_t height);
-		~TileLayer() = default;
+    namespace TileLayerUtils
+    {
+        static const char* GetRenderGroupName(RenderGroup renderGroup)
+        {
+            switch (renderGroup)
+            {
+            case RenderGroup::Disabled: return "Disabled";
+            case RenderGroup::Background: return "Background";
+            case RenderGroup::Midground: return "Midground";
+            case RenderGroup::Foreground: return "Foreground";
+            case RenderGroup::Debug: return "Debug";
+            default: return "Unknown";
+            }
+        }
+    }
+    
+    class TileLayer
+    {
+    public:
+        TileLayer() = default;
+        TileLayer(uint32_t width, uint32_t height);
+        ~TileLayer() = default;
 
-		void Clear();
-		void Resize(uint32_t width, uint32_t height);
+        void Clear();
+        void Resize(uint32_t width, uint32_t height);
 
-		// Tile access
-		const Tile& GetTile(size_t x, size_t y) const;
-		Tile& GetTile(size_t x, size_t y);
+        // Tile access
+        const Tile& GetTile(size_t x, size_t y) const;
+        Tile& GetTile(size_t x, size_t y);
 
-		const std::string& GetName() const { return m_Name; }
-		void SetName(const std::string& name) { m_Name = name; }
+        const std::string& GetName() const { return m_Name; }
+        void SetName(const std::string& name);
 
-		uint32_t GetWidth() const { return m_Width; }
-		uint32_t GetHeight() const { return m_Height; }
-		void SetWidth(uint32_t width);
-		void SetHeight(uint32_t height);
+        uint32_t GetWidth() const { return m_Width; }
+        uint32_t GetHeight() const { return m_Height; }
+        void SetWidth(uint32_t width);
+        void SetHeight(uint32_t height);
 
-		bool GetVisibility() const { return m_Visible; }
-		void SetVisibility(bool visible) { m_Visible = visible; }
+        bool GetVisibility() const { return m_Visible; }
+        void SetVisibility(bool visible) { m_Visible = visible; }
 
-		int GetRenderGroup() const { return m_RenderGroupID; }
-		void SetRenderGroup(int group) { m_RenderGroupID = group; }
-		void DisableRendering() { m_RenderGroupID = NO_RENDER_GROUP; }
-		bool IsRenderingEnabled() const { return m_RenderGroupID != NO_RENDER_GROUP; }
+        RenderGroup GetRenderGroup() const { return m_RenderGroup; }
+        void SetRenderGroup(RenderGroup group) { m_RenderGroup = group; }
+        void DisableRendering() { m_RenderGroup = RenderGroup::Disabled; }
+        bool IsRenderingEnabled() const { return m_RenderGroup != RenderGroup::Disabled; }
 
-		size_t GetTileCount() const { return m_Tiles.size(); }
-		bool IsEmpty() const { return m_Tiles.empty(); }
-		bool IsValidPosition(size_t x, size_t y) const { return x < m_Width && y < m_Height; }
+        size_t GetTileCount() const { return m_Tiles.size(); }
+        bool IsEmpty() const { return m_Tiles.empty(); }
+        bool IsValidPosition(size_t x, size_t y) const { return x < m_Width && y < m_Height; }
 
-		auto begin() { return m_Tiles.begin(); }
-		auto end() { return m_Tiles.end(); }
-		auto begin() const { return m_Tiles.begin(); }
-		auto end() const { return m_Tiles.end(); }
+        auto begin() { return m_Tiles.begin(); }
+        auto end() { return m_Tiles.end(); }
+        auto begin() const { return m_Tiles.begin(); }
+        auto end() const { return m_Tiles.end(); }
 
-		nlohmann::json ToJSON() const;
-		static TileLayer FromJSON(const nlohmann::json& jsonLayer);
+        nlohmann::json ToJSON() const;
+        static TileLayer FromJSON(const nlohmann::json& jsonLayer);
 
-	private:
-		void ResizeInternal(uint32_t width, uint32_t height);
+    private:
+        void ResizeInternal(uint32_t width, uint32_t height);
 
-		std::string m_Name = "New Layer";			// Layer name
-		uint32_t m_Width = 0;						// Layer width
-		uint32_t m_Height = 0;						// Layer height	
-		bool m_Visible = true;						// Layer visibility
-		int m_RenderGroupID = DEFAULT_RENDER_GROUP;	// Render group ID
-		std::vector<Tile> m_Tiles;					// Flat vector of tiles
-	};
+    private:
+        std::string m_Name = "New Layer";                       // Display name of the layer
+        uint32_t m_Width = 0;                                   // Width in tiles
+        uint32_t m_Height = 0;                                  // Height in tiles
+        bool m_Visible = true;                                  // Whether layer is visible in editor/game
+        RenderGroup m_RenderGroup = RenderGroup::Background;    // Rendering order group
+        std::vector<Tile> m_Tiles;                              // Flat array of tiles (row-major order)
+    };
 }

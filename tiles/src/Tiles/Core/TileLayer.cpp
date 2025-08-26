@@ -40,6 +40,22 @@ namespace Tiles
 		return m_Tiles[y * m_Width + x];
 	}
 
+	void TileLayer::SetName(const std::string& name)
+	{
+		if (name.empty())
+		{
+			LUMINA_LOG_INFO("TileLayer::SetName: Empty name provided, using default");
+			m_Name = "New Layer";
+			return;
+		}
+
+		if (name != m_Name)
+		{
+			LUMINA_LOG_INFO("TileLayer::SetName: Changed layer name from '{}' to '{}'", m_Name, name);
+			m_Name = name;
+		}
+	}
+
 	void TileLayer::SetWidth(uint32_t width)
 	{
 		if (width != m_Width)
@@ -124,7 +140,7 @@ namespace Tiles
 		if (jsonLayer.contains(JSON::TileLayer::RenderGroup))
 		{
 			int renderGroup = jsonLayer[JSON::TileLayer::RenderGroup].get<int>();
-			layer.SetRenderGroup(renderGroup);
+			layer.SetRenderGroup(static_cast<RenderGroup>(renderGroup));
 		}
 
 		if (jsonLayer.contains(JSON::TileLayer::Tiles))

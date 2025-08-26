@@ -38,6 +38,7 @@ namespace Tiles
         const char* GetFormatExtension() const;
         void ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName);
         void InitializeDialog();
+        void ApplyRenderGroupChanges();
 
     private:
         std::string m_ExportFileName = "export";

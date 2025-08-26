@@ -38,6 +38,7 @@ namespace Tiles
         void RenderComponentLayerOperationControls(const char* id);
         void RenderComponentLayerNameInput(const char* id, const std::string& layerName);
         void RenderComponentLayerProperties(const char* id, const TileLayer& layer);
+        void RenderComponentRenderGroupSelection(const char* id, TileLayer& layer);
 
         // Utility methods
         void ExecuteLayerCommand(std::unique_ptr<Command> command);

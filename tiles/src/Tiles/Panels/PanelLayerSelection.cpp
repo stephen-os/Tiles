@@ -316,6 +316,7 @@ namespace Tiles
         ImGui::PopStyleVar();
 
         RenderComponentLayerNameInput("LayerName", layer.GetName());
+        RenderComponentRenderGroupSelection("RenderGroup", layer);
         RenderComponentLayerProperties("LayerProperties", layer);
     }
 
@@ -414,7 +415,9 @@ namespace Tiles
             ImGui::TableNextColumn();
             ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), " Render Group:");
             ImGui::TableNextColumn();
-            ImGui::TextColored(UI::Layer::OrangeAccent, "%d", layer.GetRenderGroup());
+
+            const char* groupName = TileLayerUtils::GetRenderGroupName(layer.GetRenderGroup());
+            ImGui::TextColored(UI::Layer::OrangeAccent, "%s", groupName);
 
             // Visible - with colored indicator
             ImGui::TableNextRow();
@@ -432,6 +435,78 @@ namespace Tiles
         }
 
         ImGui::PopStyleColor(3);
+        ImGui::PopStyleVar(2);
+    }
+
+    void PanelLayerSelection::RenderComponentRenderGroupSelection(const char* id, TileLayer& layer)
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween * 0.5f, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+
+        ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX;
+
+        if (ImGui::BeginTable("##RenderGroupSelection", 2, tableFlags))
+        {
+            ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 100.0f);
+            ImGui::TableSetupColumn("Selection", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableNextRow();
+
+            // Label column
+            ImGui::TableNextColumn();
+            ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::BackgroundMedium);
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::BackgroundMedium);
+            ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+            ImGui::Button("Render Group", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight));
+            ImGui::PopStyleColor(4);
+
+            // Selection column
+            ImGui::TableNextColumn();
+            float framePaddingY = (UI::Component::ButtonHeight - ImGui::GetTextLineHeight()) * 0.5f;
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(UI::Component::FramePadding, framePaddingY));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, UI::Layer::ItemBackground);
+            ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, UI::Layer::ItemHover);
+            ImGui::PushStyleColor(ImGuiCol_FrameBgActive, UI::Layer::ItemHover);
+            ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
+
+            // Render group combo box
+            const char* renderGroupNames[] = { "Disabled", "Background", "Midground", "Foreground", "Debug" };
+            int renderGroupValues[] = { -1, 0, 1, 2, 99 };
+
+            int currentRenderGroup = static_cast<int>(layer.GetRenderGroup());
+            int currentIndex = 0;
+
+            // Find current selection index
+            for (int i = 0; i < 5; ++i)
+            {
+                if (renderGroupValues[i] == currentRenderGroup)
+                {
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+            std::string comboId = std::string("##") + id + "_Combo";
+
+            if (ImGui::Combo(comboId.c_str(), &currentIndex, renderGroupNames, 5))
+            {
+                RenderGroup newGroup = static_cast<RenderGroup>(renderGroupValues[currentIndex]);
+                if (layer.GetRenderGroup() != newGroup)
+                {
+                    layer.SetRenderGroup(newGroup);
+                    m_Context->GetProject()->MarkAsModified();
+                    LUMINA_LOG_INFO("PanelLayerSelection::RenderComponentRenderGroupSelection: Changed layer '{}' render group to {}",
+                        layer.GetName(), renderGroupValues[currentIndex]);
+                }
+            }
+
+            ImGui::PopStyleColor(4);
+            ImGui::PopStyleVar();
+
+            ImGui::EndTable();
+        }
+
         ImGui::PopStyleVar(2);
     }
 

@@ -1,6 +1,7 @@
 #include "PopupRenderMatrix.h"
 #include "Core/Constants.h"
 #include "Lumina/Lumina.h"
+#include "Lumina/Core/Log.h"
 #include "ImGuiFileDialog.h"
 #include <algorithm>
 #include <sstream>
@@ -53,7 +54,6 @@ namespace Tiles
 
     void PopupRenderMatrix::OnUpdate()
     {
-        // No periodic updates needed for this popup
     }
 
     void PopupRenderMatrix::InitializeDialog()
@@ -66,7 +66,18 @@ namespace Tiles
             std::replace(projectName.begin(), projectName.end(), ' ', '_');
 
             m_ExportFileName = projectName;
-            ResetToDefaults();
+
+            const auto& layerStack = project->GetLayerStack();
+            m_LayerToRenderGroup.clear();
+
+            for (size_t i = 0; i < layerStack.GetLayerCount(); ++i)
+            {
+                const auto& layer = layerStack.GetLayer(i);
+                int renderGroupValue = static_cast<int>(layer.GetRenderGroup());
+                m_LayerToRenderGroup[i] = std::max(-1, std::min(renderGroupValue, 99));
+            }
+
+            LUMINA_LOG_INFO("PopupRenderMatrix::InitializeDialog: Initialized dialog for project '{}'", projectName);
         }
     }
 
@@ -78,7 +89,7 @@ namespace Tiles
         const auto& layerStack = m_Context->GetProject()->GetLayerStack();
         size_t layerCount = layerStack.GetLayerCount();
 
-        ImGui::Text("Assign Layers to Render Groups (0-7)");
+        ImGui::Text("Assign Layers to Render Groups");
         ImGui::Spacing();
 
         ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween / 2.0f, 0.0f));
@@ -88,20 +99,19 @@ namespace Tiles
         float item_width = 0.0f;
         float cursor_x = 0.0f;
 
-        if (ImGui::BeginTable("RenderMatrix", RENDER_GROUPS + 2, tableFlags))
+        if (ImGui::BeginTable("RenderMatrix", 7, tableFlags)) // 2 + 5 render groups
         {
-            // Define Columns
             ImGui::TableSetupColumn("LayerName", ImGuiTableColumnFlags_WidthFixed, 150.0f);
             ImGui::TableSetupColumn("LayerVisibility", ImGuiTableColumnFlags_WidthFixed, 25.0f);
-
-            for (int group = 0; group < RENDER_GROUPS; ++group)
-            {
-                ImGui::TableSetupColumn(("RenderGroup" + std::to_string(group)).c_str(), ImGuiTableColumnFlags_WidthStretch);
-            }
+            ImGui::TableSetupColumn("Disabled", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Background", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Midground", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Foreground", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Debug", ImGuiTableColumnFlags_WidthStretch);
 
             ImGui::TableNextRow();
 
-            // Column Headers 
+            // Layer Name header
             ImGui::TableSetColumnIndex(0);
             {
                 const char* header = "Layer Name";
@@ -112,6 +122,7 @@ namespace Tiles
                 ImGui::TableHeader(header);
             }
 
+            // Visibility header
             ImGui::TableSetColumnIndex(1);
             {
                 const char* header = "Vis";
@@ -122,24 +133,26 @@ namespace Tiles
                 ImGui::TableHeader(header);
             }
 
-            for (int group = 0; group < RENDER_GROUPS; ++group)
+            // Render group headers
+            const char* groupNames[] = { "Disabled", "Background", "Midground", "Foreground", "Debug" };
+            for (int i = 0; i < 5; ++i)
             {
-                ImGui::TableSetColumnIndex(group + 2);
-                std::string header = std::to_string(group);
-
+                ImGui::TableSetColumnIndex(i + 2);
+                const char* header = groupNames[i];
                 cell_width = ImGui::GetColumnWidth();
-                item_width = ImGui::CalcTextSize(header.c_str()).x;
+                item_width = ImGui::CalcTextSize(header).x;
                 cursor_x = ImGui::GetCursorPosX() + (cell_width - item_width) * 0.5f - ImGui::GetStyle().CellPadding.x;
                 ImGui::SetCursorPosX(cursor_x);
-                ImGui::TableHeader(header.c_str());
+                ImGui::TableHeader(header);
             }
 
-            // Rows
+            // Layer rows
             for (size_t layerIdx = 0; layerIdx < layerCount; ++layerIdx)
             {
                 const auto& layer = layerStack.GetLayer(layerIdx);
                 ImGui::TableNextRow();
 
+                // Layer name
                 ImGui::TableSetColumnIndex(0);
                 ImGui::AlignTextToFramePadding();
                 cell_width = ImGui::GetColumnWidth();
@@ -148,6 +161,7 @@ namespace Tiles
                 ImGui::SetCursorPosX(cursor_x);
                 ImGui::Text("%s", layer.GetName().c_str());
 
+                // Visibility checkbox
                 ImGui::TableSetColumnIndex(1);
                 cell_width = ImGui::GetColumnWidth();
                 item_width = ImGui::GetFrameHeight();
@@ -159,19 +173,36 @@ namespace Tiles
                 ImGui::Checkbox(("##vis" + std::to_string(layerIdx)).c_str(), &visible);
                 ImGui::EndDisabled();
 
-                for (int group = 0; group < RENDER_GROUPS; ++group)
+                // Render group radio buttons
+                int currentLayerGroup = static_cast<int>(layer.GetRenderGroup());
+                int renderGroupValues[] = { -1, 0, 1, 2, 99 }; // Disabled, Background, Midground, Foreground, Debug
+
+                for (int i = 0; i < 5; ++i)
                 {
-                    ImGui::TableSetColumnIndex(2 + group);
+                    ImGui::TableSetColumnIndex(2 + i);
 
                     cell_width = ImGui::GetColumnWidth();
                     item_width = ImGui::GetFrameHeight();
                     cursor_x = ImGui::GetCursorPosX() + (cell_width - item_width) * 0.5f;
                     ImGui::SetCursorPosX(cursor_x);
 
-                    bool isInGroup = m_LayerToRenderGroup[layerIdx] == group;
-                    if (ImGui::RadioButton(("##" + std::to_string(layerIdx) + "_" + std::to_string(group)).c_str(), isInGroup))
+                    int groupValue = renderGroupValues[i];
+                    bool isInGroup = m_LayerToRenderGroup[layerIdx] == groupValue;
+
+                    // Highlight if this is the layer's actual current group but different from selected
+                    if (currentLayerGroup == groupValue && currentLayerGroup != m_LayerToRenderGroup[layerIdx])
                     {
-                        m_LayerToRenderGroup[layerIdx] = group;
+                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+                    }
+
+                    if (ImGui::RadioButton(("##" + std::to_string(layerIdx) + "_" + std::to_string(groupValue)).c_str(), isInGroup))
+                    {
+                        m_LayerToRenderGroup[layerIdx] = groupValue;
+                    }
+
+                    if (currentLayerGroup == groupValue && currentLayerGroup != m_LayerToRenderGroup[layerIdx])
+                    {
+                        ImGui::PopStyleColor();
                     }
                 }
             }
@@ -239,13 +270,20 @@ namespace Tiles
     void PopupRenderMatrix::RenderActionButtons()
     {
         float buttonWidth = 100.0f;
-        float totalWidth = buttonWidth * 3 + ImGui::GetStyle().ItemSpacing.x * 2;
+        float totalWidth = buttonWidth * 4 + ImGui::GetStyle().ItemSpacing.x * 3;
         float startX = (ImGui::GetContentRegionAvail().x - totalWidth) * 0.5f;
 
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startX);
 
+        if (ImGui::Button("Apply", ImVec2(buttonWidth, 0)))
+        {
+            ApplyRenderGroupChanges();
+        }
+
+        ImGui::SameLine();
         if (ImGui::Button("Export", ImVec2(buttonWidth, 0)))
         {
+            ApplyRenderGroupChanges();
             ExecuteExport();
         }
 
@@ -285,7 +323,43 @@ namespace Tiles
 
         for (size_t i = 0; i < layerStack.GetLayerCount(); ++i)
         {
-            m_LayerToRenderGroup[i] = 0;
+            const auto& layer = layerStack.GetLayer(i);
+            int currentGroup = static_cast<int>(layer.GetRenderGroup());
+            m_LayerToRenderGroup[i] = currentGroup;
+        }
+
+        LUMINA_LOG_INFO("PopupRenderMatrix::ResetToDefaults: Reset to layer's current render groups");
+    }
+
+    void PopupRenderMatrix::ApplyRenderGroupChanges()
+    {
+        if (!m_Context || !m_Context->HasProject())
+            return;
+
+        auto& layerStack = m_Context->GetProject()->GetLayerStack();
+        bool hasChanges = false;
+
+        for (const auto& [layerIdx, renderGroup] : m_LayerToRenderGroup)
+        {
+            if (layerIdx < layerStack.GetLayerCount())
+            {
+                auto& layer = layerStack.GetLayer(layerIdx);
+                RenderGroup newGroup = static_cast<RenderGroup>(renderGroup);
+
+                if (layer.GetRenderGroup() != newGroup)
+                {
+                    layer.SetRenderGroup(newGroup);
+                    hasChanges = true;
+                    LUMINA_LOG_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Set layer '{}' to render group {}",
+                        layer.GetName(), renderGroup);
+                }
+            }
+        }
+
+        if (hasChanges)
+        {
+            m_Context->GetProject()->MarkAsModified();
+            LUMINA_LOG_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Applied render group changes to project");
         }
     }
 
@@ -357,7 +431,10 @@ namespace Tiles
 
         for (const auto& pair : m_LayerToRenderGroup)
         {
-            usedGroups.insert(pair.second);
+            if (pair.second != -1) // Don't export disabled groups
+            {
+                usedGroups.insert(pair.second);
+            }
         }
 
         std::vector<std::string> result;
