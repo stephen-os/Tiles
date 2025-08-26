@@ -20,6 +20,8 @@ namespace Tiles
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
         ImGui::Begin("Viewport", nullptr, flags);
 
+		m_IsWindowFocused = ImGui::IsWindowFocused();
+
         if (!m_Context || !m_Context->HasProject())
         {
             ImGui::TextColored(UI::Color::TextError, "No project loaded");
@@ -35,7 +37,7 @@ namespace Tiles
             return;
         }
 
-        m_MousePosition = ImGui::GetMousePos();
+        m_CurrentMousePosition = ImGui::GetMousePos();
         m_ViewportPosition = ImGui::GetCursorScreenPos();
         m_ViewportSize = ImGui::GetContentRegionAvail();
         m_ViewportSize.x = std::max(m_ViewportSize.x, m_TileSize);
@@ -50,7 +52,6 @@ namespace Tiles
         RenderGrid();
         RenderLayers();
         RenderHoverTile();
-        HandleInput();
 
         Renderer2D::End();
         Renderer2D::SetRenderTarget(nullptr);
@@ -70,8 +71,13 @@ namespace Tiles
         if (!m_Context || !m_Context->HasProject())
             return;
 
-        HandleCameraMovement();
-        HandleZoom();
+        if (m_IsWindowFocused)
+        {
+            HandleInput();
+            HandleZoom();
+            HandleCameraMovement();
+            HandleMouseDragging();
+        }
     }
 
     void PanelViewport::HandleCameraMovement()
@@ -101,6 +107,41 @@ namespace Tiles
             Viewport::Render::MaxZoom
         );
         camera->SetZoom(newZoom);
+    }
+
+    void PanelViewport::HandleMouseDragging()
+    {
+        auto camera = m_Context->GetViewportCamera();
+        if (!camera) return;
+
+        if (Input::IsMouseButtonPressed(MouseCode::Middle) && !m_IsDragging)
+        {
+            m_IsDragging = true;
+            m_PreviousMousePosition = m_CurrentMousePosition;
+        }
+
+        if (m_IsDragging && (Input::IsMouseButtonPressed(MouseCode::Right) || Input::IsMouseButtonPressed(MouseCode::Middle)))
+        {
+            ImVec2 mouseDelta = {
+                m_CurrentMousePosition.x - m_PreviousMousePosition.x,
+                m_CurrentMousePosition.y - m_PreviousMousePosition.y
+            };
+
+            float dragSensitivity = Camera::Settings::DragSensitivity;
+            float zoom = camera->GetZoom();
+
+            glm::vec3 cameraPos = camera->GetPosition();
+            cameraPos.x -= mouseDelta.x * dragSensitivity / zoom;
+            cameraPos.y += mouseDelta.y * dragSensitivity / zoom;
+
+            camera->SetPosition(cameraPos);
+            m_PreviousMousePosition = m_CurrentMousePosition;
+        }
+
+        if (m_IsDragging && !Input::IsMouseButtonPressed(MouseCode::Middle))
+        {
+            m_IsDragging = false;
+        }
     }
 
     void PanelViewport::RenderGrid()
@@ -365,10 +406,9 @@ namespace Tiles
 
     void PanelViewport::HandleInput()
     {
-        if (!ImGui::IsWindowHovered()) return;
-
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
-        if (!IsValidGridPosition(gridPos)) return;
+        if (!IsValidGridPosition(gridPos)) 
+            return;
 
         if (Input::IsMouseButtonPressed(MouseCode::Left))
         {
@@ -419,8 +459,8 @@ namespace Tiles
         float zoom = camera->GetZoom();
 
         ImVec2 relativeMousePosition = {
-            m_MousePosition.x - m_ViewportPosition.x,
-            m_MousePosition.y - m_ViewportPosition.y
+            m_CurrentMousePosition.x - m_ViewportPosition.x,
+            m_CurrentMousePosition.y - m_ViewportPosition.y
         };
 
         float centeredX = relativeMousePosition.x - m_ViewportSize.x / 2.0f;

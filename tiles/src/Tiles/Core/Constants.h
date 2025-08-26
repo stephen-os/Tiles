@@ -198,6 +198,7 @@ namespace Tiles
             constexpr float MaxZoom = 5.0f;
             constexpr float ZoomSensitivity = 0.1f;
             constexpr float PanSensitivity = 1.0f;
+			constexpr float DragSensitivity = 1.0f;
         }
     }
 

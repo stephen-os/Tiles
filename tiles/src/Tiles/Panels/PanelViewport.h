@@ -37,17 +37,20 @@ namespace Tiles
         void ExecutePaintAction(const glm::ivec2& gridPos);
 
         void HandleInput();
+        void HandleMouseDragging(); 
         void HandleCameraMovement();
         void HandleZoom();
 
     private:
-        Ref<OrthographicCamera> m_Camera;
         Ref<RenderTarget> m_RenderTarget;
 
         float m_TileSize;
         float m_MouseDelta = 0.0f;
+        bool m_IsDragging = false;
+        bool m_IsWindowFocused = false; 
 
-        ImVec2 m_MousePosition = { 0.0f, 0.0f };
+        ImVec2 m_CurrentMousePosition = { 0.0f, 0.0f };
+        ImVec2 m_PreviousMousePosition = { 0, 0 };
         ImVec2 m_ViewportPosition = { 0.0f, 0.0f };
         ImVec2 m_ViewportSize = { 512.0f, 512.0f };
 
