@@ -12,6 +12,9 @@ namespace Tiles
     class LayerStack
     {
     public:
+        nlohmann::json ToJSON() const;
+        static LayerStack FromJSON(const nlohmann::json& jsonLayerStack);
+
         LayerStack(uint32_t width = 0, uint32_t height = 0);
         ~LayerStack() = default;
 
@@ -46,12 +49,9 @@ namespace Tiles
 
         bool IsValidLayerIndex(size_t index) const { return index >= 0 && index < m_Layers.size(); }
     
-        nlohmann::json ToJSON() const;
-        static LayerStack FromJSON(const nlohmann::json& jsonLayerStack);
-
     private:
-        uint32_t m_Width;
-        uint32_t m_Height;
-        std::vector<TileLayer> m_Layers;
+        uint32_t m_Width = 16;                          // Width of the layer stack in tiles
+        uint32_t m_Height = 16;                         // Height of the layer stack in tiles
+        std::vector<TileLayer> m_Layers;                // Collection of tile layers ordered from bottom to top
     };
 }
