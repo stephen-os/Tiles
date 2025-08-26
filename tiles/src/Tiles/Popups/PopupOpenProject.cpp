@@ -15,7 +15,7 @@ namespace Tiles
             m_FirstShow = false;
         }
 
-        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
         if (ImGui::Begin("Open Project", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
         {
@@ -105,14 +105,9 @@ namespace Tiles
 
     void PopupOpenProject::RenderFileSettings()
     {
-        // Directory input
         ImGui::Text("Directory:");
-        ImGui::SetNextItemWidth(-80);
-        std::string directoryStr = m_Directory.string();
-        if (ImGui::InputText("##Directory", directoryStr.data(), directoryStr.capacity() + 1, ImGuiInputTextFlags_ReadOnly))
-        {
-            // Read-only, so no need to update m_Directory
-        }
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s", m_Directory.string().c_str());
         ImGui::SameLine();
         if (ImGui::Button("Browse..."))
         {
