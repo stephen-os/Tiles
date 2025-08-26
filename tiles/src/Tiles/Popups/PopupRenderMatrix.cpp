@@ -95,19 +95,27 @@ namespace Tiles
         ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween / 2.0f, 0.0f));
         ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
+        // Get render group data dynamically
+        auto renderGroups = TileLayerUtils::GetAllRenderGroups();
+        auto renderGroupNames = TileLayerUtils::GetAllRenderGroupNames();
+        auto renderGroupValues = TileLayerUtils::GetAllRenderGroupValues();
+        size_t groupCount = TileLayerUtils::GetRenderGroupCount();
+
         float cell_width = 0.0f;
         float item_width = 0.0f;
         float cursor_x = 0.0f;
 
-        if (ImGui::BeginTable("RenderMatrix", 7, tableFlags)) // 2 + 5 render groups
+        // Dynamic table setup: 2 info columns + render group columns
+        if (ImGui::BeginTable("RenderMatrix", static_cast<int>(2 + groupCount), tableFlags))
         {
+            // Setup columns
             ImGui::TableSetupColumn("LayerName", ImGuiTableColumnFlags_WidthFixed, 150.0f);
             ImGui::TableSetupColumn("LayerVisibility", ImGuiTableColumnFlags_WidthFixed, 25.0f);
-            ImGui::TableSetupColumn("Disabled", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("Background", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("Midground", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("Foreground", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("Debug", ImGuiTableColumnFlags_WidthStretch);
+
+            for (size_t i = 0; i < groupCount; ++i)
+            {
+                ImGui::TableSetupColumn(renderGroupNames[i], ImGuiTableColumnFlags_WidthStretch);
+            }
 
             ImGui::TableNextRow();
 
@@ -133,12 +141,11 @@ namespace Tiles
                 ImGui::TableHeader(header);
             }
 
-            // Render group headers
-            const char* groupNames[] = { "Disabled", "Background", "Midground", "Foreground", "Debug" };
-            for (int i = 0; i < 5; ++i)
+            // Dynamic render group headers
+            for (size_t i = 0; i < groupCount; ++i)
             {
-                ImGui::TableSetColumnIndex(i + 2);
-                const char* header = groupNames[i];
+                ImGui::TableSetColumnIndex(static_cast<int>(i + 2));
+                const char* header = renderGroupNames[i];
                 cell_width = ImGui::GetColumnWidth();
                 item_width = ImGui::CalcTextSize(header).x;
                 cursor_x = ImGui::GetCursorPosX() + (cell_width - item_width) * 0.5f - ImGui::GetStyle().CellPadding.x;
@@ -173,23 +180,24 @@ namespace Tiles
                 ImGui::Checkbox(("##vis" + std::to_string(layerIdx)).c_str(), &visible);
                 ImGui::EndDisabled();
 
-                // Render group radio buttons
+                // Dynamic render group radio buttons
                 int currentLayerGroup = static_cast<int>(layer.GetRenderGroup());
-                int renderGroupValues[] = { -1, 0, 1, 2, 99 }; // Disabled, Background, Midground, Foreground, Debug
 
-                for (int i = 0; i < 5; ++i)
+                for (size_t i = 0; i < groupCount; ++i)
                 {
-                    ImGui::TableSetColumnIndex(2 + i);
+                    ImGui::TableSetColumnIndex(static_cast<int>(2 + i));
 
                     cell_width = ImGui::GetColumnWidth();
                     item_width = ImGui::GetFrameHeight();
                     cursor_x = ImGui::GetCursorPosX() + (cell_width - item_width) * 0.5f;
                     ImGui::SetCursorPosX(cursor_x);
 
-                    int groupValue = renderGroupValues[i];
+                    int32_t groupValue = renderGroupValues[i];
                     bool isInGroup = m_LayerToRenderGroup[layerIdx] == groupValue;
 
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+                    bool shouldHighlight = (currentLayerGroup == groupValue && currentLayerGroup != m_LayerToRenderGroup[layerIdx]);
+                    ImVec4 textColor = shouldHighlight ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImGui::GetStyleColorVec4(ImGuiCol_Text);
+                    ImGui::PushStyleColor(ImGuiCol_Text, textColor);
 
                     if (ImGui::RadioButton(("##" + std::to_string(layerIdx) + "_" + std::to_string(groupValue)).c_str(), isInGroup))
                     {

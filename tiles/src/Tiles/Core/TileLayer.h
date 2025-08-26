@@ -32,6 +32,42 @@ namespace Tiles
             default: return "Unknown";
             }
         }
+
+        static std::vector<RenderGroup> GetAllRenderGroups()
+        {
+            return {
+                RenderGroup::Disabled,
+                RenderGroup::Background,
+                RenderGroup::Midground,
+                RenderGroup::Foreground,
+                RenderGroup::Debug
+            };
+        }
+
+        static std::vector<const char*> GetAllRenderGroupNames()
+        {
+            std::vector<const char*> names;
+            for (const auto& group : GetAllRenderGroups())
+            {
+                names.push_back(GetRenderGroupName(group));
+            }
+            return names;
+        }
+
+        static std::vector<int32_t> GetAllRenderGroupValues()
+        {
+            std::vector<int32_t> values;
+            for (const auto& group : GetAllRenderGroups())
+            {
+                values.push_back(static_cast<int32_t>(group));
+            }
+            return values;
+        }
+
+        static size_t GetRenderGroupCount()
+        {
+            return GetAllRenderGroups().size();
+        }
     }
     
     class TileLayer
