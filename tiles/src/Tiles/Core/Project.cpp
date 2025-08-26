@@ -48,7 +48,6 @@ namespace Tiles
     Ref<Lumina::TextureAtlas> Project::GetTextureAtlas(size_t index)
     {
         LUMINA_ASSERT(index < m_TextureAtlases.size(), "Project::GetTextureAtlas: Index {} out of bounds (size: {})", index, m_TextureAtlases.size());
-        LUMINA_LOG_INFO("Project::GetTextureAtlas: Retrieving texture atlas at index {}", index);
         return m_TextureAtlases[index];
     }
 
