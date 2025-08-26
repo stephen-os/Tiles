@@ -469,19 +469,21 @@ namespace Tiles
             ImGui::PushStyleColor(ImGuiCol_FrameBgActive, UI::Layer::ItemHover);
             ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::Text);
 
-            // Render group combo box
-            const char* renderGroupNames[] = { "Disabled", "Background", "Midground", "Foreground", "Debug" };
-            int renderGroupValues[] = { -1, 0, 1, 2, 99 };
+            // Use TileLayerUtils for dynamic render group data
+            auto renderGroups = TileLayerUtils::GetAllRenderGroups();
+            auto renderGroupNames = TileLayerUtils::GetAllRenderGroupNames();
+            auto renderGroupValues = TileLayerUtils::GetAllRenderGroupValues();
+            size_t groupCount = TileLayerUtils::GetRenderGroupCount();
 
             int currentRenderGroup = static_cast<int>(layer.GetRenderGroup());
             int currentIndex = 0;
 
             // Find current selection index
-            for (int i = 0; i < 5; ++i)
+            for (size_t i = 0; i < groupCount; ++i)
             {
                 if (renderGroupValues[i] == currentRenderGroup)
                 {
-                    currentIndex = i;
+                    currentIndex = static_cast<int>(i);
                     break;
                 }
             }
@@ -489,15 +491,15 @@ namespace Tiles
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
             std::string comboId = std::string("##") + id + "_Combo";
 
-            if (ImGui::Combo(comboId.c_str(), &currentIndex, renderGroupNames, 5))
+            std::vector<const char*> nameArray(renderGroupNames.begin(), renderGroupNames.end());
+
+            if (ImGui::Combo(comboId.c_str(), &currentIndex, nameArray.data(), static_cast<int>(groupCount)))
             {
-                RenderGroup newGroup = static_cast<RenderGroup>(renderGroupValues[currentIndex]);
+                RenderGroup newGroup = renderGroups[currentIndex];
                 if (layer.GetRenderGroup() != newGroup)
                 {
                     layer.SetRenderGroup(newGroup);
                     m_Context->GetProject()->MarkAsModified();
-                    LUMINA_LOG_INFO("PanelLayerSelection::RenderComponentRenderGroupSelection: Changed layer '{}' render group to {}",
-                        layer.GetName(), renderGroupValues[currentIndex]);
                 }
             }
 
