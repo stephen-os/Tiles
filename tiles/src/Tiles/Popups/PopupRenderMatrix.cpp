@@ -189,21 +189,14 @@ namespace Tiles
                     int groupValue = renderGroupValues[i];
                     bool isInGroup = m_LayerToRenderGroup[layerIdx] == groupValue;
 
-                    // Highlight if this is the layer's actual current group but different from selected
-                    if (currentLayerGroup == groupValue && currentLayerGroup != m_LayerToRenderGroup[layerIdx])
-                    {
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
-                    }
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
 
                     if (ImGui::RadioButton(("##" + std::to_string(layerIdx) + "_" + std::to_string(groupValue)).c_str(), isInGroup))
                     {
                         m_LayerToRenderGroup[layerIdx] = groupValue;
                     }
 
-                    if (currentLayerGroup == groupValue && currentLayerGroup != m_LayerToRenderGroup[layerIdx])
-                    {
-                        ImGui::PopStyleColor();
-                    }
+                    ImGui::PopStyleColor();
                 }
             }
 
