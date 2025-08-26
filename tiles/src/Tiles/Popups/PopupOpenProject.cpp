@@ -15,6 +15,7 @@ namespace Tiles
             m_FirstShow = false;
         }
 
+        ImGui::SetNextWindowSizeConstraints(ImVec2(500, 0), ImVec2(500, FLT_MAX));
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
         if (ImGui::Begin("Open Project", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
