@@ -2,15 +2,10 @@
 
 #include "Lumina/Core/Assert.h"
 
+#include "Constants.h"
+
 namespace Tiles
 {
-    namespace LayerStackFields
-    {
-        static constexpr const char* WIDTH = "width";
-        static constexpr const char* HEIGHT = "height";
-        static constexpr const char* LAYERS = "layers";
-    }
-
     LayerStack::LayerStack(uint32_t width, uint32_t height) : m_Width(width), m_Height(height) {}
 
     void LayerStack::AddLayer(const std::string& name)
@@ -118,29 +113,29 @@ namespace Tiles
     {
         nlohmann::json jsonLayerStack;
 
-        jsonLayerStack[LayerStackFields::WIDTH] = GetWidth();
-        jsonLayerStack[LayerStackFields::HEIGHT] = GetHeight();
+        jsonLayerStack[JSON::LayerStack::Width] = GetWidth();
+        jsonLayerStack[JSON::LayerStack::Height] = GetHeight();
 
         nlohmann::json layersArray = nlohmann::json::array();
         for (const auto& layer : m_Layers)
         {
             layersArray.push_back(layer.ToJSON());
         }
-        jsonLayerStack[LayerStackFields::LAYERS] = layersArray;
+        jsonLayerStack[JSON::LayerStack::TileLayers] = layersArray;
 
         return jsonLayerStack;
     }
 
     LayerStack LayerStack::FromJSON(const nlohmann::json& jsonLayerStack)
     {
-        uint32_t width = jsonLayerStack.at(LayerStackFields::WIDTH).get<uint32_t>();
-        uint32_t height = jsonLayerStack.at(LayerStackFields::HEIGHT).get<uint32_t>();
+        uint32_t width = jsonLayerStack.at(JSON::LayerStack::Width).get<uint32_t>();
+        uint32_t height = jsonLayerStack.at(JSON::LayerStack::Height).get<uint32_t>();
 
         LayerStack layerStack(width, height);
 
-        if (jsonLayerStack.contains(LayerStackFields::LAYERS))
+        if (jsonLayerStack.contains(JSON::LayerStack::TileLayers))
         {
-            const auto& layersArray = jsonLayerStack[LayerStackFields::LAYERS];
+            const auto& layersArray = jsonLayerStack[JSON::LayerStack::TileLayers];
             for (const auto& layerJson : layersArray)
             {
                 TileLayer layer = TileLayer::FromJSON(layerJson);

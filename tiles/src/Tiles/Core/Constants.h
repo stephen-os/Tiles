@@ -236,18 +236,36 @@ namespace Tiles
     {
         namespace Tile
         {
-			constexpr const char* Rotation = "rotation";
-			constexpr const char* TintColor = "tint_color";
-			constexpr const char* Size = "size";
-			constexpr const char* TextureCoords = "texture_coords";
-			constexpr const char* AtlasIndex = "atlas_index";
-			constexpr const char* Textured = "is_textured";
-			constexpr const char* Painted = "is_painted";
+			constexpr const char* Rotation = "tile_rotation";
+			constexpr const char* TintColor = "tile_tint_color";
+			constexpr const char* Size = "tile_size";
+			constexpr const char* TextureCoords = "tile_texture_coords";
+			constexpr const char* AtlasIndex = "tile_atlas_index";
+			constexpr const char* Textured = "tile_is_textured";
+			constexpr const char* Painted = "tile_is_painted";
         }
+
+        namespace TileLayer
+        {
+            static constexpr const char* Name = "tile_layer_name";
+            static constexpr const char* Width = "tile_layer_width";
+            static constexpr const char* Height = "tile_layer_height";
+            static constexpr const char* Visible = "tile_layer_visible";
+            static constexpr const char* RenderGroup = "tile_layer_render_group";
+            static constexpr const char* Tiles = "tile_layer_tiles";
+        }
+
+        namespace LayerStack
+        {
+            static constexpr const char* Width = "layer_stack_width";
+            static constexpr const char* Height = "layer_stack_height";
+            static constexpr const char* TileLayers = "layer_stack_layers";
+		}
 
         namespace Project
         {
             static constexpr const char* Name = "project_name";
+			static constexpr const char* LayerStack = "project_layer_stack";
         }
 
         namespace Atlas
@@ -256,11 +274,6 @@ namespace Tiles
 			static constexpr const char* Path = "atlas_path";
 			static constexpr const char* Width = "atlas_width";
 			static constexpr const char* Height = "atlas_height";
-        }
-        
-        namespace Layer
-        {
-            static constexpr const char* Stack = "layer_stack";
         }
     }
 

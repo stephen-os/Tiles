@@ -2,18 +2,10 @@
 
 #include "Lumina/Core/Assert.h"
 
+#include "Constants.h"
+
 namespace Tiles
 {
-	namespace TileLayerFields
-	{
-		static constexpr const char* NAME = "name";
-		static constexpr const char* WIDTH = "width";
-		static constexpr const char* HEIGHT = "height";
-		static constexpr const char* VISIBLE = "visible";
-		static constexpr const char* RENDER_GROUP = "render_group";
-		static constexpr const char* TILES = "tiles";
-	}
-
 	TileLayer::TileLayer(uint32_t width, uint32_t height) : m_Width(width), m_Height(height)
 	{
 		LUMINA_ASSERT((width * height) >= 0, "TileLayer::TileLayer: Size must be greater than 0");
@@ -88,11 +80,11 @@ namespace Tiles
 	{
 		nlohmann::json jsonLayer;
 
-		jsonLayer[TileLayerFields::NAME] = GetName();
-		jsonLayer[TileLayerFields::WIDTH] = GetWidth();
-		jsonLayer[TileLayerFields::HEIGHT] = GetHeight();
-		jsonLayer[TileLayerFields::VISIBLE] = GetVisibility();
-		jsonLayer[TileLayerFields::RENDER_GROUP] = GetRenderGroup();
+		jsonLayer[JSON::TileLayer::Name] = GetName();
+		jsonLayer[JSON::TileLayer::Width] = GetWidth();
+		jsonLayer[JSON::TileLayer::Height] = GetHeight();
+		jsonLayer[JSON::TileLayer::Visible] = GetVisibility();
+		jsonLayer[JSON::TileLayer::RenderGroup] = GetRenderGroup();
 
 		nlohmann::json tilesArray = nlohmann::json::array();
 		for (uint32_t y = 0; y < GetHeight(); y++)
@@ -105,39 +97,39 @@ namespace Tiles
 			}
 			tilesArray.push_back(rowArray);
 		}
-		jsonLayer[TileLayerFields::TILES] = tilesArray;
+		jsonLayer[JSON::TileLayer::Tiles] = tilesArray;
 
 		return jsonLayer;
 	}
 
 	TileLayer TileLayer::FromJSON(const nlohmann::json& jsonLayer)
 	{
-		uint32_t width = jsonLayer.at(TileLayerFields::WIDTH).get<uint32_t>();
-		uint32_t height = jsonLayer.at(TileLayerFields::HEIGHT).get<uint32_t>();
+		uint32_t width = jsonLayer.at(JSON::TileLayer::Width).get<uint32_t>();
+		uint32_t height = jsonLayer.at(JSON::TileLayer::Height).get<uint32_t>();
 
 		TileLayer layer(width, height);
 
-		if (jsonLayer.contains(TileLayerFields::NAME))
+		if (jsonLayer.contains(JSON::TileLayer::Name))
 		{
-			std::string name = jsonLayer[TileLayerFields::NAME].get<std::string>();
+			std::string name = jsonLayer[JSON::TileLayer::Name].get<std::string>();
 			layer.SetName(name);
 		}
 
-		if (jsonLayer.contains(TileLayerFields::VISIBLE))
+		if (jsonLayer.contains(JSON::TileLayer::Visible))
 		{
-			bool visible = jsonLayer[TileLayerFields::VISIBLE].get<bool>();
+			bool visible = jsonLayer[JSON::TileLayer::Visible].get<bool>();
 			layer.SetVisibility(visible);
 		}
 
-		if (jsonLayer.contains(TileLayerFields::RENDER_GROUP))
+		if (jsonLayer.contains(JSON::TileLayer::RenderGroup))
 		{
-			int renderGroup = jsonLayer[TileLayerFields::RENDER_GROUP].get<int>();
+			int renderGroup = jsonLayer[JSON::TileLayer::RenderGroup].get<int>();
 			layer.SetRenderGroup(renderGroup);
 		}
 
-		if (jsonLayer.contains(TileLayerFields::TILES))
+		if (jsonLayer.contains(JSON::TileLayer::Tiles))
 		{
-			const auto& tilesArray = jsonLayer[TileLayerFields::TILES];
+			const auto& tilesArray = jsonLayer[JSON::TileLayer::Tiles];
 			for (uint32_t y = 0; y < height && y < tilesArray.size(); y++)
 			{
 				const auto& rowArray = tilesArray[y];

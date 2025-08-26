@@ -53,7 +53,7 @@ namespace Tiles
         nlohmann::json jsonProject;
 
         jsonProject[JSON::Project::Name] = GetProjectName();
-        jsonProject[JSON::Layer::Stack] = GetLayerStack().ToJSON();  // Uses LayerStack's ToJSON method
+        jsonProject[JSON::Project::LayerStack] = GetLayerStack().ToJSON();
 
         // Serialize texture atlases
         nlohmann::json atlasArray = nlohmann::json::array();
@@ -75,7 +75,7 @@ namespace Tiles
 
     Ref<Project> Project::FromJSON(const nlohmann::json& json)
     {
-        LayerStack layerStack = LayerStack::FromJSON(json.at(JSON::Layer::Stack));
+        LayerStack layerStack = LayerStack::FromJSON(json.at(JSON::Project::LayerStack));
 
         std::string projectName = json.value(JSON::Project::Name, "Loaded Project");
 
