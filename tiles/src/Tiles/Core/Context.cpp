@@ -256,6 +256,9 @@ namespace Tiles
             m_Project->MarkAsSaved();
             m_Project->UpdateLastAccessed();
 
+            m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
+
+            LUMINA_LOG_INFO("Context::SaveProject: Successfully saved project '{}'", m_Project->GetProjectName());
             return { true, "Project saved successfully." };
         }
         catch (const std::exception& e)
@@ -296,6 +299,9 @@ namespace Tiles
             m_Project->MarkAsSaved();
             m_Project->UpdateLastAccessed();
 
+            m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
+
+            LUMINA_LOG_INFO("Context::SaveProjectAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
             return { true, "Project saved successfully." };
         }
         catch (const std::exception& e)
@@ -308,6 +314,8 @@ namespace Tiles
     {
         if (!std::filesystem::exists(path))
         {
+            LUMINA_LOG_INFO("Context::LoadProject: File does not exist: {}", path.string());
+            m_ProjectHistory.RemoveProject(path);
             return { false, "File does not exist." };
         }
 
@@ -332,8 +340,14 @@ namespace Tiles
             project->MarkAsSaved();
             project->UpdateLastAccessed();
         }
+        catch (const nlohmann::json::parse_error& e)
+        {
+            LUMINA_LOG_INFO("Context::LoadProject: JSON parse error: {}", e.what());
+            return { false, std::string("Invalid project file format: ") + e.what() };
+        }
         catch (const std::exception& e)
         {
+            LUMINA_LOG_INFO("Context::LoadProject: Load failed: {}", e.what());
             return { false, std::string("Failed to load project: ") + e.what() };
         }
 
@@ -345,7 +359,14 @@ namespace Tiles
         m_PaintingMode = PaintingMode::None;
         m_Brush = Tile();
         m_Brush.SetPainted(true);
+        
+        ValidateWorkingLayer(); 
+
         InitializeSceneCamera();
+
+        m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
+
+        LUMINA_LOG_INFO("Context::LoadProject: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
         return { true, "Project loaded successfully." };
     }
 

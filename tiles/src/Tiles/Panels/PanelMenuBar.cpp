@@ -159,11 +159,48 @@ namespace Tiles
 
             ImGui::Separator();
 
-            if (ImGui::BeginMenu("Recent Projects", false)) // TODO: Implement recent projects
+            bool hasRecentProjects = m_Context && m_Context->HasRecentProjects();
+
+            if (ImGui::BeginMenu("Recent Projects", hasRecentProjects))
             {
-                ImGui::MenuItem("No recent projects", nullptr, false, false);
+                if (hasRecentProjects)
+                {
+                    size_t projectCount = m_Context->GetRecentProjectCount();
+                    for (size_t i = 0; i < projectCount; ++i)
+                    {
+                        const auto& entry = m_Context->GetRecentProject(i);
+
+                        std::string menuText = entry.displayName;
+                        std::string shortcut = "";
+                        if (i < 9)
+                        {
+                            shortcut = "Ctrl+" + std::to_string(i + 1);
+                        }
+
+                        if (ImGui::MenuItem(menuText.c_str(), shortcut.empty() ? nullptr : shortcut.c_str()))
+                        {
+                            m_Context->LoadProject(entry.filePath);
+                        }
+
+                        if (ImGui::IsItemHovered())
+                        {
+                            ImGui::SetTooltip("%s", entry.filePath.string().c_str());
+                        }
+                    }
+
+                    ImGui::Separator();
+                    if (ImGui::MenuItem("Clear Recent Projects"))
+                    {
+                        m_Context->ClearRecentProjects();
+                    }
+                }
+                else
+                {
+                    ImGui::MenuItem("No recent projects", nullptr, false, false);
+                }
                 ImGui::EndMenu();
             }
+            
 
             ImGui::Separator();
 

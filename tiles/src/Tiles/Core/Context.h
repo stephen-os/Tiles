@@ -5,6 +5,7 @@
 #include "Tile.h"
 #include "Project.h"
 #include "CommandHistory.h"
+#include "ProjectHistory.h"
 
 #include "Constants.h"
 
@@ -81,6 +82,11 @@ namespace Tiles
         Ref<Project> GetProject() { return m_Project; }
         const Ref<Project> GetProject() const { return m_Project; }
 
+        // Project History
+        size_t GetRecentProjectCount() const { return m_ProjectHistory.GetCount(); }
+        bool HasRecentProjects() const { return !m_ProjectHistory.IsEmpty(); }
+        const ProjectHistoryEntry& GetRecentProject(size_t index) const { return m_ProjectHistory.GetEntry(index); }
+        void ClearRecentProjects() { m_ProjectHistory.Clear(); }
 
     private:
         void ValidateWorkingLayer();
@@ -88,6 +94,7 @@ namespace Tiles
 
     private: 
         CommandHistory m_CommandHistory;
+        ProjectHistory m_ProjectHistory; 
 
         Ref<Project> m_Project;
         
