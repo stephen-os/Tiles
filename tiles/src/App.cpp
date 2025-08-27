@@ -7,6 +7,7 @@ Lumina::Application* Lumina::CreateApplication(int argc, char** argv)
 {
     Lumina::ApplicationSpecification spec;
     spec.Name = "Tiles";
+	spec.Icon = "res/assets/bucket.png";
     spec.Width = 1920;
     spec.Height = 1080;
 	spec.Use2DRenderer = true;
