@@ -1,9 +1,6 @@
 #include "PopupSaveAs.h"
-
 #include "Core/Constants.h"
-
 #include "ImGuiFileDialog.h"
-
 #include <filesystem>
 
 namespace Tiles
@@ -17,12 +14,13 @@ namespace Tiles
             m_ShowMessage = false;
             m_MessageTimer = 0.0f;
             m_ShowDirectorySelector = false;
+            m_ProjectSavedSuccessfully = false;
             InitializeFromCurrentProject();
             ValidateFileName();
             m_FirstShow = false;
         }
 
-        ImGui::SetNextWindowSizeConstraints(ImVec2(500, 0), ImVec2(500, FLT_MAX));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(600, 0), ImVec2(600, FLT_MAX));
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
         if (ImGui::Begin("Save Project As", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
@@ -37,15 +35,13 @@ namespace Tiles
             ImGui::Text("Save project as new file:");
             ImGui::Separator();
 
-            RenderBlockFileSettings();
+            RenderFileSettings();
 
-            // Show full path preview
             ImGui::Spacing();
             ImGui::Text("Full path:");
-			std::string fullPath = GetFullFilePath();
+            std::string fullPath = GetFullFilePath();
             ImGui::TextColored(UI::Color::TextHint, "%s", fullPath.c_str());
 
-            // Show message if present
             if (m_ShowMessage)
             {
                 ImGui::Spacing();
@@ -56,34 +52,42 @@ namespace Tiles
                 }
                 else
                 {
-                    ImGui::TextColored(UI::Color::Green, "%s", m_SaveMessage.c_str());
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+                    ImGui::Text("%s", m_SaveMessage.c_str());
+                    ImGui::PopStyleColor();
                 }
             }
 
             ImGui::Spacing();
             ImGui::Separator();
 
-            RenderBlockActionButtons();
+            RenderActionButtons();
         }
         ImGui::End();
 
-        // Handle directory selector dialog
         if (m_ShowDirectorySelector)
         {
             ShowDirectoryDialog();
         }
 
-        // Reset first show flag when hidden
         if (!m_IsVisible)
         {
             m_FirstShow = true;
+        }
+
+        if (m_ShowMessage && m_ProjectSavedSuccessfully)
+        {
+            m_MessageTimer += ImGui::GetIO().DeltaTime;
+            if (m_MessageTimer >= MESSAGE_DISPLAY_TIME)
+            {
+                Hide();
+            }
         }
     }
 
     void PopupSaveAs::OnUpdate()
     {
-        // Update message timer
-        if (m_ShowMessage)
+        if (m_ShowMessage && !m_ProjectSavedSuccessfully)
         {
             m_MessageTimer += ImGui::GetIO().DeltaTime;
             if (m_MessageTimer >= MESSAGE_DISPLAY_TIME)
@@ -102,7 +106,6 @@ namespace Tiles
         auto project = m_Context->GetProject();
         std::string projectName = project->GetProjectName();
 
-        // Remove any existing extension from project name
         size_t extensionPos = projectName.find_last_of('.');
         if (extensionPos != std::string::npos)
         {
@@ -111,7 +114,6 @@ namespace Tiles
 
         m_FileName = projectName;
 
-        // Set directory based on current file path or use current directory
         if (!project->IsNew())
         {
             m_Directory = project->GetFilePath().parent_path();
@@ -122,7 +124,7 @@ namespace Tiles
         }
     }
 
-    void PopupSaveAs::RenderBlockFileSettings()
+    void PopupSaveAs::RenderFileSettings()
     {
         ImGui::Text("Directory:");
         ImGui::AlignTextToFramePadding();
@@ -147,12 +149,10 @@ namespace Tiles
 
         ImGui::Spacing();
 
-        // File name input
         ImGui::Text("File name:");
-        ImGui::SetNextItemWidth(-80);
+        ImGui::SetNextItemWidth(450.0f);
         if (ImGui::InputText("##FileName", m_FileName.data(), m_FileName.capacity() + 1))
         {
-            // Resize string if needed and update
             m_FileName.resize(strlen(m_FileName.data()));
             ValidateFileName();
         }
@@ -165,10 +165,13 @@ namespace Tiles
         }
     }
 
-    void PopupSaveAs::RenderBlockActionButtons()
+    void PopupSaveAs::RenderActionButtons()
     {
         float buttonWidth = 80.0f;
-        float spacing = ImGui::GetContentRegionAvail().x - (buttonWidth * 2 + UI::Component::SpaceBetween);
+        float totalWidth = buttonWidth * 2 + ImGui::GetStyle().ItemSpacing.x;
+        float startX = (ImGui::GetContentRegionAvail().x - totalWidth) * 0.5f;
+
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startX);
 
         bool canSave = m_FileNameValid && !m_FileName.empty();
 
@@ -180,6 +183,7 @@ namespace Tiles
             m_SaveMessage = result.Message;
             m_ShowMessage = true;
             m_MessageTimer = 0.0f;
+            m_ProjectSavedSuccessfully = result.Success;
 
             if (result.Success)
             {
@@ -192,7 +196,7 @@ namespace Tiles
             ImGui::SetItemTooltip("Enter a valid file name to save");
         }
 
-        ImGui::SameLine(0, spacing);
+        ImGui::SameLine();
 
         if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
         {
@@ -223,6 +227,22 @@ namespace Tiles
 
     void PopupSaveAs::ShowDirectoryDialog()
     {
+        ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.95f));
+        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.45f, 0.45f, 0.45f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+
         if (ImGuiFileDialog::Instance()->Display("ChooseSaveDirectoryDlg"))
         {
             if (ImGuiFileDialog::Instance()->IsOk())
@@ -232,5 +252,7 @@ namespace Tiles
             ImGuiFileDialog::Instance()->Close();
             m_ShowDirectorySelector = false;
         }
+
+        ImGui::PopStyleColor(12);
     }
 }

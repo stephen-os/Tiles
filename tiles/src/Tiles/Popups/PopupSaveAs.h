@@ -18,8 +18,8 @@ namespace Tiles
         void OnUpdate() override;
 
     private:
-        void RenderBlockFileSettings();
-        void RenderBlockActionButtons();
+        void RenderFileSettings();
+        void RenderActionButtons();
         void ValidateFileName();
         void ShowDirectoryDialog();
         std::string GetFullFilePath() const;
@@ -35,6 +35,7 @@ namespace Tiles
         float m_MessageTimer = 0.0f;
         bool m_FileNameValid = true;
         bool m_FirstShow = true;
+        bool m_ProjectSavedSuccessfully = false;
 
         static constexpr float MESSAGE_DISPLAY_TIME = 3.0f;
     };
