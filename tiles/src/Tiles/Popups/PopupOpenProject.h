@@ -33,6 +33,7 @@ namespace Tiles
         float m_MessageTimer = 0.0f;
         bool m_FilePathValid = false;
         bool m_FirstShow = true;
+        bool m_ProjectOpenedSuccessfully = false;
 
         static constexpr float MESSAGE_DISPLAY_TIME = 3.0f;
         static constexpr const char* FILTER_EXTENSION = ".tiles";

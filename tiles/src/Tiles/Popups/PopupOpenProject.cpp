@@ -15,7 +15,7 @@ namespace Tiles
             m_FirstShow = false;
         }
 
-        ImGui::SetNextWindowSizeConstraints(ImVec2(500, 0), ImVec2(500, FLT_MAX));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(600, 0), ImVec2(600, FLT_MAX));
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
         if (ImGui::Begin("Open Project", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
@@ -25,7 +25,6 @@ namespace Tiles
 
             RenderFileSettings();
 
-            // Show full path preview
             auto fullPath = GetFullFilePath();
             if (!fullPath.empty() && m_FilePathValid)
             {
@@ -34,7 +33,6 @@ namespace Tiles
                 ImGui::TextColored(UI::Color::TextHint, "%s", fullPath.string().c_str());
             }
 
-            // Show message if present
             if (m_ShowMessage)
             {
                 ImGui::Spacing();
@@ -46,7 +44,9 @@ namespace Tiles
                 }
                 else
                 {
-                    ImGui::TextColored(UI::Color::Green, "%s", m_Message.c_str());
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+                    ImGui::Text("%s", m_Message.c_str());
+                    ImGui::PopStyleColor();
                 }
             }
 
@@ -62,17 +62,24 @@ namespace Tiles
             ShowFileDialog();
         }
 
-        // Reset first show flag when hidden
         if (!m_IsVisible)
         {
             m_FirstShow = true;
+        }
+
+        if (m_ShowMessage && m_ProjectOpenedSuccessfully)
+        {
+            m_MessageTimer += ImGui::GetIO().DeltaTime;
+            if (m_MessageTimer >= MESSAGE_DISPLAY_TIME)
+            {
+                Hide();
+            }
         }
     }
 
     void PopupOpenProject::OnUpdate()
     {
-        // Update message timer
-        if (m_ShowMessage)
+        if (m_ShowMessage && !m_ProjectOpenedSuccessfully)
         {
             m_MessageTimer += ImGui::GetIO().DeltaTime;
             if (m_MessageTimer >= MESSAGE_DISPLAY_TIME)
@@ -89,8 +96,8 @@ namespace Tiles
         m_MessageTimer = 0.0f;
         m_FilePathValid = false;
         m_ShowFileSelector = false;
+        m_ProjectOpenedSuccessfully = false;
 
-        // Initialize directory to current working directory
         try
         {
             m_Directory = std::filesystem::current_path();
@@ -100,7 +107,6 @@ namespace Tiles
             m_Directory = ".";
         }
 
-        // Clear filename
         m_FileName.clear();
     }
 
@@ -129,12 +135,10 @@ namespace Tiles
 
         ImGui::Spacing();
 
-        // File name input
         ImGui::Text("Project file:");
-        ImGui::SetNextItemWidth(-1);
+        ImGui::SetNextItemWidth(450.0f);
         if (ImGui::InputText("##FileName", m_FileName.data(), m_FileName.capacity() + 1))
         {
-            // Resize string if needed and update
             m_FileName.resize(strlen(m_FileName.data()));
             ValidateFilePath();
         }
@@ -149,14 +153,19 @@ namespace Tiles
         }
         else
         {
-            ImGui::TextColored(UI::Color::Green, "Valid project file");
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+            ImGui::Text("Valid project file");
+            ImGui::PopStyleColor();
         }
     }
 
     void PopupOpenProject::RenderActionButtons()
     {
         float buttonWidth = 80.0f;
-        float spacing = ImGui::GetContentRegionAvail().x - (buttonWidth * 2 + UI::Component::SpaceBetween);
+        float totalWidth = buttonWidth * 2 + ImGui::GetStyle().ItemSpacing.x;
+        float startX = (ImGui::GetContentRegionAvail().x - totalWidth) * 0.5f;
+
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startX);
 
         bool canOpen = m_FilePathValid && !m_FileName.empty();
 
@@ -170,7 +179,7 @@ namespace Tiles
             ImGui::SetItemTooltip("Select a valid project file to open");
         }
 
-        ImGui::SameLine(0, spacing);
+        ImGui::SameLine();
 
         if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
         {
@@ -185,6 +194,7 @@ namespace Tiles
             m_Message = "No context available!";
             m_ShowMessage = true;
             m_MessageTimer = 0.0f;
+            m_ProjectOpenedSuccessfully = false;
             return;
         }
 
@@ -193,6 +203,7 @@ namespace Tiles
             m_Message = "No valid file selected!";
             m_ShowMessage = true;
             m_MessageTimer = 0.0f;
+            m_ProjectOpenedSuccessfully = false;
             return;
         }
 
@@ -201,16 +212,32 @@ namespace Tiles
         m_Message = result.Message;
         m_ShowMessage = true;
         m_MessageTimer = 0.0f;
+        m_ProjectOpenedSuccessfully = result.Success;
 
         if (result.Success)
         {
-            // Close after showing success message briefly
             ImGui::SetWindowFocus(nullptr);
         }
     }
 
     void PopupOpenProject::ShowFileDialog()
     {
+        ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.95f));
+        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.45f, 0.45f, 0.45f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+
         if (ImGuiFileDialog::Instance()->Display("ChooseProjectFileDlg"))
         {
             if (ImGuiFileDialog::Instance()->IsOk())
@@ -218,7 +245,6 @@ namespace Tiles
                 std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
                 std::filesystem::path path(filePath);
 
-                // Update directory and filename
                 m_Directory = path.parent_path();
                 m_FileName = path.filename().string();
 
@@ -227,6 +253,8 @@ namespace Tiles
             ImGuiFileDialog::Instance()->Close();
             m_ShowFileSelector = false;
         }
+
+        ImGui::PopStyleColor(12);
     }
 
     std::filesystem::path PopupOpenProject::GetFullFilePath() const
