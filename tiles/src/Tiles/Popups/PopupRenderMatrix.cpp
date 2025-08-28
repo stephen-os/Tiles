@@ -21,7 +21,7 @@ namespace Tiles
             m_FirstShow = false;
         }
 
-        ImGui::SetNextWindowSizeConstraints(ImVec2(600, 0), ImVec2(600, FLT_MAX));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(700, 0), ImVec2(700, FLT_MAX));
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
         if (ImGui::Begin("Export Render Matrix", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
@@ -36,6 +36,15 @@ namespace Tiles
             RenderLayerMatrix();
             ImGui::Separator();
             RenderExportSettings();
+
+            if (m_ShowSuccessMessage)
+            {
+                ImGui::Separator();
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+                ImGui::Text("Export completed successfully!");
+                ImGui::PopStyleColor();
+            }
+
             ImGui::Separator();
             RenderActionButtons();
         }
@@ -49,6 +58,7 @@ namespace Tiles
         if (!m_IsVisible)
         {
             m_FirstShow = true;
+            m_ShowSuccessMessage = false;
         }
     }
 
@@ -95,7 +105,6 @@ namespace Tiles
         ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween / 2.0f, 0.0f));
         ImGuiTableFlags tableFlags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
 
-        // Get render group data dynamically
         auto renderGroups = TileLayerUtils::GetAllRenderGroups();
         auto renderGroupNames = TileLayerUtils::GetAllRenderGroupNames();
         auto renderGroupValues = TileLayerUtils::GetAllRenderGroupValues();
@@ -105,10 +114,8 @@ namespace Tiles
         float item_width = 0.0f;
         float cursor_x = 0.0f;
 
-        // Dynamic table setup: 2 info columns + render group columns
         if (ImGui::BeginTable("RenderMatrix", static_cast<int>(2 + groupCount), tableFlags))
         {
-            // Setup columns
             ImGui::TableSetupColumn("LayerName", ImGuiTableColumnFlags_WidthFixed, 150.0f);
             ImGui::TableSetupColumn("LayerVisibility", ImGuiTableColumnFlags_WidthFixed, 25.0f);
 
@@ -119,7 +126,6 @@ namespace Tiles
 
             ImGui::TableNextRow();
 
-            // Layer Name header
             ImGui::TableSetColumnIndex(0);
             {
                 const char* header = "Layer Name";
@@ -130,7 +136,6 @@ namespace Tiles
                 ImGui::TableHeader(header);
             }
 
-            // Visibility header
             ImGui::TableSetColumnIndex(1);
             {
                 const char* header = "Vis";
@@ -141,7 +146,6 @@ namespace Tiles
                 ImGui::TableHeader(header);
             }
 
-            // Dynamic render group headers
             for (size_t i = 0; i < groupCount; ++i)
             {
                 ImGui::TableSetColumnIndex(static_cast<int>(i + 2));
@@ -153,13 +157,11 @@ namespace Tiles
                 ImGui::TableHeader(header);
             }
 
-            // Layer rows
             for (size_t layerIdx = 0; layerIdx < layerCount; ++layerIdx)
             {
                 const auto& layer = layerStack.GetLayer(layerIdx);
                 ImGui::TableNextRow();
 
-                // Layer name
                 ImGui::TableSetColumnIndex(0);
                 ImGui::AlignTextToFramePadding();
                 cell_width = ImGui::GetColumnWidth();
@@ -168,7 +170,6 @@ namespace Tiles
                 ImGui::SetCursorPosX(cursor_x);
                 ImGui::Text("%s", layer.GetName().c_str());
 
-                // Visibility checkbox
                 ImGui::TableSetColumnIndex(1);
                 cell_width = ImGui::GetColumnWidth();
                 item_width = ImGui::GetFrameHeight();
@@ -180,7 +181,6 @@ namespace Tiles
                 ImGui::Checkbox(("##vis" + std::to_string(layerIdx)).c_str(), &visible);
                 ImGui::EndDisabled();
 
-                // Dynamic render group radio buttons
                 int currentLayerGroup = static_cast<int>(layer.GetRenderGroup());
 
                 for (size_t i = 0; i < groupCount; ++i)
@@ -242,7 +242,7 @@ namespace Tiles
 
         ImGui::Text("Base File Name:");
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(200.0f);
+        ImGui::SetNextItemWidth(350.0f);
         if (ImGui::InputText("##FileName", m_ExportFileName.data(), m_ExportFileName.capacity() + 1))
         {
             m_ExportFileName.resize(strlen(m_ExportFileName.data()));
@@ -303,6 +303,22 @@ namespace Tiles
 
     void PopupRenderMatrix::ShowDirectoryDialog()
     {
+        ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.95f));
+        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.45f, 0.45f, 0.45f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
+
         if (ImGuiFileDialog::Instance()->Display("ChooseExportDirDlg"))
         {
             if (ImGuiFileDialog::Instance()->IsOk())
@@ -312,6 +328,8 @@ namespace Tiles
             ImGuiFileDialog::Instance()->Close();
             m_ShowDirectorySelector = false;
         }
+
+        ImGui::PopStyleColor(12);
     }
 
     void PopupRenderMatrix::ResetToDefaults()
@@ -329,6 +347,7 @@ namespace Tiles
             m_LayerToRenderGroup[i] = currentGroup;
         }
 
+        m_ShowSuccessMessage = false;
         LUMINA_LOG_INFO("PopupRenderMatrix::ResetToDefaults: Reset to layer's current render groups");
     }
 
@@ -373,6 +392,8 @@ namespace Tiles
 
         if (usedGroups.empty())
             return;
+
+        m_ShowSuccessMessage = false;
 
         if (usedGroups.size() == 1)
         {
@@ -423,7 +444,7 @@ namespace Tiles
             }
         }
 
-        Hide();
+        m_ShowSuccessMessage = true;
     }
 
     std::vector<std::string> PopupRenderMatrix::GetUsedRenderGroups() const
@@ -432,7 +453,7 @@ namespace Tiles
 
         for (const auto& pair : m_LayerToRenderGroup)
         {
-            if (pair.second != -1) // Don't export disabled groups
+            if (pair.second != -1)
             {
                 usedGroups.insert(pair.second);
             }

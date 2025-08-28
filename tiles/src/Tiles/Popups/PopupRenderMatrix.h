@@ -49,6 +49,7 @@ namespace Tiles
         bool m_ExportInvisible = false;
         bool m_UseProjectBounds = true;
         bool m_ShowDirectorySelector = false;
+        bool m_ShowSuccessMessage = false;
         bool m_FirstShow = true;
 
         static constexpr int RENDER_GROUPS = 8;
