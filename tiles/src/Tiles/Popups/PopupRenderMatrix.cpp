@@ -491,8 +491,8 @@ namespace Tiles
         auto camera = CreateRef<OrthographicCamera>();
 
         camera->SetPosition({
-            width * 0.5f,
-            height * 0.5f,
+            width * 0.5f + Viewport::Render::DefaultTileSize * 0.5f,
+            height * 0.5f + Viewport::Render::DefaultTileSize * 0.5f,
             1.0f
             });
         camera->SetSize(width, height);
