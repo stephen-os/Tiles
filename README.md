@@ -155,7 +155,7 @@ Import and manage texture atlases:
 The Export Render Matrix provides flexible control over how layers are combined and exported:
 
 <div align="center" style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; margin-bottom: 20px;">
-    <img src="assets/render-matrix.png" alt="Export Render Matrix Dialog" width="400">
+    <img src="assets/export-render-matrix.png" alt="Export Render Matrix Dialog" width="400">
 </div>
 
 - **Rows** represent individual layers in your project
