@@ -36,9 +36,12 @@ namespace Tiles
 	{
 	public:
 		Application(const ApplicationSpecification& applicationSpecification = ApplicationSpecification());
-		~Application();
+		virtual ~Application();
 
 		void Run();
+
+		virtual void OnCreate() {}
+		virtual void OnDestroy() {}
 
 		// From Walnut
 		template<typename T>

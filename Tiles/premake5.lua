@@ -1,8 +1,7 @@
 project "Tiles"
-   kind "ConsoleApp"
+   kind "StaticLib"
    language "C++"
    cppdialect "C++17"
-   targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
    flags { "MultiProcessorCompile" }
@@ -54,7 +53,6 @@ project "Tiles"
       symbols "On"
 
    filter "configurations:Dist"
-      kind "WindowedApp"
       defines { "TILES_DIST" }
       runtime "Release"
       optimize "On"

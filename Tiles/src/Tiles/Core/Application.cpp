@@ -125,11 +125,15 @@ namespace Tiles
         // Apply Theme
         if (m_Specifications.Theme)
             ApplyTilesTheme();
+
+        OnCreate();
     }
 
 
     Application::~Application()
     {
+        OnDestroy();
+
 		s_Instance = nullptr;
 
         for (auto& layer : m_LayerStack)
@@ -187,6 +191,12 @@ namespace Tiles
 
             // Create the dockspace
             ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
+			static bool flag = true;
+            if (flag)
+            {
+			    TILES_LOG_INFO("Application: Dockspace ID: {}", dockspace_id);
+                flag = false;
+            }
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 
             ImGui::End();
