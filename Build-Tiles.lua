@@ -9,5 +9,5 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 include "lumina/lumina-external.lua"
 
 group "App"
-   include "tiles"
+   include "Tiles"
 group ""

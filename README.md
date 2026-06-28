@@ -3,7 +3,7 @@
 **Tiles** is a 2D map creator that allows users to upload texture atlases and build detailed 2D worlds. It features a **layer-based approach**, enabling users to organize, edit, and toggle textured layers for precise control. The tool includes essential features like brush customization, erase and fill tools for modifying large areas efficiently. Projects can be **saved and loaded** for continued editing and exported as a **single image** or **multiple grouped layers**, depending on user needs.
 
 <div align="center" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
-    <img src="assets/application.png" alt="Tiles Main Interface" width="800">
+    <img src="Assets/application.png" alt="Tiles Main Interface" width="800">
 </div>
 
 ## Example Projects
@@ -11,9 +11,9 @@
 Tiles enables the creation of complex, detailed 2D environments. Here are examples of factory-themed levels built with the included texture atlas:
 
 <div align="center" style="display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap;">
-    <img src="assets/factory-level-1.png" alt="Factory Level 1 - Industrial Complex" width="250">
-    <img src="assets/factory-level-2.png" alt="Factory Level 2 - Multi-level Platform" width="250">
-    <img src="assets/factory-level-3.png" alt="Factory Level 3 - Underground Facility" width="250">
+    <img src="Assets/factory-level-1.png" alt="Factory Level 1 - Industrial Complex" width="250">
+    <img src="Assets/factory-level-2.png" alt="Factory Level 2 - Multi-level Platform" width="250">
+    <img src="Assets/factory-level-3.png" alt="Factory Level 3 - Underground Facility" width="250">
 </div>
 
 These examples showcase the variety of environments possible with Tiles' layer system, from sprawling industrial complexes with intricate pipe networks to multi-level platformer stages and underground facilities with diverse environmental themes.
@@ -49,7 +49,7 @@ ModeSeven by Andrew Bulhak.
    ```sh
    git clone --recursive https://github.com/stephen-os/Tiles.git
    ```
-2. Navigate to the `scripts` folder and run the `Setup` script.
+2. Navigate to the `Scripts` folder and run the `Setup` script.
 3. Open the `.sln` file in Visual Studio 2017 or later.
 4. Build and run the project from Visual Studio.
 
@@ -59,7 +59,7 @@ ModeSeven by Andrew Bulhak.
 The central viewport displays your tile map with a grid overlay. The red outline indicates the active editing area where tiles can be placed.
 
 <div align="center" style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
-    <img src="assets/empty-project.png" alt="Empty Project Workspace" width="400">
+    <img src="Assets/empty-project.png" alt="Empty Project Workspace" width="400">
 </div>
 
 ### Tools Panel
@@ -72,7 +72,7 @@ Located on the right side, featuring three primary tools:
 Customize your brush with the following options:
 
 <div align="center" style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
-    <img src="assets/brush-attributes.png" alt="Brush Attributes Panel" width="300">
+    <img src="Assets/brush-attributes.png" alt="Brush Attributes Panel" width="300">
 </div>
 
 - **Rotation** – Rotate tiles in 90-degree increments (0°, 90°, 180°, 270°)
@@ -84,14 +84,14 @@ Customize your brush with the following options:
 The left panel shows a real-time preview of your current brush settings, displaying how the selected tile will appear when placed.
 
 <div align="center" style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
-    <img src="assets/brush-preview.png" alt="Brush Preview Panel" width="200">
+    <img src="Assets/brush-preview.png" alt="Brush Preview Panel" width="200">
 </div>
 
 ### Layer Management
 The Layer Selection panel allows you to:
 
 <div align="center" style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
-    <img src="assets/layer-selection.png" alt="Layer Selection Panel" width="200">
+    <img src="Assets/layer-selection.png" alt="Layer Selection Panel" width="200">
 </div>
 
 - Create, delete, and rename layers
@@ -104,7 +104,7 @@ The Layer Selection panel allows you to:
 Import and manage texture atlases:
 
 <div align="center" style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
-    <img src="assets/texture-atlas.png" alt="Texture Selection Panel" width="300">
+    <img src="Assets/texture-atlas.png" alt="Texture Selection Panel" width="300">
 </div>
 
 - Click "Add Atlas" to import texture files
@@ -155,7 +155,7 @@ Import and manage texture atlases:
 The Export Render Matrix provides flexible control over how layers are combined and exported:
 
 <div align="center" style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; margin-bottom: 20px;">
-    <img src="assets/export-render-matrix.png" alt="Export Render Matrix Dialog" width="400">
+    <img src="Assets/export-render-matrix.png" alt="Export Render Matrix Dialog" width="400">
 </div>
 
 - **Rows** represent individual layers in your project
