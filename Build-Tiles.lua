@@ -2,7 +2,7 @@
 workspace "Tiles"
    architecture "x64"
    configurations { "Debug", "Release", "Dist" }
-   startproject "Tiles"
+   startproject "TilesEditor"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -13,6 +13,10 @@ group "Dependencies"
    include "Tiles/vendor/imguifd"
 group ""
 
-group "App"
+group "Engine"
    include "Tiles"
+group ""
+
+group "Tools"
+   include "TilesEditor"
 group ""
