@@ -125,24 +125,15 @@ namespace Tiles
         // Apply Theme
         if (m_Specifications.Theme)
             ApplyTilesTheme();
-
-        OnCreate();
     }
 
 
     Application::~Application()
     {
-        OnDestroy();
-
 		s_Instance = nullptr;
-
-        for (auto& layer : m_LayerStack)
-            layer->OnDetach();
 
         if (m_Specifications.Use2DRenderer)
 			Renderer2D::Shutdown();
-
-        m_LayerStack.clear();
 
         ImGui_ImplOpenGL3_Shutdown();
 
@@ -151,6 +142,21 @@ namespace Tiles
 
         glfwDestroyWindow(m_Window);
         glfwTerminate();
+    }
+
+    void Application::Create()
+    {
+        OnCreate();
+    }
+    
+    void Application::Destroy()
+    {
+        for (auto& layer : m_LayerStack)
+            layer->OnDetach();
+
+        m_LayerStack.clear();
+
+        OnDestroy();
     }
 
     void Application::Run()

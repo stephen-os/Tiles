@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Application.h"
+#include "Core/Application.h"
 
 #ifdef TILES_PLATFORM_WINDOWS
 
@@ -11,7 +11,9 @@ namespace Tiles
 	int Main(int argc, char** argv)
 	{
 		Tiles::Application* app = Tiles::CreateApplication(argc, argv);
+		app->Create();
 		app->Run();
+		app->Destroy();
 		delete app;
 
 		return 0;

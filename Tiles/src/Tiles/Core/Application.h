@@ -38,19 +38,10 @@ namespace Tiles
 		Application(const ApplicationSpecification& applicationSpecification = ApplicationSpecification());
 		virtual ~Application();
 
+		void Create();
+		void Destroy();
 		void Run();
-
-		virtual void OnCreate() {}
-		virtual void OnDestroy() {}
-
-		// From Walnut
-		template<typename T>
-		void PushLayer()
-		{
-			static_assert(std::is_base_of<Layer, T>::value, "Pushed type is not subclass of Layer!");
-			m_LayerStack.emplace_back(std::make_shared<T>())->OnAttach();
-		}
-
+		
 		void SetWindowFullscreen();
 
 		void ApplyTilesTheme();
@@ -59,6 +50,17 @@ namespace Tiles
 
 		static Application& GetInstance();
 		GLFWwindow* GetWindowHandle() const { return m_Window; };
+
+	protected:
+		virtual void OnCreate() = 0;
+		virtual void OnDestroy() = 0;
+
+		template<typename T, typename... Args>
+		void PushLayer(Args&&... args)
+		{
+			static_assert(std::is_base_of_v<Layer, T>, "T must derive from Layer");
+			m_LayerStack.emplace_back(std::make_unique<T>(std::forward<Args>(args)...))->OnAttach();
+		}
 
 	private:
 		GLFWwindow* m_Window = nullptr;
