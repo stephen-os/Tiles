@@ -2,7 +2,7 @@
 
 #include "Panel.h"
 
-#include "Lumina/Lumina.h"
+#include "../Lumina.h"
 
 namespace Tiles
 {
@@ -42,7 +42,7 @@ namespace Tiles
         bool HasValidCurrentAtlas() const;
 
     private:
-        Lumina::Ref<Lumina::Texture> m_CheckerboardTexture = nullptr;
+        Tiles::Ref<Tiles::Texture> m_CheckerboardTexture = nullptr;
         size_t m_CurrentAtlasIndex = 0;
     };
 }

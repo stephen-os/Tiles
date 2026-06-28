@@ -1,15 +1,15 @@
 #include "PanelTextureSelection.h"
 #include "Core/Constants.h"
 #include "ImGuiFileDialog.h"
-#include "Lumina/Core/Log.h"
+#include "Core/Log.h"
 #include <filesystem>
 #include <algorithm>
 
 namespace Tiles
 {
     PanelTextureSelection::PanelTextureSelection(Ref<Context> context) : Panel(context)
-    { 
-        m_CheckerboardTexture = Lumina::Texture::Create(AssetPath::Checkerboard);
+    {
+        m_CheckerboardTexture = Tiles::Texture::Create(AssetPath::Checkerboard);
     }
 
     void PanelTextureSelection::Render()
@@ -278,14 +278,14 @@ namespace Tiles
             brush.IsTextured());
 
         // Scale border thickness with tile size
-        float borderThickness = std::max(Texture::Tile::MinBorderThickness,
-            tileSize * Texture::Tile::BorderThicknessRatio);
+        float borderThickness = std::max(TextureConstants::Tile::MinBorderThickness,
+            tileSize * TextureConstants::Tile::BorderThicknessRatio);
 
         // Draw appropriate border
         ImU32 borderColor = isSelected ?
             ImGui::ColorConvertFloat4ToU32(UI::Selection::BorderColor) :
             ImGui::ColorConvertFloat4ToU32(UI::Selection::DefaultBorderColor);
-        float thickness = isSelected ? borderThickness : Texture::Tile::MinBorderThickness;
+        float thickness = isSelected ? borderThickness : TextureConstants::Tile::MinBorderThickness;
 
         ImGui::GetWindowDrawList()->AddRect(itemMin, itemMax, borderColor, 0.0f, 0, thickness);
     }
@@ -294,7 +294,7 @@ namespace Tiles
     {
         ImVec2 dialogSize(UI::Dialog::FileDialogWidth, UI::Dialog::FileDialogHeight);
 
-        if (ImGuiFileDialog::Instance()->Display(Texture::FileDialog::DialogKey, ImGuiWindowFlags_NoCollapse, dialogSize))
+        if (ImGuiFileDialog::Instance()->Display(TextureConstants::FileDialog::DialogKey, ImGuiWindowFlags_NoCollapse, dialogSize))
         {
             HandleFileDialogResult();
         }
@@ -304,29 +304,29 @@ namespace Tiles
     {
         if (atlasWidth <= 0)
         {
-            return Texture::Tile::PreferredSize;
+            return TextureConstants::Tile::PreferredSize;
         }
 
         // Calculate what tile size would fit the available width
         float widthBasedTileSize = availableWidth / atlasWidth;
 
         // Clamp to our min/max bounds
-        float clampedSize = std::clamp(widthBasedTileSize, Texture::Tile::MinSize, Texture::Tile::MaxSize);
+        float clampedSize = std::clamp(widthBasedTileSize, TextureConstants::Tile::MinSize, TextureConstants::Tile::MaxSize);
 
         // For small atlases, prefer larger tiles for visibility
-        if (atlasWidth <= Texture::Atlas::SmallThreshold)
+        if (atlasWidth <= TextureConstants::Atlas::SmallThreshold)
         {
-            return std::max(clampedSize, Texture::Tile::PreferredSize);
+            return std::max(clampedSize, TextureConstants::Tile::PreferredSize);
         }
 
         // For medium atlases, use calculated size
-        if (atlasWidth <= Texture::Atlas::MediumThreshold)
+        if (atlasWidth <= TextureConstants::Atlas::MediumThreshold)
         {
             return clampedSize;
         }
 
         // For large atlases, prefer smaller tiles but ensure minimum visibility
-        return std::max(clampedSize, Texture::Tile::MinSize);
+        return std::max(clampedSize, TextureConstants::Tile::MinSize);
     }
 
     void PanelTextureSelection::HandleAtlasFileSelection(const std::string& newPath)
@@ -378,14 +378,14 @@ namespace Tiles
     void PanelTextureSelection::OpenFileDialog()
     {
         IGFD::FileDialogConfig config;
-        config.path = Texture::FileDialog::DefaultPath;
+        config.path = TextureConstants::FileDialog::DefaultPath;
         config.flags = ImGuiFileDialogFlags_Modal;
         config.countSelectionMax = 1;
 
         ImGuiFileDialog::Instance()->OpenDialog(
-            Texture::FileDialog::DialogKey,
-            Texture::FileDialog::DialogTitle,
-            Texture::FileDialog::FileFilters,
+            TextureConstants::FileDialog::DialogKey,
+            TextureConstants::FileDialog::DialogTitle,
+            TextureConstants::FileDialog::FileFilters,
             config
         );
     }
@@ -401,7 +401,7 @@ namespace Tiles
 
     void PanelTextureSelection::AddNewAtlas()
     {
-        auto newAtlas = Lumina::TextureAtlas::Create(Texture::Atlas::DefaultWidth, Texture::Atlas::DefaultHeight);
+        auto newAtlas = Tiles::TextureAtlas::Create(TextureConstants::Atlas::DefaultWidth, TextureConstants::Atlas::DefaultHeight);
         m_Context->GetProject()->AddTextureAtlas(newAtlas);
         SetCurrentAtlasIndex(m_Context->GetProject()->GetTextureAtlasCount() - 1);
         m_Context->GetProject()->MarkAsModified();

@@ -466,7 +466,7 @@ namespace Tiles
             ImGuiColorEditFlags_AlphaPreview |
             ImGuiColorEditFlags_DisplayRGB |
             ImGuiColorEditFlags_NoLabel;
-        ImGui::ColorEdit4("##ColorPicker", glm::value_ptr(color), flags, UI::Component::SpaceBetween);
+        ImGui::ColorEdit4("##ColorPicker", glm::value_ptr(color), flags);
 
         ImGui::PopStyleColor(3);
         ImGui::PopStyleVar(2);

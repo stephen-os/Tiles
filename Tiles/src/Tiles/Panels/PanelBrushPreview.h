@@ -2,7 +2,7 @@
 
 #include "Panel.h"
 
-#include "Lumina/Lumina.h"
+#include "../Lumina.h"
 
 #include "imgui.h"
 
@@ -41,8 +41,8 @@ namespace Tiles
         void RenderComponentSpacing();
 
     private:
-        Lumina::Ref<Lumina::OrthographicCamera> m_Camera;
-        Lumina::Ref<Lumina::RenderTarget> m_PreviewRenderTarget;
+        Tiles::Ref<Tiles::OrthographicCamera> m_Camera;
+        Tiles::Ref<Tiles::RenderTarget> m_PreviewRenderTarget;
 
         bool m_ShowGrid = true;
         bool m_ShowBounds = false;

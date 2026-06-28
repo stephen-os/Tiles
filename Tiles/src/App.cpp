@@ -1,11 +1,11 @@
-#include "Lumina/Core/Application.h"
-#include "Lumina/Core/EntryPoint.h"
+#include "Core/Application.h"
+#include "Core/EntryPoint.h"
 
 #include "Tiles/Editor.h"
 
-Lumina::Application* Lumina::CreateApplication(int argc, char** argv)
+Tiles::Application* Tiles::CreateApplication(int argc, char** argv)
 {
-    Lumina::ApplicationSpecification spec;
+    Tiles::ApplicationSpecification spec;
     spec.Name = "Tiles";
 	spec.Icon = "res/assets/bucket.png";
     spec.Width = 1920;
@@ -13,8 +13,8 @@ Lumina::Application* Lumina::CreateApplication(int argc, char** argv)
 	spec.Use2DRenderer = true;
 	spec.Maximized = true;
 
-    Lumina::Application* app = new Lumina::Application(spec);
+    Tiles::Application* app = new Tiles::Application(spec);
     app->PushLayer<Tiles::Editor>();
-    
+
     return app;
 }

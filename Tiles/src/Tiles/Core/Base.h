@@ -2,6 +2,9 @@
 
 #include <memory>
 
+#include "Log.h"
+#include "Assert.h"
+
 namespace Tiles
 {
 	template<typename T>

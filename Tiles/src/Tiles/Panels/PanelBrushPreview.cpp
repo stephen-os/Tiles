@@ -2,20 +2,20 @@
 
 #include "Core/Constants.h"
 
-#include "Lumina/Core/Log.h"
+#include "Core/Log.h"
 
 namespace Tiles
 {
     PanelBrushPreview::PanelBrushPreview(Ref<Context> context) : Panel(context)
     {
-        m_Camera = Lumina::CreateRef<Lumina::OrthographicCamera>();
+        m_Camera = Tiles::CreateRef<Tiles::OrthographicCamera>();
 
-        auto bounds = Camera::Settings::DefaultBounds;
+        auto bounds = CameraConstants::Settings::DefaultBounds;
         m_Camera->SetBounds(-bounds, bounds, -bounds, bounds);
         m_Camera->SetPosition({ 0.0f, 0.0f, 1.0f });
         m_Camera->LookAt({ 0.0f, 0.0f, 0.0f });
 
-        m_PreviewRenderTarget = Lumina::Renderer2D::CreateRenderTarget(512, 512);
+        m_PreviewRenderTarget = Tiles::Renderer2D::CreateRenderTarget(512, 512);
     }
 
     void PanelBrushPreview::Render()
@@ -38,7 +38,7 @@ namespace Tiles
                 ImGui::Checkbox("Show Bounds", &m_ShowBounds);
                 ImGui::Separator();
                 ImGui::SliderFloat("Background", &m_BackgroundBrightness, 0.0f, 1.0f, "%.2f");
-                ImGui::SliderFloat("Zoom", &m_ZoomLevel, Camera::Settings::MinZoom, Camera::Settings::MaxZoom, "%.1fx");
+                ImGui::SliderFloat("Zoom", &m_ZoomLevel, CameraConstants::Settings::MinZoom, CameraConstants::Settings::MaxZoom, "%.1fx");
 
                 if (ImGui::Button("Reset View"))
                 {
@@ -75,7 +75,7 @@ namespace Tiles
         ImVec2 previewDimensions(previewSize, previewSize);
 
         // Update camera bounds based on zoom and pan
-        float bounds = Camera::Settings::DefaultBounds / m_ZoomLevel;
+        float bounds = CameraConstants::Settings::DefaultBounds / m_ZoomLevel;
         m_Camera->SetBounds(
             -bounds + m_PanOffset.x,
             bounds + m_PanOffset.x,
@@ -87,72 +87,72 @@ namespace Tiles
         uint32_t resolutionY = static_cast<uint32_t>(previewDimensions.y);
 
         // Begin 3D rendering
-        Lumina::Renderer2D::SetRenderTarget(m_PreviewRenderTarget);
-        Lumina::Renderer2D::SetResolution(resolutionX, resolutionY);
-        Lumina::Renderer2D::Begin(m_Camera);
+        Tiles::Renderer2D::SetRenderTarget(m_PreviewRenderTarget);
+        Tiles::Renderer2D::SetResolution(resolutionX, resolutionY);
+        Tiles::Renderer2D::Begin(m_Camera);
 
         // Render background
-        Lumina::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Background });
-        Lumina::Renderer2D::SetQuadSize({ Render2D::Grid::BackgroundSize, Render2D::Grid::BackgroundSize });
-        Lumina::Renderer2D::SetQuadTintColor({ m_BackgroundBrightness, m_BackgroundBrightness, m_BackgroundBrightness, 1.0f });
-        Lumina::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
-        Lumina::Renderer2D::DrawQuad();
+        Tiles::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Background });
+        Tiles::Renderer2D::SetQuadSize({ Render2D::Grid::BackgroundSize, Render2D::Grid::BackgroundSize });
+        Tiles::Renderer2D::SetQuadTintColor({ m_BackgroundBrightness, m_BackgroundBrightness, m_BackgroundBrightness, 1.0f });
+        Tiles::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
+        Tiles::Renderer2D::DrawQuad();
 
         // Render grid if enabled
         if (m_ShowGrid)
         {
-            Lumina::Renderer2D::SetLineColor(Render2D::Grid::Color);
-            Lumina::Renderer2D::SetLineThickness(Render2D::Grid::LineThickness);
+            Tiles::Renderer2D::SetLineColor(Render2D::Grid::Color);
+            Tiles::Renderer2D::SetLineThickness(Render2D::Grid::LineThickness);
 
             // Vertical lines
-            for (float x = -Camera::Settings::DefaultBounds; x <= Camera::Settings::DefaultBounds; x += Render2D::Grid::Spacing)
+            for (float x = -CameraConstants::Settings::DefaultBounds; x <= CameraConstants::Settings::DefaultBounds; x += Render2D::Grid::Spacing)
             {
-                Lumina::Renderer2D::SetLineStart({ x, -Camera::Settings::DefaultBounds, Render2D::Depth::Grid });
-                Lumina::Renderer2D::SetLineEnd({ x, Camera::Settings::DefaultBounds, Render2D::Depth::Grid });
-                Lumina::Renderer2D::DrawLine();
+                Tiles::Renderer2D::SetLineStart({ x, -CameraConstants::Settings::DefaultBounds, Render2D::Depth::Grid });
+                Tiles::Renderer2D::SetLineEnd({ x, CameraConstants::Settings::DefaultBounds, Render2D::Depth::Grid });
+                Tiles::Renderer2D::DrawLine();
             }
 
             // Horizontal lines
-            for (float y = -Camera::Settings::DefaultBounds; y <= Camera::Settings::DefaultBounds; y += Render2D::Grid::Spacing)
+            for (float y = -CameraConstants::Settings::DefaultBounds; y <= CameraConstants::Settings::DefaultBounds; y += Render2D::Grid::Spacing)
             {
-                Lumina::Renderer2D::SetLineStart({ -Camera::Settings::DefaultBounds, y, Render2D::Depth::Grid });
-                Lumina::Renderer2D::SetLineEnd({ Camera::Settings::DefaultBounds, y, Render2D::Depth::Grid });
-                Lumina::Renderer2D::DrawLine();
+                Tiles::Renderer2D::SetLineStart({ -CameraConstants::Settings::DefaultBounds, y, Render2D::Depth::Grid });
+                Tiles::Renderer2D::SetLineEnd({ CameraConstants::Settings::DefaultBounds, y, Render2D::Depth::Grid });
+                Tiles::Renderer2D::DrawLine();
             }
         }
 
         // Render brush
         auto& brush = m_Context->GetBrush();
-        Lumina::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Brush });
-        Lumina::Renderer2D::SetQuadSize(brush.GetSize());
-        Lumina::Renderer2D::SetQuadRotation(brush.GetRotation());
-        Lumina::Renderer2D::SetQuadTextureCoords(brush.GetTextureCoords());
-        Lumina::Renderer2D::SetQuadTintColor(brush.GetTint());
+        Tiles::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Brush });
+        Tiles::Renderer2D::SetQuadSize(brush.GetSize());
+        Tiles::Renderer2D::SetQuadRotation(brush.GetRotation());
+        Tiles::Renderer2D::SetQuadTextureCoords(brush.GetTextureCoords());
+        Tiles::Renderer2D::SetQuadTintColor(brush.GetTint());
 
         if (brush.IsTextured() && brush.HasValidAtlas())
         {
             auto texture = m_Context->GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
-            Lumina::Renderer2D::SetQuadTexture(texture);
+            Tiles::Renderer2D::SetQuadTexture(texture);
         }
 
-        Lumina::Renderer2D::DrawQuad();
+        Tiles::Renderer2D::DrawQuad();
 
         // Render bounds if enabled
         if (m_ShowBounds)
         {
-            Lumina::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Bounds });
-            Lumina::Renderer2D::SetQuadSize({ brush.GetSize().x + Render2D::Bounds::Offset,
+            Tiles::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Bounds });
+            Tiles::Renderer2D::SetQuadSize({ brush.GetSize().x + Render2D::Bounds::Offset,
                                       brush.GetSize().y + Render2D::Bounds::Offset });
-            Lumina::Renderer2D::SetQuadTintColor(Render2D::Bounds::Color);
-            Lumina::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
-            Lumina::Renderer2D::DrawQuad();
+            Tiles::Renderer2D::SetQuadTintColor(Render2D::Bounds::Color);
+            Tiles::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
+            Tiles::Renderer2D::DrawQuad();
         }
 
-        Lumina::Renderer2D::End();
-        Lumina::Renderer2D::SetRenderTarget(nullptr);
+        Tiles::Renderer2D::End();
+        Tiles::Renderer2D::SetRenderTarget(nullptr);
 
-		Lumina::Renderer2D::ResetQuadState();
-        Lumina::Renderer2D::ResetLineState();
+		Tiles::Renderer2D::ResetQuadState();
+        Tiles::Renderer2D::ResetLineState();
 
         // Handle mouse interaction
         ImGui::InvisibleButton("PreviewCanvas", previewDimensions);
@@ -162,8 +162,8 @@ namespace Tiles
         if (isCanvasActive && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
         {
             ImVec2 delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
-            float panScaleX = (delta.x / previewDimensions.x) * (Render2D::Grid::BackgroundSize / m_ZoomLevel) * Camera::Settings::PanSensitivity;
-            float panScaleY = (delta.y / previewDimensions.y) * (Render2D::Grid::BackgroundSize / m_ZoomLevel) * Camera::Settings::PanSensitivity;
+            float panScaleX = (delta.x / previewDimensions.x) * (Render2D::Grid::BackgroundSize / m_ZoomLevel) * CameraConstants::Settings::PanSensitivity;
+            float panScaleY = (delta.y / previewDimensions.y) * (Render2D::Grid::BackgroundSize / m_ZoomLevel) * CameraConstants::Settings::PanSensitivity;
 
             m_PanOffset.x -= panScaleX;
             m_PanOffset.y += panScaleY;
@@ -176,8 +176,8 @@ namespace Tiles
             float wheel = ImGui::GetIO().MouseWheel;
             if (wheel != 0.0f)
             {
-                m_ZoomLevel = std::clamp(m_ZoomLevel + wheel * Camera::Settings::ZoomSensitivity,
-                    Camera::Settings::MinZoom, Camera::Settings::MaxZoom);
+                m_ZoomLevel = std::clamp(m_ZoomLevel + wheel * CameraConstants::Settings::ZoomSensitivity,
+                    CameraConstants::Settings::MinZoom, CameraConstants::Settings::MaxZoom);
             }
         }
 

@@ -61,7 +61,7 @@ namespace Tiles
         ImGui::PopStyleVar();
     }
 
-    void PanelToolSelection::RenderComponentToolButton(const char* id, ToolType toolType, const Lumina::Ref<Lumina::Texture>& texture, PaintingMode mode, const char* tooltip)
+    void PanelToolSelection::RenderComponentToolButton(const char* id, ToolType toolType, const Tiles::Ref<Tiles::Texture>& texture, PaintingMode mode, const char* tooltip)
     {
         if (!texture)
         {
@@ -141,7 +141,7 @@ namespace Tiles
         RenderComponentCursorForMode("FillCursor", PaintingMode::Fill, m_FillTexture);
     }
 
-    void PanelToolSelection::RenderComponentCursorForMode(const char* id, PaintingMode mode, const Lumina::Ref<Lumina::Texture>& texture)
+    void PanelToolSelection::RenderComponentCursorForMode(const char* id, PaintingMode mode, const Tiles::Ref<Tiles::Texture>& texture)
     {
         if (m_Context->GetPaintingMode() != mode || !texture)
         {
@@ -168,9 +168,9 @@ namespace Tiles
 
     void PanelToolSelection::LoadTextures()
     {
-        m_BrushTexture = Lumina::Texture::Create(AssetPath::Brush);
-        m_EraserTexture = Lumina::Texture::Create(AssetPath::Eraser);
-        m_FillTexture = Lumina::Texture::Create(AssetPath::Fill);
+        m_BrushTexture = Tiles::Texture::Create(AssetPath::Brush);
+        m_EraserTexture = Tiles::Texture::Create(AssetPath::Eraser);
+        m_FillTexture = Tiles::Texture::Create(AssetPath::Fill);
     }
 
     bool PanelToolSelection::IsToolSelected(PaintingMode mode) const

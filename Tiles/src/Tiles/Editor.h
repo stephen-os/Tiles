@@ -3,14 +3,14 @@
 #include <vector>
 #include <memory>
 
-#include "Lumina/Core/Layer.h"
-#include "Lumina/Utils/Timer.h"
+#include "Core/Layer.h"
+#include "Utils/Timer.h"
 
 #include "Panels/PanelManager.h"
 
 namespace Tiles
 {
-    class Editor : public Lumina::Layer
+    class Editor : public Tiles::Layer
     {
     public:
         virtual void OnAttach() override;
@@ -21,7 +21,7 @@ namespace Tiles
     private:
         PanelManager m_PanelManager;
 
-        Lumina::Timer m_FrameTimer;
+        Tiles::Timer m_FrameTimer;
         float m_FPS = 0.0f;
     };
 }

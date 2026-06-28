@@ -1,0 +1,8 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+MSBUILD : error MSB1008: Only one project can be specified.
+    Full command line: '"C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" Tiles.sln p:Configuration=Debug p:Platform=x64 M:/'
+  Switches appended by response files:
+'' came from 'C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.rsp'
+Switch: p:Configuration=Debug
+
+For switch syntax, type "MSBuild -help"

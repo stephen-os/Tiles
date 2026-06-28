@@ -13,21 +13,23 @@ project "Tiles"
    {
       "src/Tiles",
 
-      "../lumina/lumina/src",
-
-      "../lumina/dependencies/imgui",
-      "../lumina/dependencies/glew/include",
-      "../lumina/dependencies/glfw/include",
-      "../lumina/dependencies/glm",
-      "../lumina/dependencies/glad/include",
-      "../lumina/dependencies/tinygltf",
-      "../lumina/dependencies/imguifd",
-      "../lumina/dependencies/spdlog/include"
+      "vendor/imgui",
+      "vendor/glfw/include",
+      "vendor/glm",
+      "vendor/glad/include",
+      "vendor/imguifd",
+      "vendor/spdlog/include",
+      "vendor/stb",
+      "vendor/json"
    }
 
     links
     {
-        "Lumina",
+        "ImGui",
+        "GLFW",
+        "Glad",
+        "ImGuiFileDialog",
+        "opengl32.lib"
     }
 
     
@@ -38,22 +40,22 @@ project "Tiles"
 
    filter "system:windows"
       systemversion "latest"
-      defines { "LUMINA_PLATFORM_WINDOWS" }
+      defines { "TILES_PLATFORM_WINDOWS" }
 
    filter "configurations:Debug"
-      defines { "LUMINA_DEBUG" }
+      defines { "TILES_DEBUG" }
       runtime "Debug"
       symbols "On"
 
    filter "configurations:Release"
-      defines { "LUMINA_RELEASE" }
+      defines { "TILES_RELEASE" }
       runtime "Release"
       optimize "On"
       symbols "On"
 
    filter "configurations:Dist"
       kind "WindowedApp"
-      defines { "LUMINA_DIST" }
+      defines { "TILES_DIST" }
       runtime "Release"
       optimize "On"
       symbols "Off"

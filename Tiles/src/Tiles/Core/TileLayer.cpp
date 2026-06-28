@@ -1,6 +1,6 @@
 #include "TileLayer.h"
 
-#include "Lumina/Core/Assert.h"
+#include "Assert.h"
 
 #include "Constants.h"
 
@@ -8,7 +8,7 @@ namespace Tiles
 {
 	TileLayer::TileLayer(uint32_t width, uint32_t height) : m_Width(width), m_Height(height)
 	{
-		LUMINA_ASSERT((width * height) >= 0, "TileLayer::TileLayer: Size must be greater than 0");
+		TILES_ASSERT((width * height) >= 0, "TileLayer::TileLayer: Size must be greater than 0");
 		m_Tiles.resize(width * height);
 	}
 
@@ -30,13 +30,13 @@ namespace Tiles
 
 	const Tile& TileLayer::GetTile(size_t x, size_t y) const
 	{
-		LUMINA_ASSERT(IsValidPosition(x, y), "Const TileLayer::GetTile: Tile position out of bounds");
+		TILES_ASSERT(IsValidPosition(x, y), "Const TileLayer::GetTile: Tile position out of bounds");
 		return m_Tiles[y * m_Width + x];
 	}
 
 	Tile& TileLayer::GetTile(size_t x, size_t y)
 	{
-		LUMINA_ASSERT(IsValidPosition(x, y), "TileLayer::GetTile: Tile position out of bounds");
+		TILES_ASSERT(IsValidPosition(x, y), "TileLayer::GetTile: Tile position out of bounds");
 		return m_Tiles[y * m_Width + x];
 	}
 
@@ -44,14 +44,14 @@ namespace Tiles
 	{
 		if (name.empty())
 		{
-			LUMINA_LOG_INFO("TileLayer::SetName: Empty name provided, using default");
+			TILES_LOG_INFO("TileLayer::SetName: Empty name provided, using default");
 			m_Name = "New Layer";
 			return;
 		}
 
 		if (name != m_Name)
 		{
-			LUMINA_LOG_INFO("TileLayer::SetName: Changed layer name from '{}' to '{}'", m_Name, name);
+			TILES_LOG_INFO("TileLayer::SetName: Changed layer name from '{}' to '{}'", m_Name, name);
 			m_Name = name;
 		}
 	}

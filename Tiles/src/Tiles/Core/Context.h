@@ -9,7 +9,7 @@
 
 #include "Constants.h"
 
-#include "Lumina/Lumina.h"
+#include "../Lumina.h"
 
 #include "Base.h"
 
@@ -37,8 +37,8 @@ namespace Tiles
         Context();
         ~Context() = default;
 
-        Ref<Lumina::OrthographicCamera> GetViewportCamera() { return m_ViewportCamera; }
-        const Ref<Lumina::OrthographicCamera> GetViewportCamera() const { return m_ViewportCamera; }
+        Ref<Tiles::OrthographicCamera> GetViewportCamera() { return m_ViewportCamera; }
+        const Ref<Tiles::OrthographicCamera> GetViewportCamera() const { return m_ViewportCamera; }
         void ResetViewportCamera();
         void FitViewportCameraToProject();
         void CenterViewportCameraOnProject();
@@ -92,13 +92,13 @@ namespace Tiles
         void ValidateWorkingLayer();
         void InitializeSceneCamera();
 
-    private: 
+    private:
         CommandHistory m_CommandHistory;
-        ProjectHistory m_ProjectHistory; 
+        ProjectHistory m_ProjectHistory;
 
         Ref<Project> m_Project;
-        
-        Ref<Lumina::OrthographicCamera> m_ViewportCamera;
+
+        Ref<Tiles::OrthographicCamera> m_ViewportCamera;
         
         size_t m_WorkingLayer = 0;
         PaintingMode m_PaintingMode = PaintingMode::None;

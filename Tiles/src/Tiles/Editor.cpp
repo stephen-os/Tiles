@@ -11,7 +11,7 @@
 #include "Panels/PanelViewport.h"
 #include "Panels/PanelDebug.h"
 
-#include "Lumina/Core/Log.h"
+#include "Core/Log.h"
 
 #include "Core/Context.h" 
 

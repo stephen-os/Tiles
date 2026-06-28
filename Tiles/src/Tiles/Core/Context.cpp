@@ -10,7 +10,7 @@
 
 namespace Tiles
 {
-    Lumina::Ref<Context> Context::Create()
+    Tiles::Ref<Context> Context::Create()
     {
         return CreateRef<Context>();
     }
@@ -19,7 +19,7 @@ namespace Tiles
     {
 		m_Project = CreateRef<Project>(16, 16, "Untitled");
 
-        m_ViewportCamera = Lumina::CreateRef<Lumina::OrthographicCamera>();
+        m_ViewportCamera = Tiles::CreateRef<Tiles::OrthographicCamera>();
         InitializeSceneCamera();
       
         m_Project->UpdateLastAccessed();
@@ -214,7 +214,7 @@ namespace Tiles
     void Context::CreateProject(const std::string& name, uint32_t width, uint32_t height)
     {
 		m_CommandHistory.Clear();
-        m_Project = Lumina::CreateRef<Project>(width, height, name);
+        m_Project = Tiles::CreateRef<Project>(width, height, name);
         m_WorkingLayer = 0;
         m_PaintingMode = PaintingMode::None;
         m_Brush = Tile();
@@ -258,7 +258,7 @@ namespace Tiles
 
             m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
 
-            LUMINA_LOG_INFO("Context::SaveProject: Successfully saved project '{}'", m_Project->GetProjectName());
+            TILES_LOG_INFO("Context::SaveProject: Successfully saved project '{}'", m_Project->GetProjectName());
             return { true, "Project saved successfully." };
         }
         catch (const std::exception& e)
@@ -301,7 +301,7 @@ namespace Tiles
 
             m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
 
-            LUMINA_LOG_INFO("Context::SaveProjectAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
+            TILES_LOG_INFO("Context::SaveProjectAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
             return { true, "Project saved successfully." };
         }
         catch (const std::exception& e)
@@ -314,7 +314,7 @@ namespace Tiles
     {
         if (!std::filesystem::exists(path))
         {
-            LUMINA_LOG_INFO("Context::LoadProject: File does not exist: {}", path.string());
+            TILES_LOG_INFO("Context::LoadProject: File does not exist: {}", path.string());
             m_ProjectHistory.RemoveProject(path);
             return { false, "File does not exist." };
         }
@@ -342,12 +342,12 @@ namespace Tiles
         }
         catch (const nlohmann::json::parse_error& e)
         {
-            LUMINA_LOG_INFO("Context::LoadProject: JSON parse error: {}", e.what());
+            TILES_LOG_INFO("Context::LoadProject: JSON parse error: {}", e.what());
             return { false, std::string("Invalid project file format: ") + e.what() };
         }
         catch (const std::exception& e)
         {
-            LUMINA_LOG_INFO("Context::LoadProject: Load failed: {}", e.what());
+            TILES_LOG_INFO("Context::LoadProject: Load failed: {}", e.what());
             return { false, std::string("Failed to load project: ") + e.what() };
         }
 
@@ -366,7 +366,7 @@ namespace Tiles
 
         m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
 
-        LUMINA_LOG_INFO("Context::LoadProject: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
+        TILES_LOG_INFO("Context::LoadProject: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
         return { true, "Project loaded successfully." };
     }
 

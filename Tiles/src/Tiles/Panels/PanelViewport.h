@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Panel.h"
-#include "Lumina/Lumina.h"
+#include "../Lumina.h"
 #include "imgui.h"
 
 #include "../Core/Base.h"
 
-using namespace Lumina;
+using namespace Tiles;
 
 namespace Tiles
 {

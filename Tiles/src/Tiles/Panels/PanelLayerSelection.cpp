@@ -2,7 +2,7 @@
 
 #include "Core/Constants.h"
 
-#include "Lumina/Core/Log.h"
+#include "Core/Log.h"
 
 #include "../Core/Commands/LayerAddCommand.h"
 #include "../Core/Commands/LayerDeleteCommand.h"

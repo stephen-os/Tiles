@@ -135,7 +135,7 @@ namespace Tiles
         }
     }
 
-    namespace Texture
+    namespace TextureConstants
     {
         namespace Tile
         {
@@ -154,7 +154,7 @@ namespace Tiles
             constexpr int DefaultHeight = 16;
         }
 
-        
+
         namespace FileDialog
         {
             constexpr const char* DialogKey = "ChooseAtlasFileDlg";
@@ -189,7 +189,7 @@ namespace Tiles
         }
     }
 
-    namespace Camera
+    namespace CameraConstants
     {
         namespace Settings
         {

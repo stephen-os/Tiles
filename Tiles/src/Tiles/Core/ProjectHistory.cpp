@@ -1,5 +1,5 @@
 #include "ProjectHistory.h"
-#include "Lumina/Core/Log.h"
+#include "Log.h"
 #include <fstream>
 #include <algorithm>
 
@@ -73,7 +73,7 @@ namespace Tiles
         }
 
         m_HasChanges = true;
-        LUMINA_LOG_INFO("ProjectHistory::AddProject: Added '{}' to project history", displayName);
+        TILES_LOG_INFO("ProjectHistory::AddProject: Added '{}' to project history", displayName);
     }
 
     void ProjectHistory::RemoveProject(const std::filesystem::path& filePath)
@@ -96,7 +96,7 @@ namespace Tiles
         {
             m_History.clear();
             m_HasChanges = true;
-            LUMINA_LOG_INFO("ProjectHistory::Clear: Cleared all project history");
+            TILES_LOG_INFO("ProjectHistory::Clear: Cleared all project history");
         }
     }
 
@@ -148,7 +148,7 @@ namespace Tiles
             size_t removedCount = std::distance(it, m_History.end());
             m_History.erase(it, m_History.end());
             m_HasChanges = true;
-            LUMINA_LOG_INFO("ProjectHistory::RemoveInvalidEntries: Removed {} invalid entries", removedCount);
+            TILES_LOG_INFO("ProjectHistory::RemoveInvalidEntries: Removed {} invalid entries", removedCount);
         }
     }
 
@@ -183,17 +183,17 @@ namespace Tiles
                     }
                     catch (const std::exception& e)
                     {
-                        LUMINA_LOG_INFO("ProjectHistory::Load: Failed to parse entry: {}", e.what());
+                        TILES_LOG_INFO("ProjectHistory::Load: Failed to parse entry: {}", e.what());
                     }
                 }
             }
 
             RemoveInvalidEntries();
-            LUMINA_LOG_INFO("ProjectHistory::Load: Loaded {} project history entries", m_History.size());
+            TILES_LOG_INFO("ProjectHistory::Load: Loaded {} project history entries", m_History.size());
         }
         catch (const std::exception& e)
         {
-            LUMINA_LOG_INFO("ProjectHistory::Load: Failed to load project history: {}", e.what());
+            TILES_LOG_INFO("ProjectHistory::Load: Failed to load project history: {}", e.what());
             m_History.clear();
         }
     }
@@ -218,17 +218,17 @@ namespace Tiles
             std::ofstream file(configPath);
             if (!file.is_open())
             {
-                LUMINA_LOG_INFO("ProjectHistory::Save: Could not open file for writing");
+                TILES_LOG_INFO("ProjectHistory::Save: Could not open file for writing");
                 return;
             }
 
             file << json.dump(4);
             m_HasChanges = false;
-            LUMINA_LOG_INFO("ProjectHistory::Save: Saved {} project history entries", m_History.size());
+            TILES_LOG_INFO("ProjectHistory::Save: Saved {} project history entries", m_History.size());
         }
         catch (const std::exception& e)
         {
-            LUMINA_LOG_INFO("ProjectHistory::Save: Failed to save project history: {}", e.what());
+            TILES_LOG_INFO("ProjectHistory::Save: Failed to save project history: {}", e.what());
         }
     }
 }

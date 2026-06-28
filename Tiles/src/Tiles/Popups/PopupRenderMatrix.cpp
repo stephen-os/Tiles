@@ -1,13 +1,13 @@
 #include "PopupRenderMatrix.h"
 #include "Core/Constants.h"
-#include "Lumina/Lumina.h"
-#include "Lumina/Core/Log.h"
+#include "../Lumina.h"
+#include "Core/Log.h"
 #include "ImGuiFileDialog.h"
 #include <algorithm>
 #include <sstream>
 #include <set>
 
-using namespace Lumina;
+using namespace Tiles;
 
 namespace Tiles
 {
@@ -87,7 +87,7 @@ namespace Tiles
                 m_LayerToRenderGroup[i] = std::max(-1, std::min(renderGroupValue, 99));
             }
 
-            LUMINA_LOG_INFO("PopupRenderMatrix::InitializeDialog: Initialized dialog for project '{}'", projectName);
+            TILES_LOG_INFO("PopupRenderMatrix::InitializeDialog: Initialized dialog for project '{}'", projectName);
         }
     }
 
@@ -348,7 +348,7 @@ namespace Tiles
         }
 
         m_ShowSuccessMessage = false;
-        LUMINA_LOG_INFO("PopupRenderMatrix::ResetToDefaults: Reset to layer's current render groups");
+        TILES_LOG_INFO("PopupRenderMatrix::ResetToDefaults: Reset to layer's current render groups");
     }
 
     void PopupRenderMatrix::ApplyRenderGroupChanges()
@@ -370,7 +370,7 @@ namespace Tiles
                 {
                     layer.SetRenderGroup(newGroup);
                     hasChanges = true;
-                    LUMINA_LOG_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Set layer '{}' to render group {}",
+                    TILES_LOG_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Set layer '{}' to render group {}",
                         layer.GetName(), renderGroup);
                 }
             }
@@ -379,7 +379,7 @@ namespace Tiles
         if (hasChanges)
         {
             m_Context->GetProject()->MarkAsModified();
-            LUMINA_LOG_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Applied render group changes to project");
+            TILES_LOG_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Applied render group changes to project");
         }
     }
 
@@ -508,8 +508,8 @@ namespace Tiles
         uint32_t width = layerStack.GetWidth() * Viewport::Render::DefaultTileSize;
         uint32_t height = layerStack.GetHeight() * Viewport::Render::DefaultTileSize;
 
-        auto renderTarget = Renderer2D::CreateRenderTarget(width, height);
-        auto camera = CreateRef<OrthographicCamera>();
+        auto renderTarget = Tiles::Renderer2D::CreateRenderTarget(width, height);
+        auto camera = CreateRef<Tiles::OrthographicCamera>();
 
         camera->SetPosition({
             width * 0.5f + Viewport::Render::DefaultTileSize * 0.5f,
@@ -519,9 +519,9 @@ namespace Tiles
         camera->SetSize(width, height);
         camera->SetZoom(1.0f);
 
-        Renderer2D::SetRenderTarget(renderTarget);
-        Renderer2D::SetResolution(width, height);
-        Renderer2D::Begin(camera);
+        Tiles::Renderer2D::SetRenderTarget(renderTarget);
+        Tiles::Renderer2D::SetResolution(width, height);
+        Tiles::Renderer2D::Begin(camera);
 
         glm::vec3 cameraPos = camera->GetPosition();
         const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
@@ -546,16 +546,16 @@ namespace Tiles
                         (y + 1) * tileSize + cameraPos.y
                     };
 
-                    Renderer2D::SetQuadPosition({
+                    Tiles::Renderer2D::SetQuadPosition({
                         tileWorldPos.x,
                         tileWorldPos.y,
                         layerIdx * 0.01f
                         });
-                    Renderer2D::SetQuadRotation(tile.GetRotation());
-                    Renderer2D::SetQuadTintColor(tile.GetTint());
+                    Tiles::Renderer2D::SetQuadRotation(tile.GetRotation());
+                    Tiles::Renderer2D::SetQuadTintColor(tile.GetTint());
 
                     glm::vec2 tileSizeMultiplier = tile.GetSize();
-                    Renderer2D::SetQuadSize({
+                    Tiles::Renderer2D::SetQuadSize({
                         tileSize * tileSizeMultiplier.x,
                         tileSize * tileSizeMultiplier.y
                         });
@@ -565,22 +565,22 @@ namespace Tiles
                         auto atlas = textureAtlases[tile.GetAtlasIndex()];
                         if (atlas && atlas->HasTexture())
                         {
-                            Renderer2D::SetQuadTexture(atlas->GetTexture());
-                            Renderer2D::SetQuadTextureCoords(tile.GetTextureCoords());
+                            Tiles::Renderer2D::SetQuadTexture(atlas->GetTexture());
+                            Tiles::Renderer2D::SetQuadTextureCoords(tile.GetTextureCoords());
                         }
                     }
                     else
                     {
-                        Renderer2D::SetQuadTexture(nullptr);
+                        Tiles::Renderer2D::SetQuadTexture(nullptr);
                     }
 
-                    Renderer2D::DrawQuad();
+                    Tiles::Renderer2D::DrawQuad();
                 }
             }
         }
 
-        Renderer2D::End();
-        Renderer2D::SetRenderTarget(nullptr);
+        Tiles::Renderer2D::End();
+        Tiles::Renderer2D::SetRenderTarget(nullptr);
 
         renderTarget->SaveToFile(fileName.string());
     }
