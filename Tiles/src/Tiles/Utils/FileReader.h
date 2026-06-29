@@ -1,24 +1,43 @@
+#pragma once
+
 #include <string>
 #include <fstream>
-#include <iostream>
+#include <stdexcept>
 
 namespace Tiles
 {
-	static std::string ReadFile(const std::string& filename) {
-        std::ifstream file(filename, std::ios::ate | std::ios::binary);
+    // Maximum file size we'll load (64MB - reasonable for shader/config files)
+    inline constexpr size_t MaxFileSize = 64 * 1024 * 1024;
 
+    struct FileReadError : std::runtime_error {
+        using std::runtime_error::runtime_error;
+    };
+
+    [[nodiscard]] inline std::string ReadFile(const std::string& filename,
+                                              size_t maxSize = MaxFileSize) {
+        std::ifstream file(filename, std::ios::ate | std::ios::binary);
         if (!file.is_open()) {
-            std::cerr << "Error: Failed to open file: " << filename << std::endl;
-            throw std::runtime_error("failed to open file!");
+            throw FileReadError("Failed to open file: " + filename);
         }
 
         std::streampos fileSize = file.tellg();
-        size_t size = static_cast<size_t>(fileSize);
-        std::string buffer(size, '\0');
+        if (fileSize < 0) {
+            throw FileReadError("Failed to determine file size: " + filename);
+        }
+
+        auto size = static_cast<size_t>(fileSize);
+        if (size > maxSize) {
+            throw FileReadError("File exceeds maximum allowed size (" +
+                               std::to_string(maxSize) + " bytes): " + filename);
+        }
+
+        std::string buffer;
+        buffer.resize(size);
 
         file.seekg(0);
-        file.read(&buffer[0], size);
-        file.close();
+        if (!file.read(buffer.data(), static_cast<std::streamsize>(size))) {
+            throw FileReadError("Failed to read file contents: " + filename);
+        }
 
         return buffer;
     }

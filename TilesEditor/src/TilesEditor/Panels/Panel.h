@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Core/Context.h"
+#include "Core/Context.h"
 
-#include "../Lumina.h"
+#include "Tiles.h"
 
 namespace Tiles
 {

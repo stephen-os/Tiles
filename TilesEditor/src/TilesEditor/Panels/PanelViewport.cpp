@@ -2,7 +2,7 @@
 
 #include "Core/Constants.h"
 
-#include "../Core/Input.h"
+#include "Core/Input.h"
 #include <algorithm>
 
 namespace Tiles

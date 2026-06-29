@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Panel.h"
-#include "../Lumina.h"
+#include "Tiles.h"
 #include "imgui.h"
 
-#include "../Core/Base.h"
+#include "Core/Base.h"
 
 using namespace Tiles;
 

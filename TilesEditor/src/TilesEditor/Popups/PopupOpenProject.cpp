@@ -2,6 +2,8 @@
 #include "Core/Constants.h"
 #include "ImGuiFileDialog.h"
 #include <filesystem>
+#include <cstring>
+#include <algorithm>
 
 namespace Tiles
 {
@@ -107,7 +109,7 @@ namespace Tiles
             m_Directory = ".";
         }
 
-        m_FileName.clear();
+        m_FileNameBuffer[0] = '\0';
     }
 
     void PopupOpenProject::RenderFileSettings()
@@ -137,13 +139,13 @@ namespace Tiles
 
         ImGui::Text("Project file:");
         ImGui::SetNextItemWidth(450.0f);
-        if (ImGui::InputText("##FileName", m_FileName.data(), m_FileName.capacity() + 1))
+        // Use fixed buffer size to prevent overflow - NOT capacity() + 1
+        if (ImGui::InputText("##FileName", m_FileNameBuffer, FileNameBufferSize))
         {
-            m_FileName.resize(strlen(m_FileName.data()));
             ValidateFilePath();
         }
 
-        if (m_FileName.empty())
+        if (m_FileNameBuffer[0] == '\0')
         {
             ImGui::TextColored(UI::Color::TextHint, "Select a .tiles project file to open");
         }
@@ -167,7 +169,7 @@ namespace Tiles
 
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startX);
 
-        bool canOpen = m_FilePathValid && !m_FileName.empty();
+        bool canOpen = m_FilePathValid && m_FileNameBuffer[0] != '\0';
 
         if (ImGui::Button("Open", ImVec2(buttonWidth, 0)) && canOpen)
         {
@@ -198,7 +200,7 @@ namespace Tiles
             return;
         }
 
-        if (!m_FilePathValid || m_FileName.empty())
+        if (!m_FilePathValid || m_FileNameBuffer[0] == '\0')
         {
             m_Message = "No valid file selected!";
             m_ShowMessage = true;
@@ -246,7 +248,12 @@ namespace Tiles
                 std::filesystem::path path(filePath);
 
                 m_Directory = path.parent_path();
-                m_FileName = path.filename().string();
+
+                // Safely copy filename to fixed buffer
+                std::string filename = path.filename().string();
+                size_t copyLen = std::min(filename.size(), FileNameBufferSize - 1);
+                std::memcpy(m_FileNameBuffer, filename.c_str(), copyLen);
+                m_FileNameBuffer[copyLen] = '\0';
 
                 ValidateFilePath();
             }
@@ -259,15 +266,15 @@ namespace Tiles
 
     std::filesystem::path PopupOpenProject::GetFullFilePath() const
     {
-        if (m_FileName.empty())
+        if (m_FileNameBuffer[0] == '\0')
             return {};
 
-        return m_Directory / m_FileName;
+        return m_Directory / m_FileNameBuffer;
     }
 
     void PopupOpenProject::ValidateFilePath()
     {
-        if (m_FileName.empty())
+        if (m_FileNameBuffer[0] == '\0')
         {
             m_FilePathValid = false;
             return;

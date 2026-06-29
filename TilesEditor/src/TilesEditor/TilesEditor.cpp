@@ -1,6 +1,6 @@
 #include "Tiles.h"
 
-#include "Tiles/EntryPoint.h"
+#include "EntryPoint.h"
 
 #include "Panels/PanelManager.h"
 #include "Panels/PanelLayerSelection.h"
@@ -85,7 +85,6 @@ Tiles::Application* Tiles::CreateApplication(int argc, char** argv)
 	spec.Maximized = true;
 
 	Tiles::Application* app = new TilesEditor(spec);
-	app->PushLayer<TilesEditorLayer>();
 
 	return app;
 }

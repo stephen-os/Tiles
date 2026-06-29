@@ -3,9 +3,9 @@
 #include "imgui.h"
 #include <string>
 
-#include "Popups/PopupRenderMatrix.h"       
-#include "Popups/PopupSaveAs.h"
-#include "Popups/PopupOpenProject.h"
+#include "../Popups/PopupRenderMatrix.h"
+#include "../Popups/PopupSaveAs.h"
+#include "../Popups/PopupOpenProject.h"
 
 namespace Tiles
 {

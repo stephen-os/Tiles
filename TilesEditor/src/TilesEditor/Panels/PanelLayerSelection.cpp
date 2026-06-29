@@ -4,11 +4,11 @@
 
 #include "Core/Log.h"
 
-#include "../Core/Commands/LayerAddCommand.h"
-#include "../Core/Commands/LayerDeleteCommand.h"
-#include "../Core/Commands/LayerClearCommand.h"
-#include "../Core/Commands/LayerMoveUpCommand.h"
-#include "../Core/Commands/LayerMoveDownCommand.h"
+#include "Core/Commands/LayerAddCommand.h"
+#include "Core/Commands/LayerDeleteCommand.h"
+#include "Core/Commands/LayerClearCommand.h"
+#include "Core/Commands/LayerMoveUpCommand.h"
+#include "Core/Commands/LayerMoveDownCommand.h"
 
 #include "imgui.h"
 

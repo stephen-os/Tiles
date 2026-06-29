@@ -25,7 +25,9 @@ namespace Tiles
         void InitializeDialog();
 
     private:
-        std::string m_FileName;
+        // Fixed buffer for ImGui InputText - avoids buffer overflow from capacity() + 1 bug
+        static constexpr size_t FileNameBufferSize = 256;
+        char m_FileNameBuffer[FileNameBufferSize] = {};
         std::filesystem::path m_Directory = ".";
         std::string m_Message;
         bool m_ShowMessage = false;

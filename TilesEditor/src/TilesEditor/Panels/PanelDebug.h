@@ -1,6 +1,6 @@
 #pragma once
 #include "Panel.h"
-#include "../Lumina.h"
+#include "Tiles.h"
 #include "imgui.h"
 
 using namespace Tiles;
