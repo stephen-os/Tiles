@@ -21,7 +21,7 @@ namespace Tiles
     {
     public:
         nlohmann::json ToJSON() const;
-        static Ref<Project> FromJSON(const nlohmann::json& json);
+        static std::shared_ptr<Project> FromJSON(const nlohmann::json& json);
 
         Project(uint32_t width, uint32_t height, const std::string& name = "Untitled Project");
         ~Project() = default;
@@ -41,14 +41,14 @@ namespace Tiles
         bool IsNew() const { return m_FilePath.empty(); }
         bool HasUnsavedChanges() const { return m_HasUnsavedChanges; }
 
-        std::vector<Ref<Tiles::TextureAtlas>>& GetTextureAtlases() { return m_TextureAtlases; }
-        const std::vector<Ref<Tiles::TextureAtlas>>& GetTextureAtlases() const { return m_TextureAtlases; }
+        std::vector<std::shared_ptr<Tiles::TextureAtlas>>& GetTextureAtlases() { return m_TextureAtlases; }
+        const std::vector<std::shared_ptr<Tiles::TextureAtlas>>& GetTextureAtlases() const { return m_TextureAtlases; }
 
         LayerStack& GetLayerStack() { return m_LayerStack; }
         const LayerStack& GetLayerStack() const { return m_LayerStack; }
 
-        void AddTextureAtlas(Ref<Tiles::TextureAtlas> atlas);
-        Ref<Tiles::TextureAtlas> GetTextureAtlas(size_t index);
+        void AddTextureAtlas(std::shared_ptr<Tiles::TextureAtlas> atlas);
+        std::shared_ptr<Tiles::TextureAtlas> GetTextureAtlas(size_t index);
         void RemoveTextureAtlas(size_t index);
         void ClearTextureAtlases();
         size_t GetTextureAtlasCount() const { return m_TextureAtlases.size(); }
@@ -59,7 +59,7 @@ namespace Tiles
         std::chrono::steady_clock::time_point m_LastAccessed;                   // Timestamp when project was last opened/accessed
         std::chrono::steady_clock::time_point m_LastSaved;                      // Timestamp when project was last saved to disk
         bool m_HasUnsavedChanges = false;                                       // Flag indicating unsaved modifications exist
-        std::vector<Ref<Tiles::TextureAtlas>> m_TextureAtlases;                // Collection of texture atlases for sprites/tiles
+        std::vector<std::shared_ptr<Tiles::TextureAtlas>> m_TextureAtlases;                // Collection of texture atlases for sprites/tiles
         LayerStack m_LayerStack;                                                // Stack of tile layers containing the actual tile data
     };
 }

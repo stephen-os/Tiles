@@ -19,7 +19,7 @@ public:
 
 	void OnAttach() override
 	{
-		Tiles::Ref<Tiles::Context> context = Tiles::Context::Create();
+		std::shared_ptr<Tiles::Context> context = Tiles::Context::Create();
 
 		m_PanelManager.RegisterPanel<PanelLayerSelection>(context);
 		m_PanelManager.RegisterPanel<PanelToolSelection>(context);
@@ -38,12 +38,12 @@ public:
 		m_PanelManager.Clear();
 	}
 
-	void OnUpdate() override
+	void OnUpdate(float timestep) override
 	{
 		m_PanelManager.Update();
 	}
 
-	void OnRender() override
+	void OnUIRender() override
 	{
 		m_PanelManager.Render();
 	}

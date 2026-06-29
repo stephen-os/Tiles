@@ -10,9 +10,9 @@
 
 namespace Tiles
 {
-    Ref<ShaderProgram> ShaderProgram::Create(const std::string& vertexSource, const std::string& fragmentSource)
+    std::shared_ptr<ShaderProgram> ShaderProgram::Create(const std::string& vertexSource, const std::string& fragmentSource)
 	{
-		return CreateRef<ShaderProgram>(vertexSource, fragmentSource);
+		return std::make_shared<ShaderProgram>(vertexSource, fragmentSource);
 	}
 
     ShaderProgram::ShaderProgram(const std::string& vertexSource, const std::string& fragmentSource)

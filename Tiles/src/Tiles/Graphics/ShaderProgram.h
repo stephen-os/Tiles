@@ -14,7 +14,7 @@ namespace Tiles
     class ShaderProgram
     {
     public:
-        static Ref<ShaderProgram> Create(const std::string& vertexSource, const std::string& fragmentSource);
+        static std::shared_ptr<ShaderProgram> Create(const std::string& vertexSource, const std::string& fragmentSource);
 
         ShaderProgram(const std::string& vertexSource, const std::string& fragmentSource);
         ~ShaderProgram();

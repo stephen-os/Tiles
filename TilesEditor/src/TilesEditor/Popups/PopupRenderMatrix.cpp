@@ -11,7 +11,7 @@ using namespace Tiles;
 
 namespace Tiles
 {
-    PopupRenderMatrix::PopupRenderMatrix(Ref<Context> context) : Popup(context) {}
+    PopupRenderMatrix::PopupRenderMatrix(std::shared_ptr<Context> context) : Popup(context) {}
 
     void PopupRenderMatrix::OnRender()
     {
@@ -509,7 +509,7 @@ namespace Tiles
         uint32_t height = layerStack.GetHeight() * Viewport::Render::DefaultTileSize;
 
         auto renderTarget = Tiles::Renderer2D::CreateRenderTarget(width, height);
-        auto camera = CreateRef<Tiles::OrthographicCamera>();
+        auto camera = std::make_shared<Tiles::OrthographicCamera>();
 
         camera->SetPosition({
             width * 0.5f + Viewport::Render::DefaultTileSize * 0.5f,

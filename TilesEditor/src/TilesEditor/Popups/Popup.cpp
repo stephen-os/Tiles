@@ -2,7 +2,7 @@
 
 namespace Tiles
 {
-    Popup::Popup(Ref<Context> context) : m_Context(context){}
+    Popup::Popup(std::shared_ptr<Context> context) : m_Context(context){}
 
 	void Popup::Render()
 	{

@@ -4,8 +4,8 @@
 
 namespace Tiles
 {
-	Shared<FrameBuffer> FrameBuffer::Create()
+	std::shared_ptr<FrameBuffer> FrameBuffer::Create()
 	{
-		return MakeShared<OpenGLFrameBuffer>();
+		return std::make_shared<OpenGLFrameBuffer>();
 	}
 }

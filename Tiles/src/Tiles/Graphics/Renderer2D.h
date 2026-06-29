@@ -53,7 +53,7 @@ namespace Tiles
 		static void Init();
 		static void Shutdown();
 
-		static void Begin(Ref<Camera> camera);
+		static void Begin(std::shared_ptr<Camera> camera);
 		static void Begin(glm::mat4& viewProjection);
 		static void End();
 
@@ -72,7 +72,7 @@ namespace Tiles
 		static void SetQuadPosition(const glm::vec3& position);
 		static void SetQuadRotation(const glm::vec3& rotation);
 		static void SetQuadSize(const glm::vec2& size);
-		static void SetQuadTexture(const Ref<Texture>& texture);
+		static void SetQuadTexture(const std::shared_ptr<Texture>& texture);
 		static void SetQuadTextureCoords(const glm::vec4& textureCoords);
 		static void SetQuadTintColor(const glm::vec4& tintColor);
 		static void ResetQuadState();
@@ -80,7 +80,7 @@ namespace Tiles
 		static void SetCirclePosition(const glm::vec3& position);
 		static void SetCircleRotation(const glm::vec3& rotation);
 		static void SetCircleRadius(const glm::vec2& radius);
-		static void SetCircleTexture(const Ref<Texture>& texture);
+		static void SetCircleTexture(const std::shared_ptr<Texture>& texture);
 		static void SetCircleTextureCoords(const glm::vec4& textureCoords);
 		static void SetCircleColor(const glm::vec4& color);
 		static void SetCircleThickness(float thickness);
@@ -97,7 +97,7 @@ namespace Tiles
 		static void SetStringPosition(const glm::vec3& position);
 		static void SetStringColor(const glm::vec4& color);
 		static void SetStringSize(float size);
-		static void SetStringFont(const Ref<Texture>& fontTexture);
+		static void SetStringFont(const std::shared_ptr<Texture>& fontTexture);
 		static void SetStringAlignment(StringAlignment alignment);
 		static void ResetStringState();
 
@@ -109,7 +109,7 @@ namespace Tiles
 		static void SetTrianglePoint1(const glm::vec3& point1);
 		static void SetTrianglePoint2(const glm::vec3& point2);
 		static void SetTrianglePoint3(const glm::vec3& point3);
-		static void SetTriangleTexture(const Ref<Texture>& texture);
+		static void SetTriangleTexture(const std::shared_ptr<Texture>& texture);
 		static void SetTriangleColor(const glm::vec4& color);
 		static void ResetTriangleState();
 
@@ -148,10 +148,10 @@ namespace Tiles
 		static void DrawGrid();
 		static void DrawPointLight();
 
-		static void SetRenderTarget(Ref<RenderTarget> target);
+		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);
 		static void SetRenderTarget(std::nullptr_t);
-		static Ref<RenderTarget> GetCurrentRenderTarget();
-		static Ref<RenderTarget> CreateRenderTarget(uint32_t width, uint32_t height);
+		static std::shared_ptr<RenderTarget> GetCurrentRenderTarget();
+		static std::shared_ptr<RenderTarget> CreateRenderTarget(uint32_t width, uint32_t height);
 
 		struct Statistics
 		{
@@ -177,7 +177,7 @@ namespace Tiles
 		static void ResetStats();
 
 	private:
-		static float ComputeTextureIndex(const Ref<Texture>& texture);
+		static float ComputeTextureIndex(const std::shared_ptr<Texture>& texture);
 
 	};
 }

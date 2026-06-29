@@ -7,7 +7,7 @@
 
 namespace Tiles
 {
-    PanelViewport::PanelViewport(Ref<Context> context)
+    PanelViewport::PanelViewport(std::shared_ptr<Context> context)
         : Panel(context), m_TileSize(Viewport::Render::DefaultTileSize)
     {
         m_RenderTarget = Tiles::Renderer2D::CreateRenderTarget(512, 512);

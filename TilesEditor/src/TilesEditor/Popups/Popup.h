@@ -8,7 +8,7 @@ namespace Tiles
 	class Popup
 	{
 	public:
-		Popup(Ref<Context> context);
+		Popup(std::shared_ptr<Context> context);
 		virtual ~Popup() = default;
 		
 		void Render();
@@ -26,6 +26,6 @@ namespace Tiles
 	protected:
 		bool m_IsVisible = false;
 
-		Ref<Context> m_Context = nullptr;
+		std::shared_ptr<Context> m_Context = nullptr;
 	};
 }

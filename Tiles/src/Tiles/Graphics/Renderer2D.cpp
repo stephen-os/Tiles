@@ -107,35 +107,35 @@ namespace Tiles
 
 	struct RendererData
 	{
-		Ref<RenderTarget> DefaultRenderTarget;
-		Ref<RenderTarget> CurrentRenderTarget;
+		std::shared_ptr<RenderTarget> DefaultRenderTarget;
+		std::shared_ptr<RenderTarget> CurrentRenderTarget;
 
-		Ref<VertexArray> QuadVertexArray;
-		Ref<VertexBuffer> QuadVertexBuffer;
-		Ref<IndexBuffer> QuadIndexBuffer;
+		std::shared_ptr<VertexArray> QuadVertexArray;
+		std::shared_ptr<VertexBuffer> QuadVertexBuffer;
+		std::shared_ptr<IndexBuffer> QuadIndexBuffer;
 
-		Ref<VertexArray> CircleVertexArray;
-		Ref<VertexBuffer> CircleVertexBuffer;
-		Ref<IndexBuffer> CircleIndexBuffer;
+		std::shared_ptr<VertexArray> CircleVertexArray;
+		std::shared_ptr<VertexBuffer> CircleVertexBuffer;
+		std::shared_ptr<IndexBuffer> CircleIndexBuffer;
 
-		Ref<VertexArray> LineVertexArray;
-		Ref<VertexBuffer> LineVertexBuffer;
+		std::shared_ptr<VertexArray> LineVertexArray;
+		std::shared_ptr<VertexBuffer> LineVertexBuffer;
 
-		Ref<VertexArray> TextVertexArray;
-		Ref<VertexBuffer> TextVertexBuffer;
-		Ref<IndexBuffer> TextIndexBuffer;
+		std::shared_ptr<VertexArray> TextVertexArray;
+		std::shared_ptr<VertexBuffer> TextVertexBuffer;
+		std::shared_ptr<IndexBuffer> TextIndexBuffer;
 
-		Ref<VertexArray> PixelVertexArray;
-		Ref<VertexBuffer> PixelVertexBuffer;
+		std::shared_ptr<VertexArray> PixelVertexArray;
+		std::shared_ptr<VertexBuffer> PixelVertexBuffer;
 
-		Ref<VertexArray> TriangleVertexArray;
-		Ref<VertexBuffer> TriangleVertexBuffer;
+		std::shared_ptr<VertexArray> TriangleVertexArray;
+		std::shared_ptr<VertexBuffer> TriangleVertexBuffer;
 
-		Ref<VertexArray> GridVertexArray;
-		Ref<VertexBuffer> GridVertexBuffer;
-		Ref<IndexBuffer> GridIndexBuffer;
+		std::shared_ptr<VertexArray> GridVertexArray;
+		std::shared_ptr<VertexBuffer> GridVertexBuffer;
+		std::shared_ptr<IndexBuffer> GridIndexBuffer;
 
-		Ref<UniformBuffer> PointLightUniformBuffer;
+		std::shared_ptr<UniformBuffer> PointLightUniformBuffer;
 
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
@@ -169,15 +169,15 @@ namespace Tiles
 		PointLight* PointLightUniformBufferBase = nullptr;
 		PointLight* PointLightUniformBufferPtr = nullptr;
 
-		Ref<ShaderProgram> QuadShader = nullptr;
-		Ref<ShaderProgram> CircleShader = nullptr;
-		Ref<ShaderProgram> LineShader = nullptr;
-		Ref<ShaderProgram> TextShader = nullptr;
-		Ref<ShaderProgram> PixelShader = nullptr;
-		Ref<ShaderProgram> TriangleShader = nullptr;
-		Ref<ShaderProgram> GridShader = nullptr;
+		std::shared_ptr<ShaderProgram> QuadShader = nullptr;
+		std::shared_ptr<ShaderProgram> CircleShader = nullptr;
+		std::shared_ptr<ShaderProgram> LineShader = nullptr;
+		std::shared_ptr<ShaderProgram> TextShader = nullptr;
+		std::shared_ptr<ShaderProgram> PixelShader = nullptr;
+		std::shared_ptr<ShaderProgram> TriangleShader = nullptr;
+		std::shared_ptr<ShaderProgram> GridShader = nullptr;
 
-		std::array<Ref<Texture>, MaxTextureSlots> TextureSlots;
+		std::array<std::shared_ptr<Texture>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1;
 
 		glm::vec4 QuadVertexPositions[4];
@@ -185,7 +185,7 @@ namespace Tiles
 		glm::vec2 TexCoords[4];
 
 		float LineWidth = 3.0f;
-		Ref<Texture> DefaultFont = nullptr;
+		std::shared_ptr<Texture> DefaultFont = nullptr;
 
 		PolygonMode PolygonMode = PolygonMode::Fill;
 		glm::vec3 WireFrameColor = { 0.0f, 1.0f, 0.0f };
@@ -204,14 +204,14 @@ namespace Tiles
 		glm::vec3 QuadPosition = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 QuadRotation = { 0.0f, 0.0f, 0.0f };
 		glm::vec2 QuadSize = { 1.0f, 1.0f };
-		Ref<Texture> QuadTexture = nullptr;
+		std::shared_ptr<Texture> QuadTexture = nullptr;
 		glm::vec4 QuadTextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
 		glm::vec4 QuadTintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		glm::vec3 CirclePosition = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 CircleRotation = { 0.0f, 0.0f, 0.0f };
 		glm::vec2 CircleRadius = { 1.0f, 1.0f };
-		Ref<Texture> CircleTexture = nullptr;
+		std::shared_ptr<Texture> CircleTexture = nullptr;
 		glm::vec4 CircleTextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
 		glm::vec4 CircleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		float CircleThickness = 1.0f;
@@ -226,7 +226,7 @@ namespace Tiles
 		glm::vec3 StringPosition = { 0.0f, 0.0f, 0.0f };
 		glm::vec4 StringColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		float StringSize = 1.0f;
-		Ref<Texture> StringFont = nullptr;
+		std::shared_ptr<Texture> StringFont = nullptr;
 		StringAlignment StringAlignment = StringAlignment::Left;
 
 		glm::vec3 PixelPosition = { 0.0f, 0.0f, 0.0f };
@@ -236,7 +236,7 @@ namespace Tiles
 		glm::vec3 TrianglePoint1 = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 TrianglePoint2 = { 1.0f, 0.0f, 0.0f };
 		glm::vec3 TrianglePoint3 = { 0.5f, 1.0f, 0.0f };
-		Ref<Texture> TriangleTexture = nullptr;
+		std::shared_ptr<Texture> TriangleTexture = nullptr;
 		glm::vec4 TriangleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 		glm::vec3 GridPosition = { 0.0f, 0.0f, 0.0f };
@@ -513,7 +513,7 @@ namespace Tiles
 		TILES_LOG_INFO("Renderer2D: Shutdown complete");
 	}
 
-	void Renderer2D::Begin(Ref<Camera> camera)
+	void Renderer2D::Begin(std::shared_ptr<Camera> camera)
 	{
 		s_Data.ViewProjectionMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix();
 
@@ -826,7 +826,7 @@ namespace Tiles
 		return reinterpret_cast<void*>(static_cast<uintptr_t>(s_Data.CurrentRenderTarget->GetTexture()));
 	}
 
-	float Renderer2D::ComputeTextureIndex(const Ref<Texture>& texture)
+	float Renderer2D::ComputeTextureIndex(const std::shared_ptr<Texture>& texture)
 	{
 		if (texture == nullptr)
 			return 0.0f;
@@ -888,7 +888,7 @@ namespace Tiles
 		s_Data.QuadSize = size;
 	}
 
-	void Renderer2D::SetQuadTexture(const Ref<Texture>& texture)
+	void Renderer2D::SetQuadTexture(const std::shared_ptr<Texture>& texture)
 	{
 		s_Data.QuadTexture = texture;
 	}
@@ -928,7 +928,7 @@ namespace Tiles
 		s_Data.CircleRadius = radius;
 	}
 
-	void Renderer2D::SetCircleTexture(const Ref<Texture>& texture)
+	void Renderer2D::SetCircleTexture(const std::shared_ptr<Texture>& texture)
 	{
 		s_Data.CircleTexture = texture;
 	}
@@ -1013,7 +1013,7 @@ namespace Tiles
 		s_Data.StringSize = size;
 	}
 
-	void Renderer2D::SetStringFont(const Ref<Texture>& fontTexture)
+	void Renderer2D::SetStringFont(const std::shared_ptr<Texture>& fontTexture)
 	{
 		s_Data.StringFont = fontTexture;
 	}
@@ -1078,7 +1078,7 @@ namespace Tiles
 		s_Data.TrianglePoint3 = point3;
 	}
 
-	void Renderer2D::SetTriangleTexture(const Ref<Texture>& texture)
+	void Renderer2D::SetTriangleTexture(const std::shared_ptr<Texture>& texture)
 	{
 		s_Data.TriangleTexture = texture;
 	}
@@ -1337,7 +1337,7 @@ namespace Tiles
 			StartBatch();
 		}
 
-		Ref<Texture> fontToUse = s_Data.StringFont ? s_Data.StringFont : s_Data.DefaultFont;
+		std::shared_ptr<Texture> fontToUse = s_Data.StringFont ? s_Data.StringFont : s_Data.DefaultFont;
 		float texIndex = ComputeTextureIndex(fontToUse);
 
 		float charWidth = s_Data.StringSize;
@@ -1517,7 +1517,7 @@ namespace Tiles
 		s_Data.Stats.PointLightCount++;
 	}
 
-	void Renderer2D::SetRenderTarget(Ref<RenderTarget> target)
+	void Renderer2D::SetRenderTarget(std::shared_ptr<RenderTarget> target)
 	{
 		if (target)
 		{
@@ -1534,12 +1534,12 @@ namespace Tiles
 		s_Data.CurrentRenderTarget = s_Data.DefaultRenderTarget;
 	}
 
-	Ref<RenderTarget> Renderer2D::GetCurrentRenderTarget()
+	std::shared_ptr<RenderTarget> Renderer2D::GetCurrentRenderTarget()
 	{
 		return s_Data.CurrentRenderTarget;
 	}
 
-	Ref<RenderTarget> Renderer2D::CreateRenderTarget(uint32_t width, uint32_t height)
+	std::shared_ptr<RenderTarget> Renderer2D::CreateRenderTarget(uint32_t width, uint32_t height)
 	{
 		return RenderTarget::Create(width, height);
 	}

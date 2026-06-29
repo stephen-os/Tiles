@@ -7,7 +7,7 @@
 
 namespace Tiles
 {
-    PanelMenuBar::PanelMenuBar(Ref<Context> context) : Panel(context), 
+    PanelMenuBar::PanelMenuBar(std::shared_ptr<Context> context) : Panel(context), 
 		m_PopupSaveAs(context), m_PopupOpenProject(context), m_PopupRenderMatrix(context)
     {
     }

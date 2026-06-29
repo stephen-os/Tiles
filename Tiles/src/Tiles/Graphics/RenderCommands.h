@@ -149,31 +149,31 @@ namespace Tiles
         static RenderState GetRenderState();
 
         // Basic Drawing Commands
-        static void DrawArrays(const Ref<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t offset = 0);
-        static void DrawElements(const Ref<VertexArray>& vao, PrimitiveType primitive);
+        static void DrawArrays(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t offset = 0);
+        static void DrawElements(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive);
 
         // Instanced Drawing
-        static void DrawArraysInstanced(const Ref<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t instanceCount, uint32_t offset = 0);
-        static void DrawElementsInstanced(const Ref<VertexArray>& vao, PrimitiveType primitive, uint32_t instanceCount);
+        static void DrawArraysInstanced(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t instanceCount, uint32_t offset = 0);
+        static void DrawElementsInstanced(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t instanceCount);
 
         // With Count
-        static void DrawElementsWithCount(const Ref<VertexArray>& vao, PrimitiveType primitive, uint32_t indexCount);
+        static void DrawElementsWithCount(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t indexCount);
 
         // Multi-draw Commands
-        static void MultiDrawArrays(const Ref<VertexArray>& vao, PrimitiveType primitive, const int* first, const int* count, int drawCount);
+        static void MultiDrawArrays(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, const int* first, const int* count, int drawCount);
 
         // Convenience Drawing Methods (backwards compatibility and ease of use)
-        static void DrawPoints(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-        static void DrawLines(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-        static void DrawLineStrips(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-        static void DrawTriangles(const Ref<VertexArray>& vao, uint32_t count = 0, uint32_t offset = 0); // count = 0 means use index buffer
-        static void DrawTriangleStrip(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-        static void DrawTriangleFan(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+        static void DrawPoints(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+        static void DrawLines(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+        static void DrawLineStrips(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+        static void DrawTriangles(const std::shared_ptr<VertexArray>& vao, uint32_t count = 0, uint32_t offset = 0); // count = 0 means use index buffer
+        static void DrawTriangleStrip(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+        static void DrawTriangleFan(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
 
         // Indexed versions
-        static void DrawPointsIndexed(const Ref<VertexArray>& vao);
-        static void DrawLinesIndexed(const Ref<VertexArray>& vao);
-        static void DrawTrianglesIndexed(const Ref<VertexArray>& vao);
+        static void DrawPointsIndexed(const std::shared_ptr<VertexArray>& vao);
+        static void DrawLinesIndexed(const std::shared_ptr<VertexArray>& vao);
+        static void DrawTrianglesIndexed(const std::shared_ptr<VertexArray>& vao);
 
     private:
         static RenderState s_CurrentState;

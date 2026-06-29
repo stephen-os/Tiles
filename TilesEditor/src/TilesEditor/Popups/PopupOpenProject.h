@@ -8,7 +8,7 @@ namespace Tiles
     class PopupOpenProject : public Popup
     {
     public:
-        PopupOpenProject(Ref<Context> context);
+        PopupOpenProject(std::shared_ptr<Context> context);
         ~PopupOpenProject() = default;
 
     protected:

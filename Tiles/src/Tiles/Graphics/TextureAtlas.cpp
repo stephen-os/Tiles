@@ -4,14 +4,14 @@
 
 namespace Tiles
 {
-	Ref<TextureAtlas> TextureAtlas::Create(std::string& source, int width, int height)
+	std::shared_ptr<TextureAtlas> TextureAtlas::Create(std::string& source, int width, int height)
 	{
-		return CreateRef<TextureAtlas>(source, width, height);
+		return std::make_shared<TextureAtlas>(source, width, height);
 	}
 
-	Ref<TextureAtlas> TextureAtlas::Create(int width, int height)
+	std::shared_ptr<TextureAtlas> TextureAtlas::Create(int width, int height)
 	{
-		return CreateRef<TextureAtlas>(width, height);
+		return std::make_shared<TextureAtlas>(width, height);
 	}
 
 	TextureAtlas::TextureAtlas(int width, int height)

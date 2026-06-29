@@ -11,7 +11,7 @@ namespace Tiles
 	class RenderTarget
 	{
 	public:
-		static Ref<RenderTarget> Create(uint32_t width, uint32_t height);
+		static std::shared_ptr<RenderTarget> Create(uint32_t width, uint32_t height);
 
 		RenderTarget(uint32_t width, uint32_t height);
 
@@ -29,7 +29,7 @@ namespace Tiles
 		uint32_t GetHeight() const { return m_Height; }
 
 	private:
-		Ref<FrameBuffer> m_FrameBuffer;
+		std::shared_ptr<FrameBuffer> m_FrameBuffer;
 		uint32_t m_Width;
 		uint32_t m_Height;
 	};

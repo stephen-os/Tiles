@@ -7,17 +7,17 @@
 
 namespace Tiles
 {
-	Ref<Texture> Texture::Create(const std::string& source)
+	std::shared_ptr<Texture> Texture::Create(const std::string& source)
 	{
-		return CreateRef<Texture>(source);
+		return std::make_shared<Texture>(source);
 	}
 
-	Ref<Texture> Texture::Create(uint32_t width, uint32_t height, TextureFormat format)
+	std::shared_ptr<Texture> Texture::Create(uint32_t width, uint32_t height, TextureFormat format)
 	{
-		return CreateRef<Texture>(width, height, format);
+		return std::make_shared<Texture>(width, height, format);
 	}
 
-	Ref<Texture> Texture::CreateFromData(const void* data, uint32_t width, uint32_t height, int components)
+	std::shared_ptr<Texture> Texture::CreateFromData(const void* data, uint32_t width, uint32_t height, int components)
 	{
 		TextureFormat format = TextureFormats::FromComponentCount(components);
 		if (format == TextureFormat::None)
@@ -34,7 +34,7 @@ namespace Tiles
 		return texture;
 	}
 
-	Ref<Texture> Texture::CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format)
+	std::shared_ptr<Texture> Texture::CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format)
 	{
 		auto texture = Texture::Create(width, height, format);
 		if (data)
@@ -44,7 +44,7 @@ namespace Tiles
 		return texture;
 	}
 
-	Ref<Texture> Texture::CreateCubemap(const std::vector<std::string>& faces)
+	std::shared_ptr<Texture> Texture::CreateCubemap(const std::vector<std::string>& faces)
 	{
 		if (faces.size() != 6)
 		{
@@ -115,7 +115,7 @@ namespace Tiles
 		return texture;
 	}
 
-	Ref<Texture> Texture::CreateCubemap(uint32_t width, uint32_t height, const void* data)
+	std::shared_ptr<Texture> Texture::CreateCubemap(uint32_t width, uint32_t height, const void* data)
 	{
 		auto texture = Texture::Create(width, height, TextureFormat::RGBA8);
 		texture->CreateCubemapTexture(width, height, data);

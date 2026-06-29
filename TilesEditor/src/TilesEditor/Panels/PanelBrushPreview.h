@@ -14,7 +14,7 @@ namespace Tiles
     class PanelBrushPreview : public Panel
     {
     public:
-        PanelBrushPreview(Ref<Context> context);
+        PanelBrushPreview(std::shared_ptr<Context> context);
         ~PanelBrushPreview() = default;
 
         void Render() override;
@@ -41,8 +41,8 @@ namespace Tiles
         void RenderComponentSpacing();
 
     private:
-        Tiles::Ref<Tiles::OrthographicCamera> m_Camera;
-        Tiles::Ref<Tiles::RenderTarget> m_PreviewRenderTarget;
+        std::shared_ptr<Tiles::OrthographicCamera> m_Camera;
+        std::shared_ptr<Tiles::RenderTarget> m_PreviewRenderTarget;
 
         bool m_ShowGrid = true;
         bool m_ShowBounds = false;

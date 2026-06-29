@@ -23,14 +23,14 @@ namespace Tiles
         }
     }
 
-     Ref<VertexBuffer> VertexBuffer::Create(uint32_t size, BufferUsage usage)
+     std::shared_ptr<VertexBuffer> VertexBuffer::Create(uint32_t size, BufferUsage usage)
     {
-        return CreateRef<VertexBuffer>(size, usage);
+        return std::make_shared<VertexBuffer>(size, usage);
     }
 
-    Ref<VertexBuffer> VertexBuffer::Create(const void* data, uint32_t size, BufferUsage usage)
+    std::shared_ptr<VertexBuffer> VertexBuffer::Create(const void* data, uint32_t size, BufferUsage usage)
     {
-        return CreateRef<VertexBuffer>(data, size, usage);
+        return std::make_shared<VertexBuffer>(data, size, usage);
     }
 
     VertexBuffer::VertexBuffer(uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
@@ -88,9 +88,9 @@ namespace Tiles
 
     // Index Buffer
 
-    Ref<IndexBuffer> IndexBuffer::Create(uint32_t * data, uint32_t count, BufferUsage usage)
+    std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t * data, uint32_t count, BufferUsage usage)
     {
-        return CreateRef<IndexBuffer>(data, count, usage);
+        return std::make_shared<IndexBuffer>(data, count, usage);
     }
 
 	IndexBuffer::IndexBuffer(uint32_t* data, uint32_t count, BufferUsage usage) : m_Count(count), m_Usage(usage)
@@ -143,14 +143,14 @@ namespace Tiles
 	}
 
 	// Uniform Buffer
-    Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, BufferUsage usage)
+    std::shared_ptr<UniformBuffer> UniformBuffer::Create(uint32_t size, BufferUsage usage)
     {
-        return CreateRef<UniformBuffer>(size, usage);
+        return std::make_shared<UniformBuffer>(size, usage);
     }
 
-    Ref<UniformBuffer> UniformBuffer::Create(const void* data, uint32_t size, BufferUsage usage)
+    std::shared_ptr<UniformBuffer> UniformBuffer::Create(const void* data, uint32_t size, BufferUsage usage)
     {
-        return CreateRef<UniformBuffer>(data, size, usage);
+        return std::make_shared<UniformBuffer>(data, size, usage);
     }
 
     UniformBuffer::UniformBuffer(uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)

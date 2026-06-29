@@ -9,7 +9,7 @@ namespace Tiles
     class PanelTextureSelection : public Panel
     {
     public:
-        PanelTextureSelection(Ref<Context> context);
+        PanelTextureSelection(std::shared_ptr<Context> context);
         ~PanelTextureSelection() = default;
 
         void Render() override;
@@ -42,7 +42,7 @@ namespace Tiles
         bool HasValidCurrentAtlas() const;
 
     private:
-        Tiles::Ref<Tiles::Texture> m_CheckerboardTexture = nullptr;
+        std::shared_ptr<Tiles::Texture> m_CheckerboardTexture = nullptr;
         size_t m_CurrentAtlasIndex = 0;
     };
 }

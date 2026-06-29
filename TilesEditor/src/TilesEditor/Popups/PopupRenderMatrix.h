@@ -18,7 +18,7 @@ namespace Tiles
     class PopupRenderMatrix : public Popup
     {
     public:
-        PopupRenderMatrix(Ref<Context> context);
+        PopupRenderMatrix(std::shared_ptr<Context> context);
         ~PopupRenderMatrix() = default;
 
     protected:

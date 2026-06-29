@@ -5,7 +5,7 @@
 
 namespace Tiles
 {
-    PopupOpenProject::PopupOpenProject(Ref<Context> context) : Popup(context) {}
+    PopupOpenProject::PopupOpenProject(std::shared_ptr<Context> context) : Popup(context) {}
 
     void PopupOpenProject::OnRender()
     {

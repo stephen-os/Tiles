@@ -7,7 +7,7 @@
 
 namespace Tiles
 {
-    PanelTextureSelection::PanelTextureSelection(Ref<Context> context) : Panel(context)
+    PanelTextureSelection::PanelTextureSelection(std::shared_ptr<Context> context) : Panel(context)
     {
         m_CheckerboardTexture = Tiles::Texture::Create(AssetPath::Checkerboard);
     }

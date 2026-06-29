@@ -12,7 +12,7 @@ namespace Tiles
     class PanelMenuBar : public Panel
     {
     public:
-        PanelMenuBar(Ref<Context> context);
+        PanelMenuBar(std::shared_ptr<Context> context);
         ~PanelMenuBar() = default;
 
         void Render() override;

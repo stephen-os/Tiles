@@ -18,7 +18,7 @@ namespace Tiles
     class PanelLayerSelection : public Panel
     {
     public:
-        PanelLayerSelection(Ref<Context> context) : Panel(context) {}
+        PanelLayerSelection(std::shared_ptr<Context> context) : Panel(context) {}
         ~PanelLayerSelection() = default;
 
         void Render() override;

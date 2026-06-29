@@ -6,9 +6,9 @@
 
 namespace Tiles
 {
-    PanelBrushPreview::PanelBrushPreview(Ref<Context> context) : Panel(context)
+    PanelBrushPreview::PanelBrushPreview(std::shared_ptr<Context> context) : Panel(context)
     {
-        m_Camera = Tiles::CreateRef<Tiles::OrthographicCamera>();
+        m_Camera = std::make_shared<Tiles::OrthographicCamera>();
 
         auto bounds = CameraConstants::Settings::DefaultBounds;
         m_Camera->SetBounds(-bounds, bounds, -bounds, bounds);

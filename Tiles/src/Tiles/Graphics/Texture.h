@@ -12,14 +12,14 @@ namespace Tiles
 	class Texture
 	{
 	public:
-		static Ref<Texture> Create(const std::string& source);
-		static Ref<Texture> Create(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
+		static std::shared_ptr<Texture> Create(const std::string& source);
+		static std::shared_ptr<Texture> Create(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
 
-		static Ref<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, int components);
-		static Ref<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format);
+		static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, int components);
+		static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format);
 
-		static Ref<Texture> CreateCubemap(const std::vector<std::string>& faces);
-		static Ref<Texture> CreateCubemap(uint32_t width, uint32_t height, const void* data);
+		static std::shared_ptr<Texture> CreateCubemap(const std::vector<std::string>& faces);
+		static std::shared_ptr<Texture> CreateCubemap(uint32_t width, uint32_t height, const void* data);
 
 		Texture(const std::string& source);
 		Texture(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);

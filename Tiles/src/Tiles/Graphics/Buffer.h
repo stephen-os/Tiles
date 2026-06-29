@@ -18,8 +18,8 @@ namespace Tiles
     class VertexBuffer
     {
     public:
-        static Ref<VertexBuffer> Create(uint32_t size, BufferUsage usage = BufferUsage::Static);
-        static Ref<VertexBuffer> Create(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Static);
+        static std::shared_ptr<VertexBuffer> Create(uint32_t size, BufferUsage usage = BufferUsage::Static);
+        static std::shared_ptr<VertexBuffer> Create(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Static);
 
         VertexBuffer(uint32_t size, BufferUsage usage = BufferUsage::Static);
         VertexBuffer(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Static);
@@ -47,7 +47,7 @@ namespace Tiles
     class IndexBuffer
     {
     public:
-        static Ref<IndexBuffer> Create(uint32_t* data, uint32_t count, BufferUsage usage = BufferUsage::Static);
+        static std::shared_ptr<IndexBuffer> Create(uint32_t* data, uint32_t count, BufferUsage usage = BufferUsage::Static);
 
         IndexBuffer(uint32_t* data, uint32_t count, BufferUsage usage = BufferUsage::Static);
         virtual ~IndexBuffer();
@@ -70,8 +70,8 @@ namespace Tiles
     class UniformBuffer
     {
     public:
-        static Ref<UniformBuffer> Create(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
-        static Ref<UniformBuffer> Create(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
+        static std::shared_ptr<UniformBuffer> Create(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
+        static std::shared_ptr<UniformBuffer> Create(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
 
         UniformBuffer(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
         UniformBuffer(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);

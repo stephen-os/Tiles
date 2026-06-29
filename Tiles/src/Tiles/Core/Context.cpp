@@ -10,16 +10,16 @@
 
 namespace Tiles
 {
-    Tiles::Ref<Context> Context::Create()
+    std::shared_ptr<Context> Context::Create()
     {
-        return CreateRef<Context>();
+        return std::make_shared<Context>();
     }
 
     Context::Context()
     {
-		m_Project = CreateRef<Project>(16, 16, "Untitled");
+		m_Project = std::make_shared<Project>(16, 16, "Untitled");
 
-        m_ViewportCamera = Tiles::CreateRef<Tiles::OrthographicCamera>();
+        m_ViewportCamera = std::make_shared<Tiles::OrthographicCamera>();
         InitializeSceneCamera();
       
         m_Project->UpdateLastAccessed();
@@ -214,7 +214,7 @@ namespace Tiles
     void Context::CreateProject(const std::string& name, uint32_t width, uint32_t height)
     {
 		m_CommandHistory.Clear();
-        m_Project = Tiles::CreateRef<Project>(width, height, name);
+        m_Project = std::make_shared<Project>(width, height, name);
         m_WorkingLayer = 0;
         m_PaintingMode = PaintingMode::None;
         m_Brush = Tile();
@@ -320,7 +320,7 @@ namespace Tiles
         }
 
 
-        Ref<Project> project;
+        std::shared_ptr<Project> project;
 
         try
         {

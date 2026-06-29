@@ -10,7 +10,7 @@ namespace Tiles
     class PanelDebug : public Panel
     {
     public:
-        PanelDebug(Ref<Context> context);
+        PanelDebug(std::shared_ptr<Context> context);
         ~PanelDebug() = default;
 
         void Render() override;

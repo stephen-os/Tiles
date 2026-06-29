@@ -4,7 +4,7 @@
 
 namespace Tiles
 {
-    PanelToolSelection::PanelToolSelection(Ref<Context> context) : Panel(context)
+    PanelToolSelection::PanelToolSelection(std::shared_ptr<Context> context) : Panel(context)
     {
         LoadTextures();
     }
@@ -61,7 +61,7 @@ namespace Tiles
         ImGui::PopStyleVar();
     }
 
-    void PanelToolSelection::RenderComponentToolButton(const char* id, ToolType toolType, const Tiles::Ref<Tiles::Texture>& texture, PaintingMode mode, const char* tooltip)
+    void PanelToolSelection::RenderComponentToolButton(const char* id, ToolType toolType, const std::shared_ptr<Tiles::Texture>& texture, PaintingMode mode, const char* tooltip)
     {
         if (!texture)
         {
@@ -141,7 +141,7 @@ namespace Tiles
         RenderComponentCursorForMode("FillCursor", PaintingMode::Fill, m_FillTexture);
     }
 
-    void PanelToolSelection::RenderComponentCursorForMode(const char* id, PaintingMode mode, const Tiles::Ref<Tiles::Texture>& texture)
+    void PanelToolSelection::RenderComponentCursorForMode(const char* id, PaintingMode mode, const std::shared_ptr<Tiles::Texture>& texture)
     {
         if (m_Context->GetPaintingMode() != mode || !texture)
         {

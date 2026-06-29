@@ -4,9 +4,9 @@
 
 namespace Tiles
 {
-	Ref<RenderTarget> RenderTarget::Create(uint32_t width, uint32_t height)
+	std::shared_ptr<RenderTarget> RenderTarget::Create(uint32_t width, uint32_t height)
 	{
-		return CreateRef<RenderTarget>(width, height);
+		return std::make_shared<RenderTarget>(width, height);
 	}
 
 	RenderTarget::RenderTarget(uint32_t width, uint32_t height)

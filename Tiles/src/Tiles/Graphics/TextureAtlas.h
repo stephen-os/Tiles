@@ -15,8 +15,8 @@ namespace Tiles
 	class TextureAtlas
 	{
 	public:
-		static Ref<TextureAtlas> Create(std::string& source, int width, int height);
-		static Ref<TextureAtlas> Create(int width, int height);
+		static std::shared_ptr<TextureAtlas> Create(std::string& source, int width, int height);
+		static std::shared_ptr<TextureAtlas> Create(int width, int height);
 
 
 		TextureAtlas(int width, int height);
@@ -32,13 +32,13 @@ namespace Tiles
 		bool HasTexture() const { return m_HasTexture; }
 		void RemoveTexture();
 
-		const Ref<Texture> GetTexture() const { return m_Texture; }
+		const std::shared_ptr<Texture> GetTexture() const { return m_Texture; }
 		glm::vec4 GetTextureCoords(int index) const;
 		glm::vec2 GetOffset(int index) const;
 		glm::vec2 GetPosition(int index) const;
 
 	private:
-		Ref<Texture> m_Texture = nullptr;		// std::shared_ptr pointer to Texture
+		std::shared_ptr<Texture> m_Texture = nullptr;		// std::shared_ptr pointer to Texture
 		int m_GridWidth = 1;					// Number of textures along the width
 		int m_GridHeight = 1;					// Number of textures along the height
 		float m_TexWidth = 1.0f;				// Width of a single texture in UV space

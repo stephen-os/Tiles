@@ -32,7 +32,7 @@ namespace Tiles
         }
     }
 
-    void Project::AddTextureAtlas(Ref<Tiles::TextureAtlas> atlas)
+    void Project::AddTextureAtlas(std::shared_ptr<Tiles::TextureAtlas> atlas)
     {
         if (!atlas)
         {
@@ -45,7 +45,7 @@ namespace Tiles
         MarkAsModified();
     }
 
-    Ref<Tiles::TextureAtlas> Project::GetTextureAtlas(size_t index)
+    std::shared_ptr<Tiles::TextureAtlas> Project::GetTextureAtlas(size_t index)
     {
         TILES_ASSERT(index < m_TextureAtlases.size(), "Project::GetTextureAtlas: Index {} out of bounds (size: {})", index, m_TextureAtlases.size());
         return m_TextureAtlases[index];
@@ -100,7 +100,7 @@ namespace Tiles
         return jsonProject;
     }
 
-    Ref<Project> Project::FromJSON(const nlohmann::json& json)
+    std::shared_ptr<Project> Project::FromJSON(const nlohmann::json& json)
     {
         TILES_LOG_INFO("Project::FromJSON: Loading project from JSON");
 
@@ -115,7 +115,7 @@ namespace Tiles
 
         TILES_LOG_INFO("Project::FromJSON: Creating project '{}' with dimensions {}x{}", projectName, layerStack.GetWidth(), layerStack.GetHeight());
 
-        Ref<Project> project = CreateRef<Project>(layerStack.GetWidth(), layerStack.GetHeight(), projectName);
+        std::shared_ptr<Project> project = std::make_shared<Project>(layerStack.GetWidth(), layerStack.GetHeight(), projectName);
         project->m_LayerStack = layerStack;
 
         if (json.contains(JSON::Atlas::Array))

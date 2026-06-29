@@ -13,7 +13,7 @@ namespace Tiles
     class PanelViewport : public Panel
     {
     public:
-        PanelViewport(Ref<Context> context);
+        PanelViewport(std::shared_ptr<Context> context);
         ~PanelViewport() = default;
 
         void Render() override;
@@ -42,7 +42,7 @@ namespace Tiles
         void HandleZoom();
 
     private:
-        Ref<RenderTarget> m_RenderTarget;
+        std::shared_ptr<RenderTarget> m_RenderTarget;
 
         float m_TileSize;
         float m_MouseDelta = 0.0f;

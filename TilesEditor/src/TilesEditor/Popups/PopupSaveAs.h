@@ -10,7 +10,7 @@ namespace Tiles
     class PopupSaveAs : public Popup
     {
     public:
-        PopupSaveAs(Ref<Context> context);
+        PopupSaveAs(std::shared_ptr<Context> context);
         ~PopupSaveAs() = default;
 
     protected:

@@ -32,13 +32,13 @@ namespace Tiles
     class Context
     {
     public:   
-        static Ref<Context> Create();
+        static std::shared_ptr<Context> Create();
 
         Context();
         ~Context() = default;
 
-        Ref<Tiles::OrthographicCamera> GetViewportCamera() { return m_ViewportCamera; }
-        const Ref<Tiles::OrthographicCamera> GetViewportCamera() const { return m_ViewportCamera; }
+        std::shared_ptr<Tiles::OrthographicCamera> GetViewportCamera() { return m_ViewportCamera; }
+        const std::shared_ptr<Tiles::OrthographicCamera> GetViewportCamera() const { return m_ViewportCamera; }
         void ResetViewportCamera();
         void FitViewportCameraToProject();
         void CenterViewportCameraOnProject();
@@ -79,8 +79,8 @@ namespace Tiles
         void ResizeProject(uint32_t width, uint32_t height);
         bool HasProject() const { return m_Project != nullptr; }
         std::string GetProjectDisplayName() const;
-        Ref<Project> GetProject() { return m_Project; }
-        const Ref<Project> GetProject() const { return m_Project; }
+        std::shared_ptr<Project> GetProject() { return m_Project; }
+        const std::shared_ptr<Project> GetProject() const { return m_Project; }
 
         // Project History
         size_t GetRecentProjectCount() const { return m_ProjectHistory.GetCount(); }
@@ -96,9 +96,9 @@ namespace Tiles
         CommandHistory m_CommandHistory;
         ProjectHistory m_ProjectHistory;
 
-        Ref<Project> m_Project;
+        std::shared_ptr<Project> m_Project;
 
-        Ref<Tiles::OrthographicCamera> m_ViewportCamera;
+        std::shared_ptr<Tiles::OrthographicCamera> m_ViewportCamera;
         
         size_t m_WorkingLayer = 0;
         PaintingMode m_PaintingMode = PaintingMode::None;

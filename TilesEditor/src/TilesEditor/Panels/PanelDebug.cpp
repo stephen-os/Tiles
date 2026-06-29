@@ -5,7 +5,7 @@
 
 namespace Tiles
 {
-    PanelDebug::PanelDebug(Ref<Context> context)
+    PanelDebug::PanelDebug(std::shared_ptr<Context> context)
         : Panel(context), m_LastUpdateTime(std::chrono::steady_clock::now())
     {
     }

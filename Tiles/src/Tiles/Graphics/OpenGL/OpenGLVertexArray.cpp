@@ -24,7 +24,7 @@ namespace Tiles
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::SetVertexBuffer(Shared<VertexBuffer> vertexBuffer)
+	void OpenGLVertexArray::SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer)
 	{
 		glBindVertexArray(m_RendererID);
 		vertexBuffer->Bind();
@@ -73,7 +73,7 @@ namespace Tiles
 		m_VertexBuffer = vertexBuffer;
 	}
 
-	void OpenGLVertexArray::SetIndexBuffer(Shared<IndexBuffer> indexBuffer)
+	void OpenGLVertexArray::SetIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer)
 	{
 		glBindVertexArray(m_RendererID);
 		indexBuffer->Bind();

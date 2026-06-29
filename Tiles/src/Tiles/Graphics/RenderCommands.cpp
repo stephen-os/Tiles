@@ -227,7 +227,7 @@ namespace Tiles
     }
 
     // Basic Drawing Commands
-    void RenderCommands::DrawArrays(const Ref<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t offset)
+    void RenderCommands::DrawArrays(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t offset)
     {
         TILES_ASSERT(vao, "VertexArray cannot be null!");
         TILES_ASSERT(count > 0, "Vertex count must be greater than zero!");
@@ -237,7 +237,7 @@ namespace Tiles
         vao->Unbind();
     }
 
-    void RenderCommands::DrawElements(const Ref<VertexArray>& vao, PrimitiveType primitive)
+    void RenderCommands::DrawElements(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive)
     {
         TILES_ASSERT(vao, "VertexArray cannot be null!");
 
@@ -249,7 +249,7 @@ namespace Tiles
     }
 
     // Instanced Drawing
-    void RenderCommands::DrawArraysInstanced(const Ref<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t instanceCount, uint32_t offset)
+    void RenderCommands::DrawArraysInstanced(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t instanceCount, uint32_t offset)
     {
         TILES_ASSERT(vao, "VertexArray cannot be null!");
         TILES_ASSERT(count > 0, "Vertex count must be greater than zero!");
@@ -260,7 +260,7 @@ namespace Tiles
         vao->Unbind();
     }
 
-    void RenderCommands::DrawElementsInstanced(const Ref<VertexArray>& vao, PrimitiveType primitive, uint32_t instanceCount)
+    void RenderCommands::DrawElementsInstanced(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t instanceCount)
     {
         TILES_ASSERT(vao, "VertexArray cannot be null!");
         TILES_ASSERT(instanceCount > 0, "Instance count must be greater than zero!");
@@ -272,7 +272,7 @@ namespace Tiles
         vao->Unbind();
     }
 
-    void RenderCommands::DrawElementsWithCount(const Ref<VertexArray>& vao, PrimitiveType primitive, uint32_t indexCount)
+    void RenderCommands::DrawElementsWithCount(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t indexCount)
     {
         TILES_ASSERT(vao, "VertexArray cannot be null!");
         TILES_ASSERT(indexCount > 0, "Index count must be greater than zero!");
@@ -283,7 +283,7 @@ namespace Tiles
     }
 
     // Multi-draw Commands
-    void RenderCommands::MultiDrawArrays(const Ref<VertexArray>& vao, PrimitiveType primitive, const int* first, const int* count, int drawCount)
+    void RenderCommands::MultiDrawArrays(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, const int* first, const int* count, int drawCount)
     {
         TILES_ASSERT(vao, "VertexArray cannot be null!");
         TILES_ASSERT(first, "First array cannot be null!");
@@ -296,22 +296,22 @@ namespace Tiles
     }
 
     // Convenience Drawing Methods
-    void RenderCommands::DrawPoints(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset)
+    void RenderCommands::DrawPoints(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset)
     {
         DrawArrays(vao, PrimitiveType::Points, count, offset);
     }
 
-    void RenderCommands::DrawLines(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset)
+    void RenderCommands::DrawLines(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset)
     {
         DrawArrays(vao, PrimitiveType::Lines, count, offset);
     }
 
-    void RenderCommands::DrawLineStrips(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset)
+    void RenderCommands::DrawLineStrips(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset)
     {
         DrawArrays(vao, PrimitiveType::LineStrip, count, offset);
     }
 
-    void RenderCommands::DrawTriangles(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset)
+    void RenderCommands::DrawTriangles(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset)
     {
         if (count == 0)
         {
@@ -325,28 +325,28 @@ namespace Tiles
         }
     }
 
-    void RenderCommands::DrawTriangleStrip(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset)
+    void RenderCommands::DrawTriangleStrip(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset)
     {
         DrawArrays(vao, PrimitiveType::TriangleStrip, count, offset);
     }
 
-    void RenderCommands::DrawTriangleFan(const Ref<VertexArray>& vao, uint32_t count, uint32_t offset)
+    void RenderCommands::DrawTriangleFan(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset)
     {
         DrawArrays(vao, PrimitiveType::TriangleFan, count, offset);
     }
 
     // Indexed versions
-    void RenderCommands::DrawPointsIndexed(const Ref<VertexArray>& vao)
+    void RenderCommands::DrawPointsIndexed(const std::shared_ptr<VertexArray>& vao)
     {
         DrawElements(vao, PrimitiveType::Points);
     }
 
-    void RenderCommands::DrawLinesIndexed(const Ref<VertexArray>& vao)
+    void RenderCommands::DrawLinesIndexed(const std::shared_ptr<VertexArray>& vao)
     {
         DrawElements(vao, PrimitiveType::Lines);
     }
 
-    void RenderCommands::DrawTrianglesIndexed(const Ref<VertexArray>& vao)
+    void RenderCommands::DrawTrianglesIndexed(const std::shared_ptr<VertexArray>& vao)
     {
         DrawElements(vao, PrimitiveType::Triangles);
     }

@@ -5,7 +5,7 @@
 
 namespace Tiles
 {
-    PopupSaveAs::PopupSaveAs(Ref<Context> context) : Popup(context) {}
+    PopupSaveAs::PopupSaveAs(std::shared_ptr<Context> context) : Popup(context) {}
 
     void PopupSaveAs::OnRender()
     {

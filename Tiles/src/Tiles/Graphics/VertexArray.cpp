@@ -3,9 +3,9 @@
 
 namespace Tiles
 {
-	Shared<VertexArray> VertexArray::Create()
+	std::shared_ptr<VertexArray> VertexArray::Create()
 	{
 		// Tiles uses OpenGL directly
-		return MakeShared<OpenGLVertexArray>();
+		return std::make_shared<OpenGLVertexArray>();
 	}
 }
