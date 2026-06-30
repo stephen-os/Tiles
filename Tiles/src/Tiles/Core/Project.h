@@ -13,7 +13,7 @@
 #include "TileLayer.h"
 #include "LayerStack.h"
 
-#include "../Lumina.h"
+#include "../Tiles.h"
 
 namespace Tiles
 {

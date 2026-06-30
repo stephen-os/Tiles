@@ -471,7 +471,7 @@ namespace Tiles
             ImGui::Separator();
 
             ImGui::Text("Version: 1.0.0");
-            ImGui::Text("A tile map editor built with Lumina Engine");
+            ImGui::Text("A tile map editor built with the Tiles engine");
 
             ImGui::Spacing();
             ImGui::Text("Features:");

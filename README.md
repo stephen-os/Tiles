@@ -28,11 +28,11 @@ These examples showcase the variety of environments possible with Tiles' layer s
 
 ## Inspiration
 
-Tiles was inspired by the popular framework Tiled, which provides a structured approach to tile-based map editing. The rendering framework Lumina used in this project was inspired by TheCherno's Walnut engine. The goal was to create a streamlined and intuitive tool for building 2D environments with modern rendering capabilities.
+Tiles was inspired by the popular framework Tiled, which provides a structured approach to tile-based map editing. Its rendering layer was inspired by TheCherno's Walnut engine. The goal was to create a streamlined and intuitive tool for building 2D environments with modern rendering capabilities.
 
 ## Technical Dependencies
 
-Tiles is built on top of **[Lumina](https://github.com/stephen-os/Lumina)** – a custom application framework featuring a state-based batch 2D renderer written in OpenGL. Lumina provides the rendering pipeline, window management, and core application structure that powers Tiles' real-time tile editing capabilities.
+Tiles ships with its own built-in application framework featuring a state-based batch 2D renderer written in OpenGL. This framework provides the rendering pipeline, window management, and core application structure that powers Tiles' real-time tile editing capabilities.
 
 ## Font
 

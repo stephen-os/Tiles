@@ -9,7 +9,7 @@
 
 #include "Constants.h"
 
-#include "../Lumina.h"
+#include "../Tiles.h"
 
 #include "Base.h"
 

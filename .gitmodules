@@ -16,6 +16,3 @@
 [submodule "Tiles/vendor/glm"]
 	path = Tiles/vendor/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "lumina"]
-	path = lumina
-	url = https://github.com/stephen-os/lumina.git
