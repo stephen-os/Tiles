@@ -25,6 +25,11 @@ namespace Tiles
         VertexBuffer(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Static);
         ~VertexBuffer();
 
+        VertexBuffer(const VertexBuffer&) = delete;
+        VertexBuffer& operator=(const VertexBuffer&) = delete;
+        VertexBuffer(VertexBuffer&& other) noexcept;
+        VertexBuffer& operator=(VertexBuffer&& other) noexcept;
+
         void Bind() const;
         void Unbind() const;
         void SetData(const void* data, uint32_t size);
@@ -52,6 +57,11 @@ namespace Tiles
         IndexBuffer(uint32_t* data, uint32_t count, BufferUsage usage = BufferUsage::Static);
         virtual ~IndexBuffer();
 
+        IndexBuffer(const IndexBuffer&) = delete;
+        IndexBuffer& operator=(const IndexBuffer&) = delete;
+        IndexBuffer(IndexBuffer&& other) noexcept;
+        IndexBuffer& operator=(IndexBuffer&& other) noexcept;
+
         void Bind() const;
         void Unbind() const;
         void SetData(uint32_t* data, uint32_t count);
@@ -76,6 +86,11 @@ namespace Tiles
         UniformBuffer(uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
         UniformBuffer(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
         ~UniformBuffer();
+
+        UniformBuffer(const UniformBuffer&) = delete;
+        UniformBuffer& operator=(const UniformBuffer&) = delete;
+        UniformBuffer(UniformBuffer&& other) noexcept;
+        UniformBuffer& operator=(UniformBuffer&& other) noexcept;
 
         void Bind(uint32_t bindingPoint) const;
         void Unbind() const;

@@ -25,6 +25,11 @@ namespace Tiles
 		Texture(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
 		~Texture();
 
+		Texture(const Texture&) = delete;
+		Texture& operator=(const Texture&) = delete;
+		Texture(Texture&& other) noexcept;
+		Texture& operator=(Texture&& other) noexcept;
+
 		void Bind(uint32_t slot = 0) const;
 		void Unbind() const;
 

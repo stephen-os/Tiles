@@ -14,6 +14,14 @@ namespace Tiles
         OpenGLFrameBuffer();
         ~OpenGLFrameBuffer();
 
+        // Owns GL framebuffer/texture/renderbuffer handles freed in the
+        // destructor; copying or moving would risk a double free, and it is
+        // only ever held via shared_ptr, so neither is permitted.
+        OpenGLFrameBuffer(const OpenGLFrameBuffer&) = delete;
+        OpenGLFrameBuffer& operator=(const OpenGLFrameBuffer&) = delete;
+        OpenGLFrameBuffer(OpenGLFrameBuffer&&) = delete;
+        OpenGLFrameBuffer& operator=(OpenGLFrameBuffer&&) = delete;
+
         void Bind() const override;
         void Unbind() const override;
         void Resize(uint32_t width, uint32_t height) override;

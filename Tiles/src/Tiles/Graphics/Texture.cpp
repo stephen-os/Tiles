@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 #include <stb_image.h>
+#include <utility>
 
 namespace Tiles
 {
@@ -137,6 +138,29 @@ namespace Tiles
 	Texture::~Texture()
 	{
 		GLCALL(glDeleteTextures(1, &m_BufferID));
+	}
+
+	Texture::Texture(Texture&& other) noexcept
+		: m_Path(std::move(other.m_Path)), m_Width(other.m_Width), m_Height(other.m_Height),
+		  m_BufferID(other.m_BufferID), m_Format(other.m_Format), m_IsCubemap(other.m_IsCubemap)
+	{
+		other.m_BufferID = 0;
+	}
+
+	Texture& Texture::operator=(Texture&& other) noexcept
+	{
+		if (this != &other)
+		{
+			GLCALL(glDeleteTextures(1, &m_BufferID));
+			m_Path = std::move(other.m_Path);
+			m_Width = other.m_Width;
+			m_Height = other.m_Height;
+			m_BufferID = other.m_BufferID;
+			m_Format = other.m_Format;
+			m_IsCubemap = other.m_IsCubemap;
+			other.m_BufferID = 0;
+		}
+		return *this;
 	}
 
 	void Texture::Bind(uint32_t slot) const
