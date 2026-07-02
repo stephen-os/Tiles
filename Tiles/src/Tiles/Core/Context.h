@@ -4,7 +4,7 @@
 
 #include "Tile.h"
 #include "Project.h"
-#include "CommandHistory.h"
+#include "Session/CommandDispatcher.h"
 #include "ProjectHistory.h"
 #include "ProjectSerializer.h"
 
@@ -67,14 +67,14 @@ namespace Tiles
         /// Runs a command through the history (recording it for undo) and marks
         /// the project modified. Null commands and a missing project are ignored.
         void ExecuteCommand(std::unique_ptr<Command> command);
-        bool CanUndo() const { return m_CommandHistory.CanUndo(); }
-        bool CanRedo() const { return m_CommandHistory.CanRedo(); }
+        bool CanUndo() const { return m_CommandDispatcher.CanUndo(); }
+        bool CanRedo() const { return m_CommandDispatcher.CanRedo(); }
         void Undo();
         void Redo();
 
         bool IsDirty() const { return m_Project->HasUnsavedChanges(); }
 
-		void ClearHistory() { m_CommandHistory.Clear(); }   
+		void ClearHistory() { m_CommandDispatcher.Clear(); }
 
 		// Project Management
 
@@ -109,7 +109,7 @@ namespace Tiles
         void ValidateWorkingLayer();
 
     private:
-        CommandHistory m_CommandHistory;
+        CommandDispatcher m_CommandDispatcher;
         ProjectHistory m_ProjectHistory;
 
         std::shared_ptr<Project> m_Project;

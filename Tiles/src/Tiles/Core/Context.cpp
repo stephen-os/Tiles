@@ -15,6 +15,14 @@ namespace Tiles
     {
 		m_Project = std::make_shared<Project>(16, 16, "Untitled");
 
+        // After any command runs, mark the project dirty and keep the working
+        // layer in range (a layer delete can be undone/redone under us).
+        m_CommandDispatcher.SetOnMutated([this]()
+            {
+                m_Project->MarkAsModified();
+                ValidateWorkingLayer();
+            });
+
         const auto& layerStack = m_Project->GetLayerStack();
         m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
 
@@ -122,32 +130,20 @@ namespace Tiles
 
     void Context::ExecuteCommand(std::unique_ptr<Command> command)
     {
-        if (command && m_Project)
-        {
-            m_CommandHistory.Execute(std::move(command), m_Project->GetLayerStack());
-            m_Project->MarkAsModified();
-            ValidateWorkingLayer();
-        }
+        if (m_Project)
+            m_CommandDispatcher.Execute(std::move(command), m_Project->GetLayerStack());
     }
 
     void Context::Undo()
     {
-        if (CanUndo())
-        {
-            m_CommandHistory.Undo(m_Project->GetLayerStack());
-            m_Project->MarkAsModified();
-            ValidateWorkingLayer();
-        }
+        if (m_Project)
+            m_CommandDispatcher.Undo(m_Project->GetLayerStack());
     }
 
     void Context::Redo()
     {
-        if (CanRedo())
-        {
-            m_CommandHistory.Redo(m_Project->GetLayerStack());
-            m_Project->MarkAsModified();
-            ValidateWorkingLayer();
-        }
+        if (m_Project)
+            m_CommandDispatcher.Redo(m_Project->GetLayerStack());
     }
 
     void Context::ValidateWorkingLayer()
@@ -169,7 +165,7 @@ namespace Tiles
 
     void Context::CreateProject(const std::string& name, uint32_t width, uint32_t height)
     {
-		m_CommandHistory.Clear();
+		m_CommandDispatcher.Clear();
         m_Project = std::make_shared<Project>(width, height, name);
         m_WorkingLayer = 0;
         m_PaintingMode = PaintingMode::None;
@@ -248,7 +244,7 @@ namespace Tiles
 
         m_Project = project;
 
-        m_CommandHistory.Clear();
+        m_CommandDispatcher.Clear();
 
         m_WorkingLayer = 0;
         m_PaintingMode = PaintingMode::None;
