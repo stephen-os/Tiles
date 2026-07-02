@@ -61,7 +61,40 @@ namespace Tiles
         {
             m_PopupRenderMatrix.Render();
         }
-        
+
+        RenderErrorDialog();
+    }
+
+    void PanelMenuBar::ReportResult(const ProjectResult& result)
+    {
+        if (!result.Success)
+        {
+            m_ErrorMessage = result.Message;
+            m_ShowErrorDialog = true;
+        }
+    }
+
+    void PanelMenuBar::RenderErrorDialog()
+    {
+        if (m_ShowErrorDialog)
+        {
+            ImGui::OpenPopup("Error##MenuBar");
+            m_ShowErrorDialog = false;
+        }
+
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+        if (ImGui::BeginPopupModal("Error##MenuBar", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::TextColored(UI::Color::TextError, "%s", m_ErrorMessage.c_str());
+            ImGui::Separator();
+            if (ImGui::Button("OK", ImVec2(UI::Component::ControlButtonWidth, 0)))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
     }
 
     void PanelMenuBar::Update()
@@ -94,7 +127,7 @@ namespace Tiles
                 }
                 else
                 {
-                    m_Context->SaveProject(); 
+                    ReportResult(m_Context->SaveProject());
                 }
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_Z, false))
@@ -141,7 +174,7 @@ namespace Tiles
                 }
                 else
                 {
-                    m_Context->SaveProject();
+                    ReportResult(m_Context->SaveProject());
                 }
             }
 
@@ -179,7 +212,7 @@ namespace Tiles
 
                         if (ImGui::MenuItem(menuText.c_str(), shortcut.empty() ? nullptr : shortcut.c_str()))
                         {
-                            m_Context->LoadProject(entry.filePath);
+                            ReportResult(m_Context->LoadProject(entry.filePath));
                         }
 
                         if (ImGui::IsItemHovered())
@@ -508,7 +541,7 @@ namespace Tiles
                     std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
                     if (m_Context)
                     {
-                        m_Context->LoadProject(filePath);
+                        ReportResult(m_Context->LoadProject(filePath));
                     }
                 }
                 ImGuiFileDialog::Instance()->Close();
@@ -525,7 +558,7 @@ namespace Tiles
                     std::string filePath = ImGuiFileDialog::Instance()->GetFilePathName();
                     if (m_Context)
                     {
-                        m_Context->SaveProjectAs(filePath);
+                        ReportResult(m_Context->SaveProjectAs(filePath));
                     }
                 }
                 ImGuiFileDialog::Instance()->Close();

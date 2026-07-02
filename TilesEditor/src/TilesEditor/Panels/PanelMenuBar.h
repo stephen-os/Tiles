@@ -37,6 +37,10 @@ namespace Tiles
         void CreateNewProject();
         void ResizeCurrentProject();
 
+        // Raises the error dialog when a save/load result reports failure.
+        void ReportResult(const ProjectResult& result);
+        void RenderErrorDialog();
+
     private:
 		PopupRenderMatrix m_PopupRenderMatrix;
         PopupSaveAs m_PopupSaveAs;
@@ -67,5 +71,9 @@ namespace Tiles
             Open,
             SaveAs
         } m_FileDialogMode = FileDialogMode::None;
+
+        // Error dialog state
+        bool m_ShowErrorDialog = false;
+        std::string m_ErrorMessage;
     };
 }
