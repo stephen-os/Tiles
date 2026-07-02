@@ -4,8 +4,6 @@
 #include "Commands/TileEraseCommand.h"
 #include "Commands/LayerFillCommand.h"
 
-#include <algorithm>
-
 namespace Tiles
 {
     std::shared_ptr<Context> Context::Create()
@@ -17,67 +15,30 @@ namespace Tiles
     {
 		m_Project = std::make_shared<Project>(16, 16, "Untitled");
 
-        m_ViewportCamera = std::make_shared<Tiles::OrthographicCamera>();
-        InitializeSceneCamera();
-      
+        const auto& layerStack = m_Project->GetLayerStack();
+        m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
+
         m_Project->UpdateLastAccessed();
 
         m_Brush.SetPainted(true);
     }
 
-    void Context::InitializeSceneCamera()
-    {
-        const auto& layerStack = m_Project->GetLayerStack();
-        const float gridWidth = static_cast<float>(layerStack.GetWidth());
-        const float gridHeight = static_cast<float>(layerStack.GetHeight());
-
-        m_ViewportCamera->SetPosition({
-            Viewport::Render::DefaultTileSize * (gridWidth * 0.5f),
-            Viewport::Render::DefaultTileSize * (gridHeight * 0.5f),
-            1.0f
-            });
-
-        m_ViewportCamera->SetZoom(1.0f);
-    }
-
     void Context::ResetViewportCamera()
     {
-        InitializeSceneCamera();
+        const auto& layerStack = m_Project->GetLayerStack();
+        m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
     }
 
     void Context::FitViewportCameraToProject()
     {
         const auto& layerStack = m_Project->GetLayerStack();
-        const float projectWidth = layerStack.GetWidth() * Viewport::Render::DefaultTileSize;
-        const float projectHeight = layerStack.GetHeight() * Viewport::Render::DefaultTileSize;
-
-        CenterViewportCameraOnProject();
-
-        // Assumes a nominal viewport size; the 0.9 factor leaves a margin so the
-        // grid does not sit flush against the edges.
-        const float viewportWidth = 800.0f;
-        const float viewportHeight = 600.0f;
-
-        const float zoomX = viewportWidth / projectWidth;
-        const float zoomY = viewportHeight / projectHeight;
-        const float fitZoom = std::min(zoomX, zoomY) * 0.9f;
-
-        const float clampedZoom = std::clamp(fitZoom, Viewport::Render::MinZoom, Viewport::Render::MaxZoom);
-        m_ViewportCamera->SetZoom(clampedZoom);
+        m_CameraController.Fit(layerStack.GetWidth(), layerStack.GetHeight());
     }
 
     void Context::CenterViewportCameraOnProject()
     {
         const auto& layerStack = m_Project->GetLayerStack();
-        const float gridWidth = static_cast<float>(layerStack.GetWidth());
-        const float gridHeight = static_cast<float>(layerStack.GetHeight());
-
-        glm::vec3 currentPos = m_ViewportCamera->GetPosition();
-        m_ViewportCamera->SetPosition({
-            Viewport::Render::DefaultTileSize * (gridWidth * 0.5f),
-            Viewport::Render::DefaultTileSize * (gridHeight * 0.5f),
-            currentPos.z
-            });
+        m_CameraController.Center(layerStack.GetWidth(), layerStack.GetHeight());
     }
 
     void Context::SetWorkingLayer(size_t index)
@@ -214,7 +175,10 @@ namespace Tiles
         m_PaintingMode = PaintingMode::None;
         m_Brush = Tile();
         m_Brush.SetPainted(true);
-        InitializeSceneCamera();
+
+        const auto& layerStack = m_Project->GetLayerStack();
+        m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
+
         m_Project->UpdateLastAccessed();
     }
 
@@ -293,7 +257,8 @@ namespace Tiles
 
         ValidateWorkingLayer();
 
-        InitializeSceneCamera();
+        const auto& layerStack = m_Project->GetLayerStack();
+        m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
 
         m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
 
@@ -306,26 +271,14 @@ namespace Tiles
         if (!m_Project)
             return;
 
-        const auto& layerStack = m_Project->GetLayerStack();
-        const float oldWidth = static_cast<float>(layerStack.GetWidth());
-        const float oldHeight = static_cast<float>(layerStack.GetHeight());
+        const uint32_t oldWidth = m_Project->GetLayerStack().GetWidth();
+        const uint32_t oldHeight = m_Project->GetLayerStack().GetHeight();
 
         m_Project->GetLayerStack().Resize(width, height);
         m_Project->MarkAsModified();
         ValidateWorkingLayer();
 
-        glm::vec3 currentPos = m_ViewportCamera->GetPosition();
-        const float relativeX = currentPos.x / (oldWidth * Viewport::Render::DefaultTileSize);
-        const float relativeY = currentPos.y / (oldHeight * Viewport::Render::DefaultTileSize);
-
-        const float clampedX = std::clamp(relativeX, 0.0f, 1.0f);
-        const float clampedY = std::clamp(relativeY, 0.0f, 1.0f);
-
-        m_ViewportCamera->SetPosition({
-            clampedX * width * Viewport::Render::DefaultTileSize,
-            clampedY * height * Viewport::Render::DefaultTileSize,
-            currentPos.z
-            });
+        m_CameraController.FollowResize(oldWidth, oldHeight, width, height);
 
 		m_Project->UpdateLastAccessed();
     }

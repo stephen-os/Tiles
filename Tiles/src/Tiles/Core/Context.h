@@ -10,7 +10,7 @@
 
 #include "Constants.h"
 
-#include "../Graphics/Cameras/OrthographicCamera.h"
+#include "Session/ViewportCameraController.h"
 
 #include "Base.h"
 
@@ -34,8 +34,8 @@ namespace Tiles
         Context();
         ~Context() = default;
 
-        std::shared_ptr<Tiles::OrthographicCamera> GetViewportCamera() { return m_ViewportCamera; }
-        const std::shared_ptr<Tiles::OrthographicCamera> GetViewportCamera() const { return m_ViewportCamera; }
+        std::shared_ptr<Tiles::OrthographicCamera> GetViewportCamera() { return m_CameraController.GetCamera(); }
+        const std::shared_ptr<Tiles::OrthographicCamera> GetViewportCamera() const { return m_CameraController.GetCamera(); }
         /// Recenters the camera on the project at default zoom.
         void ResetViewportCamera();
         /// Centers and zooms the camera so the whole project fits in view.
@@ -107,8 +107,6 @@ namespace Tiles
         /// Clamps the working-layer index back into range after the layer count
         /// changes (e.g. a delete via undo/redo).
         void ValidateWorkingLayer();
-        /// Positions the camera at the project's center at default zoom.
-        void InitializeSceneCamera();
 
     private:
         CommandHistory m_CommandHistory;
@@ -116,8 +114,8 @@ namespace Tiles
 
         std::shared_ptr<Project> m_Project;
 
-        std::shared_ptr<Tiles::OrthographicCamera> m_ViewportCamera;
-        
+        ViewportCameraController m_CameraController;
+
         size_t m_WorkingLayer = 0;
         PaintingMode m_PaintingMode = PaintingMode::None;
         Tile m_Brush;
