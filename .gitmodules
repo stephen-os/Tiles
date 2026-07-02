@@ -1,15 +1,20 @@
 [submodule "Tiles/vendor/imgui"]
 	path = Tiles/vendor/imgui
 	url = https://github.com/stephen-os/imgui.git
+	branch = docking
 [submodule "Tiles/vendor/imguifd"]
 	path = Tiles/vendor/imguifd
 	url = https://github.com/stephen-os/ImGuiFileDialog.git
+	branch = master
 [submodule "Tiles/vendor/glfw"]
 	path = Tiles/vendor/glfw
 	url = https://github.com/stephen-os/glfw.git
+	branch = master
 [submodule "Tiles/vendor/spdlog"]
 	path = Tiles/vendor/spdlog
 	url = https://github.com/stephen-os/spdlog.git
+	branch = v1.x
 [submodule "Tiles/vendor/glm"]
 	path = Tiles/vendor/glm
 	url = https://github.com/g-truc/glm.git
+	branch = master
