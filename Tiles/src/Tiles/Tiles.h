@@ -1,23 +1,6 @@
 #pragma once
 
-// =============================================================================
-// CLEAN ARCHITECTURE LAYERS (New)
-// =============================================================================
-
-// Domain Layer - Core business entities (no dependencies)
-#include "Domain/Domain.h"
-
-// Application Layer - Use cases and services
-#include "Application/Application.h"
-
-// Infrastructure Layer - External implementations
-#include "Infrastructure/Infrastructure.h"
-
-// =============================================================================
-// LEGACY COMPONENTS (To be migrated)
-// =============================================================================
-
-// Core (Presentation layer)
+// Core
 #include "Core/Base.h"
 #include "Core/Application.h"
 #include "Core/Layer.h"
@@ -26,7 +9,7 @@
 #include "Core/Log.h"
 #include "Core/Assert.h"
 
-// Graphics (Infrastructure layer - to be migrated)
+// Graphics
 #include "Graphics/Renderer2D.h"
 #include "Graphics/Texture.h"
 #include "Graphics/TextureAtlas.h"
