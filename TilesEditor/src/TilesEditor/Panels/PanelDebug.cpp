@@ -210,7 +210,7 @@ namespace Tiles
 
     void PanelDebug::RenderTextureAtlasInfo()
     {
-        auto& project = m_Context->GetProject();
+        const auto& project = m_Context->GetProject();
         ImGui::Text("Atlas Count: %zu", project->GetTextureAtlasCount());
 
         if (project->GetTextureAtlasCount() > 0)

@@ -52,7 +52,7 @@ namespace Tiles
 		}
 	}
 
-	void TextureAtlas::SetTexture(std::string& source)
+	void TextureAtlas::SetTexture(const std::string& source)
 	{
 		m_Texture = Texture::Create(source);
 

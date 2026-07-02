@@ -1,7 +1,7 @@
 project "Tiles"
    kind "StaticLib"
    language "C++"
-   cppdialect "C++17"
+   cppdialect "C++23"
    staticruntime "off"
 
    flags { "MultiProcessorCompile" }

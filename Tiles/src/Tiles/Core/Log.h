@@ -59,11 +59,11 @@ namespace Tiles
 }
 
 #ifdef TILES_DEBUG
-	#define TILES_LOG_TRACE(format, ...)    ::Tiles::Log::GetLogger()->trace(::Tiles::Log::Format(format), __VA_ARGS__)
-	#define TILES_LOG_INFO(format, ...)     ::Tiles::Log::GetLogger()->info(::Tiles::Log::Format(format), __VA_ARGS__)
-	#define TILES_LOG_WARN(format, ...)     ::Tiles::Log::GetLogger()->warn(::Tiles::Log::Format(format), __VA_ARGS__)
-	#define TILES_LOG_ERROR(format, ...)    ::Tiles::Log::GetLogger()->error(::Tiles::Log::Format(format), __VA_ARGS__)
-	#define TILES_LOG_CRITICAL(format, ...) ::Tiles::Log::GetLogger()->critical(::Tiles::Log::Format(format), __VA_ARGS__)
+	#define TILES_LOG_TRACE(format, ...)    ::Tiles::Log::GetLogger()->trace(fmt::runtime(::Tiles::Log::Format(format)), __VA_ARGS__)
+	#define TILES_LOG_INFO(format, ...)     ::Tiles::Log::GetLogger()->info(fmt::runtime(::Tiles::Log::Format(format)), __VA_ARGS__)
+	#define TILES_LOG_WARN(format, ...)     ::Tiles::Log::GetLogger()->warn(fmt::runtime(::Tiles::Log::Format(format)), __VA_ARGS__)
+	#define TILES_LOG_ERROR(format, ...)    ::Tiles::Log::GetLogger()->error(fmt::runtime(::Tiles::Log::Format(format)), __VA_ARGS__)
+	#define TILES_LOG_CRITICAL(format, ...) ::Tiles::Log::GetLogger()->critical(fmt::runtime(::Tiles::Log::Format(format)), __VA_ARGS__)
 #else
 	#define TILES_LOG_TRACE(...)    (void)0
 	#define TILES_LOG_INFO(...)     (void)0

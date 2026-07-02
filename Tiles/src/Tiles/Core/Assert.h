@@ -29,7 +29,7 @@ namespace Tiles::Assert
 	{
 		TILES_LOG_ERROR("[ASSERT FAILED] Condition: {}\nMessage: {}\nFile: {}\nLine: {}",
 			condition,
-			fmt::format(fmt, std::forward<Args>(args)...),
+			fmt::format(fmt::runtime(fmt), std::forward<Args>(args)...),
 			file,
 			line
 		);

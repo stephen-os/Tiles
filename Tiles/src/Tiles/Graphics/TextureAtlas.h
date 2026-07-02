@@ -24,7 +24,7 @@ namespace Tiles
 		~TextureAtlas() = default;
 
 		void Resize(int width, int height);
-		void SetTexture(std::string& source);
+		void SetTexture(const std::string& source);
 
 		int GetWidth() const { return m_GridWidth; }
 		int GetHeight() const { return m_GridHeight; }
