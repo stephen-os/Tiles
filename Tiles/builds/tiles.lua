@@ -6,20 +6,20 @@ project "Tiles"
 
    flags { "MultiProcessorCompile" }
 
-   files { "src/**.h", "src/**.cpp" }
+   files { "../src/**.h", "../src/**.cpp" }
 
    includedirs
    {
-      "src/Tiles",
+      "../src/Tiles",
 
-      "vendor/imgui",
-      "vendor/glfw/include",
-      "vendor/glm",
-      "vendor/glad/include",
-      "vendor/imguifd",
-      "vendor/spdlog/include",
-      "vendor/stb",
-      "vendor/json"
+      "../vendor/imgui",
+      "../vendor/glfw/include",
+      "../vendor/glm",
+      "../vendor/glad/include",
+      "../vendor/imguifd",
+      "../vendor/spdlog/include",
+      "../vendor/stb",
+      "../vendor/json"
    }
 
     links
@@ -31,11 +31,11 @@ project "Tiles"
         "opengl32.lib"
     }
 
-    
+
    buildoptions { "/utf-8" }
 
-   targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
-   objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
+   targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+   objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
    filter "system:windows"
       systemversion "latest"

@@ -6,24 +6,24 @@ project "TilesEditor"
 
    flags { "MultiProcessorCompile" }
 
-   files { "src/**.h", "src/**.cpp" }
+   files { "../src/**.h", "../src/**.cpp" }
 
    includedirs
    {
-      "src",
+      "../src",
 
       -- Tiles includes
-      "../Tiles/src/Tiles",
+      "../../Tiles/src/Tiles",
 
       -- Vendor includes (from Tiles)
-      "../Tiles/vendor/imgui",
-      "../Tiles/vendor/glfw/include",
-      "../Tiles/vendor/glm",
-      "../Tiles/vendor/glad/include",
-      "../Tiles/vendor/imguifd",
-      "../Tiles/vendor/spdlog/include",
-      "../Tiles/vendor/stb",
-      "../Tiles/vendor/json"
+      "../../Tiles/vendor/imgui",
+      "../../Tiles/vendor/glfw/include",
+      "../../Tiles/vendor/glm",
+      "../../Tiles/vendor/glad/include",
+      "../../Tiles/vendor/imguifd",
+      "../../Tiles/vendor/spdlog/include",
+      "../../Tiles/vendor/stb",
+      "../../Tiles/vendor/json"
    }
 
    links
@@ -38,8 +38,8 @@ project "TilesEditor"
 
    buildoptions { "/utf-8" }
 
-   targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
-   objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
+   targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
+   objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
    filter "system:windows"
       systemversion "latest"
