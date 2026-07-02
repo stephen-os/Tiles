@@ -132,15 +132,20 @@ namespace Tiles
     {
 		s_Instance = nullptr;
 
-        if (m_Specifications.Use2DRenderer)
-			Renderer2D::Shutdown();
+        // A null window means construction bailed out before the graphics and
+        // ImGui backends were initialized, so their teardown must be skipped.
+        if (m_Window)
+        {
+            if (m_Specifications.Use2DRenderer)
+                Renderer2D::Shutdown();
 
-        ImGui_ImplOpenGL3_Shutdown();
+            ImGui_ImplOpenGL3_Shutdown();
+            ImGui_ImplGlfw_Shutdown();
+            ImGui::DestroyContext();
 
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
+            glfwDestroyWindow(m_Window);
+        }
 
-        glfwDestroyWindow(m_Window);
         glfwTerminate();
     }
 
@@ -161,6 +166,12 @@ namespace Tiles
 
     void Application::Run()
     {
+        if (!m_Window)
+        {
+            TILES_LOG_ERROR("Application::Run: Window was not created; aborting run loop.");
+            return;
+        }
+
         while (!glfwWindowShouldClose(m_Window) && m_Running)
         {
             m_TimeStep = m_FrameTimer.Elapsed();
