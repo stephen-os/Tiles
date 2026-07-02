@@ -29,7 +29,10 @@ namespace Tiles
         void InitializeFromCurrentProject();
 
     private:
-        std::string m_FileName = "Untitled";
+        // ImGui::InputText writes into this fixed buffer; its size is independent
+        // of the string contents so the writable region is always well defined.
+        static constexpr size_t FileNameBufferSize = 256;
+        char m_FileNameBuffer[FileNameBufferSize] = "Untitled";
         std::filesystem::path m_Directory = ".";
         std::string m_SaveMessage;
 

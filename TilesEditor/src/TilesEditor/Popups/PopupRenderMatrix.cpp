@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <sstream>
 #include <set>
+#include <cstring>
 
 using namespace Tiles;
 
@@ -75,7 +76,10 @@ namespace Tiles
             std::transform(projectName.begin(), projectName.end(), projectName.begin(), ::tolower);
             std::replace(projectName.begin(), projectName.end(), ' ', '_');
 
-            m_ExportFileName = projectName;
+            // Safely copy the derived name into the fixed input buffer.
+            size_t copyLen = std::min(projectName.size(), ExportFileNameBufferSize - 1);
+            std::memcpy(m_ExportFileNameBuffer, projectName.c_str(), copyLen);
+            m_ExportFileNameBuffer[copyLen] = '\0';
 
             const auto& layerStack = project->GetLayerStack();
             m_LayerToRenderGroup.clear();
@@ -248,10 +252,7 @@ namespace Tiles
         ImGui::Text("Base File Name:");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(350.0f);
-        if (ImGui::InputText("##FileName", m_ExportFileName.data(), m_ExportFileName.capacity() + 1))
-        {
-            m_ExportFileName.resize(strlen(m_ExportFileName.data()));
-        }
+        ImGui::InputText("##FileName", m_ExportFileNameBuffer, ExportFileNameBufferSize);
 
         ImGui::Text("Format:");
         ImGui::SameLine();
@@ -475,7 +476,7 @@ namespace Tiles
 
     std::string PopupRenderMatrix::GetExportFileName(int groupIndex) const
     {
-        std::string baseName = m_ExportFileName;
+        std::string baseName(m_ExportFileNameBuffer);
         std::string extension = GetFormatExtension();
 
         if (groupIndex >= 0)

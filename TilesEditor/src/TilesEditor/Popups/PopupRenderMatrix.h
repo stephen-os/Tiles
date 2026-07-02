@@ -60,7 +60,10 @@ namespace Tiles
         void ApplyRenderGroupChanges();
 
     private:
-        std::string m_ExportFileName = "export";
+        // ImGui::InputText writes into this fixed buffer; its size is independent
+        // of the string contents so the writable region is always well defined.
+        static constexpr size_t ExportFileNameBufferSize = 256;
+        char m_ExportFileNameBuffer[ExportFileNameBufferSize] = "export";
         std::filesystem::path m_ExportDirectory = ".";
         ExportFormat m_ExportFormat = ExportFormat::PNG;
         std::map<size_t, int> m_LayerToRenderGroup;

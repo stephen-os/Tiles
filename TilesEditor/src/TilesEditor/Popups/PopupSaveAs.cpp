@@ -2,6 +2,8 @@
 #include "Core/Constants.h"
 #include "ImGuiFileDialog.h"
 #include <filesystem>
+#include <algorithm>
+#include <cstring>
 
 namespace Tiles
 {
@@ -116,7 +118,10 @@ namespace Tiles
             projectName = projectName.substr(0, extensionPos);
         }
 
-        m_FileName = projectName;
+        // Safely copy the project name into the fixed input buffer.
+        size_t copyLen = std::min(projectName.size(), FileNameBufferSize - 1);
+        std::memcpy(m_FileNameBuffer, projectName.c_str(), copyLen);
+        m_FileNameBuffer[copyLen] = '\0';
 
         if (!project->IsNew())
         {
@@ -155,9 +160,8 @@ namespace Tiles
 
         ImGui::Text("File name:");
         ImGui::SetNextItemWidth(450.0f);
-        if (ImGui::InputText("##FileName", m_FileName.data(), m_FileName.capacity() + 1))
+        if (ImGui::InputText("##FileName", m_FileNameBuffer, FileNameBufferSize))
         {
-            m_FileName.resize(strlen(m_FileName.data()));
             ValidateFileName();
         }
         ImGui::SameLine();
@@ -177,7 +181,7 @@ namespace Tiles
 
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + startX);
 
-        bool canSave = m_FileNameValid && !m_FileName.empty();
+        bool canSave = m_FileNameValid && m_FileNameBuffer[0] != '\0';
 
         if (ImGui::Button("Save", ImVec2(buttonWidth, 0)) && canSave)
         {
@@ -210,7 +214,7 @@ namespace Tiles
 
     void PopupSaveAs::ValidateFileName()
     {
-        std::string fileName(m_FileName);
+        std::string fileName(m_FileNameBuffer);
         m_FileNameValid = !fileName.empty() &&
             fileName.find_first_of("<>:\"/\\|?*") == std::string::npos &&
             fileName != "." && fileName != "..";
@@ -219,7 +223,7 @@ namespace Tiles
     std::string PopupSaveAs::GetFullFilePath() const
     {
         std::filesystem::path dir(m_Directory);
-        std::string fileName(m_FileName);
+        std::string fileName(m_FileNameBuffer);
 
         if (fileName.find(File::ProjectExtension) == std::string::npos)
         {
