@@ -10,8 +10,6 @@
 #include <vector>
 #include <string>
 
-using namespace Tiles;
-
 namespace Tiles
 {
     /// Tool palette for the three painting modes (Brush/Eraser/Fill). The active

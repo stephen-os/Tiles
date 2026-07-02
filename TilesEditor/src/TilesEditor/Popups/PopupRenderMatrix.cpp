@@ -8,8 +8,6 @@
 #include <set>
 #include <cstring>
 
-using namespace Tiles;
-
 namespace Tiles
 {
     PopupRenderMatrix::PopupRenderMatrix(std::shared_ptr<Context> context) : Popup(context) {}

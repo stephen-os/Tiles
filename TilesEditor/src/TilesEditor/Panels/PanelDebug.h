@@ -3,8 +3,6 @@
 #include "Tiles.h"
 #include "imgui.h"
 
-using namespace Tiles;
-
 namespace Tiles
 {
     /// Debug-only inspector (registered only in TILES_DEBUG builds) exposing live

@@ -13,7 +13,7 @@
 #include "TileLayer.h"
 #include "LayerStack.h"
 
-#include "../Tiles.h"
+#include "../Graphics/TextureAtlas.h"
 
 namespace Tiles
 {

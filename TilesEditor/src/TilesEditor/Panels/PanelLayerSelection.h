@@ -7,8 +7,6 @@
 #include <string>
 #include <memory>
 
-using namespace Tiles;
-
 namespace Tiles
 {
     class Command;

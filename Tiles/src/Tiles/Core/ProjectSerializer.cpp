@@ -52,6 +52,14 @@ namespace Tiles
             file.close();
 
             outProject = Project::FromJSON(jsonProject);
+            if (!outProject)
+            {
+                // Parseable JSON that is missing required fields (e.g. no layer
+                // stack) yields a null project; fail cleanly instead of letting
+                // the caller dereference it.
+                return { false, "Invalid project file format." };
+            }
+
             return { true, "Project loaded successfully." };
         }
         catch (const nlohmann::json::parse_error& e)

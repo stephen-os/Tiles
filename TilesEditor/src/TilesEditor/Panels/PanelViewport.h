@@ -6,8 +6,6 @@
 
 #include "Core/Base.h"
 
-using namespace Tiles;
-
 namespace Tiles
 {
     /// The main editing canvas. Draws the grid, layers, and a hover/brush preview
