@@ -29,17 +29,17 @@ namespace Tiles
 
 		glm::vec3& GetRotation() { return m_Rotation; };
 		glm::vec2& GetSize() { return m_Size; };
-		glm::vec4& GetTint() { return TintColor; };
+		glm::vec4& GetTint() { return m_TintColor; };
 		glm::vec4& GetTextureCoords() { return m_TextureCoords; };
 
 		const glm::vec3& GetRotation() const { return m_Rotation; }
 		const glm::vec2& GetSize() const { return m_Size; }
-		const glm::vec4& GetTint() const { return TintColor; }
+		const glm::vec4& GetTint() const { return m_TintColor; }
 		const glm::vec4& GetTextureCoords() const { return m_TextureCoords; }
 
 		void SetRotation(const glm::vec3& rotation) { m_Rotation = rotation; }
 		void SetSize(const glm::vec2& size) { m_Size = size; }
-		void SetTint(const glm::vec4& tint) { TintColor = tint; }
+		void SetTint(const glm::vec4& tint) { m_TintColor = tint; }
 		void SetTextureCoords(const glm::vec4& textureCoords) { m_TextureCoords = textureCoords; }
 
 		/// Value equality; float fields are compared with an epsilon tolerance.
@@ -57,7 +57,7 @@ namespace Tiles
 
 		glm::vec3 m_Rotation = { 0.0f, 0.0f, 0.0f };
 		glm::vec2 m_Size = { 1.0f, 1.0f };
-		glm::vec4 TintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glm::vec4 m_TintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		size_t m_AtlasIndex = INVALID_ATLAS_INDEX;
 		glm::vec4 m_TextureCoords = { 0, 0, 1, 1 };
 	};

@@ -15,7 +15,7 @@ namespace Tiles
 
 		m_Rotation = { 0.0f, 0.0f, 0.0f };
 		m_Size = { 1.0f, 1.0f };
-		TintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		m_TintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 		m_TextureCoords = { 0, 0, 1, 1 };
 	}
 
@@ -26,7 +26,7 @@ namespace Tiles
             && m_AtlasIndex == other.m_AtlasIndex
             && glm::all(glm::epsilonEqual(m_Rotation, other.m_Rotation, 1e-6f))
             && glm::all(glm::epsilonEqual(m_Size, other.m_Size, 1e-6f))
-            && glm::all(glm::epsilonEqual(TintColor, other.TintColor, 1e-6f))
+            && glm::all(glm::epsilonEqual(m_TintColor, other.m_TintColor, 1e-6f))
             && glm::all(glm::epsilonEqual(m_TextureCoords, other.m_TextureCoords, 1e-6f));
 	}
 
