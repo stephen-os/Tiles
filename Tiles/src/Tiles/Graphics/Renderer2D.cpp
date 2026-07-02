@@ -1,284 +1,28 @@
 #include "Renderer2D.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-#include <stb_image_write.h>
-#include "../Utils/FileReader.h"
-#include "VertexArray.h"
-#include "Buffer.h"
-#include "BufferLayout.h"
-#include "FrameBuffer.h"
+#include "Renderer2D/RendererState.h"
 
-#include <iostream>
-#include <fstream>
-#include <filesystem>
-#include <array>
+#include <memory>
+#include <vector>
+#include <cstring>
 
 namespace Tiles
 {
-	constexpr uint32_t MaxQuads = 10000;
-	constexpr uint32_t MaxCircles = 10000;
-	constexpr uint32_t MaxLines = 10000;
-	constexpr uint32_t MaxText = 10000;
-	constexpr uint32_t MaxPixels = 50000;
-	constexpr uint32_t MaxTriangles = 10000;
-	constexpr uint32_t MaxGrids = 1000;
-	constexpr uint32_t MaxPointLights = 32;
-
-	constexpr uint32_t MaxVertices = MaxQuads * 4;
-	constexpr uint32_t MaxIndices = MaxQuads * 6;
-	constexpr uint32_t MaxTextureSlots = 32;
-
-	constexpr uint32_t BindingLocationPointLight = 1;
-
-	struct QuadVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-	};
-
-	struct CircleVertex
-	{
-		glm::vec3 WorldPosition;
-		glm::vec3 LocalPosition;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-		float Thickness;
-		float Fade;
-	};
-
-	struct LineVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-	};
-
-	struct TextVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-	};
-
-	struct PixelVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-	};
-
-	struct TriangleVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-	};
-
-	struct GridVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-		glm::vec3 GridPosition;
-		glm::vec2 GridSize;
-		float CellSize;
-		glm::vec4 GridColor;
-		float LineWidth;
-		float ShowCheckerboard;
-		glm::vec4 CheckerColor1;
-		glm::vec4 CheckerColor2;
-	};
-
-	struct PointLight
-	{
-		glm::vec3 Position;
-		float Intensity;
-		glm::vec3 Color;
-		float Radius;
-		float BlendingMode;
-		float BlendingAlpha;
-		float FalloffType;
-		float Falloff;
-	};
-
-	struct RendererData
-	{
-		std::shared_ptr<RenderTarget> DefaultRenderTarget;
-		std::shared_ptr<RenderTarget> CurrentRenderTarget;
-
-		std::shared_ptr<VertexArray> QuadVertexArray;
-		std::shared_ptr<VertexBuffer> QuadVertexBuffer;
-		std::shared_ptr<IndexBuffer> QuadIndexBuffer;
-
-		std::shared_ptr<VertexArray> CircleVertexArray;
-		std::shared_ptr<VertexBuffer> CircleVertexBuffer;
-		std::shared_ptr<IndexBuffer> CircleIndexBuffer;
-
-		std::shared_ptr<VertexArray> LineVertexArray;
-		std::shared_ptr<VertexBuffer> LineVertexBuffer;
-
-		std::shared_ptr<VertexArray> TextVertexArray;
-		std::shared_ptr<VertexBuffer> TextVertexBuffer;
-		std::shared_ptr<IndexBuffer> TextIndexBuffer;
-
-		std::shared_ptr<VertexArray> PixelVertexArray;
-		std::shared_ptr<VertexBuffer> PixelVertexBuffer;
-
-		std::shared_ptr<VertexArray> TriangleVertexArray;
-		std::shared_ptr<VertexBuffer> TriangleVertexBuffer;
-
-		std::shared_ptr<VertexArray> GridVertexArray;
-		std::shared_ptr<VertexBuffer> GridVertexBuffer;
-		std::shared_ptr<IndexBuffer> GridIndexBuffer;
-
-		std::shared_ptr<UniformBuffer> PointLightUniformBuffer;
-
-		uint32_t QuadIndexCount = 0;
-		QuadVertex* QuadVertexBufferBase = nullptr;
-		QuadVertex* QuadVertexBufferPtr = nullptr;
-
-		uint32_t CircleIndexCount = 0;
-		CircleVertex* CircleVertexBufferBase = nullptr;
-		CircleVertex* CircleVertexBufferPtr = nullptr;
-
-		uint32_t LineVertexCount = 0;
-		LineVertex* LineVertexBufferBase = nullptr;
-		LineVertex* LineVertexBufferPtr = nullptr;
-
-		uint32_t TextIndexCount = 0;
-		TextVertex* TextVertexBufferBase = nullptr;
-		TextVertex* TextVertexBufferPtr = nullptr;
-
-		uint32_t PixelVertexCount = 0;
-		PixelVertex* PixelVertexBufferBase = nullptr;
-		PixelVertex* PixelVertexBufferPtr = nullptr;
-
-		uint32_t TriangleVertexCount = 0;
-		TriangleVertex* TriangleVertexBufferBase = nullptr;
-		TriangleVertex* TriangleVertexBufferPtr = nullptr;
-
-		uint32_t GridIndexCount = 0;
-		GridVertex* GridVertexBufferBase = nullptr;
-		GridVertex* GridVertexBufferPtr = nullptr;
-
-		uint32_t PointLightCount = 0;
-		PointLight* PointLightUniformBufferBase = nullptr;
-		PointLight* PointLightUniformBufferPtr = nullptr;
-
-		std::shared_ptr<ShaderProgram> QuadShader = nullptr;
-		std::shared_ptr<ShaderProgram> CircleShader = nullptr;
-		std::shared_ptr<ShaderProgram> LineShader = nullptr;
-		std::shared_ptr<ShaderProgram> TextShader = nullptr;
-		std::shared_ptr<ShaderProgram> PixelShader = nullptr;
-		std::shared_ptr<ShaderProgram> TriangleShader = nullptr;
-		std::shared_ptr<ShaderProgram> GridShader = nullptr;
-
-		std::array<std::shared_ptr<Texture>, MaxTextureSlots> TextureSlots;
-		uint32_t TextureSlotIndex = 1;
-
-		glm::vec4 QuadVertexPositions[4];
-		glm::vec3 CircleVertexPositions[4];
-		glm::vec2 TexCoords[4];
-
-		float LineWidth = 3.0f;
-		std::shared_ptr<Texture> DefaultFont = nullptr;
-
-		PolygonMode PolygonMode = PolygonMode::Fill;
-		glm::vec3 WireFrameColor = { 0.0f, 1.0f, 0.0f };
-
-		glm::mat4 ViewProjectionMatrix = glm::mat4(1.0f);
-
-		uint32_t Width = 800;
-		uint32_t Height = 600;
-
-		Renderer2D::Statistics Stats;
-
-		bool UseLighting = false;
-		glm::vec3 AmbientColor = { 0.1f, 0.1f, 0.1f };
-		float AmbientIntensity = 0.5f;
-
-		glm::vec3 QuadPosition = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 QuadRotation = { 0.0f, 0.0f, 0.0f };
-		glm::vec2 QuadSize = { 1.0f, 1.0f };
-		std::shared_ptr<Texture> QuadTexture = nullptr;
-		glm::vec4 QuadTextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
-		glm::vec4 QuadTintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		glm::vec3 CirclePosition = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 CircleRotation = { 0.0f, 0.0f, 0.0f };
-		glm::vec2 CircleRadius = { 1.0f, 1.0f };
-		std::shared_ptr<Texture> CircleTexture = nullptr;
-		glm::vec4 CircleTextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
-		glm::vec4 CircleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		float CircleThickness = 1.0f;
-		float CircleFade = 0.0f;
-
-		glm::vec3 LineStart = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 LineEnd = { 1.0f, 1.0f, 0.0f };
-		float LineThickness = 2.0f;
-		glm::vec4 LineColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		std::string StringContent = "";
-		glm::vec3 StringPosition = { 0.0f, 0.0f, 0.0f };
-		glm::vec4 StringColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		float StringSize = 1.0f;
-		std::shared_ptr<Texture> StringFont = nullptr;
-		StringAlignment StringAlignment = StringAlignment::Left;
-
-		glm::vec3 PixelPosition = { 0.0f, 0.0f, 0.0f };
-		glm::vec4 PixelColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		float PixelSize = 1.0f;
-
-		glm::vec3 TrianglePoint1 = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 TrianglePoint2 = { 1.0f, 0.0f, 0.0f };
-		glm::vec3 TrianglePoint3 = { 0.5f, 1.0f, 0.0f };
-		std::shared_ptr<Texture> TriangleTexture = nullptr;
-		glm::vec4 TriangleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		glm::vec3 GridPosition = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 GridRotation = { 0.0f, 0.0f, 0.0f };
-		glm::vec2 GridSize = { 1000.0f, 1000.0f };
-		float GridCellSize = 1.0f;
-		glm::vec4 GridColor = { 0.3f, 0.3f, 0.3f, 0.8f };
-		float GridLineWidth = 1.0f;
-		bool GridShowCheckerboard = true;
-		glm::vec4 GridCheckerColor1 = { 0.9f, 0.9f, 0.9f, 0.2f };
-		glm::vec4 GridCheckerColor2 = { 0.8f, 0.8f, 0.8f, 0.2f };
-
-		glm::vec3 PointLightPosition = { 0.0f, 0.0f, 0.0f };
-		float PointLightIntensity = 1.0f;
-		glm::vec3 PointLightColor = { 1.0f, 1.0f, 1.0f };
-		float PointLightRadius = 5.0f;
-		BlendMode PointLightBlendMode = BlendMode::Additive;
-		float PointLightBlendAlpha = 1.0f;
-		AttenuationModel PointLightFalloffType = AttenuationModel::Quadratic;
-		float PointLightFalloff = 1.0f;
-	};
-
-	static RendererData s_Data;
+	// Single owner of all renderer state. Constructed in Init() once a GL context
+	// is current, destroyed at the end of Shutdown(). The class methods below are a
+	// thin facade over this state and its per-primitive batchers.
+	static std::unique_ptr<RendererState> s_State;
 
 	void Renderer2D::Init()
 	{
 		TILES_LOG_INFO("Renderer2D: Initializing...");
 
-		s_Data.DefaultRenderTarget = RenderTarget::Create(800, 600);
-		s_Data.CurrentRenderTarget = s_Data.DefaultRenderTarget;
+		s_State = std::make_unique<RendererState>();
 
-		// Quad setup
-		s_Data.QuadVertexArray = VertexArray::Create();
-		s_Data.QuadVertexBuffer = VertexBuffer::Create(MaxVertices * sizeof(QuadVertex));
-		s_Data.QuadVertexBuffer->SetLayout({
-			{ BufferDataType::Float3, "a_Position" },
-			{ BufferDataType::Float4, "a_Color" },
-			{ BufferDataType::Float2, "a_TexCoord" },
-			{ BufferDataType::Float,  "a_TexIndex" }
-			});
-		s_Data.QuadVertexArray->SetVertexBuffer(s_Data.QuadVertexBuffer);
+		s_State->DefaultRenderTarget = RenderTarget::Create(800, 600);
+		s_State->CurrentRenderTarget = s_State->DefaultRenderTarget;
 
+		// Quad index pattern reused by every indexed batcher (quad/circle/text/grid).
 		std::vector<uint32_t> quadIndices(MaxIndices);
 		uint32_t offset = 0;
 		for (uint32_t i = 0; i < MaxIndices; i += 6)
@@ -292,163 +36,36 @@ namespace Tiles
 			offset += 4;
 		}
 
-		s_Data.QuadIndexBuffer = IndexBuffer::Create(quadIndices.data(), MaxIndices);
-		s_Data.QuadVertexArray->SetIndexBuffer(s_Data.QuadIndexBuffer);
-		s_Data.QuadVertexBufferBase = new QuadVertex[MaxVertices];
+		s_State->Quad.Init(quadIndices);
+		s_State->Circle.Init(quadIndices);
+		s_State->Line.Init();
+		s_State->Text.Init(quadIndices);
+		s_State->Pixel.Init();
+		s_State->Triangle.Init();
+		s_State->Grid.Init(quadIndices);
+		s_State->PointLights.Init();
 
-		{
-			std::string vertexSource = ReadFile("res/shaders/Quad.vert");
-			std::string fragmentSource = ReadFile("res/shaders/Quad.frag");
-			s_Data.QuadShader = ShaderProgram::Create(vertexSource, fragmentSource);
-		}
-
-		// Circle setup
-		s_Data.CircleVertexArray = VertexArray::Create();
-		s_Data.CircleVertexBuffer = VertexBuffer::Create(MaxVertices * sizeof(CircleVertex));
-		s_Data.CircleVertexBuffer->SetLayout({
-			{ BufferDataType::Float3, "a_WorldPosition" },
-			{ BufferDataType::Float3, "a_LocalPosition" },
-			{ BufferDataType::Float4, "a_Color" },
-			{ BufferDataType::Float2, "a_TexCoord" },
-			{ BufferDataType::Float,  "a_TexIndex" },
-			{ BufferDataType::Float,  "a_Thickness" },
-			{ BufferDataType::Float,  "a_Fade" }
-			});
-		s_Data.CircleVertexArray->SetVertexBuffer(s_Data.CircleVertexBuffer);
-		s_Data.CircleIndexBuffer = IndexBuffer::Create(quadIndices.data(), MaxIndices);
-		s_Data.CircleVertexArray->SetIndexBuffer(s_Data.CircleIndexBuffer);
-		s_Data.CircleVertexBufferBase = new CircleVertex[MaxVertices];
-
-		{
-			std::string vertexSource = ReadFile("res/shaders/Circle.vert");
-			std::string fragmentSource = ReadFile("res/shaders/Circle.frag");
-			s_Data.CircleShader = ShaderProgram::Create(vertexSource, fragmentSource);
-		}
-
-		// Line setup
-		s_Data.LineVertexArray = VertexArray::Create();
-		s_Data.LineVertexBuffer = VertexBuffer::Create(MaxVertices * sizeof(LineVertex));
-		s_Data.LineVertexBuffer->SetLayout({
-			{ BufferDataType::Float3, "a_Position" },
-			{ BufferDataType::Float4, "a_Color" }
-			});
-		s_Data.LineVertexArray->SetVertexBuffer(s_Data.LineVertexBuffer);
-		s_Data.LineVertexBufferBase = new LineVertex[MaxVertices];
-
-		{
-			std::string vertexSource = ReadFile("res/shaders/Line.vert");
-			std::string fragmentSource = ReadFile("res/shaders/Line.frag");
-			s_Data.LineShader = ShaderProgram::Create(vertexSource, fragmentSource);
-		}
-
-		// Text setup
-		s_Data.TextVertexArray = VertexArray::Create();
-		s_Data.TextVertexBuffer = VertexBuffer::Create(MaxVertices * sizeof(TextVertex));
-		s_Data.TextVertexBuffer->SetLayout({
-			{ BufferDataType::Float3, "a_Position" },
-			{ BufferDataType::Float4, "a_Color" },
-			{ BufferDataType::Float2, "a_TexCoord" },
-			{ BufferDataType::Float,  "a_TexIndex" }
-			});
-		s_Data.TextVertexArray->SetVertexBuffer(s_Data.TextVertexBuffer);
-		s_Data.TextIndexBuffer = IndexBuffer::Create(quadIndices.data(), MaxIndices);
-		s_Data.TextVertexArray->SetIndexBuffer(s_Data.TextIndexBuffer);
-		s_Data.TextVertexBufferBase = new TextVertex[MaxVertices];
-
-		{
-			std::string vertexSource = ReadFile("res/shaders/Text.vert");
-			std::string fragmentSource = ReadFile("res/shaders/Text.frag");
-			s_Data.TextShader = ShaderProgram::Create(vertexSource, fragmentSource);
-		}
-
-		// Pixel setup
-		s_Data.PixelVertexArray = VertexArray::Create();
-		s_Data.PixelVertexBuffer = VertexBuffer::Create(MaxPixels * sizeof(PixelVertex));
-		s_Data.PixelVertexBuffer->SetLayout({
-			{ BufferDataType::Float3, "a_Position" },
-			{ BufferDataType::Float4, "a_Color" }
-			});
-		s_Data.PixelVertexArray->SetVertexBuffer(s_Data.PixelVertexBuffer);
-		s_Data.PixelVertexBufferBase = new PixelVertex[MaxPixels];
-
-		{
-			std::string vertexSource = ReadFile("res/shaders/Pixel.vert");
-			std::string fragmentSource = ReadFile("res/shaders/Pixel.frag");
-			s_Data.PixelShader = ShaderProgram::Create(vertexSource, fragmentSource);
-		}
-
-		// Triangle setup
-		s_Data.TriangleVertexArray = VertexArray::Create();
-		s_Data.TriangleVertexBuffer = VertexBuffer::Create(MaxTriangles * 3 * sizeof(TriangleVertex));
-		s_Data.TriangleVertexBuffer->SetLayout({
-			{ BufferDataType::Float3, "a_Position" },
-			{ BufferDataType::Float4, "a_Color" },
-			{ BufferDataType::Float2, "a_TexCoord" },
-			{ BufferDataType::Float,  "a_TexIndex" }
-			});
-		s_Data.TriangleVertexArray->SetVertexBuffer(s_Data.TriangleVertexBuffer);
-		s_Data.TriangleVertexBufferBase = new TriangleVertex[MaxTriangles * 3];
-
-		{
-			std::string vertexSource = ReadFile("res/shaders/Triangle.vert");
-			std::string fragmentSource = ReadFile("res/shaders/Triangle.frag");
-			s_Data.TriangleShader = ShaderProgram::Create(vertexSource, fragmentSource);
-		}
-
-		// Grid setup
-		s_Data.GridVertexArray = VertexArray::Create();
-		s_Data.GridVertexBuffer = VertexBuffer::Create(MaxGrids * 4 * sizeof(GridVertex));
-		s_Data.GridVertexBuffer->SetLayout({
-			{ BufferDataType::Float3, "a_Position" },
-			{ BufferDataType::Float4, "a_Color" },
-			{ BufferDataType::Float2, "a_TexCoord" },
-			{ BufferDataType::Float,  "a_TexIndex" },
-			{ BufferDataType::Float3, "a_GridPosition" },
-			{ BufferDataType::Float2, "a_GridSize" },
-			{ BufferDataType::Float,  "a_CellSize" },
-			{ BufferDataType::Float4, "a_GridColor" },
-			{ BufferDataType::Float,  "a_LineWidth" },
-			{ BufferDataType::Float,  "a_ShowCheckerboard" },
-			{ BufferDataType::Float4, "a_CheckerColor1" },
-			{ BufferDataType::Float4, "a_CheckerColor2" }
-			});
-		s_Data.GridVertexArray->SetVertexBuffer(s_Data.GridVertexBuffer);
-		s_Data.GridIndexBuffer = IndexBuffer::Create(quadIndices.data(), MaxIndices);
-		s_Data.GridVertexArray->SetIndexBuffer(s_Data.GridIndexBuffer);
-		s_Data.GridVertexBufferBase = new GridVertex[MaxGrids * 4];
-
-		{
-			std::string vertexSource = ReadFile("res/shaders/Grid.vert");
-			std::string fragmentSource = ReadFile("res/shaders/Grid.frag");
-			s_Data.GridShader = ShaderProgram::Create(vertexSource, fragmentSource);
-		}
-
-		s_Data.PointLightUniformBuffer = UniformBuffer::Create(sizeof(PointLight) * MaxPointLights, BufferUsage::Dynamic);
-		s_Data.PointLightUniformBufferBase = new PointLight[MaxPointLights];
-		s_Data.PointLightUniformBufferPtr = s_Data.PointLightUniformBufferBase;
-
-		uint32_t whiteTextureData = 0xffffffff;
-		s_Data.TextureSlots[0] = Texture::Create(1, 1);
-		s_Data.TextureSlots[0]->SetData(&whiteTextureData, sizeof(uint32_t));
+		s_State->Textures.Init();
+		// Slot overflow flushes the whole renderer so the new texture starts fresh.
+		s_State->Textures.SetFlushCallback([]() { EndBatch(); StartBatch(); });
 
 		// Text rendering not needed for Tiles (tile editor)
-		// s_Data.DefaultFont = DefaultFont::Create();
+		// s_State->Text.DefaultFont = DefaultFont::Create();
 
+		s_State->QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+		s_State->QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
+		s_State->QuadVertexPositions[2] = { 0.5f,  0.5f, 0.0f, 1.0f };
+		s_State->QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
 
-		s_Data.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data.QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data.QuadVertexPositions[2] = { 0.5f,  0.5f, 0.0f, 1.0f };
-		s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+		s_State->CircleVertexPositions[0] = { -1.0f, -1.0f, 0.0f };
+		s_State->CircleVertexPositions[1] = { 1.0f, -1.0f, 0.0f };
+		s_State->CircleVertexPositions[2] = { 1.0f,  1.0f, 0.0f };
+		s_State->CircleVertexPositions[3] = { -1.0f,  1.0f, 0.0f };
 
-		s_Data.CircleVertexPositions[0] = { -1.0f, -1.0f, 0.0f };
-		s_Data.CircleVertexPositions[1] = { 1.0f, -1.0f, 0.0f };
-		s_Data.CircleVertexPositions[2] = { 1.0f,  1.0f, 0.0f };
-		s_Data.CircleVertexPositions[3] = { -1.0f,  1.0f, 0.0f };
-
-		s_Data.TexCoords[0] = { 0.0f, 0.0f };
-		s_Data.TexCoords[1] = { 1.0f, 0.0f };
-		s_Data.TexCoords[2] = { 1.0f, 1.0f };
-		s_Data.TexCoords[3] = { 0.0f, 1.0f };
+		s_State->TexCoords[0] = { 0.0f, 0.0f };
+		s_State->TexCoords[1] = { 1.0f, 0.0f };
+		s_State->TexCoords[2] = { 1.0f, 1.0f };
+		s_State->TexCoords[3] = { 0.0f, 1.0f };
 
 		TILES_LOG_INFO("Renderer2D: Initialization complete");
 	}
@@ -457,337 +74,115 @@ namespace Tiles
 	{
 		TILES_LOG_INFO("Renderer2D: Shutting down...");
 
-		s_Data.DefaultRenderTarget.reset();
-		s_Data.CurrentRenderTarget.reset();
+		s_State->DefaultRenderTarget.reset();
+		s_State->CurrentRenderTarget.reset();
 
-		s_Data.QuadVertexArray.reset();
-		s_Data.QuadVertexBuffer.reset();
-		s_Data.QuadIndexBuffer.reset();
-		s_Data.CircleVertexArray.reset();
-		s_Data.CircleVertexBuffer.reset();
-		s_Data.CircleIndexBuffer.reset();
-		s_Data.LineVertexArray.reset();
-		s_Data.LineVertexBuffer.reset();
-		s_Data.TextVertexArray.reset();
-		s_Data.TextVertexBuffer.reset();
-		s_Data.TextIndexBuffer.reset();
-		s_Data.PixelVertexArray.reset();
-		s_Data.PixelVertexBuffer.reset();
-		s_Data.TriangleVertexArray.reset();
-		s_Data.TriangleVertexBuffer.reset();
-		s_Data.GridVertexArray.reset();
-		s_Data.GridVertexBuffer.reset();
-		s_Data.GridIndexBuffer.reset();
-		s_Data.PointLightUniformBuffer.reset();
+		s_State->Quad.Shutdown();
+		s_State->Circle.Shutdown();
+		s_State->Line.Shutdown();
+		s_State->Text.Shutdown();
+		s_State->Pixel.Shutdown();
+		s_State->Triangle.Shutdown();
+		s_State->Grid.Shutdown();
+		s_State->PointLights.Shutdown();
 
-		s_Data.QuadShader.reset();
-		s_Data.CircleShader.reset();
-		s_Data.LineShader.reset();
-		s_Data.TextShader.reset();
-		s_Data.PixelShader.reset();
-		s_Data.TriangleShader.reset();
-		s_Data.GridShader.reset();
+		s_State->Textures.Shutdown();
 
-		for (auto& texture : s_Data.TextureSlots) {
-			texture.reset();
-		}
-
-		delete[] s_Data.QuadVertexBufferBase;
-		delete[] s_Data.CircleVertexBufferBase;
-		delete[] s_Data.LineVertexBufferBase;
-		delete[] s_Data.TextVertexBufferBase;
-		delete[] s_Data.PixelVertexBufferBase;
-		delete[] s_Data.TriangleVertexBufferBase;
-		delete[] s_Data.GridVertexBufferBase;
-		delete[] s_Data.PointLightUniformBufferBase;
-
-		s_Data.QuadVertexBufferBase = nullptr;
-		s_Data.CircleVertexBufferBase = nullptr;
-		s_Data.LineVertexBufferBase = nullptr;
-		s_Data.TextVertexBufferBase = nullptr;
-		s_Data.PixelVertexBufferBase = nullptr;
-		s_Data.TriangleVertexBufferBase = nullptr;
-		s_Data.GridVertexBufferBase = nullptr;
-		s_Data.PointLightUniformBufferBase = nullptr;
+		s_State.reset();
 
 		TILES_LOG_INFO("Renderer2D: Shutdown complete");
 	}
 
 	void Renderer2D::Begin(std::shared_ptr<Camera> camera)
 	{
-		s_Data.ViewProjectionMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix();
+		s_State->ViewProjectionMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix();
 
-		s_Data.CurrentRenderTarget->Bind();
-		s_Data.CurrentRenderTarget->Resize(s_Data.Width, s_Data.Height);
+		s_State->CurrentRenderTarget->Bind();
+		s_State->CurrentRenderTarget->Resize(s_State->Width, s_State->Height);
 
 		RenderCommands::Clear();
-		RenderCommands::SetViewport(0, 0, s_Data.Width, s_Data.Height);
+		RenderCommands::SetViewport(0, 0, s_State->Width, s_State->Height);
 		RenderCommands::EnableDepthTest();
-		RenderCommands::SetPolygonMode(s_Data.PolygonMode);
+		RenderCommands::SetPolygonMode(s_State->PolygonMode);
 
 		StartBatch();
 	}
 
 	void Renderer2D::Begin(glm::mat4& viewProjection)
 	{
-		s_Data.ViewProjectionMatrix = viewProjection;
+		s_State->ViewProjectionMatrix = viewProjection;
 		StartBatch();
 	}
 
 	void Renderer2D::End()
 	{
 		EndBatch();
-		s_Data.CurrentRenderTarget->Unbind();
+		s_State->CurrentRenderTarget->Unbind();
 	}
 
 	void Renderer2D::StartBatch()
 	{
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+		s_State->Quad.Reset();
+		s_State->Circle.Reset();
+		s_State->Line.Reset();
+		s_State->Text.Reset();
+		s_State->Pixel.Reset();
+		s_State->Triangle.Reset();
+		s_State->Grid.Reset();
+		s_State->PointLights.Reset();
 
-		s_Data.CircleIndexCount = 0;
-		s_Data.CircleVertexBufferPtr = s_Data.CircleVertexBufferBase;
-
-		s_Data.LineVertexCount = 0;
-		s_Data.LineVertexBufferPtr = s_Data.LineVertexBufferBase;
-
-		s_Data.TextIndexCount = 0;
-		s_Data.TextVertexBufferPtr = s_Data.TextVertexBufferBase;
-
-		s_Data.PixelVertexCount = 0;
-		s_Data.PixelVertexBufferPtr = s_Data.PixelVertexBufferBase;
-
-		s_Data.TriangleVertexCount = 0;
-		s_Data.TriangleVertexBufferPtr = s_Data.TriangleVertexBufferBase;
-
-		s_Data.GridIndexCount = 0;
-		s_Data.GridVertexBufferPtr = s_Data.GridVertexBufferBase;
-
-		s_Data.PointLightCount = 0;
-		s_Data.PointLightUniformBufferPtr = s_Data.PointLightUniformBufferBase;
-
-		s_Data.TextureSlotIndex = 1;
+		s_State->Textures.Reset();
 	}
 
 	// Uploads whatever geometry each primitive accumulated this batch, then
-	// flushes once if any primitive produced vertices. Buffer size is the byte
-	// distance the write pointer advanced past its base.
+	// flushes once if any primitive produced vertices.
 	void Renderer2D::EndBatch()
 	{
 		bool issueDraw = false;
 
-		auto CalculateBufferSize = [](const void* ptr, const void* base) -> uint32_t
-		{
-			ptrdiff_t diff = static_cast<const uint8_t*>(ptr) - static_cast<const uint8_t*>(base);
-			TILES_ASSERT(diff >= 0, "Renderer2D: Buffer pointer is before base pointer!");
-			TILES_ASSERT(diff <= UINT32_MAX, "Renderer2D: Buffer size exceeds uint32_t limit!");
-			return static_cast<uint32_t>(diff);
-		};
+		if (s_State->Quad.Upload(*s_State)) issueDraw = true;
+		if (s_State->Circle.Upload(*s_State)) issueDraw = true;
+		if (s_State->Line.Upload(*s_State)) issueDraw = true;
+		if (s_State->Text.Upload(*s_State)) issueDraw = true;
+		if (s_State->Pixel.Upload(*s_State)) issueDraw = true;
+		if (s_State->Triangle.Upload(*s_State)) issueDraw = true;
+		if (s_State->Grid.Upload(*s_State)) issueDraw = true;
 
-		uint32_t quadDataSize = CalculateBufferSize(s_Data.QuadVertexBufferPtr, s_Data.QuadVertexBufferBase);
-		if (quadDataSize > 0)
-		{
-			s_Data.Stats.DataSize += quadDataSize;
-			s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, quadDataSize);
-			issueDraw = true;
-		}
-
-		uint32_t circleDataSize = CalculateBufferSize(s_Data.CircleVertexBufferPtr, s_Data.CircleVertexBufferBase);
-		if (circleDataSize > 0)
-		{
-			s_Data.Stats.DataSize += circleDataSize;
-			s_Data.CircleVertexBuffer->SetData(s_Data.CircleVertexBufferBase, circleDataSize);
-			issueDraw = true;
-		}
-
-		uint32_t lineDataSize = CalculateBufferSize(s_Data.LineVertexBufferPtr, s_Data.LineVertexBufferBase);
-		if (lineDataSize > 0)
-		{
-			s_Data.Stats.DataSize += lineDataSize;
-			s_Data.LineVertexBuffer->SetData(s_Data.LineVertexBufferBase, lineDataSize);
-			issueDraw = true;
-		}
-
-		uint32_t textDataSize = CalculateBufferSize(s_Data.TextVertexBufferPtr, s_Data.TextVertexBufferBase);
-		if (textDataSize > 0)
-		{
-			s_Data.Stats.DataSize += textDataSize;
-			s_Data.TextVertexBuffer->SetData(s_Data.TextVertexBufferBase, textDataSize);
-			issueDraw = true;
-		}
-
-		uint32_t pixelDataSize = CalculateBufferSize(s_Data.PixelVertexBufferPtr, s_Data.PixelVertexBufferBase);
-		if (pixelDataSize > 0)
-		{
-			s_Data.Stats.DataSize += pixelDataSize;
-			s_Data.PixelVertexBuffer->SetData(s_Data.PixelVertexBufferBase, pixelDataSize);
-			issueDraw = true;
-		}
-
-		uint32_t triangleDataSize = CalculateBufferSize(s_Data.TriangleVertexBufferPtr, s_Data.TriangleVertexBufferBase);
-		if (triangleDataSize > 0)
-		{
-			s_Data.Stats.DataSize += triangleDataSize;
-			s_Data.TriangleVertexBuffer->SetData(s_Data.TriangleVertexBufferBase, triangleDataSize);
-			issueDraw = true;
-		}
-
-		uint32_t gridDataSize = CalculateBufferSize(s_Data.GridVertexBufferPtr, s_Data.GridVertexBufferBase);
-		if (gridDataSize > 0)
-		{
-			s_Data.Stats.DataSize += gridDataSize;
-			s_Data.GridVertexBuffer->SetData(s_Data.GridVertexBufferBase, gridDataSize);
-			issueDraw = true;
-		}
-
-		if (s_Data.PointLightCount > 0)
-		{
-			uint32_t lightDataSize = s_Data.PointLightCount * sizeof(PointLight);
-			s_Data.PointLightUniformBuffer->SetData(s_Data.PointLightUniformBufferBase, lightDataSize);
-		}
+		s_State->PointLights.Upload(*s_State);
 
 		if (issueDraw)
-		{
 			Flush();
-		}
-	}
-
-	// Applies the view-projection, wireframe, and lighting uniforms shared by the
-	// quad, circle, line, text, and triangle shaders. Pixel and grid use reduced
-	// uniform sets and set theirs inline.
-	static void SetSharedUniforms(const std::shared_ptr<ShaderProgram>& shader)
-	{
-		shader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-		shader->SetUniformInt("u_WireframeMode", (int)s_Data.PolygonMode);
-		shader->SetUniformVec3("u_WireframeColor", s_Data.WireFrameColor);
-		shader->SetUniformInt("u_EnableLighting", (int)s_Data.UseLighting);
-		shader->SetUniformVec3("u_AmbientColor", s_Data.AmbientColor);
-		shader->SetUniformFloat("u_AmbientIntensity", s_Data.AmbientIntensity);
-		shader->SetUniformInt("u_PointLightCount", (int)s_Data.PointLightCount);
 	}
 
 	// Binds textures/lights once, then draws each non-empty primitive batch with
 	// its shader and shared uniforms, and resets the per-batch counters.
 	void Renderer2D::Flush()
 	{
-		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-			s_Data.TextureSlots[i]->Bind(i);
+		s_State->Textures.Bind();
 
-		if (s_Data.PointLightCount > 0 && s_Data.UseLighting)
-			s_Data.PointLightUniformBuffer->Bind(BindingLocationPointLight);
+		if (s_State->PointLights.Count > 0 && s_State->UseLighting)
+			s_State->PointLights.Bind();
 
-		if (s_Data.QuadIndexCount > 0)
-		{
-			s_Data.QuadShader->Bind();
-			SetSharedUniforms(s_Data.QuadShader);
+		s_State->Quad.Flush(*s_State);
+		s_State->Circle.Flush(*s_State);
+		s_State->Line.Flush(*s_State);
+		s_State->Text.Flush(*s_State);
+		s_State->Pixel.Flush(*s_State);
+		s_State->Triangle.Flush(*s_State);
+		s_State->Grid.Flush(*s_State);
 
-			s_Data.QuadVertexArray->Bind();
-			RenderCommands::DrawElementsWithCount(s_Data.QuadVertexArray, PrimitiveType::Triangles, s_Data.QuadIndexCount);
-			s_Data.QuadVertexArray->Unbind();
-			s_Data.QuadShader->Unbind();
-			s_Data.Stats.DrawCalls++;
-		}
+		s_State->Textures.Unbind();
 
-		if (s_Data.CircleIndexCount > 0)
-		{
-			s_Data.CircleShader->Bind();
-			SetSharedUniforms(s_Data.CircleShader);
+		if (s_State->PointLights.Count > 0 && s_State->UseLighting)
+			s_State->PointLights.Unbind();
 
-			s_Data.CircleVertexArray->Bind();
-			RenderCommands::DrawElementsWithCount(s_Data.CircleVertexArray, PrimitiveType::Triangles, s_Data.CircleIndexCount);
-			s_Data.CircleVertexArray->Unbind();
-			s_Data.CircleShader->Unbind();
-			s_Data.Stats.DrawCalls++;
-		}
-
-		if (s_Data.LineVertexCount > 0)
-		{
-			s_Data.LineShader->Bind();
-			SetSharedUniforms(s_Data.LineShader);
-
-			s_Data.LineVertexArray->Bind();
-			RenderCommands::SetLineWidth(s_Data.LineWidth);
-			RenderCommands::DrawLines(s_Data.LineVertexArray, s_Data.LineVertexCount);
-			s_Data.LineVertexArray->Unbind();
-			s_Data.LineShader->Unbind();
-			s_Data.Stats.DrawCalls++;
-		}
-
-		if (s_Data.TextIndexCount > 0)
-		{
-			s_Data.TextShader->Bind();
-			SetSharedUniforms(s_Data.TextShader);
-
-			s_Data.TextVertexArray->Bind();
-			RenderCommands::DrawElementsWithCount(s_Data.TextVertexArray, PrimitiveType::Triangles, s_Data.TextIndexCount);
-			s_Data.TextVertexArray->Unbind();
-			s_Data.TextShader->Unbind();
-			s_Data.Stats.DrawCalls++;
-		}
-
-		if (s_Data.PixelVertexCount > 0)
-		{
-			s_Data.PixelShader->Bind();
-			s_Data.PixelShader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-			s_Data.PixelShader->SetUniformInt("u_EnableLighting", (int)s_Data.UseLighting);
-			s_Data.PixelShader->SetUniformVec3("u_AmbientColor", s_Data.AmbientColor);
-			s_Data.PixelShader->SetUniformFloat("u_AmbientIntensity", s_Data.AmbientIntensity);
-			s_Data.PixelShader->SetUniformInt("u_PointLightCount", (int)s_Data.PointLightCount);
-
-			s_Data.PixelVertexArray->Bind();
-			RenderCommands::SetPointSize(s_Data.PixelSize);
-			RenderCommands::DrawPoints(s_Data.PixelVertexArray, s_Data.PixelVertexCount);
-			RenderCommands::SetPointSize(1.0f);
-			s_Data.PixelVertexArray->Unbind();
-			s_Data.PixelShader->Unbind();
-			s_Data.Stats.DrawCalls++;
-		}
-
-		if (s_Data.TriangleVertexCount > 0)
-		{
-			s_Data.TriangleShader->Bind();
-			SetSharedUniforms(s_Data.TriangleShader);
-
-			s_Data.TriangleVertexArray->Bind();
-			RenderCommands::DrawArrays(s_Data.TriangleVertexArray, PrimitiveType::Triangles, s_Data.TriangleVertexCount);
-			s_Data.TriangleVertexArray->Unbind();
-			s_Data.TriangleShader->Unbind();
-			s_Data.Stats.DrawCalls++;
-		}
-
-		if (s_Data.GridIndexCount > 0)
-		{
-			s_Data.GridShader->Bind();
-			s_Data.GridShader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-
-			s_Data.GridVertexArray->Bind();
-			RenderCommands::DrawElementsWithCount(s_Data.GridVertexArray, PrimitiveType::Triangles, s_Data.GridIndexCount);
-			s_Data.GridVertexArray->Unbind();
-			s_Data.GridShader->Unbind();
-			s_Data.Stats.DrawCalls++;
-		}
-
-		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-			s_Data.TextureSlots[i]->Unbind();
-
-		if (s_Data.PointLightCount > 0 && s_Data.UseLighting)
-			s_Data.PointLightUniformBuffer->Unbind();
-
-		s_Data.Stats.TexturesUsed = s_Data.TextureSlotIndex - 1;
-
-		s_Data.QuadIndexCount = 0;
-		s_Data.CircleIndexCount = 0;
-		s_Data.LineVertexCount = 0;
-		s_Data.TextIndexCount = 0;
-		s_Data.PixelVertexCount = 0;
-		s_Data.TriangleVertexCount = 0;
-		s_Data.GridIndexCount = 0;
+		s_State->Stats.TexturesUsed = s_State->Textures.Index - 1;
 	}
 
 	void Renderer2D::SetResolution(uint32_t width, uint32_t height)
 	{
-		s_Data.Width = width;
-		s_Data.Height = height;
+		s_State->Width = width;
+		s_State->Height = height;
 	}
 
 	void Renderer2D::SetResolution(float width, float height)
@@ -802,734 +197,491 @@ namespace Tiles
 
 	glm::vec2 Renderer2D::GetResolution()
 	{
-		return { s_Data.Width, s_Data.Height };
+		return { s_State->Width, s_State->Height };
 	}
 
 	void Renderer2D::SetRenderMode(PolygonMode mode)
 	{
-		s_Data.PolygonMode = mode;
+		s_State->PolygonMode = mode;
 	}
 
 	void* Renderer2D::GetImage()
 	{
-		return reinterpret_cast<void*>(static_cast<uintptr_t>(s_Data.CurrentRenderTarget->GetTexture()));
+		return reinterpret_cast<void*>(static_cast<uintptr_t>(s_State->CurrentRenderTarget->GetTexture()));
 	}
 
-	// Returns the sampler slot a texture maps to for this batch, reusing an
-	// existing slot or assigning the next free one. Slot 0 is the default white
-	// texture (and the result for a null texture). When all slots are taken the
-	// batch is flushed first so the new texture starts a fresh set of slots.
 	float Renderer2D::ComputeTextureIndex(const std::shared_ptr<Texture>& texture)
 	{
-		if (texture == nullptr)
-			return 0.0f;
-
-		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-		{
-			if (s_Data.TextureSlots[i] == texture)
-				return static_cast<float>(i);
-		}
-
-		if (s_Data.TextureSlotIndex >= MaxTextureSlots)
-		{
-			EndBatch();
-			StartBatch();
-		}
-
-		TILES_ASSERT(s_Data.TextureSlotIndex < MaxTextureSlots, "Texture slot index overflow!");
-
-		float texIndex = static_cast<float>(s_Data.TextureSlotIndex);
-		s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-		s_Data.TextureSlotIndex++;
-
-		return texIndex;
+		return s_State->Textures.ComputeTextureIndex(texture);
 	}
 
 	void Renderer2D::UseLighting(bool enabled)
 	{
-		s_Data.UseLighting = enabled;
-		s_Data.Stats.LightingUsed = enabled;
+		s_State->UseLighting = enabled;
+		s_State->Stats.LightingUsed = enabled;
 	}
 
 	bool Renderer2D::IsLightingUsed()
 	{
-		return s_Data.UseLighting;
+		return s_State->UseLighting;
 	}
 
 	void Renderer2D::SetAmbientLightColor(const glm::vec3& color)
 	{
-		s_Data.AmbientColor = color;
+		s_State->AmbientColor = color;
 	}
 
 	void Renderer2D::SetAmbientLightIntensity(float intensity)
 	{
-		s_Data.AmbientIntensity = intensity;
+		s_State->AmbientIntensity = intensity;
 	}
 
 	void Renderer2D::SetQuadPosition(const glm::vec3& position)
 	{
-		s_Data.QuadPosition = position;
+		s_State->Quad.Position = position;
 	}
 
 	void Renderer2D::SetQuadRotation(const glm::vec3& rotation)
 	{
-		s_Data.QuadRotation = rotation;
+		s_State->Quad.Rotation = rotation;
 	}
 
 	void Renderer2D::SetQuadSize(const glm::vec2& size)
 	{
-		s_Data.QuadSize = size;
+		s_State->Quad.Size = size;
 	}
 
 	void Renderer2D::SetQuadTexture(const std::shared_ptr<Texture>& texture)
 	{
-		s_Data.QuadTexture = texture;
+		s_State->Quad.Texture = texture;
 	}
 
 	void Renderer2D::SetQuadTextureCoords(const glm::vec4& textureCoords)
 	{
-		s_Data.QuadTextureCoords = textureCoords;
+		s_State->Quad.TextureCoords = textureCoords;
 	}
 
 	void Renderer2D::SetQuadTintColor(const glm::vec4& tintColor)
 	{
-		s_Data.QuadTintColor = tintColor;
+		s_State->Quad.TintColor = tintColor;
 	}
 
 	void Renderer2D::ResetQuadState()
 	{
-		s_Data.QuadPosition = { 0.0f, 0.0f, 0.0f };
-		s_Data.QuadRotation = { 0.0f, 0.0f, 0.0f };
-		s_Data.QuadSize = { 1.0f, 1.0f };
-		s_Data.QuadTexture = nullptr;
-		s_Data.QuadTextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
-		s_Data.QuadTintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		s_State->Quad.Position = { 0.0f, 0.0f, 0.0f };
+		s_State->Quad.Rotation = { 0.0f, 0.0f, 0.0f };
+		s_State->Quad.Size = { 1.0f, 1.0f };
+		s_State->Quad.Texture = nullptr;
+		s_State->Quad.TextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
+		s_State->Quad.TintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
 	void Renderer2D::SetCirclePosition(const glm::vec3& position)
 	{
-		s_Data.CirclePosition = position;
+		s_State->Circle.Position = position;
 	}
 
 	void Renderer2D::SetCircleRotation(const glm::vec3& rotation)
 	{
-		s_Data.CircleRotation = rotation;
+		s_State->Circle.Rotation = rotation;
 	}
 
 	void Renderer2D::SetCircleRadius(const glm::vec2& radius)
 	{
-		s_Data.CircleRadius = radius;
+		s_State->Circle.Radius = radius;
 	}
 
 	void Renderer2D::SetCircleTexture(const std::shared_ptr<Texture>& texture)
 	{
-		s_Data.CircleTexture = texture;
+		s_State->Circle.Texture = texture;
 	}
 
 	void Renderer2D::SetCircleTextureCoords(const glm::vec4& textureCoords)
 	{
-		s_Data.CircleTextureCoords = textureCoords;
+		s_State->Circle.TextureCoords = textureCoords;
 	}
 
 	void Renderer2D::SetCircleColor(const glm::vec4& color)
 	{
-		s_Data.CircleColor = color;
+		s_State->Circle.Color = color;
 	}
 
 	void Renderer2D::SetCircleThickness(float thickness)
 	{
-		s_Data.CircleThickness = thickness;
+		s_State->Circle.Thickness = thickness;
 	}
 
 	void Renderer2D::SetCircleFade(float fade)
 	{
-		s_Data.CircleFade = fade;
+		s_State->Circle.Fade = fade;
 	}
 
 	void Renderer2D::ResetCircleState()
 	{
-		s_Data.CirclePosition = { 0.0f, 0.0f, 0.0f };
-		s_Data.CircleRotation = { 0.0f, 0.0f, 0.0f };
-		s_Data.CircleRadius = { 1.0f, 1.0f };
-		s_Data.CircleTexture = nullptr;
-		s_Data.CircleTextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
-		s_Data.CircleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		s_Data.CircleThickness = 1.0f;
-		s_Data.CircleFade = 0.0f;
+		s_State->Circle.Position = { 0.0f, 0.0f, 0.0f };
+		s_State->Circle.Rotation = { 0.0f, 0.0f, 0.0f };
+		s_State->Circle.Radius = { 1.0f, 1.0f };
+		s_State->Circle.Texture = nullptr;
+		s_State->Circle.TextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
+		s_State->Circle.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		s_State->Circle.Thickness = 1.0f;
+		s_State->Circle.Fade = 0.0f;
 	}
 
 	void Renderer2D::SetLineStart(const glm::vec3& start)
 	{
-		s_Data.LineStart = start;
+		s_State->Line.Start = start;
 	}
 
 	void Renderer2D::SetLineEnd(const glm::vec3& end)
 	{
-		s_Data.LineEnd = end;
+		s_State->Line.End = end;
 	}
 
 	void Renderer2D::SetLineThickness(float thickness)
 	{
-		s_Data.LineThickness = thickness;
+		s_State->Line.Thickness = thickness;
 	}
 
 	void Renderer2D::SetLineColor(const glm::vec4& color)
 	{
-		s_Data.LineColor = color;
+		s_State->Line.Color = color;
 	}
 
 	void Renderer2D::ResetLineState()
 	{
-		s_Data.LineStart = { 0.0f, 0.0f, 0.0f };
-		s_Data.LineEnd = { 1.0f, 1.0f, 0.0f };
-		s_Data.LineThickness = 2.0f;
-		s_Data.LineColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		s_State->Line.Start = { 0.0f, 0.0f, 0.0f };
+		s_State->Line.End = { 1.0f, 1.0f, 0.0f };
+		s_State->Line.Thickness = 2.0f;
+		s_State->Line.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
 	void Renderer2D::SetStringContent(const std::string& text)
 	{
-		s_Data.StringContent = text;
+		s_State->Text.Content = text;
 	}
 
 	void Renderer2D::SetStringPosition(const glm::vec3& position)
 	{
-		s_Data.StringPosition = position;
+		s_State->Text.Position = position;
 	}
 
 	void Renderer2D::SetStringColor(const glm::vec4& color)
 	{
-		s_Data.StringColor = color;
+		s_State->Text.Color = color;
 	}
 
 	void Renderer2D::SetStringSize(float size)
 	{
-		s_Data.StringSize = size;
+		s_State->Text.Size = size;
 	}
 
 	void Renderer2D::SetStringFont(const std::shared_ptr<Texture>& fontTexture)
 	{
-		s_Data.StringFont = fontTexture;
+		s_State->Text.Font = fontTexture;
 	}
 
 	void Renderer2D::SetStringAlignment(StringAlignment alignment)
 	{
-		s_Data.StringAlignment = alignment;
+		s_State->Text.Alignment = alignment;
 	}
 
 	void Renderer2D::ResetStringState()
 	{
-		s_Data.StringContent = "";
-		s_Data.StringPosition = { 0.0f, 0.0f, 0.0f };
-		s_Data.StringColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-		s_Data.StringSize = 1.0f;
-		s_Data.StringFont = nullptr;
-		s_Data.StringAlignment = StringAlignment::Left;
+		s_State->Text.Content = "";
+		s_State->Text.Position = { 0.0f, 0.0f, 0.0f };
+		s_State->Text.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+		s_State->Text.Size = 1.0f;
+		s_State->Text.Font = nullptr;
+		s_State->Text.Alignment = StringAlignment::Left;
 	}
 
 	void Renderer2D::SetPixelPosition(const glm::vec3& position)
 	{
-		s_Data.PixelPosition = position;
+		s_State->Pixel.Position = position;
 	}
 
 	void Renderer2D::SetPixelColor(const glm::vec4& color)
 	{
-		s_Data.PixelColor = color;
+		s_State->Pixel.Color = color;
 	}
 
 	void Renderer2D::SetPixelSize(float size)
 	{
-		if (s_Data.PixelSize != size)
+		if (s_State->Pixel.Size != size)
 		{
-			if (s_Data.PixelVertexCount > 0)
+			if (s_State->Pixel.VertexCount > 0)
 			{
 				EndBatch();
 				StartBatch();
 			}
 
-			s_Data.PixelSize = size;
+			s_State->Pixel.Size = size;
 		}
 	}
 
 	void Renderer2D::ResetPixelState()
 	{
-		s_Data.PixelPosition = { 0.0f, 0.0f, 0.0f };
-		s_Data.PixelColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		s_State->Pixel.Position = { 0.0f, 0.0f, 0.0f };
+		s_State->Pixel.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
 	void Renderer2D::SetTrianglePoint1(const glm::vec3& point1)
 	{
-		s_Data.TrianglePoint1 = point1;
+		s_State->Triangle.Point1 = point1;
 	}
 
 	void Renderer2D::SetTrianglePoint2(const glm::vec3& point2)
 	{
-		s_Data.TrianglePoint2 = point2;
+		s_State->Triangle.Point2 = point2;
 	}
 
 	void Renderer2D::SetTrianglePoint3(const glm::vec3& point3)
 	{
-		s_Data.TrianglePoint3 = point3;
+		s_State->Triangle.Point3 = point3;
 	}
 
 	void Renderer2D::SetTriangleTexture(const std::shared_ptr<Texture>& texture)
 	{
-		s_Data.TriangleTexture = texture;
+		s_State->Triangle.Texture = texture;
 	}
 
 	void Renderer2D::SetTriangleColor(const glm::vec4& color)
 	{
-		s_Data.TriangleColor = color;
+		s_State->Triangle.Color = color;
 	}
 
 	void Renderer2D::ResetTriangleState()
 	{
-		s_Data.TrianglePoint1 = { 0.0f, 0.0f, 0.0f };
-		s_Data.TrianglePoint2 = { 1.0f, 0.0f, 0.0f };
-		s_Data.TrianglePoint3 = { 0.5f, 1.0f, 0.0f };
-		s_Data.TriangleTexture = nullptr;
-		s_Data.TriangleColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		s_State->Triangle.Point1 = { 0.0f, 0.0f, 0.0f };
+		s_State->Triangle.Point2 = { 1.0f, 0.0f, 0.0f };
+		s_State->Triangle.Point3 = { 0.5f, 1.0f, 0.0f };
+		s_State->Triangle.Texture = nullptr;
+		s_State->Triangle.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
 	void Renderer2D::SetGridPosition(const glm::vec3& position)
 	{
-		s_Data.GridPosition = position;
+		s_State->Grid.Position = position;
 	}
 
 	void Renderer2D::SetGridRotation(const glm::vec3& rotation)
 	{
-		s_Data.GridRotation = rotation;
+		s_State->Grid.Rotation = rotation;
 	}
 
 	void Renderer2D::SetGridSize(const glm::vec2& size)
 	{
-		s_Data.GridSize = size;
+		s_State->Grid.Size = size;
 	}
 
 	void Renderer2D::SetGridCellSize(float gridSize)
 	{
-		s_Data.GridCellSize = gridSize;
+		s_State->Grid.CellSize = gridSize;
 	}
 
 	void Renderer2D::SetGridColor(const glm::vec4& color)
 	{
-		s_Data.GridColor = color;
+		s_State->Grid.Color = color;
 	}
 
 	void Renderer2D::SetGridLineWidth(float lineWidth)
 	{
-		s_Data.GridLineWidth = lineWidth;
+		s_State->Grid.LineWidth = lineWidth;
 	}
 
 	void Renderer2D::SetGridShowCheckerboard(bool showCheckerboard)
 	{
-		s_Data.GridShowCheckerboard = showCheckerboard;
+		s_State->Grid.ShowCheckerboard = showCheckerboard;
 	}
 
 	void Renderer2D::SetGridCheckerColor1(const glm::vec4& checkerColor1)
 	{
-		s_Data.GridCheckerColor1 = checkerColor1;
+		s_State->Grid.CheckerColor1 = checkerColor1;
 	}
 
 	void Renderer2D::SetGridCheckerColor2(const glm::vec4& checkerColor2)
 	{
-		s_Data.GridCheckerColor2 = checkerColor2;
+		s_State->Grid.CheckerColor2 = checkerColor2;
 	}
 
 	void Renderer2D::ResetGridState()
 	{
-		s_Data.GridPosition = { 0.0f, 0.0f, 0.0f };
-		s_Data.GridRotation = { 0.0f, 0.0f, 0.0f };
-		s_Data.GridSize = { 1000.0f, 1000.0f };
-		s_Data.GridCellSize = 1.0f;
-		s_Data.GridColor = { 0.3f, 0.3f, 0.3f, 0.8f };
-		s_Data.GridLineWidth = 1.0f;
-		s_Data.GridShowCheckerboard = true;
-		s_Data.GridCheckerColor1 = { 0.9f, 0.9f, 0.9f, 0.2f };
-		s_Data.GridCheckerColor2 = { 0.8f, 0.8f, 0.8f, 0.2f };
+		s_State->Grid.Position = { 0.0f, 0.0f, 0.0f };
+		s_State->Grid.Rotation = { 0.0f, 0.0f, 0.0f };
+		s_State->Grid.Size = { 1000.0f, 1000.0f };
+		s_State->Grid.CellSize = 1.0f;
+		s_State->Grid.Color = { 0.3f, 0.3f, 0.3f, 0.8f };
+		s_State->Grid.LineWidth = 1.0f;
+		s_State->Grid.ShowCheckerboard = true;
+		s_State->Grid.CheckerColor1 = { 0.9f, 0.9f, 0.9f, 0.2f };
+		s_State->Grid.CheckerColor2 = { 0.8f, 0.8f, 0.8f, 0.2f };
 	}
 
 	void Renderer2D::SetPointLightPosition(const glm::vec3& position)
 	{
-		s_Data.PointLightPosition = position;
+		s_State->PointLights.Position = position;
 	}
 
 	void Renderer2D::SetPointLightIntensity(float intensity)
 	{
-		s_Data.PointLightIntensity = intensity;
+		s_State->PointLights.Intensity = intensity;
 	}
 
 	void Renderer2D::SetPointLightColor(const glm::vec4& color)
 	{
-		s_Data.PointLightColor = glm::vec3(color.r, color.g, color.b);
+		s_State->PointLights.Color = glm::vec3(color.r, color.g, color.b);
 	}
 
 	void Renderer2D::SetPointLightRadius(float radius)
 	{
-		s_Data.PointLightRadius = radius;
+		s_State->PointLights.Radius = radius;
 	}
 
 	void Renderer2D::SetPointLightBlendMode(BlendMode blendMode)
 	{
-		s_Data.PointLightBlendMode = blendMode;
+		s_State->PointLights.Blend = blendMode;
 	}
 
 	void Renderer2D::SetPointLightBlendAlpha(float alpha)
 	{
-		s_Data.PointLightBlendAlpha = alpha;
+		s_State->PointLights.BlendAlpha = alpha;
 	}
 
 	void Renderer2D::SetPointLightFalloffType(AttenuationModel falloffType)
 	{
-		s_Data.PointLightFalloffType = falloffType;
+		s_State->PointLights.FalloffType = falloffType;
 	}
 
 	void Renderer2D::SetPointLightFalloff(float falloff)
 	{
-		s_Data.PointLightFalloff = falloff;
+		s_State->PointLights.Falloff = falloff;
 	}
 
 	void Renderer2D::ResetPointLightState()
 	{
-		s_Data.PointLightPosition = { 0.0f, 0.0f, 0.0f };
-		s_Data.PointLightIntensity = 1.0f;
-		s_Data.PointLightColor = { 1.0f, 1.0f, 1.0f };
-		s_Data.PointLightRadius = 5.0f;
-		s_Data.PointLightBlendMode = BlendMode::Additive;
-		s_Data.PointLightBlendAlpha = 1.0f;
-		s_Data.PointLightFalloffType = AttenuationModel::Linear;
-		s_Data.PointLightFalloff = 1.0f;
+		s_State->PointLights.Position = { 0.0f, 0.0f, 0.0f };
+		s_State->PointLights.Intensity = 1.0f;
+		s_State->PointLights.Color = { 1.0f, 1.0f, 1.0f };
+		s_State->PointLights.Radius = 5.0f;
+		s_State->PointLights.Blend = BlendMode::Additive;
+		s_State->PointLights.BlendAlpha = 1.0f;
+		s_State->PointLights.FalloffType = AttenuationModel::Linear;
+		s_State->PointLights.Falloff = 1.0f;
 	}
 
 	void Renderer2D::DrawQuad()
 	{
-		TILES_ASSERT(s_Data.QuadVertexBufferPtr >= s_Data.QuadVertexBufferBase, "Vertex buffer pointer underflow");
-
-		if (s_Data.QuadIndexCount >= MaxIndices)
+		if (s_State->Quad.IndexCount >= MaxIndices)
 		{
 			EndBatch();
 			StartBatch();
 		}
 
-		glm::mat4 translation = glm::translate(glm::mat4(1.0f), s_Data.QuadPosition);
-		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), glm::radians(s_Data.QuadRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), glm::radians(s_Data.QuadRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), glm::radians(s_Data.QuadRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 rotation = rotationZ * rotationY * rotationX;
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(s_Data.QuadSize, 1.0f));
-		glm::mat4 transform = translation * rotation * scale;
-
-		float texIndex = ComputeTextureIndex(s_Data.QuadTexture);
-
-		glm::vec2 uvMin = { s_Data.QuadTextureCoords.x, s_Data.QuadTextureCoords.y };
-		glm::vec2 uvMax = { s_Data.QuadTextureCoords.z, s_Data.QuadTextureCoords.w };
-
-		glm::vec2 uvs[4] =
-		{
-			{ uvMin.x, uvMax.y },  // Top-left
-			{ uvMax.x, uvMax.y },  // Top-right
-			{ uvMax.x, uvMin.y },  // Bottom-right
-			{ uvMin.x, uvMin.y }   // Bottom-left
-		};
-
-		for (size_t i = 0; i < 4; i++)
-		{
-			s_Data.QuadVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
-			s_Data.QuadVertexBufferPtr->Color = s_Data.QuadTintColor;
-			s_Data.QuadVertexBufferPtr->TexCoord = uvs[i];
-			s_Data.QuadVertexBufferPtr->TexIndex = texIndex;
-			s_Data.QuadVertexBufferPtr++;
-		}
-
-		s_Data.QuadIndexCount += 6;
-		s_Data.Stats.QuadCount++;
+		s_State->Quad.Append(*s_State);
 	}
 
 	void Renderer2D::DrawCircle()
 	{
-		TILES_ASSERT(s_Data.CircleVertexBufferPtr >= s_Data.CircleVertexBufferBase, "Vertex buffer pointer underflow");
-
-		if (s_Data.CircleIndexCount >= MaxIndices)
+		if (s_State->Circle.IndexCount >= MaxIndices)
 		{
 			EndBatch();
 			StartBatch();
 		}
 
-		glm::mat4 translation = glm::translate(glm::mat4(1.0f), s_Data.CirclePosition);
-		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), s_Data.CircleRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), s_Data.CircleRotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), s_Data.CircleRotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 rotation = rotationZ * rotationY * rotationX;
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(s_Data.CircleRadius.x, s_Data.CircleRadius.y, 1.0f));
-		glm::mat4 transform = translation * rotation * scale;
-
-		float texIndex = ComputeTextureIndex(s_Data.CircleTexture);
-
-		glm::vec2 uvMin = { s_Data.CircleTextureCoords.x, s_Data.CircleTextureCoords.y };
-		glm::vec2 uvMax = { s_Data.CircleTextureCoords.z, s_Data.CircleTextureCoords.w };
-
-		glm::vec2 uvs[4] =
-		{
-			{ uvMin.x, uvMax.y },  // Top-left
-			{ uvMax.x, uvMax.y },  // Top-right
-			{ uvMax.x, uvMin.y },  // Bottom-right
-			{ uvMin.x, uvMin.y }   // Bottom-left
-		};
-
-		for (size_t i = 0; i < 4; i++)
-		{
-			s_Data.CircleVertexBufferPtr->WorldPosition = transform * s_Data.QuadVertexPositions[i];
-			s_Data.CircleVertexBufferPtr->LocalPosition = s_Data.CircleVertexPositions[i];
-			s_Data.CircleVertexBufferPtr->Color = s_Data.CircleColor;
-			s_Data.CircleVertexBufferPtr->TexCoord = uvs[i];
-			s_Data.CircleVertexBufferPtr->TexIndex = texIndex;
-			s_Data.CircleVertexBufferPtr->Thickness = s_Data.CircleThickness;
-			s_Data.CircleVertexBufferPtr->Fade = s_Data.CircleFade;
-			s_Data.CircleVertexBufferPtr++;
-		}
-
-		s_Data.CircleIndexCount += 6;
-		s_Data.Stats.CircleCount++;
+		s_State->Circle.Append(*s_State);
 	}
 
 	void Renderer2D::DrawLine()
 	{
-		if (s_Data.LineVertexCount >= MaxVertices)
+		if (s_State->Line.VertexCount >= MaxVertices)
 		{
 			EndBatch();
 			StartBatch();
 		}
 
-		if (s_Data.LineWidth != s_Data.LineThickness)
+		if (s_State->Line.Width != s_State->Line.Thickness)
 		{
 			EndBatch();
 			StartBatch();
-			s_Data.LineWidth = s_Data.LineThickness;
+			s_State->Line.Width = s_State->Line.Thickness;
 		}
 
-		s_Data.LineVertexBufferPtr->Position = s_Data.LineStart;
-		s_Data.LineVertexBufferPtr->Color = s_Data.LineColor;
-		s_Data.LineVertexBufferPtr++;
-		s_Data.LineVertexCount++;
-
-		s_Data.LineVertexBufferPtr->Position = s_Data.LineEnd;
-		s_Data.LineVertexBufferPtr->Color = s_Data.LineColor;
-		s_Data.LineVertexBufferPtr++;
-		s_Data.LineVertexCount++;
-
-		s_Data.Stats.LineCount++;
+		s_State->Line.Append(*s_State);
 	}
 
 	void Renderer2D::DrawString()
 	{
-		if (s_Data.StringContent.empty())
+		if (s_State->Text.Content.empty())
 			return;
 
-		if (s_Data.TextIndexCount >= MaxIndices)
+		if (s_State->Text.IndexCount >= MaxIndices)
 		{
 			EndBatch();
 			StartBatch();
 		}
 
-		std::shared_ptr<Texture> fontToUse = s_Data.StringFont ? s_Data.StringFont : s_Data.DefaultFont;
-		float texIndex = ComputeTextureIndex(fontToUse);
-
-		float charWidth = s_Data.StringSize;
-		float charHeight = s_Data.StringSize;
-
-		// Calculate total text width for alignment
-		float totalWidth = s_Data.StringContent.length() * charWidth;
-
-		// Calculate starting X offset based on alignment
-		float startXOffset = 0.0f;
-		switch (s_Data.StringAlignment)
-		{
-		case StringAlignment::Left:
-			startXOffset = 0.0f;
-			break;
-		case StringAlignment::Right:
-			startXOffset = -totalWidth;
-			break;
-		case StringAlignment::Center:
-			startXOffset = -totalWidth * 0.5f;
-			break;
-		}
-
-		float xOffset = startXOffset;
-
-		for (char c : s_Data.StringContent)
-		{
-			glm::vec3 charPos = s_Data.StringPosition + glm::vec3(xOffset, 0.0f, 0.0f);
-
-			glm::mat4 translation = glm::translate(glm::mat4(1.0f), charPos);
-			glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(charWidth, charHeight, 1.0f));
-			glm::mat4 transform = translation * scale;
-
-			float uvX = (c % 16) / 16.0f;
-			float uvY = (c / 16) / 16.0f;
-			float uvWidth = 1.0f / 16.0f;
-			float uvHeight = 1.0f / 16.0f;
-
-			glm::vec2 uvs[4] =
-			{
-				{ uvX, uvY + uvHeight },           // Top-left
-				{ uvX + uvWidth, uvY + uvHeight }, // Top-right
-				{ uvX + uvWidth, uvY },            // Bottom-right
-				{ uvX, uvY }                       // Bottom-left
-			};
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				s_Data.TextVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
-				s_Data.TextVertexBufferPtr->Color = s_Data.StringColor;
-				s_Data.TextVertexBufferPtr->TexCoord = uvs[i];
-				s_Data.TextVertexBufferPtr->TexIndex = texIndex;
-				s_Data.TextVertexBufferPtr++;
-			}
-
-			s_Data.TextIndexCount += 6;
-			xOffset += charWidth;
-		}
-
-		s_Data.Stats.TextCount++;
+		s_State->Text.Append(*s_State);
 	}
 
 	void Renderer2D::DrawPixel()
 	{
-		if (s_Data.PixelVertexCount >= MaxPixels)
+		if (s_State->Pixel.VertexCount >= MaxPixels)
 		{
 			EndBatch();
 			StartBatch();
 		}
 
-		s_Data.PixelVertexBufferPtr->Position = s_Data.PixelPosition;
-		s_Data.PixelVertexBufferPtr->Color = s_Data.PixelColor;
-		s_Data.PixelVertexBufferPtr++;
-		s_Data.PixelVertexCount++;
-
-		s_Data.Stats.PixelCount++;
+		s_State->Pixel.Append(*s_State);
 	}
 
 	void Renderer2D::DrawTriangle()
 	{
-		if (s_Data.TriangleVertexCount >= MaxTriangles * 3)
+		if (s_State->Triangle.VertexCount >= MaxTriangles * 3)
 		{
 			EndBatch();
 			StartBatch();
 		}
 
-		float texIndex = ComputeTextureIndex(s_Data.TriangleTexture);
-
-		s_Data.TriangleVertexBufferPtr->Position = s_Data.TrianglePoint1;
-		s_Data.TriangleVertexBufferPtr->Color = s_Data.TriangleColor;
-		s_Data.TriangleVertexBufferPtr->TexCoord = { 0.0f, 1.0f };
-		s_Data.TriangleVertexBufferPtr->TexIndex = texIndex;
-		s_Data.TriangleVertexBufferPtr++;
-
-		s_Data.TriangleVertexBufferPtr->Position = s_Data.TrianglePoint2;
-		s_Data.TriangleVertexBufferPtr->Color = s_Data.TriangleColor;
-		s_Data.TriangleVertexBufferPtr->TexCoord = { 1.0f, 1.0f };
-		s_Data.TriangleVertexBufferPtr->TexIndex = texIndex;
-		s_Data.TriangleVertexBufferPtr++;
-
-		s_Data.TriangleVertexBufferPtr->Position = s_Data.TrianglePoint3;
-		s_Data.TriangleVertexBufferPtr->Color = s_Data.TriangleColor;
-		s_Data.TriangleVertexBufferPtr->TexCoord = { 0.5f, 0.0f };
-		s_Data.TriangleVertexBufferPtr->TexIndex = texIndex;
-		s_Data.TriangleVertexBufferPtr++;
-
-		s_Data.TriangleVertexCount += 3;
-		s_Data.Stats.TriangleCount++;
+		s_State->Triangle.Append(*s_State);
 	}
 
 	void Renderer2D::DrawGrid()
 	{
-		if (s_Data.GridIndexCount >= MaxIndices)
+		if (s_State->Grid.IndexCount >= MaxIndices)
 		{
 			EndBatch();
 			StartBatch();
 		}
 
-		glm::mat4 translation = glm::translate(glm::mat4(1.0f), s_Data.GridPosition);
-		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), glm::radians(s_Data.GridRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), glm::radians(s_Data.GridRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), glm::radians(s_Data.GridRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 rotation = rotationZ * rotationY * rotationX;
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(s_Data.GridSize, 1.0f));
-		glm::mat4 transform = translation * rotation * scale;
-
-		glm::vec2 texCoords[4] =
-		{
-			{ 0.0f, 1.0f },
-			{ 1.0f, 1.0f },
-			{ 1.0f, 0.0f },
-			{ 0.0f, 0.0f }
-		};
-
-		for (size_t i = 0; i < 4; i++)
-		{
-			s_Data.GridVertexBufferPtr->Position = transform * s_Data.QuadVertexPositions[i];
-			s_Data.GridVertexBufferPtr->Color = s_Data.GridColor;
-			s_Data.GridVertexBufferPtr->TexCoord = texCoords[i];
-			s_Data.GridVertexBufferPtr->TexIndex = 0.0f;
-
-			s_Data.GridVertexBufferPtr->GridPosition = s_Data.GridPosition;
-			s_Data.GridVertexBufferPtr->GridSize = s_Data.GridSize;
-			s_Data.GridVertexBufferPtr->CellSize = s_Data.GridCellSize;
-			s_Data.GridVertexBufferPtr->GridColor = s_Data.GridColor;
-			s_Data.GridVertexBufferPtr->LineWidth = s_Data.GridLineWidth;
-			s_Data.GridVertexBufferPtr->ShowCheckerboard = s_Data.GridShowCheckerboard ? 1.0f : 0.0f;
-			s_Data.GridVertexBufferPtr->CheckerColor1 = s_Data.GridCheckerColor1;
-			s_Data.GridVertexBufferPtr->CheckerColor2 = s_Data.GridCheckerColor2;
-
-			s_Data.GridVertexBufferPtr++;
-		}
-
-		s_Data.GridIndexCount += 6;
-		s_Data.Stats.GridCount++;
+		s_State->Grid.Append(*s_State);
 	}
 
 	void Renderer2D::DrawPointLight()
 	{
-		if (s_Data.PointLightCount >= MaxPointLights)
-		{
-			TILES_LOG_WARN("Maximum number of point lights ({}) exceeded", MaxPointLights);
-			return;
-		}
-
-		s_Data.PointLightUniformBufferPtr->Position = s_Data.PointLightPosition;
-		s_Data.PointLightUniformBufferPtr->Intensity = s_Data.PointLightIntensity;
-		s_Data.PointLightUniformBufferPtr->Color = s_Data.PointLightColor;
-		s_Data.PointLightUniformBufferPtr->Radius = s_Data.PointLightRadius;
-		s_Data.PointLightUniformBufferPtr->BlendingMode = (float)s_Data.PointLightBlendMode;
-		s_Data.PointLightUniformBufferPtr->BlendingAlpha = s_Data.PointLightBlendAlpha;
-		s_Data.PointLightUniformBufferPtr->FalloffType = (float)s_Data.PointLightFalloffType;
-		s_Data.PointLightUniformBufferPtr->Falloff = s_Data.PointLightFalloff;
-		s_Data.PointLightUniformBufferPtr++;
-
-		s_Data.PointLightCount++;
-		s_Data.Stats.PointLightCount++;
+		s_State->PointLights.Append(*s_State);
 	}
 
 	void Renderer2D::SetRenderTarget(std::shared_ptr<RenderTarget> target)
 	{
 		if (target)
 		{
-			s_Data.CurrentRenderTarget = target;
+			s_State->CurrentRenderTarget = target;
 		}
 		else
 		{
-			s_Data.CurrentRenderTarget = s_Data.DefaultRenderTarget;
+			s_State->CurrentRenderTarget = s_State->DefaultRenderTarget;
 		}
 	}
 
 	void Renderer2D::SetRenderTarget(std::nullptr_t)
 	{
-		s_Data.CurrentRenderTarget = s_Data.DefaultRenderTarget;
+		s_State->CurrentRenderTarget = s_State->DefaultRenderTarget;
 	}
 
 	std::shared_ptr<RenderTarget> Renderer2D::GetCurrentRenderTarget()
 	{
-		return s_Data.CurrentRenderTarget;
+		return s_State->CurrentRenderTarget;
 	}
 
 	std::shared_ptr<RenderTarget> Renderer2D::CreateRenderTarget(uint32_t width, uint32_t height)
@@ -1539,11 +691,11 @@ namespace Tiles
 
 	Renderer2D::Statistics Renderer2D::GetStats()
 	{
-		return s_Data.Stats;
+		return s_State->Stats;
 	}
 
 	void Renderer2D::ResetStats()
 	{
-		memset(&s_Data.Stats, 0, sizeof(Statistics));
+		memset(&s_State->Stats, 0, sizeof(Statistics));
 	}
 }
