@@ -6,6 +6,7 @@
 #include "Project.h"
 #include "CommandHistory.h"
 #include "ProjectHistory.h"
+#include "ProjectSerializer.h"
 
 #include "Constants.h"
 
@@ -21,14 +22,6 @@ namespace Tiles
         Brush,
         Eraser,
         Fill
-    };
-
-    /// Outcome of a project file operation. Message carries a user-facing
-    /// reason when Success is false.
-    struct ProjectResult
-    {
-		bool Success = false;
-		std::string Message;
     };
 
     /// Owns the active project and editing state (working layer, brush,

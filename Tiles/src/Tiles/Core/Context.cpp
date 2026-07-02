@@ -6,8 +6,6 @@
 
 #include <algorithm>
 
-#include "json.hpp"
-
 namespace Tiles
 {
     std::shared_ptr<Context> Context::Create()
@@ -228,40 +226,18 @@ namespace Tiles
         if (m_Project->IsNew())
             return { false, "Project has no file path. Use 'Save As' to specify a location." };
 
-        auto path = m_Project->GetFilePath();
+        const auto path = m_Project->GetFilePath();
 
-        auto directory = path.parent_path();
-        if (!directory.empty() && !std::filesystem::exists(directory))
-        {
-            std::filesystem::create_directories(directory);
-        }
+        ProjectResult result = ProjectSerializer::Save(*m_Project, path);
+        if (!result.Success)
+            return result;
 
-        try
-        {
-            nlohmann::json projectJSON = m_Project->ToJSON();
+        m_Project->MarkAsSaved();
+        m_Project->UpdateLastAccessed();
+        m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
 
-            std::ofstream file(path);
-
-            if (!file.is_open())
-            {
-                return { false, "Failed to open file for writing." };
-            }
-
-            file << projectJSON.dump(4);
-            file.close();
-
-            m_Project->MarkAsSaved();
-            m_Project->UpdateLastAccessed();
-
-            m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
-
-            TILES_LOG_INFO("Context::SaveProject: Successfully saved project '{}'", m_Project->GetProjectName());
-            return { true, "Project saved successfully." };
-        }
-        catch (const std::exception& e)
-        {
-            return { false, std::string("Failed to save project: ") + e.what() };
-        }
+        TILES_LOG_INFO("Context::SaveProject: Successfully saved project '{}'", m_Project->GetProjectName());
+        return result;
     }
 
     ProjectResult Context::SaveProjectAs(const std::filesystem::path& path)
@@ -272,39 +248,17 @@ namespace Tiles
         if (path.empty())
             return { false, "Invalid file path." };
 
-        auto directory = path.parent_path();
-        if (!directory.empty() && !std::filesystem::exists(directory))
-        {
-            std::filesystem::create_directories(directory);
-        }
+        ProjectResult result = ProjectSerializer::Save(*m_Project, path);
+        if (!result.Success)
+            return result;
 
-        try
-        {
-            nlohmann::json projectJSON = m_Project->ToJSON();
+        m_Project->SetFilePath(path.string());
+        m_Project->MarkAsSaved();
+        m_Project->UpdateLastAccessed();
+        m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
 
-            std::ofstream file(path);
-
-            if (!file.is_open())
-            {
-                return { false, "Failed to open file for writing." };
-            }
-
-            file << projectJSON.dump(4);
-            file.close();
-
-            m_Project->SetFilePath(path.string());
-            m_Project->MarkAsSaved();
-            m_Project->UpdateLastAccessed();
-
-            m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
-
-            TILES_LOG_INFO("Context::SaveProjectAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
-            return { true, "Project saved successfully." };
-        }
-        catch (const std::exception& e)
-        {
-            return { false, std::string("Failed to save project: ") + e.what() };
-        }
+        TILES_LOG_INFO("Context::SaveProjectAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
+        return result;
     }
 
     ProjectResult Context::LoadProject(const std::filesystem::path& path)
@@ -316,39 +270,19 @@ namespace Tiles
             return { false, "File does not exist." };
         }
 
-
         std::shared_ptr<Project> project;
-
-        try
+        ProjectResult result = ProjectSerializer::Load(path, project);
+        if (!result.Success)
         {
-			std::ifstream file(path);
-            if (!file.is_open())
-            {
-                return { false, "Failed to open file for reading." };
-            }
-
-            nlohmann::json jsonProject;
-            file >> jsonProject;
-            file.close();
-            
-            project = Project::FromJSON(jsonProject);
-            
-            project->SetFilePath(path.string());
-            project->MarkAsSaved();
-            project->UpdateLastAccessed();
-        }
-        catch (const nlohmann::json::parse_error& e)
-        {
-            TILES_LOG_INFO("Context::LoadProject: JSON parse error: {}", e.what());
-            return { false, std::string("Invalid project file format: ") + e.what() };
-        }
-        catch (const std::exception& e)
-        {
-            TILES_LOG_INFO("Context::LoadProject: Load failed: {}", e.what());
-            return { false, std::string("Failed to load project: ") + e.what() };
+            TILES_LOG_INFO("Context::LoadProject: Load failed: {}", result.Message);
+            return result;
         }
 
-		m_Project = project;
+        project->SetFilePath(path.string());
+        project->MarkAsSaved();
+        project->UpdateLastAccessed();
+
+        m_Project = project;
 
         m_CommandHistory.Clear();
 
@@ -356,15 +290,15 @@ namespace Tiles
         m_PaintingMode = PaintingMode::None;
         m_Brush = Tile();
         m_Brush.SetPainted(true);
-        
-        ValidateWorkingLayer(); 
+
+        ValidateWorkingLayer();
 
         InitializeSceneCamera();
 
         m_ProjectHistory.AddProject(path, m_Project->GetProjectName());
 
         TILES_LOG_INFO("Context::LoadProject: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
-        return { true, "Project loaded successfully." };
+        return result;
     }
 
     void Context::ResizeProject(uint32_t width, uint32_t height)
