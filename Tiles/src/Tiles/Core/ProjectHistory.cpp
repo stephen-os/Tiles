@@ -2,6 +2,8 @@
 #include "Log.h"
 #include <fstream>
 #include <algorithm>
+#include <cstdint>
+#include <ctime>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -34,8 +36,8 @@ namespace Tiles
         entry.filePath = json.value("filePath", "");
         entry.displayName = json.value("displayName", "");
 
-        auto timestamp = json.value("lastAccessed", 0);
-        entry.lastAccessed = std::chrono::system_clock::from_time_t(timestamp);
+        auto timestamp = json.value("lastAccessed", std::int64_t{ 0 });
+        entry.lastAccessed = std::chrono::system_clock::from_time_t(static_cast<std::time_t>(timestamp));
 
         return entry;
     }

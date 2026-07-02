@@ -46,7 +46,7 @@ namespace Tiles
         auto begin() const { return m_Layers.begin(); }
         auto end() const { return m_Layers.end(); }
 
-        bool IsValidLayerIndex(size_t index) const { return index >= 0 && index < m_Layers.size(); }
+        bool IsValidLayerIndex(size_t index) const { return index < m_Layers.size(); }
     
     private:
         uint32_t m_Width = 16;                          // Width of the layer stack in tiles

@@ -2,7 +2,6 @@
 
 #include "glm/glm.hpp"
 
-// This is wrong we need nlohmann in the dependencies. 
 #include "json.hpp"
 
 namespace Tiles
