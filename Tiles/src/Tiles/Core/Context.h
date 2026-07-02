@@ -3,10 +3,8 @@
 #include <filesystem>
 
 #include "Tile.h"
-#include "Project.h"
 #include "Session/CommandDispatcher.h"
-#include "ProjectHistory.h"
-#include "ProjectSerializer.h"
+#include "Session/ProjectSession.h"
 
 #include "Constants.h"
 
@@ -65,7 +63,7 @@ namespace Tiles
         void Undo();
         void Redo();
 
-        bool IsDirty() const { return m_Project->HasUnsavedChanges(); }
+        bool IsDirty() const { return m_ProjectSession.IsDirty(); }
 
 		void ClearHistory() { m_CommandDispatcher.Clear(); }
 
@@ -84,17 +82,17 @@ namespace Tiles
         ProjectResult LoadProject(const std::filesystem::path& path);
         /// Resizes the grid, keeping the camera focused on the same relative point.
         void ResizeProject(uint32_t width, uint32_t height);
-        bool HasProject() const { return m_Project != nullptr; }
+        bool HasProject() const { return m_ProjectSession.HasProject(); }
         /// Project name, suffixed with "(Unsaved)" while it has no file path.
-        std::string GetProjectDisplayName() const;
-        std::shared_ptr<Project> GetProject() { return m_Project; }
-        const std::shared_ptr<Project> GetProject() const { return m_Project; }
+        std::string GetProjectDisplayName() const { return m_ProjectSession.GetDisplayName(); }
+        std::shared_ptr<Project> GetProject() { return m_ProjectSession.GetProject(); }
+        const std::shared_ptr<Project> GetProject() const { return m_ProjectSession.GetProject(); }
 
         // Project History
-        size_t GetRecentProjectCount() const { return m_ProjectHistory.GetCount(); }
-        bool HasRecentProjects() const { return !m_ProjectHistory.IsEmpty(); }
-        const ProjectHistoryEntry& GetRecentProject(size_t index) const { return m_ProjectHistory.GetEntry(index); }
-        void ClearRecentProjects() { m_ProjectHistory.Clear(); }
+        size_t GetRecentProjectCount() const { return m_ProjectSession.GetRecentCount(); }
+        bool HasRecentProjects() const { return m_ProjectSession.HasRecent(); }
+        const ProjectHistoryEntry& GetRecentProject(size_t index) const { return m_ProjectSession.GetRecent(index); }
+        void ClearRecentProjects() { m_ProjectSession.ClearRecent(); }
 
     private:
         /// Clamps the working-layer index back into range after the layer count
@@ -102,11 +100,8 @@ namespace Tiles
         void ValidateWorkingLayer();
 
     private:
+        ProjectSession m_ProjectSession;
         CommandDispatcher m_CommandDispatcher;
-        ProjectHistory m_ProjectHistory;
-
-        std::shared_ptr<Project> m_Project;
-
         ViewportCameraController m_CameraController;
         EditingState m_EditingState;
     };
