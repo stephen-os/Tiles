@@ -54,7 +54,14 @@ namespace Tiles
 		m_FrameBuffer->ReadPixels(0, 0, m_Width, m_Height, pixels.data());
 		m_FrameBuffer->Unbind();
 
-		std::string extension = path.substr(path.find_last_of("."));
+		size_t dotPos = path.find_last_of('.');
+		if (dotPos == std::string::npos)
+		{
+			TILES_LOG_ERROR("RenderTarget::SaveToFile: Path has no file extension: {}", path);
+			return false;
+		}
+
+		std::string extension = path.substr(dotPos);
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
 		int result = 0;
