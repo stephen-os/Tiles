@@ -1,9 +1,5 @@
 #include "Context.h"
 
-#include "Commands/TilePaintCommand.h"
-#include "Commands/TileEraseCommand.h"
-#include "Commands/LayerFillCommand.h"
-
 namespace Tiles
 {
     std::shared_ptr<Context> Context::Create()
@@ -27,8 +23,6 @@ namespace Tiles
         m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
 
         m_Project->UpdateLastAccessed();
-
-        m_Brush.SetPainted(true);
     }
 
     void Context::ResetViewportCamera()
@@ -51,81 +45,49 @@ namespace Tiles
 
     void Context::SetWorkingLayer(size_t index)
     {
-        LayerStack& layerStack = m_Project->GetLayerStack();
-        if (layerStack.IsValidLayerIndex(index))
-        {
-            m_WorkingLayer = index;
-        }
+        if (m_Project->GetLayerStack().IsValidLayerIndex(index))
+            m_EditingState.SetWorkingLayer(index);
     }
 
     bool Context::HasWorkingLayer() const
     {
-        return m_Project->GetLayerStack().IsValidLayerIndex(m_WorkingLayer);
+        return m_Project->GetLayerStack().IsValidLayerIndex(m_EditingState.GetWorkingLayer());
     }
 
     TileLayer& Context::GetWorkingLayerRef()
     {
-        return m_Project->GetLayerStack().GetLayer(m_WorkingLayer);
+        return m_Project->GetLayerStack().GetLayer(m_EditingState.GetWorkingLayer());
     }
 
     const TileLayer& Context::GetWorkingLayerRef() const
     {
-        return m_Project->GetLayerStack().GetLayer(m_WorkingLayer);
+        return m_Project->GetLayerStack().GetLayer(m_EditingState.GetWorkingLayer());
     }
 
     void Context::PaintTile(size_t x, size_t y)
     {
         if (HasWorkingLayer())
-        {
-            PaintTileOnLayer(m_WorkingLayer, x, y, m_Brush);
-        }
+            PaintTileOnLayer(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush());
     }
 
     void Context::PaintTileOnLayer(size_t layerIndex, size_t x, size_t y, const Tile& tile)
     {
-        LayerStack& layerStack = m_Project->GetLayerStack();
-        if (!layerStack.IsValidLayerIndex(layerIndex))
+        if (!m_Project->GetLayerStack().IsValidLayerIndex(layerIndex))
             return;
 
-        switch (m_PaintingMode)
-        {
-        case PaintingMode::Brush:
-        {
-            auto command = std::make_unique<TilePaintCommand>(x, y, layerIndex, tile);
-            ExecuteCommand(std::move(command));
-            break;
-        }
-        case PaintingMode::Eraser:
-        {
-            auto command = std::make_unique<TileEraseCommand>(x, y, layerIndex);
-            ExecuteCommand(std::move(command));
-            break;
-        }
-        case PaintingMode::Fill:
-        {
-            auto command = std::make_unique<LayerFillCommand>(x, y, layerIndex, tile);
-            ExecuteCommand(std::move(command));
-            break;
-        }
-        }
+        ExecuteCommand(m_EditingState.BuildModeCommand(layerIndex, x, y, tile));
     }
 
     void Context::EraseTile(size_t x, size_t y)
     {
         if (HasWorkingLayer())
-        {
-            auto command = std::make_unique<TileEraseCommand>(x, y, m_WorkingLayer);
-            ExecuteCommand(std::move(command));
-        }
+            ExecuteCommand(m_EditingState.BuildEraseCommand(m_EditingState.GetWorkingLayer(), x, y));
     }
 
     void Context::FillLayer(size_t x, size_t y)
     {
         if (HasWorkingLayer())
-        {
-            auto command = std::make_unique<LayerFillCommand>(x, y, m_WorkingLayer, m_Brush);
-            ExecuteCommand(std::move(command));
-        }
+            ExecuteCommand(m_EditingState.BuildFillCommand(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush()));
     }
 
     void Context::ExecuteCommand(std::unique_ptr<Command> command)
@@ -148,29 +110,14 @@ namespace Tiles
 
     void Context::ValidateWorkingLayer()
     {
-        LayerStack& layerStack = m_Project->GetLayerStack();
-        if (!HasWorkingLayer() && !layerStack.IsEmpty())
-        {
-            m_WorkingLayer = 0;
-        }
-        else if (layerStack.IsEmpty())
-        {
-            m_WorkingLayer = 0;
-        }
-        else if (m_WorkingLayer >= layerStack.GetLayerCount())
-        {
-            m_WorkingLayer = layerStack.GetLayerCount() - 1;
-        }
+        m_EditingState.ValidateWorkingLayer(m_Project->GetLayerStack());
     }
 
     void Context::CreateProject(const std::string& name, uint32_t width, uint32_t height)
     {
 		m_CommandDispatcher.Clear();
         m_Project = std::make_shared<Project>(width, height, name);
-        m_WorkingLayer = 0;
-        m_PaintingMode = PaintingMode::None;
-        m_Brush = Tile();
-        m_Brush.SetPainted(true);
+        m_EditingState.Reset();
 
         const auto& layerStack = m_Project->GetLayerStack();
         m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
@@ -246,11 +193,7 @@ namespace Tiles
 
         m_CommandDispatcher.Clear();
 
-        m_WorkingLayer = 0;
-        m_PaintingMode = PaintingMode::None;
-        m_Brush = Tile();
-        m_Brush.SetPainted(true);
-
+        m_EditingState.Reset();
         ValidateWorkingLayer();
 
         const auto& layerStack = m_Project->GetLayerStack();

@@ -11,19 +11,12 @@
 #include "Constants.h"
 
 #include "Session/ViewportCameraController.h"
+#include "Session/EditingState.h"
 
 #include "Base.h"
 
 namespace Tiles
 {
-    enum class PaintingMode
-    {
-        None = 0,
-        Brush,
-        Eraser,
-        Fill
-    };
-
     /// Owns the active project and editing state (working layer, brush,
     /// painting mode) and mediates every edit through the undo/redo history.
     class Context
@@ -44,17 +37,17 @@ namespace Tiles
 
         /// Selects the active layer for painting; ignored if index is out of range.
         void SetWorkingLayer(size_t index);
-        size_t GetWorkingLayer() const { return m_WorkingLayer; }
+        size_t GetWorkingLayer() const { return m_EditingState.GetWorkingLayer(); }
         bool HasWorkingLayer() const;
         /// Returns the active layer. Requires HasWorkingLayer(); asserts otherwise.
         TileLayer& GetWorkingLayerRef();
         const TileLayer& GetWorkingLayerRef() const;
 
-        void SetPaintingMode(PaintingMode mode) { m_PaintingMode = mode; }
-        PaintingMode GetPaintingMode() const { return m_PaintingMode; }
-        void SetBrush(const Tile& brush) { m_Brush = brush; }
-        const Tile& GetBrush() const { return m_Brush; }
-        Tile& GetBrush() { return m_Brush; }
+        void SetPaintingMode(PaintingMode mode) { m_EditingState.SetPaintingMode(mode); }
+        PaintingMode GetPaintingMode() const { return m_EditingState.GetPaintingMode(); }
+        void SetBrush(const Tile& brush) { m_EditingState.SetBrush(brush); }
+        const Tile& GetBrush() const { return m_EditingState.GetBrush(); }
+        Tile& GetBrush() { return m_EditingState.GetBrush(); }
 
         /// Applies the current painting mode/brush to the working layer at (x, y).
         void PaintTile(size_t x, size_t y);
@@ -115,9 +108,6 @@ namespace Tiles
         std::shared_ptr<Project> m_Project;
 
         ViewportCameraController m_CameraController;
-
-        size_t m_WorkingLayer = 0;
-        PaintingMode m_PaintingMode = PaintingMode::None;
-        Tile m_Brush;
+        EditingState m_EditingState;
     };
 }
