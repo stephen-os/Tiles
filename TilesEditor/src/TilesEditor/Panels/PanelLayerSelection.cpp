@@ -236,6 +236,11 @@ namespace Tiles
         bool hasWorkingLayer = HasWorkingLayer();
         bool hasLayers = HasLayers();
 
+        // Deleting the final layer would leave the project with no layers, so
+        // the Delete button stays disabled until at least two exist.
+        size_t layerCount = m_Context ? m_Context->GetProject()->GetLayerStack().GetLayerCount() : 0;
+        bool canDeleteLayer = hasWorkingLayer && layerCount > 1;
+
         // Style for buttons
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(UI::Component::SpaceBetween / 2.0f, 0.0f));
@@ -261,30 +266,23 @@ namespace Tiles
                 ExecuteLayerCommand(std::move(command));
             }
 
-            // Delete and Clear buttons (conditionally enabled)
-            if (!hasLayers || !hasWorkingLayer)
-            {
-                ImGui::BeginDisabled();
-            }
-
             ImGui::TableNextColumn();
+            ImGui::BeginDisabled(!canDeleteLayer);
             if (ImGui::Button("Delete Layer", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
             {
                 auto command = std::make_unique<LayerDeleteCommand>(m_Context->GetWorkingLayer());
                 ExecuteLayerCommand(std::move(command));
             }
+            ImGui::EndDisabled();
 
             ImGui::TableNextColumn();
+            ImGui::BeginDisabled(!hasLayers || !hasWorkingLayer);
             if (ImGui::Button("Clear Layer", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
             {
                 auto command = std::make_unique<LayerClearCommand>(m_Context->GetWorkingLayer());
                 ExecuteLayerCommand(std::move(command));
             }
-
-            if (!hasLayers || !hasWorkingLayer)
-            {
-                ImGui::EndDisabled();
-            }
+            ImGui::EndDisabled();
 
             ImGui::EndTable();
         }
