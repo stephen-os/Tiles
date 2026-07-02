@@ -41,6 +41,10 @@ project "TilesEditor"
    targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
    objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")
 
+   -- Assets load via cwd-relative paths (e.g. "res/shaders/Quad.vert"), so the
+   -- debugger must run from TilesEditor/ where res/ lives, not the build dir.
+   debugdir "%{wks.location}/TilesEditor"
+
    filter "system:windows"
       systemversion "latest"
       defines { "TILES_PLATFORM_WINDOWS" }
