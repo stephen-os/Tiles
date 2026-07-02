@@ -5,11 +5,17 @@
 
 namespace Tiles
 {
-    LayerStack::LayerStack(uint32_t width, uint32_t height) : m_Width(width), m_Height(height)
+    LayerStack::LayerStack(uint32_t width, uint32_t height)
+        : m_Width(Grid::ClampDimension(width)), m_Height(Grid::ClampDimension(height))
     {
         if (width == 0 || height == 0)
         {
             TILES_LOG_INFO("LayerStack::LayerStack: Warning - LayerStack created with zero dimensions ({}x{})", width, height);
+        }
+
+        if (width != m_Width || height != m_Height)
+        {
+            TILES_LOG_INFO("LayerStack::LayerStack: Clamped dimensions from {}x{} to {}x{}", width, height, m_Width, m_Height);
         }
     }
 
@@ -156,6 +162,9 @@ namespace Tiles
         {
             TILES_LOG_INFO("LayerStack::Resize: Warning - Resizing LayerStack to zero dimensions ({}x{})", width, height);
         }
+
+        width = Grid::ClampDimension(width);
+        height = Grid::ClampDimension(height);
 
         TILES_LOG_INFO("LayerStack::Resize: Resizing LayerStack from {}x{} to {}x{} ({} layers)", m_Width, m_Height, width, height, m_Layers.size());
 

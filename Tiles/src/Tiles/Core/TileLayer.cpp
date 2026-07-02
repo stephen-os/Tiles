@@ -6,10 +6,15 @@
 
 namespace Tiles
 {
-	TileLayer::TileLayer(uint32_t width, uint32_t height) : m_Width(width), m_Height(height)
+	TileLayer::TileLayer(uint32_t width, uint32_t height)
+		: m_Width(Grid::ClampDimension(width)), m_Height(Grid::ClampDimension(height))
 	{
-		TILES_ASSERT((width * height) >= 0, "TileLayer::TileLayer: Size must be greater than 0");
-		m_Tiles.resize(width * height);
+		if (width != m_Width || height != m_Height)
+		{
+			TILES_LOG_INFO("TileLayer::TileLayer: Clamped dimensions from {}x{} to {}x{}", width, height, m_Width, m_Height);
+		}
+
+		m_Tiles.resize(Grid::TileCount(m_Width, m_Height));
 	}
 
 	void TileLayer::Clear()
@@ -74,7 +79,10 @@ namespace Tiles
 
 	void TileLayer::ResizeInternal(uint32_t width, uint32_t height)
 	{
-		std::vector<Tile> newTiles(width * height);
+		width = Grid::ClampDimension(width);
+		height = Grid::ClampDimension(height);
+
+		std::vector<Tile> newTiles(Grid::TileCount(width, height));
 
 		uint32_t copyWidth = std::min(width, m_Width);
 		uint32_t copyHeight = std::min(height, m_Height);
@@ -145,11 +153,13 @@ namespace Tiles
 
 		if (jsonLayer.contains(JSON::TileLayer::Tiles))
 		{
+			// Bound the loops by the layer's clamped dimensions, not the raw
+			// JSON values, so GetTile is never indexed past the allocation.
 			const auto& tilesArray = jsonLayer[JSON::TileLayer::Tiles];
-			for (uint32_t y = 0; y < height && y < tilesArray.size(); y++)
+			for (uint32_t y = 0; y < layer.GetHeight() && y < tilesArray.size(); y++)
 			{
 				const auto& rowArray = tilesArray[y];
-				for (uint32_t x = 0; x < width && x < rowArray.size(); x++)
+				for (uint32_t x = 0; x < layer.GetWidth() && x < rowArray.size(); x++)
 				{
 					Tile tile = Tile::FromJSON(rowArray[x]);
 					layer.GetTile(x, y) = tile;

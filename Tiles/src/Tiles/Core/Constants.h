@@ -1,6 +1,8 @@
 #pragma once
 #include "imgui.h"
 #include <glm/glm.hpp>
+#include <cstddef>
+#include <cstdint>
 
 namespace Tiles
 {
@@ -230,6 +232,28 @@ namespace Tiles
             constexpr glm::vec4 Red = { 1.0f, 0.3f, 0.3f, 1.0f };
             constexpr glm::vec4 Green = { 0.3f, 1.0f, 0.3f, 1.0f };
             constexpr glm::vec4 Blue = { 0.3f, 0.3f, 1.0f, 1.0f };
+        }
+    }
+
+    namespace Grid
+    {
+        // Upper bound on a single grid dimension. Guards against corrupt or
+        // malicious project files whose width/height would overflow the
+        // 32-bit tile-buffer size computation and trigger an out-of-bounds
+        // write. Clamped dimensions (<= MaxDimension each) multiply to at
+        // most MaxDimension^2, which fits comfortably in size_t.
+        constexpr uint32_t MaxDimension = 10000;
+
+        constexpr uint32_t ClampDimension(uint32_t dimension)
+        {
+            return dimension < MaxDimension ? dimension : MaxDimension;
+        }
+
+        // Tile count of a grid whose dimensions are already clamped. Computed
+        // in 64-bit space so the multiply can never wrap.
+        constexpr size_t TileCount(uint32_t width, uint32_t height)
+        {
+            return static_cast<size_t>(width) * static_cast<size_t>(height);
         }
     }
 
