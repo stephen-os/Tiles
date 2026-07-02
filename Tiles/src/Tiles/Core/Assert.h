@@ -5,6 +5,8 @@
 
 #ifdef TILES_DEBUG
 
+// Logs the failed condition with a formatted message and aborts (debug builds
+// only; compiles to a no-op in release).
 #define TILES_ASSERT(condition, fmt, ...) \
 	do { \
 		if (!(condition)) { \

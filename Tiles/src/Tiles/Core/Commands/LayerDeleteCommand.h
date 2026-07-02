@@ -5,6 +5,8 @@
 
 namespace Tiles
 {
+    /// Removes a layer, snapshotting it on first Execute so Undo can reinsert it
+    /// at the same index with its original contents.
     class LayerDeleteCommand : public Command
     {
     public:

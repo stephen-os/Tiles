@@ -15,6 +15,9 @@ namespace Tiles
         TGA
     };
 
+    /// Export dialog. Presents a matrix that assigns each layer to a render group,
+    /// then renders the layers of each used group to an image file. The pending
+    /// matrix is edited locally and only written back to the layers on Apply/Export.
     class PopupRenderMatrix : public Popup
     {
     public:
@@ -31,13 +34,29 @@ namespace Tiles
         void RenderActionButtons();
         void ShowDirectoryDialog();
         void ResetToDefaults();
+
+        /// Renders each used render group to its own image file. A single used
+        /// group exports to the base file name; multiple groups get numbered suffixes.
         void ExecuteExport();
+
+        /// Distinct render-group ids (as strings) currently assigned to any layer,
+        /// excluding the unassigned sentinel (-1).
         std::vector<std::string> GetUsedRenderGroups() const;
+
+        /// Builds the output file name and extension; groupIndex >= 0 appends a
+        /// 1-based group suffix, -1 yields the un-suffixed base name.
         std::string GetExportFileName(int groupIndex = -1) const;
         std::filesystem::path GetFullExportPath(const std::string& fileName) const;
         const char* GetFormatExtension() const;
+
+        /// Renders the given layers into an offscreen target sized to the project
+        /// bounds and writes it to fileName.
         void ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName);
+
         void InitializeDialog();
+
+        /// Writes the locally edited matrix back onto the layers' render groups,
+        /// marking the project modified only if something actually changed.
         void ApplyRenderGroupChanges();
 
     private:

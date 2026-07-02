@@ -55,6 +55,8 @@ namespace Tiles
 
         CenterViewportCameraOnProject();
 
+        // Assumes a nominal viewport size; the 0.9 factor leaves a margin so the
+        // grid does not sit flush against the edges.
         const float viewportWidth = 800.0f;
         const float viewportHeight = 600.0f;
 

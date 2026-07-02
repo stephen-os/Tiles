@@ -9,6 +9,8 @@
 
 namespace Tiles
 {
+    /// Flood-fills the contiguous region matching the tile at (x, y) with a fill
+    /// tile, snapshotting the whole layer on first Execute so Undo can restore it.
     class LayerFillCommand : public Command
     {
     public:
@@ -48,6 +50,8 @@ namespace Tiles
         }
 
     private:
+        /// Breadth-first 4-connected fill: replaces every tile reachable from
+        /// (startX, startY) that equals targetTile with the fill tile.
         void FloodFill(TileLayer& layer, size_t startX, size_t startY, const Tile& targetTile)
         {
             std::queue<std::pair<size_t, size_t>> tileQueue;

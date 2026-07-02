@@ -75,6 +75,8 @@ namespace Tiles
 				return nullptr;
 			}
 
+			// The first face fixes the cubemap dimensions/format and allocates
+			// immutable storage; every later face must match those dimensions.
 			if (i == 0)
 			{
 				width = faceWidth;
@@ -225,6 +227,8 @@ namespace Tiles
 
 		auto formatInfo = TextureFormats::GetInfo(format);
 
+		// Immutable storage cannot be resized or reformatted in place, so a new
+		// size/format requires deleting and recreating the texture object.
 		GLCALL(glDeleteTextures(1, &m_BufferID));
 		GLCALL(glCreateTextures(GL_TEXTURE_2D, 1, &m_BufferID));
 		GLCALL(glTextureStorage2D(m_BufferID, 1, formatInfo.InternalFormat, width, height));

@@ -19,6 +19,9 @@ namespace Tiles
         static ProjectHistoryEntry FromJSON(const nlohmann::json& json);
     };
 
+    /// Most-recently-used list of opened/saved projects, persisted to a JSON
+    /// file in the platform's app-data directory. Loads on construction and
+    /// saves on destruction when dirty.
     class ProjectHistory
     {
     public:
@@ -27,6 +30,9 @@ namespace Tiles
         ProjectHistory();
         ~ProjectHistory();
 
+        /// Records a project as most-recent, moving it to the front if already
+        /// present and trimming the list to MAX_HISTORY_SIZE. Empty paths/names
+        /// are ignored.
         void AddProject(const std::filesystem::path& filePath, const std::string& displayName);
         void Clear();
 
@@ -38,7 +44,9 @@ namespace Tiles
         void Save();
 
     private:
+        /// Full path to the history JSON file, creating its directory if needed.
         std::filesystem::path GetAppDataPath() const;
+        /// Drops entries whose file no longer exists on disk.
         void RemoveInvalidEntries();
         void RemoveProject(const std::filesystem::path& filePath);
 

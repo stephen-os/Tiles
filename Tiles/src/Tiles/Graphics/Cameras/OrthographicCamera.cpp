@@ -117,6 +117,8 @@ namespace Tiles
 
 	void OrthographicCamera::UpdateProjectionMatrix()
 	{
+		// Top and bottom are passed swapped to flip Y, so +Y points down and
+		// world space matches the top-left origin screen convention.
 		m_ProjectionMatrix = glm::ortho(m_Left, m_Right, m_Top, m_Bottom, m_NearPlane, m_FarPlane);
 	}
 }

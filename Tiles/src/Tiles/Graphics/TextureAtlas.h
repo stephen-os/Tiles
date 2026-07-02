@@ -33,8 +33,13 @@ namespace Tiles
 		void RemoveTexture();
 
 		const std::shared_ptr<Texture> GetTexture() const { return m_Texture; }
+
+		/// UV rectangle of cell @p index, packed as (uMin, vMin, uMax, vMax).
+		/// Returns a zero vector on out-of-range index.
 		glm::vec4 GetTextureCoords(int index) const;
+		/// UV-space offset of cell @p index's lower-left corner.
 		glm::vec2 GetOffset(int index) const;
+		/// Grid (column, row) coordinates of cell @p index.
 		glm::vec2 GetPosition(int index) const;
 
 	private:

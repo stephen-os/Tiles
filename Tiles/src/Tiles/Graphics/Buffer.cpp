@@ -95,6 +95,7 @@ namespace Tiles
 
         GLCALL(glBindBuffer(GL_ARRAY_BUFFER, m_BufferID));
 
+		// Reuse existing storage when the update fits; only reallocate to grow.
 		if (size <= m_Size)
 		{
 			GLCALL(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
@@ -173,6 +174,7 @@ namespace Tiles
 
         GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID));
 
+        // Reuse existing storage when the update fits; only reallocate to grow.
         if (newSize <= currentSize)
         {
             GLCALL(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, newSize, data));
@@ -260,6 +262,7 @@ namespace Tiles
 
         GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID));
 
+        // Reuse existing storage when the update fits; only reallocate to grow.
         if (size <= m_Size)
         {
             GLCALL(glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data));

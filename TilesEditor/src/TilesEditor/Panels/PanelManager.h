@@ -13,6 +13,9 @@ namespace Tiles
 		PanelManager() = default;
 		~PanelManager() = default;
 
+		/// Constructs a panel of type TPanel in place and takes ownership of it.
+		/// Registration order is the per-frame Update/Render order.
+		/// @param args Arguments forwarded to the TPanel constructor (typically the shared Context).
 		template<typename TPanel, typename... Args>
 		void RegisterPanel(Args&&... args)
 		{

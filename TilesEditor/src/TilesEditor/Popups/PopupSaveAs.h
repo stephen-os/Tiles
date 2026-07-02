@@ -7,6 +7,9 @@
 
 namespace Tiles
 {
+    /// Save-As dialog: pick a directory and file name (project extension appended
+    /// automatically) and write the project via Context::SaveProjectAs. Shows an
+    /// inline status message and auto-closes a few seconds after a successful save.
     class PopupSaveAs : public Popup
     {
     public:

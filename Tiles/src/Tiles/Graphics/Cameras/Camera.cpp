@@ -389,6 +389,8 @@ namespace Tiles
 		rotation = glm::rotate(rotation, glm::radians(m_Rotation.x), glm::vec3(1, 0, 0)); // Pitch
 		rotation = glm::rotate(rotation, glm::radians(m_Rotation.z), glm::vec3(0, 0, 1)); // Roll
 
+		// The view matrix is the inverse of the camera transform: transpose the
+		// (orthogonal) rotation and negate the translation.
 		glm::mat4 translation = glm::translate(glm::mat4(1.0f), -m_Position);
 		m_ViewMatrix = glm::transpose(rotation) * translation;
 	}

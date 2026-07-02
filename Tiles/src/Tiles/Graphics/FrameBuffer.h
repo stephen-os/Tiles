@@ -5,6 +5,8 @@
 
 namespace Tiles
 {
+	/// Backend-agnostic framebuffer interface; Create() returns the GL
+	/// implementation (color texture + depth renderbuffer).
 	class FrameBuffer
 	{
 	public:

@@ -25,6 +25,8 @@ namespace Tiles
 		Resize(width, height);
 	}
 
+	// Sets the grid dimensions and precomputes the UV rectangle of every cell
+	// so per-frame lookups are a plain array index.
 	void TextureAtlas::Resize(int width, int height)
 	{
 		m_GridWidth = width;

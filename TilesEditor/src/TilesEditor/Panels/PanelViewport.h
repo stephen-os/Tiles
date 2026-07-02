@@ -10,6 +10,10 @@ using namespace Tiles;
 
 namespace Tiles
 {
+    /// The main editing canvas. Draws the grid, layers, and a hover/brush preview
+    /// into an offscreen RenderTarget each frame and blits it via ImGui::Image.
+    /// Paint and camera input are only processed while the window is focused, so
+    /// Render() builds the frame and Update() handles interaction.
     class PanelViewport : public Panel
     {
     public:
@@ -20,8 +24,15 @@ namespace Tiles
         void Update() override;
 
     private:
+        /// Maps the current mouse position from screen space into world space,
+        /// accounting for the viewport origin, its centered projection, and zoom.
         glm::vec2 ScreenToWorld() const;
+
+        /// Returns the tile grid cell under the mouse. Cells are 1-based: (1,1) is
+        /// the first tile, matching the one-tile border offset used when drawing.
         glm::ivec2 GetGridPositionUnderMouse() const;
+
+        /// True when gridPos falls within the layer stack's 1-based tile bounds.
         bool IsValidGridPosition(const glm::ivec2& gridPos) const;
 
         void RenderGrid();

@@ -569,6 +569,9 @@ namespace Tiles
 		s_Data.TextureSlotIndex = 1;
 	}
 
+	// Uploads whatever geometry each primitive accumulated this batch, then
+	// flushes once if any primitive produced vertices. Buffer size is the byte
+	// distance the write pointer advanced past its base.
 	void Renderer2D::EndBatch()
 	{
 		bool issueDraw = false;
@@ -649,6 +652,8 @@ namespace Tiles
 		}
 	}
 
+	// Binds textures/lights once, then draws each non-empty primitive batch with
+	// its shader and shared uniforms, and resets the per-batch counters.
 	void Renderer2D::Flush()
 	{
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
@@ -826,6 +831,10 @@ namespace Tiles
 		return reinterpret_cast<void*>(static_cast<uintptr_t>(s_Data.CurrentRenderTarget->GetTexture()));
 	}
 
+	// Returns the sampler slot a texture maps to for this batch, reusing an
+	// existing slot or assigning the next free one. Slot 0 is the default white
+	// texture (and the result for a null texture). When all slots are taken the
+	// batch is flushed first so the new texture starts a fresh set of slots.
 	float Renderer2D::ComputeTextureIndex(const std::shared_ptr<Texture>& texture)
 	{
 		if (texture == nullptr)

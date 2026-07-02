@@ -47,17 +47,26 @@ namespace Tiles
 		Center = 2
 	};
 
+	/// Immediate-mode-style 2D batch renderer. Primitives are configured through
+	/// Set*/Draw* calls between Begin() and End(); geometry accumulates into
+	/// per-primitive vertex buffers and is flushed in as few draw calls as
+	/// possible. All state is global (single static instance).
 	class Renderer2D
 	{
 	public:
 		static void Init();
 		static void Shutdown();
 
+		/// Begins a frame: sets the view-projection, binds the current render
+		/// target, clears it, and starts a fresh batch.
 		static void Begin(std::shared_ptr<Camera> camera);
+		/// Begins a frame with an explicit view-projection and no target setup.
 		static void Begin(glm::mat4& viewProjection);
+		/// Ends the frame, flushing any pending geometry and unbinding the target.
 		static void End();
 
 		static void StartBatch();
+		/// Uploads accumulated vertex data to the GPU and issues the draw calls.
 		static void EndBatch();
 		static void Flush();
 

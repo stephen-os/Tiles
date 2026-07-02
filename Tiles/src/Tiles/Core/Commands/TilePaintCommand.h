@@ -5,6 +5,8 @@
 
 namespace Tiles
 {
+    /// Paints a single tile, capturing the overwritten tile on first Execute so
+    /// Undo can restore it. Coalesces with an identical paint on the same cell.
     class TilePaintCommand : public Command
     {
     public:

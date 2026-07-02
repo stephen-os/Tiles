@@ -24,6 +24,9 @@ namespace Tiles
 		glBindVertexArray(0);
 	}
 
+	// Attaches a vertex buffer and wires each of its layout elements to the next
+	// attribute index. Padding elements advance the stride but get no attribute,
+	// and integer types use glVertexAttribIPointer to avoid float conversion.
 	void OpenGLVertexArray::SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer)
 	{
 		glBindVertexArray(m_RendererID);

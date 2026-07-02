@@ -9,6 +9,8 @@ namespace Tiles
 
     void PopupSaveAs::OnRender()
     {
+        // Re-seed the dialog from the current project each time it opens; the flag
+        // is reset in the "not visible" branch below so this runs once per opening.
         if (m_FirstShow)
         {
             m_ShowMessage = false;
@@ -87,6 +89,8 @@ namespace Tiles
 
     void PopupSaveAs::OnUpdate()
     {
+        // A failed save only times out its error message and leaves the popup open
+        // to retry; a successful save auto-closes the whole popup (handled in OnRender).
         if (m_ShowMessage && !m_ProjectSavedSuccessfully)
         {
             m_MessageTimer += ImGui::GetIO().DeltaTime;

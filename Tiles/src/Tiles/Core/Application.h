@@ -38,14 +38,21 @@ namespace Tiles
 		Application(const ApplicationSpecification& applicationSpecification = ApplicationSpecification());
 		virtual ~Application();
 
+		/// Runs client setup (OnCreate); call once before Run.
 		void Create();
+		/// Detaches all layers and runs client teardown (OnDestroy).
 		void Destroy();
+		/// Drives the main loop: updates layers, renders the ImGui dockspace and
+		/// UI, and presents each frame until the window closes or Shutdown is called.
 		void Run();
-		
+
+		/// Toggles between borderless-fullscreen on the primary monitor and the
+		/// last windowed position/size, per the current Fullscreen spec flag.
 		void SetWindowFullscreen();
 
 		void ApplyTilesTheme();
 
+		/// Requests the run loop to exit at the end of the current frame.
 		void Shutdown() { m_Running = false; };
 
 		static Application& GetInstance();
@@ -55,6 +62,9 @@ namespace Tiles
 		virtual void OnCreate() = 0;
 		virtual void OnDestroy() = 0;
 
+		/// Constructs a layer of type T in place, takes ownership, and attaches it.
+		/// @tparam T Layer subclass to instantiate.
+		/// @param args Arguments forwarded to T's constructor.
 		template<typename T, typename... Args>
 		void PushLayer(Args&&... args)
 		{
@@ -77,6 +87,7 @@ namespace Tiles
 		ImVec2 m_DragOffset = { 0.0f, 0.0f };
 	};
 
-	// Implemented by CLIENT
+	/// Factory implemented by the client to build the concrete Application.
+	/// Called by the entry point; the returned instance is owned by Main.
 	Application* CreateApplication(int argc, char** argv);
 }

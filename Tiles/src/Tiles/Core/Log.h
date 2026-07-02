@@ -23,6 +23,8 @@ namespace Tiles
 		constexpr const char* BOLD_RED = "\033[1;31m";
 	}
 
+	/// spdlog formatter rendering "[time] [logger] [level] message" with ANSI
+	/// color per field for the console sink.
 	class LogFormatter : public spdlog::formatter
 	{
 	public:
@@ -37,12 +39,17 @@ namespace Tiles
 	class Log
 	{
 	public:
+		/// Creates the shared console logger. Idempotent; later calls are no-ops.
+		/// @param name Logger name shown in each line.
 		static void Init(std::string& name);
 		static void Shutdown();
 		static std::shared_ptr<spdlog::logger>& GetLogger() { return s_Logger; }
 		static void SetLogLevel(spdlog::level::level_enum level);
+		/// Adds a rotating file sink alongside the console sink.
 		static void EnableFileLogging(const std::string& filename);
 
+		/// Wraps each "{}" / "{...}" placeholder in a format string with ANSI
+		/// color codes so substituted arguments stand out. Used by the log macros.
 		static std::string Format(const std::string& format);
 	private:
 		static std::shared_ptr<spdlog::logger> s_Logger;

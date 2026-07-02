@@ -6,6 +6,9 @@
 
 namespace Tiles
 {
+    /// Base class for editor panels. Each panel holds a shared reference to the
+    /// editor Context (the single source of project/brush/command state) and is
+    /// driven once per frame by PanelManager: Update() first, then Render().
     class Panel
     {
     public:

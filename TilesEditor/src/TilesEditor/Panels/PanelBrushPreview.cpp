@@ -154,7 +154,8 @@ namespace Tiles
 		Tiles::Renderer2D::ResetQuadState();
         Tiles::Renderer2D::ResetLineState();
 
-        // Handle mouse interaction
+        // An InvisibleButton reserves the canvas rect and captures hover/drag for
+        // pan and zoom; the rendered texture is drawn over it afterward.
         ImGui::InvisibleButton("PreviewCanvas", previewDimensions);
         bool isCanvasHovered = ImGui::IsItemHovered();
         bool isCanvasActive = ImGui::IsItemActive();

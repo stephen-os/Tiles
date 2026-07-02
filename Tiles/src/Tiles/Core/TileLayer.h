@@ -70,17 +70,22 @@ namespace Tiles
         }
     }
     
+    /// A single grid of tiles with a name, visibility, and render group.
+    /// Tiles are stored row-major and addressed by (x, y).
     class TileLayer
     {
     public:
         TileLayer() = default;
+        /// @param width,height Grid size in tiles; clamped to Grid::MaxDimension.
         TileLayer(uint32_t width, uint32_t height);
         ~TileLayer() = default;
 
+        /// Resets every tile to its default (unpainted) state.
         void Clear();
+        /// Resizes the grid, preserving tiles within the overlapping region.
         void Resize(uint32_t width, uint32_t height);
 
-        // Tile access
+        // Tile access; (x, y) must satisfy IsValidPosition or the call asserts.
         const Tile& GetTile(size_t x, size_t y) const;
         Tile& GetTile(size_t x, size_t y);
 

@@ -6,12 +6,15 @@
 
 namespace Tiles
 {
+	/// A single grid cell: paint/texture flags plus transform, tint, and the
+	/// atlas sub-region it samples. Default-constructs to an empty, unpainted tile.
 	class Tile
 	{
 	public:
 		Tile() = default;
 		~Tile() = default;
 
+		/// Restores the tile to its default empty state.
 		void Reset();
 
 		bool IsPainted() const { return m_IsPainted; }
@@ -39,6 +42,7 @@ namespace Tiles
 		void SetTint(const glm::vec4& tint) { TintColor = tint; }
 		void SetTextureCoords(const glm::vec4& textureCoords) { m_TextureCoords = textureCoords; }
 
+		/// Value equality; float fields are compared with an epsilon tolerance.
 		bool operator==(const Tile& other) const;
 		bool operator!=(const Tile& other) const;
 

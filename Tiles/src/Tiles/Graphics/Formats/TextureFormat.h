@@ -23,9 +23,13 @@ namespace Tiles
 		bool IsFloat;
 	};
 
+	/// Static lookup of per-format GL enums and pixel metrics, table-driven by
+	/// the TextureFormat enum value.
 	class TextureFormats
 	{
 	public:
+		/// Returns the info record for @p format, or the None record if the value
+		/// is out of range.
 		static const TextureFormatInfo& GetInfo(TextureFormat format);
 
 		static uint32_t GetInternalFormat(TextureFormat format) { return GetInfo(format).InternalFormat; }
@@ -36,6 +40,7 @@ namespace Tiles
 		static const char* GetName(TextureFormat format) { return GetInfo(format).Name; }
 		static bool IsFloat(TextureFormat format) { return GetInfo(format).IsFloat; }
 
+		/// Maps a channel count (1-4) to the matching 8-bit format, None otherwise.
 		static TextureFormat FromComponentCount(int components);
 		static bool IsValidFormat(TextureFormat format);
 		static size_t CalculateImageSize(TextureFormat format, uint32_t width, uint32_t height);

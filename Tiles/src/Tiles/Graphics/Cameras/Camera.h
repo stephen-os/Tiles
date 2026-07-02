@@ -32,7 +32,9 @@ namespace Tiles
 		virtual ~Camera() = default;
 
 		virtual void SetPosition(const glm::vec3& position) = 0;
+		/// Moves the camera in world space.
 		void Translate(const glm::vec3& translation);
+		/// Moves the camera along its own right/up/forward axes.
 		void TranslateLocal(const glm::vec3& translation);
 
 		void SetRotation(const glm::vec3& rotation);
@@ -42,8 +44,12 @@ namespace Tiles
 		void RotateYaw(float angle);
 		void RotateRoll(float angle);
 
+		/// Orients the camera to face @p target, deriving pitch/yaw and keeping roll.
 		void LookAt(const glm::vec3& target);
+		/// Orients toward @p target using @p up to also resolve roll.
 		void LookAt(const glm::vec3& target, const glm::vec3& up);
+		/// Like LookAt but interpolates toward the target orientation by
+		/// @p speed * @p deltaTime; call each frame to animate.
 		void LookAtSmooth(const glm::vec3& target, float speed, float deltaTime);
 		void LookAtSmooth(const glm::vec3& target, float speed, float deltaTime, const glm::vec3& up);
 
@@ -71,17 +77,26 @@ namespace Tiles
 		void MoveRight(float distance);
 		void MoveUp(float distance);
 
+		/// Unprojects a pixel position to a world-space point at the given NDC
+		/// @p depth (-1 near, +1 far). @p screenSize is the viewport in pixels.
 		glm::vec3 ScreenToWorld(const glm::vec2& screenPos, const glm::vec2& screenSize, float depth = 0.0f) const;
+		/// Projects a world-space point to a pixel position within @p screenSize.
 		glm::vec2 WorldToScreen(const glm::vec3& worldPos, const glm::vec2& screenSize) const;
 
+		/// Builds a world-space ray from the near to far plane through @p screenPos
+		/// (e.g. for mouse picking).
 		Ray GetRay(const glm::vec2& screenPos, const glm::vec2& screenSize) const;
 
+		/// Extracts the six frustum planes from the view-projection matrix, each
+		/// pointing inward so a positive plane distance means inside.
 		Frustum GetFrustum() const;
 		bool IsPointInFrustum(const glm::vec3& point) const;
 		bool IsSphereInFrustum(const glm::vec3& center, float radius) const;
 
 		void SetTargetPosition(const glm::vec3& target);
 		void SetTargetRotation(const glm::vec3& target);
+		/// Advances any set position/rotation targets toward them by an amount
+		/// proportional to @p deltaTime; clears a target once it is reached.
 		void UpdateSmooth(float deltaTime, float positionSpeed = 5.0f, float rotationSpeed = 5.0f);
 
 	protected:

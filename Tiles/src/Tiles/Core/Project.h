@@ -17,10 +17,14 @@
 
 namespace Tiles
 {
+    /// A document: the layer stack, its texture atlases, and file/dirty
+    /// bookkeeping. A project with no file path is considered "new" (unsaved).
     class Project
     {
     public:
         nlohmann::json ToJSON() const;
+        /// Reconstructs a project from JSON.
+        /// @return Null if the required layer-stack field is missing.
         static std::shared_ptr<Project> FromJSON(const nlohmann::json& json);
 
         Project(uint32_t width, uint32_t height, const std::string& name = "Untitled Project");

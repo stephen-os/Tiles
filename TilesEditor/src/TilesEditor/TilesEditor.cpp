@@ -19,6 +19,8 @@ public:
 
 	void OnAttach() override
 	{
+		// One Context is shared by every panel so they all read and mutate the
+		// same project, brush, working layer, and command history.
 		std::shared_ptr<Tiles::Context> context = Tiles::Context::Create();
 
 		m_PanelManager.RegisterPanel<PanelLayerSelection>(context);

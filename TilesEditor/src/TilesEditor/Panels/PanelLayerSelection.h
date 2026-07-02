@@ -15,6 +15,10 @@ namespace Tiles
     class LayerStack;
     class TileLayer;
 
+    /// Panel for managing the project's layer stack: the layer list with
+    /// per-layer visibility, selection of the working layer, add/delete/clear and
+    /// reorder operations, and editing of the selected layer's name/render group.
+    /// Structural changes go through the Context command system so they are undoable.
     class PanelLayerSelection : public Panel
     {
     public:

@@ -5,6 +5,8 @@
 
 namespace Tiles
 {
+	// Padding1..4 reserve N*4 bytes of stride without emitting a vertex
+	// attribute, used to match std140/UBO alignment rules in a layout.
 	enum class BufferDataType
 	{
 		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool, Padding1, Padding2, Padding3, Padding4

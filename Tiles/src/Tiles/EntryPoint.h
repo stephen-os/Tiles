@@ -8,6 +8,7 @@ extern Tiles::Application* Tiles::CreateApplication(int argc, char** argv);
 
 namespace Tiles
 {
+	/// Builds the client application, runs its full lifecycle, and cleans up.
 	int Main(int argc, char** argv)
 	{
 		Tiles::Application* app = Tiles::CreateApplication(argc, argv);

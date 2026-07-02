@@ -10,11 +10,15 @@ namespace Tiles
 		OrthographicCamera(float left = -10.0f, float right = 10.0f, float bottom = -10.0f, float top = 10.0f, float nearPlane = -100.0f, float farPlane = 100.0f);
 		virtual ~OrthographicCamera() = default;
 
+		/// Convenience factory for a pixel-space 2D camera centered on the origin.
 		static OrthographicCamera Create2D(float width, float height);
 
 		void SetBounds(float left, float right, float bottom, float top);
 		void SetClippingPlanes(float nearPlane, float farPlane);
+		/// Sets the base (unzoomed) view size and recomputes bounds around center.
 		void SetSize(float width, float height);
+		/// Scales the base view size by 1/@p zoom about the current center, so
+		/// higher zoom shows a smaller area. Clamped to a small positive value.
 		void SetZoom(float zoom);
 		void SetOrthoParams(float left, float right, float bottom, float top, float nearPlane, float farPlane);
 		void SetPosition(const glm::vec3& position) override;

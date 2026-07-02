@@ -11,6 +11,8 @@ namespace Tiles
 
     void PopupOpenProject::OnRender()
     {
+        // Reset dialog state once per opening; the flag is restored in the
+        // "not visible" branch below.
         if (m_FirstShow)
         {
             InitializeDialog();
@@ -81,6 +83,8 @@ namespace Tiles
 
     void PopupOpenProject::OnUpdate()
     {
+        // A failed open only times out its error message and leaves the popup open
+        // to retry; a successful open auto-closes the popup (handled in OnRender).
         if (m_ShowMessage && !m_ProjectOpenedSuccessfully)
         {
             m_MessageTimer += ImGui::GetIO().DeltaTime;
@@ -139,7 +143,6 @@ namespace Tiles
 
         ImGui::Text("Project file:");
         ImGui::SetNextItemWidth(450.0f);
-        // Use fixed buffer size to prevent overflow - NOT capacity() + 1
         if (ImGui::InputText("##FileName", m_FileNameBuffer, FileNameBufferSize))
         {
             ValidateFilePath();

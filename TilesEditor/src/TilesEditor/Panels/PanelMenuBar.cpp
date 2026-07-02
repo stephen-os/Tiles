@@ -76,6 +76,9 @@ namespace Tiles
 
     void PanelMenuBar::RenderErrorDialog()
     {
+        // OpenPopup must be issued from the same ID scope that hosts the modal
+        // below, so ReportResult only raises a flag and the actual open is
+        // deferred to here; clearing the flag makes it a one-shot.
         if (m_ShowErrorDialog)
         {
             ImGui::OpenPopup("Error##MenuBar");
@@ -120,6 +123,8 @@ namespace Tiles
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_S, false))
             {
+                // A never-saved project has no path yet, so Ctrl+S must fall back
+                // to Save-As; an existing project saves in place.
                 auto project = m_Context->GetProject();
                 if (project->IsNew() && project->HasUnsavedChanges())
                 {

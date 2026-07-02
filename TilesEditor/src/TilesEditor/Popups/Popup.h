@@ -5,6 +5,10 @@
 
 namespace Tiles
 {
+	/// Base class for dialog-style popups owned by a panel. Tracks a visibility
+	/// flag toggled via Show/Hide/Toggle; Render() and Update() dispatch to the
+	/// derived OnRender/OnUpdate only while visible, so callers may call them
+	/// unconditionally each frame.
 	class Popup
 	{
 	public:

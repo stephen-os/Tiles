@@ -114,6 +114,9 @@ namespace Tiles
         auto camera = m_Context->GetViewportCamera();
         if (!camera) return;
 
+        // A pan begins on middle-button press and ends only when middle is
+        // released; while dragging, either middle or right may hold the pan.
+        // World Y grows upward, so the vertical delta is added rather than subtracted.
         if (Input::IsMouseButtonPressed(MouseCode::Middle) && !m_IsDragging)
         {
             m_IsDragging = true;
@@ -259,6 +262,7 @@ namespace Tiles
                     (y + 1) * m_TileSize + cameraPos.y
                 };
 
+                // Nudge each layer's depth so higher layers draw above lower ones.
                 Tiles::Renderer2D::SetQuadPosition({
                     tileWorldPos.x,
                     tileWorldPos.y,
@@ -420,6 +424,8 @@ namespace Tiles
     {
         PaintingMode mode = m_Context->GetPaintingMode();
 
+        // gridPos is 1-based (see GetGridPositionUnderMouse); layers are indexed
+        // from zero, hence the -1 on each coordinate.
         switch (mode)
         {
         case PaintingMode::Brush:

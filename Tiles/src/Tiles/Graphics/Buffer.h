@@ -15,6 +15,7 @@ namespace Tiles
         Stream          // Data modified every frame (GL_STREAM_DRAW)
     };
 
+    /// GPU vertex buffer; RAII wrapper owning a single GL buffer object.
     class VertexBuffer
     {
     public:
@@ -25,6 +26,9 @@ namespace Tiles
         VertexBuffer(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Static);
         ~VertexBuffer();
 
+        // Owns a GL buffer handle freed in the destructor. Copying would double
+        // free it, so the type is move-only: a moved-from buffer keeps id 0 and
+        // its destructor becomes a no-op.
         VertexBuffer(const VertexBuffer&) = delete;
         VertexBuffer& operator=(const VertexBuffer&) = delete;
         VertexBuffer(VertexBuffer&& other) noexcept;
@@ -49,6 +53,7 @@ namespace Tiles
         BufferLayout m_Layout;
     };
 
+    /// GPU element/index buffer; RAII wrapper owning a single GL buffer object.
     class IndexBuffer
     {
     public:
@@ -57,6 +62,7 @@ namespace Tiles
         IndexBuffer(uint32_t* data, uint32_t count, BufferUsage usage = BufferUsage::Static);
         virtual ~IndexBuffer();
 
+        // Move-only for the same GL-ownership reason as VertexBuffer.
         IndexBuffer(const IndexBuffer&) = delete;
         IndexBuffer& operator=(const IndexBuffer&) = delete;
         IndexBuffer(IndexBuffer&& other) noexcept;
@@ -77,6 +83,8 @@ namespace Tiles
         BufferUsage m_Usage;
     };
 
+    /// GPU uniform buffer (UBO) for sharing uniform blocks across shaders;
+    /// RAII wrapper owning a single GL buffer object.
     class UniformBuffer
     {
     public:
@@ -87,11 +95,14 @@ namespace Tiles
         UniformBuffer(const void* data, uint32_t size, BufferUsage usage = BufferUsage::Dynamic);
         ~UniformBuffer();
 
+        // Move-only for the same GL-ownership reason as VertexBuffer.
         UniformBuffer(const UniformBuffer&) = delete;
         UniformBuffer& operator=(const UniformBuffer&) = delete;
         UniformBuffer(UniformBuffer&& other) noexcept;
         UniformBuffer& operator=(UniformBuffer&& other) noexcept;
 
+        /// Binds the buffer to an indexed uniform binding point (glBindBufferBase)
+        /// and remembers it so Unbind() can release the same point.
         void Bind(uint32_t bindingPoint) const;
         void Unbind() const;
 

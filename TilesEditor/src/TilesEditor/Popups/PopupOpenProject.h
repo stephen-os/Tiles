@@ -5,6 +5,9 @@
 
 namespace Tiles
 {
+    /// Open-Project dialog: browse to or type a .tiles file, validate that it
+    /// exists and has the right extension, then load it via Context::LoadProject.
+    /// Shows an inline status message and auto-closes shortly after a successful open.
     class PopupOpenProject : public Popup
     {
     public:
@@ -25,7 +28,8 @@ namespace Tiles
         void InitializeDialog();
 
     private:
-        // Fixed buffer for ImGui InputText - avoids buffer overflow from capacity() + 1 bug
+        // ImGui::InputText writes into this fixed buffer; its size is independent
+        // of the string contents so the writable region is always well defined.
         static constexpr size_t FileNameBufferSize = 256;
         char m_FileNameBuffer[FileNameBufferSize] = {};
         std::filesystem::path m_Directory = ".";

@@ -126,6 +126,8 @@ namespace Tiles
 
             ImGui::TableNextRow();
 
+            // Each header/cell below is manually centered in its column by offsetting
+            // the cursor by half the leftover width (cell width minus content width).
             ImGui::TableSetColumnIndex(0);
             {
                 const char* header = "Layer Name";
@@ -176,6 +178,7 @@ namespace Tiles
                 cursor_x = ImGui::GetCursorPosX() + (cell_width - item_width) * 0.5f;
                 ImGui::SetCursorPosX(cursor_x);
 
+                // Display-only mirror of the layer's visibility flag.
                 bool visible = layer.GetVisibility();
                 ImGui::BeginDisabled(true);
                 ImGui::Checkbox(("##vis" + std::to_string(layerIdx)).c_str(), &visible);
@@ -195,6 +198,8 @@ namespace Tiles
                     int32_t groupValue = renderGroupValues[i];
                     bool isInGroup = m_LayerToRenderGroup[layerIdx] == groupValue;
 
+                    // Highlight the layer's applied group in yellow when the pending
+                    // selection differs, so unsaved reassignments stand out.
                     bool shouldHighlight = (currentLayerGroup == groupValue && currentLayerGroup != m_LayerToRenderGroup[layerIdx]);
                     ImVec4 textColor = shouldHighlight ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImGui::GetStyleColorVec4(ImGuiCol_Text);
                     ImGui::PushStyleColor(ImGuiCol_Text, textColor);
@@ -541,6 +546,8 @@ namespace Tiles
                     const Tile& tile = layer.GetTile(x, y);
                     if (!tile.IsPainted()) continue;
 
+                    // The (x+1, y+1) offset matches the viewport's one-tile border,
+                    // keeping exported output aligned with what the editor shows.
                     glm::vec2 tileWorldPos = {
                         (x + 1) * tileSize + cameraPos.x,
                         (y + 1) * tileSize + cameraPos.y

@@ -148,6 +148,8 @@ namespace Tiles
             return;
         }
 
+        // Hide the system cursor and draw the tool texture on the foreground draw
+        // list so it appears above every window as the cursor.
         ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 
         ImVec2 mousePos = ImGui::GetMousePos();
@@ -185,6 +187,7 @@ namespace Tiles
             return;
         }
 
+        // Clicking the already-active tool toggles it off (back to None).
         if (m_Context->GetPaintingMode() == mode)
         {
             m_Context->SetPaintingMode(PaintingMode::None);

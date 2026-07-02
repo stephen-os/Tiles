@@ -5,6 +5,8 @@
 
 namespace Tiles
 {
+    /// Clears every tile on a layer, snapshotting the layer on first Execute so
+    /// Undo can restore its contents.
     class LayerClearCommand : public Command
     {
     public:

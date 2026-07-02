@@ -4,6 +4,8 @@
 
 namespace Tiles
 {
+    // Fixed texture-unit assignments shared between binding code and shaders so
+    // both agree on which sampler each kind of texture lives in.
     namespace TextureSlots
     {
         // Material texture slots (0-7)

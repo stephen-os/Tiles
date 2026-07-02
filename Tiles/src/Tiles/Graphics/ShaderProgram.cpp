@@ -23,6 +23,7 @@ namespace Tiles
         m_FragmentShaderID = CompileSource(GL_FRAGMENT_SHADER, fragmentSource);
         TILES_ASSERT(m_FragmentShaderID != 0, "Fragment shader compilation failed!");
 
+        // Link the two compiled stages into a program.
         m_ShaderProgramID = glCreateProgram();
         TILES_ASSERT(m_ShaderProgramID != 0, "Failed to create shader program!");
 
@@ -42,7 +43,8 @@ namespace Tiles
             TILES_LOG_ERROR("Shader program linking error:\n{0}", message);
         }
 
-        // Query uniforms
+        // Cache the location of every active uniform so SetUniform* can look up
+        // by name without a GL round-trip per call.
         m_Uniforms.clear();
         int nuniforms;
         GLCALL(glGetProgramiv(m_ShaderProgramID, GL_ACTIVE_UNIFORMS, &nuniforms));
@@ -57,6 +59,8 @@ namespace Tiles
             location = glGetUniformLocation(m_ShaderProgramID, name);
             m_Uniforms[name] = location;
 
+            // Array uniforms report only their [0] element; strip that suffix and
+            // cache each remaining element ("name[1]", "name[2]", ...) explicitly.
             for (int elementIndex = 1; elementIndex < size; ++elementIndex)
             {
                 std::string elementName = std::string(name).substr(0, length - 3) + "[" + std::to_string(elementIndex) + "]";

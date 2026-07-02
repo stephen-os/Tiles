@@ -9,6 +9,9 @@
 
 namespace Tiles
 {
+    /// The application's main menu bar (File/Edit/Project/View/Help), the source
+    /// of the global keyboard shortcuts, and the host for the New/Resize/About
+    /// modal dialogs plus the Save-As, Open, and Export (render matrix) popups.
     class PanelMenuBar : public Panel
     {
     public:
