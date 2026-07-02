@@ -652,6 +652,20 @@ namespace Tiles
 		}
 	}
 
+	// Applies the view-projection, wireframe, and lighting uniforms shared by the
+	// quad, circle, line, text, and triangle shaders. Pixel and grid use reduced
+	// uniform sets and set theirs inline.
+	static void SetSharedUniforms(const std::shared_ptr<ShaderProgram>& shader)
+	{
+		shader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
+		shader->SetUniformInt("u_WireframeMode", (int)s_Data.PolygonMode);
+		shader->SetUniformVec3("u_WireframeColor", s_Data.WireFrameColor);
+		shader->SetUniformInt("u_EnableLighting", (int)s_Data.UseLighting);
+		shader->SetUniformVec3("u_AmbientColor", s_Data.AmbientColor);
+		shader->SetUniformFloat("u_AmbientIntensity", s_Data.AmbientIntensity);
+		shader->SetUniformInt("u_PointLightCount", (int)s_Data.PointLightCount);
+	}
+
 	// Binds textures/lights once, then draws each non-empty primitive batch with
 	// its shader and shared uniforms, and resets the per-batch counters.
 	void Renderer2D::Flush()
@@ -665,13 +679,7 @@ namespace Tiles
 		if (s_Data.QuadIndexCount > 0)
 		{
 			s_Data.QuadShader->Bind();
-			s_Data.QuadShader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-			s_Data.QuadShader->SetUniformInt("u_WireframeMode", (int)s_Data.PolygonMode);
-			s_Data.QuadShader->SetUniformVec3("u_WireframeColor", s_Data.WireFrameColor);
-			s_Data.QuadShader->SetUniformInt("u_EnableLighting", (int)s_Data.UseLighting);
-			s_Data.QuadShader->SetUniformVec3("u_AmbientColor", s_Data.AmbientColor);
-			s_Data.QuadShader->SetUniformFloat("u_AmbientIntensity", s_Data.AmbientIntensity);
-			s_Data.QuadShader->SetUniformInt("u_PointLightCount", (int)s_Data.PointLightCount);
+			SetSharedUniforms(s_Data.QuadShader);
 
 			s_Data.QuadVertexArray->Bind();
 			RenderCommands::DrawElementsWithCount(s_Data.QuadVertexArray, PrimitiveType::Triangles, s_Data.QuadIndexCount);
@@ -683,13 +691,7 @@ namespace Tiles
 		if (s_Data.CircleIndexCount > 0)
 		{
 			s_Data.CircleShader->Bind();
-			s_Data.CircleShader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-			s_Data.CircleShader->SetUniformInt("u_WireframeMode", (int)s_Data.PolygonMode);
-			s_Data.CircleShader->SetUniformVec3("u_WireframeColor", s_Data.WireFrameColor);
-			s_Data.CircleShader->SetUniformInt("u_EnableLighting", (int)s_Data.UseLighting);
-			s_Data.CircleShader->SetUniformVec3("u_AmbientColor", s_Data.AmbientColor);
-			s_Data.CircleShader->SetUniformFloat("u_AmbientIntensity", s_Data.AmbientIntensity);
-			s_Data.CircleShader->SetUniformInt("u_PointLightCount", (int)s_Data.PointLightCount);
+			SetSharedUniforms(s_Data.CircleShader);
 
 			s_Data.CircleVertexArray->Bind();
 			RenderCommands::DrawElementsWithCount(s_Data.CircleVertexArray, PrimitiveType::Triangles, s_Data.CircleIndexCount);
@@ -701,13 +703,7 @@ namespace Tiles
 		if (s_Data.LineVertexCount > 0)
 		{
 			s_Data.LineShader->Bind();
-			s_Data.LineShader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-			s_Data.LineShader->SetUniformInt("u_WireframeMode", (int)s_Data.PolygonMode);
-			s_Data.LineShader->SetUniformVec3("u_WireframeColor", s_Data.WireFrameColor);
-			s_Data.LineShader->SetUniformInt("u_EnableLighting", (int)s_Data.UseLighting);
-			s_Data.LineShader->SetUniformVec3("u_AmbientColor", s_Data.AmbientColor);
-			s_Data.LineShader->SetUniformFloat("u_AmbientIntensity", s_Data.AmbientIntensity);
-			s_Data.LineShader->SetUniformInt("u_PointLightCount", (int)s_Data.PointLightCount);
+			SetSharedUniforms(s_Data.LineShader);
 
 			s_Data.LineVertexArray->Bind();
 			RenderCommands::SetLineWidth(s_Data.LineWidth);
@@ -720,13 +716,7 @@ namespace Tiles
 		if (s_Data.TextIndexCount > 0)
 		{
 			s_Data.TextShader->Bind();
-			s_Data.TextShader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-			s_Data.TextShader->SetUniformInt("u_WireframeMode", (int)s_Data.PolygonMode);
-			s_Data.TextShader->SetUniformVec3("u_WireframeColor", s_Data.WireFrameColor);
-			s_Data.TextShader->SetUniformInt("u_EnableLighting", (int)s_Data.UseLighting);
-			s_Data.TextShader->SetUniformVec3("u_AmbientColor", s_Data.AmbientColor);
-			s_Data.TextShader->SetUniformFloat("u_AmbientIntensity", s_Data.AmbientIntensity);
-			s_Data.TextShader->SetUniformInt("u_PointLightCount", (int)s_Data.PointLightCount);
+			SetSharedUniforms(s_Data.TextShader);
 
 			s_Data.TextVertexArray->Bind();
 			RenderCommands::DrawElementsWithCount(s_Data.TextVertexArray, PrimitiveType::Triangles, s_Data.TextIndexCount);
@@ -756,13 +746,7 @@ namespace Tiles
 		if (s_Data.TriangleVertexCount > 0)
 		{
 			s_Data.TriangleShader->Bind();
-			s_Data.TriangleShader->SetUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-			s_Data.TriangleShader->SetUniformInt("u_WireframeMode", (int)s_Data.PolygonMode);
-			s_Data.TriangleShader->SetUniformVec3("u_WireframeColor", s_Data.WireFrameColor);
-			s_Data.TriangleShader->SetUniformInt("u_EnableLighting", (int)s_Data.UseLighting);
-			s_Data.TriangleShader->SetUniformVec3("u_AmbientColor", s_Data.AmbientColor);
-			s_Data.TriangleShader->SetUniformFloat("u_AmbientIntensity", s_Data.AmbientIntensity);
-			s_Data.TriangleShader->SetUniformInt("u_PointLightCount", (int)s_Data.PointLightCount);
+			SetSharedUniforms(s_Data.TriangleShader);
 
 			s_Data.TriangleVertexArray->Bind();
 			RenderCommands::DrawArrays(s_Data.TriangleVertexArray, PrimitiveType::Triangles, s_Data.TriangleVertexCount);
