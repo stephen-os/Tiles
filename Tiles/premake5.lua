@@ -27,7 +27,7 @@ project "Tiles"
         "ImGui",
         "GLFW",
         "Glad",
-        "ImGuiFileDialog",
+        "ImGuiFD",
         "opengl32.lib"
     }
 
