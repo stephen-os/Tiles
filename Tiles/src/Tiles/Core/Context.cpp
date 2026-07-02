@@ -112,14 +112,6 @@ namespace Tiles
         }
     }
 
-    void Context::PaintTileWithBrush(size_t x, size_t y, const Tile& brush)
-    {
-        if (HasWorkingLayer())
-        {
-            PaintTileOnLayer(m_WorkingLayer, x, y, brush);
-        }
-    }
-
     void Context::PaintTileOnLayer(size_t layerIndex, size_t x, size_t y, const Tile& tile)
     {
         LayerStack& layerStack = m_Project->GetLayerStack();

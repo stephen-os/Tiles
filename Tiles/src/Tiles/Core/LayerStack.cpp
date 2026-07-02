@@ -85,30 +85,6 @@ namespace Tiles
         }
     }
 
-    void LayerStack::SwapLayers(size_t indexA, size_t indexB)
-    {
-        if (!IsValidLayerIndex(indexA))
-        {
-            TILES_LOG_INFO("LayerStack::SwapLayers: Invalid layer index A: {} (layer count: {})", indexA, m_Layers.size());
-            return;
-        }
-
-        if (!IsValidLayerIndex(indexB))
-        {
-            TILES_LOG_INFO("LayerStack::SwapLayers: Invalid layer index B: {} (layer count: {})", indexB, m_Layers.size());
-            return;
-        }
-
-        if (indexA == indexB)
-        {
-            TILES_LOG_INFO("LayerStack::SwapLayers: Attempted to swap layer {} with itself - no action taken", indexA);
-            return;
-        }
-
-        TILES_LOG_INFO("LayerStack::SwapLayers: Swapping layers at indices {} and {}", indexA, indexB);
-        std::swap(m_Layers[indexA], m_Layers[indexB]);
-    }
-
     void LayerStack::ClearAllLayers()
     {
         size_t layerCount = m_Layers.size();

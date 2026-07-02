@@ -56,7 +56,6 @@ namespace Tiles
         Tile& GetBrush() { return m_Brush; }
 
         void PaintTile(size_t x, size_t y);
-        void PaintTileWithBrush(size_t x, size_t y, const Tile& brush);
         void PaintTileOnLayer(size_t layerIndex, size_t x, size_t y, const Tile& tile);
         void EraseTile(size_t x, size_t y);
         void FillLayer(size_t x, size_t y);

@@ -23,7 +23,6 @@ namespace Tiles
         void ClearLayer(size_t index);
         void InsertLayer(size_t index, const std::string& name = "New Layer");
         void ReplaceLayer(size_t index, const TileLayer& layer);
-        void SwapLayers(size_t indexA, size_t indexB); 
         void ClearAllLayers();
 
         void MoveLayerUp(size_t index);
