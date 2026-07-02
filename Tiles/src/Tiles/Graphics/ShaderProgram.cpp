@@ -3,7 +3,7 @@
 #include "../Utils/FileReader.h"
 #include "RenderCommands.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>

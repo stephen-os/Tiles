@@ -7,9 +7,6 @@
 [submodule "Tiles/vendor/glfw"]
 	path = Tiles/vendor/glfw
 	url = https://github.com/stephen-os/glfw.git
-[submodule "Tiles/vendor/glad"]
-	path = Tiles/vendor/glad
-	url = https://github.com/stephen-os/glad.git
 [submodule "Tiles/vendor/spdlog"]
 	path = Tiles/vendor/spdlog
 	url = https://github.com/stephen-os/spdlog.git

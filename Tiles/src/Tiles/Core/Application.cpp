@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include "Application.h"
 
@@ -80,7 +80,7 @@ namespace Tiles
             }
         }
 
-        int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+        int status = gladLoadGL((GLADloadfunc)glfwGetProcAddress);
         TILES_ASSERT(status, "[OpenGL Context] Failed to initialize GLAD.");
 
         const char* version = (const char*)glGetString(GL_VERSION);

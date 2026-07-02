@@ -11,9 +11,9 @@ project "GLAD"
 
     files
     {
-        "../vendor/glad/include/glad/glad.h",
+        "../vendor/glad/include/glad/gl.h",
         "../vendor/glad/include/KHR/khrplatform.h",
-        "../vendor/glad/src/glad.c"
+        "../vendor/glad/src/gl.c"
     }
 
     includedirs
