@@ -2,6 +2,33 @@
 
 #include <glad/glad.h>
 
+namespace Tiles::GL
+{
+    static const char* ErrorString(GLenum error)
+    {
+        switch (error)
+        {
+        case GL_INVALID_ENUM: return "GL_INVALID_ENUM";
+        case GL_INVALID_VALUE: return "GL_INVALID_VALUE";
+        case GL_INVALID_OPERATION: return "GL_INVALID_OPERATION";
+        case GL_INVALID_FRAMEBUFFER_OPERATION: return "GL_INVALID_FRAMEBUFFER_OPERATION";
+        case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
+        case GL_STACK_UNDERFLOW: return "GL_STACK_UNDERFLOW";
+        case GL_STACK_OVERFLOW: return "GL_STACK_OVERFLOW";
+        default: return "GL_UNKNOWN_ERROR";
+        }
+    }
+
+    void CheckError(const char* call, const char* file, int line)
+    {
+        while (GLenum error = glGetError())
+        {
+            TILES_LOG_ERROR("[GL ERROR] {} (0x{:04X}) from '{}'\nFile: {}\nLine: {}",
+                ErrorString(error), error, call, file, line);
+        }
+    }
+}
+
 namespace Tiles
 {
     RenderState RenderCommands::s_CurrentState;

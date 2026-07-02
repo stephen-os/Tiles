@@ -4,9 +4,19 @@
 
 #include "Core/Base.h"
 
-// GLCALL macro for OpenGL debugging
+namespace Tiles::GL
+{
+    // Drains the OpenGL error queue after a call and logs any errors with the
+    // originating call, file, and line. Declared here, defined in the .cpp so
+    // this header stays free of the GL headers.
+    void CheckError(const char* call, const char* file, int line);
+}
+
+// Wraps an OpenGL call so GL errors are surfaced during development. In debug
+// builds the error queue is drained and logged after every call; release keeps
+// the call bare to avoid a glGetError round-trip per command.
 #ifdef TILES_DEBUG
-    #define GLCALL(x) x
+    #define GLCALL(x) do { x; ::Tiles::GL::CheckError(#x, __FILE__, __LINE__); } while (0)
 #else
     #define GLCALL(x) x
 #endif
