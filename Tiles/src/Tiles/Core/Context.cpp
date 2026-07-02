@@ -173,6 +173,7 @@ namespace Tiles
         {
             m_CommandHistory.Execute(std::move(command), m_Project->GetLayerStack());
             m_Project->MarkAsModified();
+            ValidateWorkingLayer();
         }
     }
 
@@ -182,6 +183,7 @@ namespace Tiles
         {
             m_CommandHistory.Undo(m_Project->GetLayerStack());
             m_Project->MarkAsModified();
+            ValidateWorkingLayer();
         }
     }
 
@@ -191,6 +193,7 @@ namespace Tiles
         {
             m_CommandHistory.Redo(m_Project->GetLayerStack());
             m_Project->MarkAsModified();
+            ValidateWorkingLayer();
         }
     }
 
