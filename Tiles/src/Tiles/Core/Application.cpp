@@ -32,13 +32,13 @@ namespace Tiles
         TILES_LOG_ERROR("[GLFW ERROR] {}: {}", error, description);
     }
 
-    Application::Application(const ApplicationSpecification& applicationSpecification)
+    Application::Application(const ApplicationSettings& settings)
     {
 		s_Instance = this;
-        m_Specifications = applicationSpecification;
+        m_Settings = settings;
 
-        Log::Init(m_Specifications.Name);
-        TILES_LOG_INFO("Starting Tiles Application: {}", m_Specifications.Name);
+        Log::Init(m_Settings.Name);
+        TILES_LOG_INFO("Starting Tiles Application: {}", m_Settings.Name);
 
         glfwSetErrorCallback(GLFWErrorCallback);
 
@@ -50,7 +50,7 @@ namespace Tiles
 
         // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
-        m_Window = glfwCreateWindow(m_Specifications.Width, m_Specifications.Height, m_Specifications.Name.c_str(), NULL, NULL);
+        m_Window = glfwCreateWindow(m_Settings.Width, m_Settings.Height, m_Settings.Name.c_str(), NULL, NULL);
         if (!m_Window)
         {
             TILES_LOG_ERROR("Failed to create GLFW window.");
@@ -65,18 +65,27 @@ namespace Tiles
         // glfwSetWindowTitleBarColor(m_Window, 45, 45, 45);
         // glfwSetWindowTitleBarTextColor(m_Window, 255, 153, 51);
 
-        if (!m_Specifications.Icon.empty())
+        // A missing or undecodable icon is non-fatal: log it and fall back to the
+        // window system's default icon (nothing set).
+        if (!m_Settings.Icon.empty())
         {
-            GLFWimage icon;
-            icon.pixels = stbi_load(m_Specifications.Icon.c_str(), &icon.width, &icon.height, 0, 4);
-            if (icon.pixels)
+            if (!std::filesystem::exists(m_Settings.Icon))
             {
-                glfwSetWindowIcon(m_Window, 1, &icon);
-                stbi_image_free(icon.pixels);
+                TILES_LOG_WARN("Application: Window icon '{}' not found; using the default.", m_Settings.Icon);
             }
             else
             {
-                TILES_LOG_WARN("Failed to load window icon: {}", m_Specifications.Icon);
+                GLFWimage icon;
+                icon.pixels = stbi_load(m_Settings.Icon.c_str(), &icon.width, &icon.height, 0, 4);
+                if (icon.pixels)
+                {
+                    glfwSetWindowIcon(m_Window, 1, &icon);
+                    stbi_image_free(icon.pixels);
+                }
+                else
+                {
+                    TILES_LOG_WARN("Application: Failed to decode window icon '{}'; using the default.", m_Settings.Icon);
+                }
             }
         }
 
@@ -87,7 +96,7 @@ namespace Tiles
         TILES_ASSERT(version, "[OpenGL Context] Failed to retrieve OpenGL version.");
         TILES_LOG_INFO("OpenGL Version: {}", version);
 
-        if (m_Specifications.Use2DRenderer)
+        if (m_Settings.Use2DRenderer)
             Renderer2D::Init();
 
         IMGUI_CHECKVERSION();
@@ -111,20 +120,18 @@ namespace Tiles
         ImGui_ImplOpenGL3_Init(glsl_version);
 
 		// Maximize Window
-        if (m_Specifications.Maximized)
+        if (m_Settings.Maximized)
         {
             glfwMaximizeWindow(m_Window);
         }
 
         // Fullscreen
-        if (m_Specifications.Fullscreen)
+        if (m_Settings.Fullscreen)
         {
             SetWindowFullscreen();
         }
 
-        // Apply Theme
-        if (m_Specifications.Theme)
-            ApplyTilesTheme();
+        ApplyTilesTheme();
     }
 
 
@@ -136,7 +143,7 @@ namespace Tiles
         // ImGui backends were initialized, so their teardown must be skipped.
         if (m_Window)
         {
-            if (m_Specifications.Use2DRenderer)
+            if (m_Settings.Use2DRenderer)
                 Renderer2D::Shutdown();
 
             ImGui_ImplOpenGL3_Shutdown();
@@ -252,10 +259,10 @@ namespace Tiles
 
     void Application::SetWindowFullscreen()
     {
-        if (m_Specifications.Fullscreen)
+        if (m_Settings.Fullscreen)
         {
-            glfwGetWindowPos(m_Window, &m_Specifications.PositionX, &m_Specifications.PositionY);
-            glfwGetWindowSize(m_Window, (int*)&m_Specifications.Width, (int*)&m_Specifications.Height);
+            glfwGetWindowPos(m_Window, &m_Settings.PositionX, &m_Settings.PositionY);
+            glfwGetWindowSize(m_Window, (int*)&m_Settings.Width, (int*)&m_Settings.Height);
 
             GLFWmonitor* monitor = glfwGetPrimaryMonitor();
             TILES_ASSERT(monitor, "Failed to get primary monitor.");
@@ -268,8 +275,8 @@ namespace Tiles
         }
         else
         {
-            glfwSetWindowMonitor(m_Window, nullptr, m_Specifications.PositionX, m_Specifications.PositionY,
-                m_Specifications.Width, m_Specifications.Height, 0);
+            glfwSetWindowMonitor(m_Window, nullptr, m_Settings.PositionX, m_Settings.PositionY,
+                m_Settings.Width, m_Settings.Height, 0);
         }
     }
 

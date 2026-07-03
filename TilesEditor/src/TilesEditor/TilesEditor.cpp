@@ -62,7 +62,7 @@ private:
 class TilesEditor : public Tiles::Application
 {
 public:
-	TilesEditor(const Tiles::ApplicationSpecification& spec)
+	TilesEditor(const Tiles::ApplicationSettings& spec)
 		: Application(spec)
 	{
 	}
@@ -78,7 +78,7 @@ public:
 
 Tiles::Application* Tiles::CreateApplication(int argc, char** argv)
 {
-	Tiles::ApplicationSpecification spec;
+	Tiles::ApplicationSettings spec;
 	spec.Name = "Tiles";
 	spec.Icon = "res/assets/bucket.png";
 	spec.Width = 1920;

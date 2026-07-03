@@ -14,7 +14,7 @@
 namespace Tiles
 {
 
-	struct ApplicationSpecification
+	struct ApplicationSettings
 	{
 		std::string Name = "Tiles App";
 		std::string Icon = "";
@@ -25,17 +25,15 @@ namespace Tiles
 		int32_t PositionY = 100;
 
 		bool Use2DRenderer = false;
-		bool Use3DRenderer = false;
 
 		bool Fullscreen = false;
 		bool Maximized = false;
-		bool Theme = true;
 	};
 
 	class Application
 	{
 	public:
-		Application(const ApplicationSpecification& applicationSpecification = ApplicationSpecification());
+		Application(const ApplicationSettings& settings = ApplicationSettings());
 		virtual ~Application();
 
 		/// Runs client setup (OnCreate); call once before Run.
@@ -78,7 +76,7 @@ namespace Tiles
 		bool m_Running = true;
 
 		std::vector<std::shared_ptr<Layer>> m_LayerStack;
-		ApplicationSpecification m_Specifications;
+		ApplicationSettings m_Settings;
 
 		float m_TimeStep = 0.0f;
 		Timer m_FrameTimer;
