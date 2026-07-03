@@ -58,7 +58,6 @@ namespace Tiles::Editor
         Tiles::Renderer2D::End();
         Tiles::Renderer2D::SetRenderTarget(nullptr);
 
-		Tiles::Renderer2D::ResetLineState();
 
         ImGui::Image((void*)m_RenderTarget->GetTexture(), m_ViewportSize);
 
@@ -181,56 +180,57 @@ namespace Tiles::Editor
         const float gridHeight = layerStack.GetHeight();
         const float offset = m_TileSize * 0.5f;
 
-        Tiles::Renderer2D::SetLineColor(Viewport::Grid::BoundaryColor);
-        Tiles::Renderer2D::SetLineThickness(2.0f);
+        Tiles::LineParams line;
+        line.Color = Viewport::Grid::BoundaryColor;
+        line.Thickness = 2.0f;
 
-        Tiles::Renderer2D::SetLineStart({
+        line.Start = {
             offset + cameraPos.x,
             offset + cameraPos.y,
             Viewport::Depth::Outline
-            });
-        Tiles::Renderer2D::SetLineEnd({
+            };
+        line.End = {
             m_TileSize * gridWidth + offset + cameraPos.x,
             offset + cameraPos.y,
             Viewport::Depth::Outline
-            });
-        Tiles::Renderer2D::DrawLine();
+            };
+        Tiles::Renderer2D::DrawLine(line);
 
-        Tiles::Renderer2D::SetLineStart({
+        line.Start = {
             offset + cameraPos.x,
             offset + cameraPos.y,
             Viewport::Depth::Outline
-            });
-        Tiles::Renderer2D::SetLineEnd({
+            };
+        line.End = {
             offset + cameraPos.x,
             m_TileSize * gridHeight + offset + cameraPos.y,
             Viewport::Depth::Outline
-            });
-        Tiles::Renderer2D::DrawLine();
+            };
+        Tiles::Renderer2D::DrawLine(line);
 
-        Tiles::Renderer2D::SetLineStart({
+        line.Start = {
             m_TileSize * gridWidth + offset + cameraPos.x,
             m_TileSize * gridHeight + offset + cameraPos.y,
             Viewport::Depth::Outline
-            });
-        Tiles::Renderer2D::SetLineEnd({
+            };
+        line.End = {
             offset + cameraPos.x,
             m_TileSize * gridHeight + offset + cameraPos.y,
             Viewport::Depth::Outline
-            });
-        Tiles::Renderer2D::DrawLine();
+            };
+        Tiles::Renderer2D::DrawLine(line);
 
-        Tiles::Renderer2D::SetLineStart({
+        line.Start = {
             m_TileSize * gridWidth + offset + cameraPos.x,
             m_TileSize * gridHeight + offset + cameraPos.y,
             Viewport::Depth::Outline
-            });
-        Tiles::Renderer2D::SetLineEnd({
+            };
+        line.End = {
             m_TileSize * gridWidth + offset + cameraPos.x,
             offset + cameraPos.y,
             Viewport::Depth::Outline
-            });
-        Tiles::Renderer2D::DrawLine();
+            };
+        Tiles::Renderer2D::DrawLine(line);
     }
 
     void PanelViewport::RenderLayers()

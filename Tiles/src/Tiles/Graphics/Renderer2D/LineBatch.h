@@ -19,7 +19,7 @@ namespace Tiles
 		void Init();
 		void Shutdown();
 
-		void Append(RendererState& state);
+		void Append(RendererState& state, const LineParams& params);
 		void Reset();
 		bool Upload(RendererState& state);
 		void Flush(RendererState& state);
@@ -32,13 +32,8 @@ namespace Tiles
 		LineVertex* Base = nullptr;
 		LineVertex* Ptr = nullptr;
 
-		// Width is the GL line width applied to the current batch; Thickness is the
-		// value staged by SetLineThickness for the next line(s).
+		// GL line width applied to the current batch. DrawLine flushes when a new
+		// line's thickness differs, so every batch renders at one width.
 		float Width = 3.0f;
-
-		glm::vec3 Start = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 End = { 1.0f, 1.0f, 0.0f };
-		float Thickness = 2.0f;
-		glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 }

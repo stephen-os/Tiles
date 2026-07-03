@@ -239,34 +239,6 @@ namespace Tiles
 		s_State->Circle.Fade = 0.0f;
 	}
 
-	void Renderer2D::SetLineStart(const glm::vec3& start)
-	{
-		s_State->Line.Start = start;
-	}
-
-	void Renderer2D::SetLineEnd(const glm::vec3& end)
-	{
-		s_State->Line.End = end;
-	}
-
-	void Renderer2D::SetLineThickness(float thickness)
-	{
-		s_State->Line.Thickness = thickness;
-	}
-
-	void Renderer2D::SetLineColor(const glm::vec4& color)
-	{
-		s_State->Line.Color = color;
-	}
-
-	void Renderer2D::ResetLineState()
-	{
-		s_State->Line.Start = { 0.0f, 0.0f, 0.0f };
-		s_State->Line.End = { 1.0f, 1.0f, 0.0f };
-		s_State->Line.Thickness = 2.0f;
-		s_State->Line.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	}
-
 	void Renderer2D::SetGridPosition(const glm::vec3& position)
 	{
 		s_State->Grid.Position = position;
@@ -347,7 +319,7 @@ namespace Tiles
 		s_State->Circle.Append(*s_State);
 	}
 
-	void Renderer2D::DrawLine()
+	void Renderer2D::DrawLine(const LineParams& params)
 	{
 		if (s_State->Line.VertexCount >= MaxVertices)
 		{
@@ -355,14 +327,14 @@ namespace Tiles
 			StartBatch();
 		}
 
-		if (s_State->Line.Width != s_State->Line.Thickness)
+		if (s_State->Line.Width != params.Thickness)
 		{
 			EndBatch();
 			StartBatch();
-			s_State->Line.Width = s_State->Line.Thickness;
+			s_State->Line.Width = params.Thickness;
 		}
 
-		s_State->Line.Append(*s_State);
+		s_State->Line.Append(*s_State, params);
 	}
 
 	void Renderer2D::DrawGrid()

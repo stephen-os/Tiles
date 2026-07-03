@@ -60,6 +60,16 @@ namespace Tiles
 		glm::vec4 TexCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
 	};
 
+	/// Parameters for one line draw. Lines batch by thickness: drawing lines of
+	/// differing thickness flushes the batch between them (one GL width per batch).
+	struct LineParams
+	{
+		glm::vec3 Start{ 0.0f };
+		glm::vec3 End{ 0.0f };
+		glm::vec4 Color{ 1.0f };
+		float Thickness = 1.0f;
+	};
+
 	/// Immediate-mode-style 2D batch renderer. Primitives are configured through
 	/// Set*/Draw* calls between Begin() and End(); geometry accumulates into
 	/// per-primitive vertex buffers and is flushed in as few draw calls as
@@ -101,12 +111,6 @@ namespace Tiles
 		static void SetCircleFade(float fade);
 		static void ResetCircleState();
 
-		static void SetLineStart(const glm::vec3& start);
-		static void SetLineEnd(const glm::vec3& end);
-		static void SetLineThickness(float thickness);
-		static void SetLineColor(const glm::vec4& color);
-		static void ResetLineState();
-
 		static void SetGridPosition(const glm::vec3& position);
 		static void SetGridRotation(const glm::vec3& rotation);
 		static void SetGridSize(const glm::vec2& size);
@@ -120,7 +124,7 @@ namespace Tiles
 
 		static void DrawQuad(const QuadParams& params);
 		static void DrawCircle();
-		static void DrawLine();
+		static void DrawLine(const LineParams& params);
 		static void DrawGrid();
 
 		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);

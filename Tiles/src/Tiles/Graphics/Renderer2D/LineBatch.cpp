@@ -33,15 +33,15 @@ namespace Tiles
 		Ptr = nullptr;
 	}
 
-	void LineBatch::Append(RendererState& state)
+	void LineBatch::Append(RendererState& state, const LineParams& params)
 	{
-		Ptr->Position = Start;
-		Ptr->Color = Color;
+		Ptr->Position = params.Start;
+		Ptr->Color = params.Color;
 		Ptr++;
 		VertexCount++;
 
-		Ptr->Position = End;
-		Ptr->Color = Color;
+		Ptr->Position = params.End;
+		Ptr->Color = params.Color;
 		Ptr++;
 		VertexCount++;
 

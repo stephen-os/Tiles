@@ -101,23 +101,24 @@ namespace Tiles::Editor
         // Render grid if enabled
         if (m_ShowGrid)
         {
-            Tiles::Renderer2D::SetLineColor(Render2D::Grid::Color);
-            Tiles::Renderer2D::SetLineThickness(Render2D::Grid::LineThickness);
+            Tiles::LineParams line;
+            line.Color = Render2D::Grid::Color;
+            line.Thickness = Render2D::Grid::LineThickness;
 
             // Vertical lines
             for (float x = -CameraConstants::Settings::DefaultBounds; x <= CameraConstants::Settings::DefaultBounds; x += Render2D::Grid::Spacing)
             {
-                Tiles::Renderer2D::SetLineStart({ x, -CameraConstants::Settings::DefaultBounds, Render2D::Depth::Grid });
-                Tiles::Renderer2D::SetLineEnd({ x, CameraConstants::Settings::DefaultBounds, Render2D::Depth::Grid });
-                Tiles::Renderer2D::DrawLine();
+                line.Start = { x, -CameraConstants::Settings::DefaultBounds, Render2D::Depth::Grid };
+                line.End = { x, CameraConstants::Settings::DefaultBounds, Render2D::Depth::Grid };
+                Tiles::Renderer2D::DrawLine(line);
             }
 
             // Horizontal lines
             for (float y = -CameraConstants::Settings::DefaultBounds; y <= CameraConstants::Settings::DefaultBounds; y += Render2D::Grid::Spacing)
             {
-                Tiles::Renderer2D::SetLineStart({ -CameraConstants::Settings::DefaultBounds, y, Render2D::Depth::Grid });
-                Tiles::Renderer2D::SetLineEnd({ CameraConstants::Settings::DefaultBounds, y, Render2D::Depth::Grid });
-                Tiles::Renderer2D::DrawLine();
+                line.Start = { -CameraConstants::Settings::DefaultBounds, y, Render2D::Depth::Grid };
+                line.End = { CameraConstants::Settings::DefaultBounds, y, Render2D::Depth::Grid };
+                Tiles::Renderer2D::DrawLine(line);
             }
         }
 
@@ -151,7 +152,6 @@ namespace Tiles::Editor
         Tiles::Renderer2D::End();
         Tiles::Renderer2D::SetRenderTarget(nullptr);
 
-        Tiles::Renderer2D::ResetLineState();
 
         // An InvisibleButton reserves the canvas rect and captures hover/drag for
         // pan and zoom; the rendered texture is drawn over it afterward.
