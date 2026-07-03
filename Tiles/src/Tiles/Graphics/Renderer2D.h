@@ -103,26 +103,6 @@ namespace Tiles
 		static void SetLineColor(const glm::vec4& color);
 		static void ResetLineState();
 
-		static void SetStringContent(const std::string& text);
-		static void SetStringPosition(const glm::vec3& position);
-		static void SetStringColor(const glm::vec4& color);
-		static void SetStringSize(float size);
-		static void SetStringFont(const std::shared_ptr<Texture>& fontTexture);
-		static void SetStringAlignment(StringAlignment alignment);
-		static void ResetStringState();
-
-		static void SetPixelPosition(const glm::vec3& position);
-		static void SetPixelColor(const glm::vec4& color);
-		static void SetPixelSize(float size = 1.0f);
-		static void ResetPixelState();
-
-		static void SetTrianglePoint1(const glm::vec3& point1);
-		static void SetTrianglePoint2(const glm::vec3& point2);
-		static void SetTrianglePoint3(const glm::vec3& point3);
-		static void SetTriangleTexture(const std::shared_ptr<Texture>& texture);
-		static void SetTriangleColor(const glm::vec4& color);
-		static void ResetTriangleState();
-
 		static void SetGridPosition(const glm::vec3& position);
 		static void SetGridRotation(const glm::vec3& rotation);
 		static void SetGridSize(const glm::vec2& size);
@@ -134,29 +114,10 @@ namespace Tiles
 		static void SetGridCheckerColor2(const glm::vec4& checkerColor2);
 		static void ResetGridState();
 
-		static void UseLighting(bool enabled);
-		static bool IsLightingUsed();
-		static void SetAmbientLightColor(const glm::vec3& color);
-		static void SetAmbientLightIntensity(float intensity);
-
-		static void SetPointLightPosition(const glm::vec3& position);
-		static void SetPointLightIntensity(float intensity);
-		static void SetPointLightColor(const glm::vec4& color);
-		static void SetPointLightRadius(float radius);
-		static void SetPointLightBlendMode(BlendMode blendMode);
-		static void SetPointLightBlendAlpha(float alpha);
-		static void SetPointLightFalloffType(AttenuationModel type);
-		static void SetPointLightFalloff(float falloff);
-		static void ResetPointLightState();
-
 		static void DrawQuad();
 		static void DrawCircle();
 		static void DrawLine();
-		static void DrawString();
-		static void DrawPixel();
-		static void DrawTriangle();
 		static void DrawGrid();
-		static void DrawPointLight();
 
 		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);
 		static void SetRenderTarget(std::nullptr_t);
@@ -169,18 +130,13 @@ namespace Tiles
 			uint32_t QuadCount = 0;
 			uint32_t CircleCount = 0;
 			uint32_t LineCount = 0;
-			uint32_t TextCount = 0;
-			uint32_t PixelCount = 0;
-			uint32_t TriangleCount = 0;
 			uint32_t GridCount = 0;
-			uint32_t PointLightCount = 0;
-			bool LightingUsed = false;
 			uint32_t TexturesUsed = 0;
 			uint32_t ShadersUsed = 0;
 			uint32_t DataSize = 0;
 
-			uint32_t GetTotalVertexCount() const { return QuadCount * 4 + CircleCount * 4 + LineCount * 2 + TextCount * 4 + PixelCount + TriangleCount * 3 + GridCount * 4; }
-			uint32_t GetTotalIndexCount() const { return QuadCount * 6 + CircleCount * 6 + TextCount * 6 + TriangleCount * 3 + GridCount * 6; }
+			uint32_t GetTotalVertexCount() const { return QuadCount * 4 + CircleCount * 4 + LineCount * 2 + GridCount * 4; }
+			uint32_t GetTotalIndexCount() const { return QuadCount * 6 + CircleCount * 6 + GridCount * 6; }
 		};
 
 		static Statistics GetStats();

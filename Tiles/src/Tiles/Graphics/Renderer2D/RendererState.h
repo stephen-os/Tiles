@@ -14,17 +14,11 @@ namespace Tiles
 	constexpr uint32_t MaxQuads = 10000;
 	constexpr uint32_t MaxCircles = 10000;
 	constexpr uint32_t MaxLines = 10000;
-	constexpr uint32_t MaxText = 10000;
-	constexpr uint32_t MaxPixels = 50000;
-	constexpr uint32_t MaxTriangles = 10000;
 	constexpr uint32_t MaxGrids = 1000;
-	constexpr uint32_t MaxPointLights = 32;
 
 	constexpr uint32_t MaxVertices = MaxQuads * 4;
 	constexpr uint32_t MaxIndices = MaxQuads * 6;
 	constexpr uint32_t MaxTextureSlots = 32;
-
-	constexpr uint32_t BindingLocationPointLight = 1;
 
 	struct QuadVertex
 	{
@@ -51,28 +45,6 @@ namespace Tiles
 		glm::vec4 Color;
 	};
 
-	struct TextVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-	};
-
-	struct PixelVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-	};
-
-	struct TriangleVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-	};
-
 	struct GridVertex
 	{
 		glm::vec3 Position;
@@ -87,18 +59,6 @@ namespace Tiles
 		float ShowCheckerboard;
 		glm::vec4 CheckerColor1;
 		glm::vec4 CheckerColor2;
-	};
-
-	struct PointLight
-	{
-		glm::vec3 Position;
-		float Intensity;
-		glm::vec3 Color;
-		float Radius;
-		float BlendingMode;
-		float BlendingAlpha;
-		float FalloffType;
-		float Falloff;
 	};
 
 	// Byte distance a write pointer advanced past its base; used to size buffer
@@ -117,11 +77,7 @@ namespace Tiles
 #include "QuadBatch.h"
 #include "CircleBatch.h"
 #include "LineBatch.h"
-#include "TextBatch.h"
-#include "PixelBatch.h"
-#include "TriangleBatch.h"
 #include "GridBatch.h"
-#include "PointLightBuffer.h"
 
 namespace Tiles
 {
@@ -142,11 +98,7 @@ namespace Tiles
 		PolygonMode PolygonMode = PolygonMode::Fill;
 		glm::vec3 WireFrameColor = { 0.0f, 1.0f, 0.0f };
 
-		bool UseLighting = false;
-		glm::vec3 AmbientColor = { 0.1f, 0.1f, 0.1f };
-		float AmbientIntensity = 0.5f;
-
-		// Unit-quad corners shared by the quad, circle, text, and grid batchers.
+		// Unit-quad corners shared by the quad, circle, and grid batchers.
 		glm::vec4 QuadVertexPositions[4];
 		glm::vec3 CircleVertexPositions[4];
 		glm::vec2 TexCoords[4];
@@ -158,10 +110,6 @@ namespace Tiles
 		QuadBatch Quad;
 		CircleBatch Circle;
 		LineBatch Line;
-		TextBatch Text;
-		PixelBatch Pixel;
-		TriangleBatch Triangle;
 		GridBatch Grid;
-		PointLightBuffer PointLights;
 	};
 }

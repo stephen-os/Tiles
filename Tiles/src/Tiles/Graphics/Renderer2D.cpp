@@ -23,7 +23,7 @@ namespace Tiles
 		s_State->DefaultRenderTarget = RenderTarget::Create(800, 600);
 		s_State->CurrentRenderTarget = s_State->DefaultRenderTarget;
 
-		// Quad index pattern reused by every indexed batcher (quad/circle/text/grid).
+		// Quad index pattern reused by every indexed batcher (quad/circle/grid).
 		std::vector<uint32_t> quadIndices(MaxIndices);
 		uint32_t offset = 0;
 		for (uint32_t i = 0; i < MaxIndices; i += 6)
@@ -40,18 +40,11 @@ namespace Tiles
 		s_State->Quad.Init(quadIndices);
 		s_State->Circle.Init(quadIndices);
 		s_State->Line.Init();
-		s_State->Text.Init(quadIndices);
-		s_State->Pixel.Init();
-		s_State->Triangle.Init();
 		s_State->Grid.Init(quadIndices);
-		s_State->PointLights.Init();
 
 		s_State->Textures.Init();
 		// Slot overflow flushes the whole renderer so the new texture starts fresh.
 		s_State->Textures.SetFlushCallback([]() { EndBatch(); StartBatch(); });
-
-		// Text rendering not needed for Tiles (tile editor)
-		// s_State->Text.DefaultFont = DefaultFont::Create();
 
 		s_State->QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
 		s_State->QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
@@ -81,11 +74,7 @@ namespace Tiles
 		s_State->Quad.Shutdown();
 		s_State->Circle.Shutdown();
 		s_State->Line.Shutdown();
-		s_State->Text.Shutdown();
-		s_State->Pixel.Shutdown();
-		s_State->Triangle.Shutdown();
 		s_State->Grid.Shutdown();
-		s_State->PointLights.Shutdown();
 
 		s_State->Textures.Shutdown();
 
@@ -126,11 +115,7 @@ namespace Tiles
 		s_State->Quad.Reset();
 		s_State->Circle.Reset();
 		s_State->Line.Reset();
-		s_State->Text.Reset();
-		s_State->Pixel.Reset();
-		s_State->Triangle.Reset();
 		s_State->Grid.Reset();
-		s_State->PointLights.Reset();
 
 		s_State->Textures.Reset();
 	}
@@ -144,38 +129,24 @@ namespace Tiles
 		if (s_State->Quad.Upload(*s_State)) issueDraw = true;
 		if (s_State->Circle.Upload(*s_State)) issueDraw = true;
 		if (s_State->Line.Upload(*s_State)) issueDraw = true;
-		if (s_State->Text.Upload(*s_State)) issueDraw = true;
-		if (s_State->Pixel.Upload(*s_State)) issueDraw = true;
-		if (s_State->Triangle.Upload(*s_State)) issueDraw = true;
 		if (s_State->Grid.Upload(*s_State)) issueDraw = true;
-
-		s_State->PointLights.Upload(*s_State);
 
 		if (issueDraw)
 			Flush();
 	}
 
-	// Binds textures/lights once, then draws each non-empty primitive batch with
-	// its shader and shared uniforms, and resets the per-batch counters.
+	// Binds textures once, then draws each non-empty primitive batch with its
+	// shader and shared uniforms, and resets the per-batch counters.
 	void Renderer2D::Flush()
 	{
 		s_State->Textures.Bind();
 
-		if (s_State->PointLights.Count > 0 && s_State->UseLighting)
-			s_State->PointLights.Bind();
-
 		s_State->Quad.Flush(*s_State);
 		s_State->Circle.Flush(*s_State);
 		s_State->Line.Flush(*s_State);
-		s_State->Text.Flush(*s_State);
-		s_State->Pixel.Flush(*s_State);
-		s_State->Triangle.Flush(*s_State);
 		s_State->Grid.Flush(*s_State);
 
 		s_State->Textures.Unbind();
-
-		if (s_State->PointLights.Count > 0 && s_State->UseLighting)
-			s_State->PointLights.Unbind();
 
 		s_State->Stats.TexturesUsed = s_State->Textures.Index - 1;
 	}
@@ -214,27 +185,6 @@ namespace Tiles
 	float Renderer2D::ComputeTextureIndex(const std::shared_ptr<Texture>& texture)
 	{
 		return s_State->Textures.ComputeTextureIndex(texture);
-	}
-
-	void Renderer2D::UseLighting(bool enabled)
-	{
-		s_State->UseLighting = enabled;
-		s_State->Stats.LightingUsed = enabled;
-	}
-
-	bool Renderer2D::IsLightingUsed()
-	{
-		return s_State->UseLighting;
-	}
-
-	void Renderer2D::SetAmbientLightColor(const glm::vec3& color)
-	{
-		s_State->AmbientColor = color;
-	}
-
-	void Renderer2D::SetAmbientLightIntensity(float intensity)
-	{
-		s_State->AmbientIntensity = intensity;
 	}
 
 	void Renderer2D::SetQuadPosition(const glm::vec3& position)
@@ -357,110 +307,6 @@ namespace Tiles
 		s_State->Line.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	}
 
-	void Renderer2D::SetStringContent(const std::string& text)
-	{
-		s_State->Text.Content = text;
-	}
-
-	void Renderer2D::SetStringPosition(const glm::vec3& position)
-	{
-		s_State->Text.Position = position;
-	}
-
-	void Renderer2D::SetStringColor(const glm::vec4& color)
-	{
-		s_State->Text.Color = color;
-	}
-
-	void Renderer2D::SetStringSize(float size)
-	{
-		s_State->Text.Size = size;
-	}
-
-	void Renderer2D::SetStringFont(const std::shared_ptr<Texture>& fontTexture)
-	{
-		s_State->Text.Font = fontTexture;
-	}
-
-	void Renderer2D::SetStringAlignment(StringAlignment alignment)
-	{
-		s_State->Text.Alignment = alignment;
-	}
-
-	void Renderer2D::ResetStringState()
-	{
-		s_State->Text.Content = "";
-		s_State->Text.Position = { 0.0f, 0.0f, 0.0f };
-		s_State->Text.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		s_State->Text.Size = 1.0f;
-		s_State->Text.Font = nullptr;
-		s_State->Text.Alignment = StringAlignment::Left;
-	}
-
-	void Renderer2D::SetPixelPosition(const glm::vec3& position)
-	{
-		s_State->Pixel.Position = position;
-	}
-
-	void Renderer2D::SetPixelColor(const glm::vec4& color)
-	{
-		s_State->Pixel.Color = color;
-	}
-
-	void Renderer2D::SetPixelSize(float size)
-	{
-		if (s_State->Pixel.Size != size)
-		{
-			if (s_State->Pixel.VertexCount > 0)
-			{
-				EndBatch();
-				StartBatch();
-			}
-
-			s_State->Pixel.Size = size;
-		}
-	}
-
-	void Renderer2D::ResetPixelState()
-	{
-		s_State->Pixel.Position = { 0.0f, 0.0f, 0.0f };
-		s_State->Pixel.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	}
-
-	void Renderer2D::SetTrianglePoint1(const glm::vec3& point1)
-	{
-		s_State->Triangle.Point1 = point1;
-	}
-
-	void Renderer2D::SetTrianglePoint2(const glm::vec3& point2)
-	{
-		s_State->Triangle.Point2 = point2;
-	}
-
-	void Renderer2D::SetTrianglePoint3(const glm::vec3& point3)
-	{
-		s_State->Triangle.Point3 = point3;
-	}
-
-	void Renderer2D::SetTriangleTexture(const std::shared_ptr<Texture>& texture)
-	{
-		s_State->Triangle.Texture = texture;
-	}
-
-	void Renderer2D::SetTriangleColor(const glm::vec4& color)
-	{
-		s_State->Triangle.Color = color;
-	}
-
-	void Renderer2D::ResetTriangleState()
-	{
-		s_State->Triangle.Point1 = { 0.0f, 0.0f, 0.0f };
-		s_State->Triangle.Point2 = { 1.0f, 0.0f, 0.0f };
-		s_State->Triangle.Point3 = { 0.5f, 1.0f, 0.0f };
-		s_State->Triangle.Texture = nullptr;
-		s_State->Triangle.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	}
-
 	void Renderer2D::SetGridPosition(const glm::vec3& position)
 	{
 		s_State->Grid.Position = position;
@@ -519,58 +365,6 @@ namespace Tiles
 		s_State->Grid.CheckerColor2 = { 0.8f, 0.8f, 0.8f, 0.2f };
 	}
 
-	void Renderer2D::SetPointLightPosition(const glm::vec3& position)
-	{
-		s_State->PointLights.Position = position;
-	}
-
-	void Renderer2D::SetPointLightIntensity(float intensity)
-	{
-		s_State->PointLights.Intensity = intensity;
-	}
-
-	void Renderer2D::SetPointLightColor(const glm::vec4& color)
-	{
-		s_State->PointLights.Color = glm::vec3(color.r, color.g, color.b);
-	}
-
-	void Renderer2D::SetPointLightRadius(float radius)
-	{
-		s_State->PointLights.Radius = radius;
-	}
-
-	void Renderer2D::SetPointLightBlendMode(BlendMode blendMode)
-	{
-		s_State->PointLights.Blend = blendMode;
-	}
-
-	void Renderer2D::SetPointLightBlendAlpha(float alpha)
-	{
-		s_State->PointLights.BlendAlpha = alpha;
-	}
-
-	void Renderer2D::SetPointLightFalloffType(AttenuationModel falloffType)
-	{
-		s_State->PointLights.FalloffType = falloffType;
-	}
-
-	void Renderer2D::SetPointLightFalloff(float falloff)
-	{
-		s_State->PointLights.Falloff = falloff;
-	}
-
-	void Renderer2D::ResetPointLightState()
-	{
-		s_State->PointLights.Position = { 0.0f, 0.0f, 0.0f };
-		s_State->PointLights.Intensity = 1.0f;
-		s_State->PointLights.Color = { 1.0f, 1.0f, 1.0f };
-		s_State->PointLights.Radius = 5.0f;
-		s_State->PointLights.Blend = BlendMode::Additive;
-		s_State->PointLights.BlendAlpha = 1.0f;
-		s_State->PointLights.FalloffType = AttenuationModel::Linear;
-		s_State->PointLights.Falloff = 1.0f;
-	}
-
 	void Renderer2D::DrawQuad()
 	{
 		if (s_State->Quad.IndexCount >= MaxIndices)
@@ -611,42 +405,6 @@ namespace Tiles
 		s_State->Line.Append(*s_State);
 	}
 
-	void Renderer2D::DrawString()
-	{
-		if (s_State->Text.Content.empty())
-			return;
-
-		if (s_State->Text.IndexCount >= MaxIndices)
-		{
-			EndBatch();
-			StartBatch();
-		}
-
-		s_State->Text.Append(*s_State);
-	}
-
-	void Renderer2D::DrawPixel()
-	{
-		if (s_State->Pixel.VertexCount >= MaxPixels)
-		{
-			EndBatch();
-			StartBatch();
-		}
-
-		s_State->Pixel.Append(*s_State);
-	}
-
-	void Renderer2D::DrawTriangle()
-	{
-		if (s_State->Triangle.VertexCount >= MaxTriangles * 3)
-		{
-			EndBatch();
-			StartBatch();
-		}
-
-		s_State->Triangle.Append(*s_State);
-	}
-
 	void Renderer2D::DrawGrid()
 	{
 		if (s_State->Grid.IndexCount >= MaxIndices)
@@ -656,11 +414,6 @@ namespace Tiles
 		}
 
 		s_State->Grid.Append(*s_State);
-	}
-
-	void Renderer2D::DrawPointLight()
-	{
-		s_State->PointLights.Append(*s_State);
 	}
 
 	void Renderer2D::SetRenderTarget(std::shared_ptr<RenderTarget> target)
