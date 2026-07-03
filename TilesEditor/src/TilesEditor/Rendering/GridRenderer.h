@@ -29,7 +29,7 @@ namespace Tiles::Editor
 		GridRenderer();   // creates GL resources; a GL context must be current
 
 		/// Draws the grid across the viewport without writing depth, so anything
-		/// drawn afterward sits on top. Call between Renderer2D::Begin/End.
+		/// drawn afterward sits on top. Call between Renderer::BeginFrame/EndFrame.
 		void Draw(const GridParams& params);
 
 	private:

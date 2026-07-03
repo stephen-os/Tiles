@@ -525,9 +525,9 @@ namespace Tiles::Editor
         camera->SetSize(width, height);
         camera->SetZoom(1.0f);
 
-        Tiles::Renderer2D::SetRenderTarget(renderTarget);
-        Tiles::Renderer2D::SetResolution(width, height);
-        Tiles::Renderer2D::Begin(camera);
+        Tiles::Renderer::SetRenderTarget(renderTarget);
+        Tiles::Renderer::SetResolution(width, height);
+        Tiles::Renderer::BeginFrame(camera);
 
         glm::vec3 cameraPos = camera->GetPosition();
         const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
@@ -542,8 +542,8 @@ namespace Tiles::Editor
             DrawTileLayer(layer, layerIdx, cameraPos, tileSize, textureAtlases, 0.0f);
         }
 
-        Tiles::Renderer2D::End();
-        Tiles::Renderer2D::SetRenderTarget(nullptr);
+        Tiles::Renderer::EndFrame();
+        Tiles::Renderer::SetRenderTarget(nullptr);
 
         renderTarget->SaveToFile(fileName.string());
     }

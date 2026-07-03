@@ -2,7 +2,7 @@
 
 #include "Domain/Tile.h"
 #include "Domain/TileLayer.h"
-#include "Graphics/Renderer2D.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/TextureAtlas.h"
 
 namespace Tiles::Editor
@@ -49,7 +49,7 @@ namespace Tiles::Editor
                     }
                 }
 
-                Tiles::Renderer2D::DrawQuad(params);
+                Tiles::Renderer::DrawQuad(params);
             }
         }
     }

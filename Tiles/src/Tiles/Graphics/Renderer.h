@@ -53,10 +53,10 @@ namespace Tiles
 	};
 
 	/// Immediate-mode 2D batch renderer. Primitives are drawn with DrawQuad/
-	/// DrawCircle/DrawLine(params) between Begin() and End(); geometry accumulates into
+	/// DrawCircle/DrawLine(params) between BeginFrame() and EndFrame(); geometry accumulates into
 	/// per-primitive vertex buffers and is flushed in as few draw calls as
 	/// possible. All state is global (single static instance).
-	class Renderer2D
+	class Renderer
 	{
 	public:
 
@@ -68,14 +68,14 @@ namespace Tiles
 
 		/// Begins a frame: sets the view-projection, binds the current render
 		/// target, clears it, and starts a fresh batch.
-		static void Begin(std::shared_ptr<OrthographicCamera> camera);
+		static void BeginFrame(std::shared_ptr<OrthographicCamera> camera);
 		
 		/// Begins a frame with an explicit view-projection and no target setup.
-		static void Begin(glm::mat4& viewProjection);
+		static void BeginFrame(glm::mat4& viewProjection);
 		
 		/// Ends the frame, flushing any pending geometry and unbinding 
 		/// the target.
-		static void End();
+		static void EndFrame();
 		
 		/// Starts a new batch. Accumulates geometry until 
 		/// EndBatch() is called.

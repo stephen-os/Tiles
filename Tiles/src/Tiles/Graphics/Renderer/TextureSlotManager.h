@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Renderer2D.h"
+#include "../Renderer.h"
 
 #include <array>
 #include <functional>

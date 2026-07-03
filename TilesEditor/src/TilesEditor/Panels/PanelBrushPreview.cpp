@@ -87,12 +87,12 @@ namespace Tiles::Editor
         uint32_t resolutionY = static_cast<uint32_t>(previewDimensions.y);
 
         // Begin 3D rendering
-        Tiles::Renderer2D::SetRenderTarget(m_PreviewRenderTarget);
-        Tiles::Renderer2D::SetResolution(resolutionX, resolutionY);
-        Tiles::Renderer2D::Begin(m_Camera);
+        Tiles::Renderer::SetRenderTarget(m_PreviewRenderTarget);
+        Tiles::Renderer::SetResolution(resolutionX, resolutionY);
+        Tiles::Renderer::BeginFrame(m_Camera);
 
         // Render background
-        Tiles::Renderer2D::DrawQuad({
+        Tiles::Renderer::DrawQuad({
             .Position = { 0.0f, 0.0f, Render2D::Depth::Background },
             .Size = { Render2D::Grid::BackgroundSize, Render2D::Grid::BackgroundSize },
             .Tint = { m_BackgroundBrightness, m_BackgroundBrightness, m_BackgroundBrightness, 1.0f },
@@ -110,7 +110,7 @@ namespace Tiles::Editor
             {
                 line.Start = { x, -CameraConstants::Settings::DefaultBounds, Render2D::Depth::Grid };
                 line.End = { x, CameraConstants::Settings::DefaultBounds, Render2D::Depth::Grid };
-                Tiles::Renderer2D::DrawLine(line);
+                Tiles::Renderer::DrawLine(line);
             }
 
             // Horizontal lines
@@ -118,7 +118,7 @@ namespace Tiles::Editor
             {
                 line.Start = { -CameraConstants::Settings::DefaultBounds, y, Render2D::Depth::Grid };
                 line.End = { CameraConstants::Settings::DefaultBounds, y, Render2D::Depth::Grid };
-                Tiles::Renderer2D::DrawLine(line);
+                Tiles::Renderer::DrawLine(line);
             }
         }
 
@@ -137,20 +137,20 @@ namespace Tiles::Editor
             brushQuad.Texture = m_Context->GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
         }
 
-        Tiles::Renderer2D::DrawQuad(brushQuad);
+        Tiles::Renderer::DrawQuad(brushQuad);
 
         // Render bounds if enabled
         if (m_ShowBounds)
         {
-            Tiles::Renderer2D::DrawQuad({
+            Tiles::Renderer::DrawQuad({
                 .Position = { 0.0f, 0.0f, Render2D::Depth::Bounds },
                 .Size = { brush.GetSize().x + Render2D::Bounds::Offset, brush.GetSize().y + Render2D::Bounds::Offset },
                 .Tint = Render2D::Bounds::Color,
             });
         }
 
-        Tiles::Renderer2D::End();
-        Tiles::Renderer2D::SetRenderTarget(nullptr);
+        Tiles::Renderer::EndFrame();
+        Tiles::Renderer::SetRenderTarget(nullptr);
 
 
         // An InvisibleButton reserves the canvas rect and captures hover/drag for

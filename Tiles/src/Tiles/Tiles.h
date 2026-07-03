@@ -9,7 +9,7 @@
 #include "Core/Assert.h"
 
 // Graphics
-#include "Graphics/Renderer2D.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/TextureAtlas.h"
 #include "Graphics/RenderTarget.h"

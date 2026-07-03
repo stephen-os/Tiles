@@ -13,7 +13,7 @@ namespace Tiles
 
 namespace Tiles::Editor
 {
-    /// Draws every painted tile of a single layer through Renderer2D, applying the
+    /// Draws every painted tile of a single layer through Renderer, applying the
     /// viewport's (x + 1, y + 1) one-tile border, the per-layer depth nudge
     /// (baseDepth + layerIndex * 0.01f), and each tile's tint, rotation, and size.
     /// Untextured or invalid-atlas tiles reset the quad to no texture and full
