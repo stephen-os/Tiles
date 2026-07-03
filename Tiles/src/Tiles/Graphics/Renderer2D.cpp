@@ -187,58 +187,6 @@ namespace Tiles
 		return s_State->Textures.ComputeTextureIndex(texture);
 	}
 
-	void Renderer2D::SetCirclePosition(const glm::vec3& position)
-	{
-		s_State->Circle.Position = position;
-	}
-
-	void Renderer2D::SetCircleRotation(const glm::vec3& rotation)
-	{
-		s_State->Circle.Rotation = rotation;
-	}
-
-	void Renderer2D::SetCircleRadius(const glm::vec2& radius)
-	{
-		s_State->Circle.Radius = radius;
-	}
-
-	void Renderer2D::SetCircleTexture(const std::shared_ptr<Texture>& texture)
-	{
-		s_State->Circle.Texture = texture;
-	}
-
-	void Renderer2D::SetCircleTextureCoords(const glm::vec4& textureCoords)
-	{
-		s_State->Circle.TextureCoords = textureCoords;
-	}
-
-	void Renderer2D::SetCircleColor(const glm::vec4& color)
-	{
-		s_State->Circle.Color = color;
-	}
-
-	void Renderer2D::SetCircleThickness(float thickness)
-	{
-		s_State->Circle.Thickness = thickness;
-	}
-
-	void Renderer2D::SetCircleFade(float fade)
-	{
-		s_State->Circle.Fade = fade;
-	}
-
-	void Renderer2D::ResetCircleState()
-	{
-		s_State->Circle.Position = { 0.0f, 0.0f, 0.0f };
-		s_State->Circle.Rotation = { 0.0f, 0.0f, 0.0f };
-		s_State->Circle.Radius = { 1.0f, 1.0f };
-		s_State->Circle.Texture = nullptr;
-		s_State->Circle.TextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
-		s_State->Circle.Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-		s_State->Circle.Thickness = 1.0f;
-		s_State->Circle.Fade = 0.0f;
-	}
-
 	void Renderer2D::SetGridPosition(const glm::vec3& position)
 	{
 		s_State->Grid.Position = position;
@@ -308,7 +256,7 @@ namespace Tiles
 		s_State->Quad.Append(*s_State, params);
 	}
 
-	void Renderer2D::DrawCircle()
+	void Renderer2D::DrawCircle(const CircleParams& params)
 	{
 		if (s_State->Circle.IndexCount >= MaxIndices)
 		{
@@ -316,7 +264,7 @@ namespace Tiles
 			StartBatch();
 		}
 
-		s_State->Circle.Append(*s_State);
+		s_State->Circle.Append(*s_State, params);
 	}
 
 	void Renderer2D::DrawLine(const LineParams& params)

@@ -45,22 +45,22 @@ namespace Tiles
 		Ptr = nullptr;
 	}
 
-	void CircleBatch::Append(RendererState& state)
+	void CircleBatch::Append(RendererState& state, const CircleParams& params)
 	{
 		TILES_ASSERT(Ptr >= Base, "Vertex buffer pointer underflow");
 
-		glm::mat4 translation = glm::translate(glm::mat4(1.0f), Position);
-		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), Rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), Rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 translation = glm::translate(glm::mat4(1.0f), params.Position);
+		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), params.Rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), params.Rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), params.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 rotation = rotationZ * rotationY * rotationX;
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(Radius.x, Radius.y, 1.0f));
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(params.Radius.x, params.Radius.y, 1.0f));
 		glm::mat4 transform = translation * rotation * scale;
 
-		float texIndex = state.Textures.ComputeTextureIndex(Texture);
+		float texIndex = state.Textures.ComputeTextureIndex(params.Texture);
 
-		glm::vec2 uvMin = { TextureCoords.x, TextureCoords.y };
-		glm::vec2 uvMax = { TextureCoords.z, TextureCoords.w };
+		glm::vec2 uvMin = { params.TexCoords.x, params.TexCoords.y };
+		glm::vec2 uvMax = { params.TexCoords.z, params.TexCoords.w };
 
 		glm::vec2 uvs[4] =
 		{
@@ -74,11 +74,11 @@ namespace Tiles
 		{
 			Ptr->WorldPosition = transform * state.QuadVertexPositions[i];
 			Ptr->LocalPosition = state.CircleVertexPositions[i];
-			Ptr->Color = Color;
+			Ptr->Color = params.Color;
 			Ptr->TexCoord = uvs[i];
 			Ptr->TexIndex = texIndex;
-			Ptr->Thickness = Thickness;
-			Ptr->Fade = Fade;
+			Ptr->Thickness = params.Thickness;
+			Ptr->Fade = params.Fade;
 			Ptr++;
 		}
 

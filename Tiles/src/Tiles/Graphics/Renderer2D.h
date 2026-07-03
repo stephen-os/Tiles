@@ -70,6 +70,20 @@ namespace Tiles
 		float Thickness = 1.0f;
 	};
 
+	/// Parameters for one circle draw. Radius is per-axis; Thickness and Fade
+	/// control the SDF ring (Thickness 1, Fade 0 renders a filled disc).
+	struct CircleParams
+	{
+		glm::vec3 Position{ 0.0f };
+		glm::vec2 Radius{ 1.0f };
+		glm::vec3 Rotation{ 0.0f };
+		glm::vec4 Color{ 1.0f };
+		std::shared_ptr<Texture> Texture = nullptr;
+		glm::vec4 TexCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
+		float Thickness = 1.0f;
+		float Fade = 0.0f;
+	};
+
 	/// Immediate-mode-style 2D batch renderer. Primitives are configured through
 	/// Set*/Draw* calls between Begin() and End(); geometry accumulates into
 	/// per-primitive vertex buffers and is flushed in as few draw calls as
@@ -101,16 +115,6 @@ namespace Tiles
 		static void SetRenderMode(PolygonMode mode);
 		static void* GetImage();
 
-		static void SetCirclePosition(const glm::vec3& position);
-		static void SetCircleRotation(const glm::vec3& rotation);
-		static void SetCircleRadius(const glm::vec2& radius);
-		static void SetCircleTexture(const std::shared_ptr<Texture>& texture);
-		static void SetCircleTextureCoords(const glm::vec4& textureCoords);
-		static void SetCircleColor(const glm::vec4& color);
-		static void SetCircleThickness(float thickness);
-		static void SetCircleFade(float fade);
-		static void ResetCircleState();
-
 		static void SetGridPosition(const glm::vec3& position);
 		static void SetGridRotation(const glm::vec3& rotation);
 		static void SetGridSize(const glm::vec2& size);
@@ -123,7 +127,7 @@ namespace Tiles
 		static void ResetGridState();
 
 		static void DrawQuad(const QuadParams& params);
-		static void DrawCircle();
+		static void DrawCircle(const CircleParams& params);
 		static void DrawLine(const LineParams& params);
 		static void DrawGrid();
 
