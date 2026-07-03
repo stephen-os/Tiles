@@ -9,5 +9,8 @@ bin-int/
 *.vcxproj.filters
 *.sln
 
+# Runtime per-user window state
+TilesEditor/settings.json
+
 # Exclude
 !Directories/premake
