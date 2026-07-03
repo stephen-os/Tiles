@@ -9,45 +9,12 @@
 #include "RenderTarget.h"
 
 #include <glm/glm.hpp>
-#include <unordered_map>
 #include <string>
 
 #include "Cameras/OrthographicCamera.h"
 
 namespace Tiles
 {
-	enum class BlendMode : int
-	{
-		Additive = 0,        // Standard light blending (light adds to scene)
-		Multiply = 1,        // Darkens areas (shadows/ambient occlusion)
-		Screen = 2,          // Brightens without harsh highlights
-		Overlay = 3,         // Combines multiply and screen
-		SoftLight = 4,       // Subtle lighting effect
-		LinearBurn = 5,      // Darker than multiply
-		ColorDodge = 6,      // Creates bright highlights
-		Subtract = 7,        // Subtracts light (negative lighting)
-		Alpha = 8            // Standard alpha blending
-	};
-
-	enum class AttenuationModel : int
-	{
-		None = 0,            // No falloff (constant intensity)
-		Linear = 1,          // Linear falloff
-		Quadratic = 2,       // Quadratic falloff (physically accurate)
-		InverseSquare = 3,   // 1/distance^2 (realistic)
-		Exponential = 4,     // Exponential decay
-		Smoothstep = 5,      // Smooth transition with ease-in/out
-		Custom = 6,          // User-defined curve
-		Realistic = 7        // Physically-based (constant + linear + quadratic)
-	};
-
-	enum class StringAlignment : int
-	{
-		Left = 0,
-		Right = 1,
-		Center = 2
-	};
-
 	/// Parameters for one quad draw. Set only what you need; the rest fall back to
 	/// sensible defaults (unit size, no rotation, full white tint, untextured).
 	struct QuadParams
