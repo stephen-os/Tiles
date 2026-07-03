@@ -6,20 +6,38 @@
 
 namespace Tiles
 {
+	/// Vertex array object: binds a vertex buffer (wiring its layout to GL
+	/// attribute slots) and an optional index buffer. RAII wrapper owning a
+	/// single GL vertex-array handle.
 	class VertexArray
 	{
 	public:
-		virtual ~VertexArray() = default;
+		VertexArray();
+		~VertexArray();
 
-		virtual void Bind() const = 0;
-		virtual void Unbind() const = 0;
+		// Owns a GL vertex-array handle freed in the destructor; copying or moving
+		// would risk a double free, and it is only ever held via shared_ptr, so
+		// neither is permitted.
+		VertexArray(const VertexArray&) = delete;
+		VertexArray& operator=(const VertexArray&) = delete;
+		VertexArray(VertexArray&&) = delete;
+		VertexArray& operator=(VertexArray&&) = delete;
 
-		virtual void SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) = 0;
-		virtual void SetIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer) = 0;
+		void Bind() const;
+		void Unbind() const;
 
-		virtual std::shared_ptr<VertexBuffer> GetVertexBuffer() = 0;
-		virtual std::shared_ptr<IndexBuffer> GetIndexBuffer() = 0;
+		void SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer);
+		void SetIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer);
+
+		std::shared_ptr<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
+		std::shared_ptr<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
 
 		static std::shared_ptr<VertexArray> Create();
+
+	private:
+		uint32_t m_RendererID = 0;
+		uint32_t m_VertexBufferIndex = 0;
+		std::shared_ptr<VertexBuffer> m_VertexBuffer;
+		std::shared_ptr<IndexBuffer> m_IndexBuffer;
 	};
 }
