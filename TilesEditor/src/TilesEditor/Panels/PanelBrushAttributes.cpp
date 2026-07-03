@@ -2,6 +2,8 @@
 
 #include "../UIConstants.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Tiles::Editor
 {
     void PanelBrushAttributes::Render()

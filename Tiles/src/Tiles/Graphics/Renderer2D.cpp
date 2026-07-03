@@ -93,7 +93,7 @@ namespace Tiles
 		TILES_LOG_INFO("Renderer2D: Shutdown complete");
 	}
 
-	void Renderer2D::Begin(std::shared_ptr<Camera> camera)
+	void Renderer2D::Begin(std::shared_ptr<OrthographicCamera> camera)
 	{
 		s_State->ViewProjectionMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix();
 

@@ -11,7 +11,7 @@
 #include <string>
 
 #include "../Core/Base.h"
-#include "Cameras/Camera.h"
+#include "Cameras/OrthographicCamera.h"
 
 namespace Tiles
 {
@@ -59,7 +59,7 @@ namespace Tiles
 
 		/// Begins a frame: sets the view-projection, binds the current render
 		/// target, clears it, and starts a fresh batch.
-		static void Begin(std::shared_ptr<Camera> camera);
+		static void Begin(std::shared_ptr<OrthographicCamera> camera);
 		/// Begins a frame with an explicit view-projection and no target setup.
 		static void Begin(glm::mat4& viewProjection);
 		/// Ends the frame, flushing any pending geometry and unbinding the target.
