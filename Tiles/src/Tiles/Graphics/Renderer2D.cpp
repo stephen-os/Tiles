@@ -157,11 +157,6 @@ namespace Tiles
 		s_State->PolygonMode = mode;
 	}
 
-	void* Renderer2D::GetImage()
-	{
-		return reinterpret_cast<void*>(static_cast<uintptr_t>(s_State->CurrentRenderTarget->GetTexture()));
-	}
-
 	float Renderer2D::ComputeTextureIndex(const std::shared_ptr<Texture>& texture)
 	{
 		return s_State->Textures.ComputeTextureIndex(texture);

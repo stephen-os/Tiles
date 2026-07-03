@@ -72,15 +72,20 @@ namespace Tiles
 		/// Begins a frame with an explicit view-projection and no target setup.
 		static void Begin(glm::mat4& viewProjection);
 		
-		/// Ends the frame, flushing any pending geometry and unbinding the target.
+		/// Ends the frame, flushing any pending geometry and unbinding 
+		/// the target.
 		static void End();
-
+		
+		/// Starts a new batch. Accumulates geometry until 
+		/// EndBatch() is called.
 		static void StartBatch();
 		
-		/// Uploads accumulated vertex data to the GPU and issues the draw calls.
+		/// Uploads accumulated vertex data to the GPU and issues the 
+		/// draw calls.
 		static void EndBatch();
 		
-		/// Uploads accumulated vertex data to the GPU and issues the draw calls.
+		/// Uploads accumulated vertex data to the GPU and issues the 
+		/// draw calls.
 		static void Flush();
 
 		/// Sets the pixel resolution of the render target.
@@ -88,10 +93,6 @@ namespace Tiles
 
 		/// Sets the render mode.
 		static void SetRenderMode(PolygonMode mode);
-		
-		/// Returns image data.
-		/// TODO: Not sure if we should use a void ptr here. 
-		static void* GetImage();
 
 		/// Draws one quad.
 		static void DrawQuad(const QuadParams& params);
@@ -106,9 +107,14 @@ namespace Tiles
 		/// TODO: So we need the nullptr overload?
 		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);
 		static void SetRenderTarget(std::nullptr_t);
+
+		/// Returns the current render target.
 		static std::shared_ptr<RenderTarget> GetCurrentRenderTarget();
+
+		/// TODO: Do we need a create here? 
 		static std::shared_ptr<RenderTarget> CreateRenderTarget(uint32_t width, uint32_t height);
 
+		/// Renderer statistics
 		struct Statistics
 		{
 			uint32_t DrawCalls = 0;
@@ -119,15 +125,22 @@ namespace Tiles
 			uint32_t ShadersUsed = 0;
 			uint32_t DataSize = 0;
 
+			/// Returns the total number of vertices used.
 			uint32_t GetTotalVertexCount() const { return QuadCount * 4 + CircleCount * 4 + LineCount * 2; }
+			
+			/// Returns the total number of indices used.
 			uint32_t GetTotalIndexCount() const { return QuadCount * 6 + CircleCount * 6; }
 		};
 
+		/// Returns the current statistics.
 		static Statistics GetStats();
+
+		/// Resets the statistics.
 		static void ResetStats();
 
 	private:
-		static float ComputeTextureIndex(const std::shared_ptr<Texture>& texture);
 
+		/// Computes the index of the texture in the texture slot manager.
+		static float ComputeTextureIndex(const std::shared_ptr<Texture>& texture);
 	};
 }
