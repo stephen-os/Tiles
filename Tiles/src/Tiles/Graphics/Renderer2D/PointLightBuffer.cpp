@@ -22,7 +22,7 @@ namespace Tiles
 	{
 		if (Count >= MaxPointLights)
 		{
-			TILES_LOG_WARN("Maximum number of point lights ({}) exceeded", MaxPointLights);
+			TILES_ENGINE_WARN("Maximum number of point lights ({}) exceeded", MaxPointLights);
 			return;
 		}
 

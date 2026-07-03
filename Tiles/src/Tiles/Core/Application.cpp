@@ -29,7 +29,7 @@ namespace Tiles
 
     static void GLFWErrorCallback(int error, const char* description)
     {
-        TILES_LOG_ERROR("[GLFW ERROR] {}: {}", error, description);
+        TILES_ENGINE_ERROR("[GLFW ERROR] {}: {}", error, description);
     }
 
     Application::Application(const ApplicationSettings& settings)
@@ -37,14 +37,14 @@ namespace Tiles
 		s_Instance = this;
         m_Settings = settings;
 
-        Log::Init(m_Settings.Name);
-        TILES_LOG_INFO("Starting Tiles Application: {}", m_Settings.Name);
+        TILES_LOGGER_INIT();
+        TILES_ENGINE_INFO("Starting Tiles Application: {}", m_Settings.Name);
 
         glfwSetErrorCallback(GLFWErrorCallback);
 
         if (!glfwInit())
         {
-            TILES_LOG_ERROR("GLFW failed to initialize.");
+            TILES_ENGINE_ERROR("GLFW failed to initialize.");
             return;
         }
 
@@ -53,7 +53,7 @@ namespace Tiles
         m_Window = glfwCreateWindow(m_Settings.Width, m_Settings.Height, m_Settings.Name.c_str(), NULL, NULL);
         if (!m_Window)
         {
-            TILES_LOG_ERROR("Failed to create GLFW window.");
+            TILES_ENGINE_ERROR("Failed to create GLFW window.");
             glfwTerminate();
             return;
         }
@@ -71,7 +71,7 @@ namespace Tiles
         {
             if (!std::filesystem::exists(m_Settings.Icon))
             {
-                TILES_LOG_WARN("Application: Window icon '{}' not found; using the default.", m_Settings.Icon);
+                TILES_ENGINE_WARN("Application: Window icon '{}' not found; using the default.", m_Settings.Icon);
             }
             else
             {
@@ -84,7 +84,7 @@ namespace Tiles
                 }
                 else
                 {
-                    TILES_LOG_WARN("Application: Failed to decode window icon '{}'; using the default.", m_Settings.Icon);
+                    TILES_ENGINE_WARN("Application: Failed to decode window icon '{}'; using the default.", m_Settings.Icon);
                 }
             }
         }
@@ -94,7 +94,7 @@ namespace Tiles
 
         const char* version = (const char*)glGetString(GL_VERSION);
         TILES_ASSERT(version, "[OpenGL Context] Failed to retrieve OpenGL version.");
-        TILES_LOG_INFO("OpenGL Version: {}", version);
+        TILES_ENGINE_INFO("OpenGL Version: {}", version);
 
         if (m_Settings.Use2DRenderer)
             Renderer2D::Init();
@@ -154,6 +154,8 @@ namespace Tiles
         }
 
         glfwTerminate();
+
+        TILES_LOGGER_SHUTDOWN();
     }
 
     void Application::Create()
@@ -175,7 +177,7 @@ namespace Tiles
     {
         if (!m_Window)
         {
-            TILES_LOG_ERROR("Application::Run: Window was not created; aborting run loop.");
+            TILES_ENGINE_ERROR("Application::Run: Window was not created; aborting run loop.");
             return;
         }
 
@@ -218,7 +220,7 @@ namespace Tiles
 			static bool flag = true;
             if (flag)
             {
-			    TILES_LOG_INFO("Application: Dockspace ID: {}", dockspace_id);
+			    TILES_ENGINE_INFO("Application: Dockspace ID: {}", dockspace_id);
                 flag = false;
             }
             ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);

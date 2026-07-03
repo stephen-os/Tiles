@@ -23,7 +23,7 @@ namespace Tiles::GL
     {
         while (GLenum error = glGetError())
         {
-            TILES_LOG_ERROR("[GL ERROR] {} (0x{:04X}) from '{}'\nFile: {}\nLine: {}",
+            TILES_ENGINE_ERROR("[GL ERROR] {} (0x{:04X}) from '{}'\nFile: {}\nLine: {}",
                 ErrorString(error), error, call, file, line);
         }
     }

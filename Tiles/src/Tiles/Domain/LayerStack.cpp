@@ -10,12 +10,12 @@ namespace Tiles
     {
         if (width == 0 || height == 0)
         {
-            TILES_LOG_INFO("LayerStack::LayerStack: Warning - LayerStack created with zero dimensions ({}x{})", width, height);
+            TILES_ENGINE_INFO("LayerStack::LayerStack: Warning - LayerStack created with zero dimensions ({}x{})", width, height);
         }
 
         if (width != m_Width || height != m_Height)
         {
-            TILES_LOG_INFO("LayerStack::LayerStack: Clamped dimensions from {}x{} to {}x{}", width, height, m_Width, m_Height);
+            TILES_ENGINE_INFO("LayerStack::LayerStack: Clamped dimensions from {}x{} to {}x{}", width, height, m_Width, m_Height);
         }
     }
 
@@ -25,31 +25,31 @@ namespace Tiles
         std::string layerName = name.empty() ? "New Layer" : name;
         m_Layers.back().SetName(layerName);
 
-        TILES_LOG_INFO("LayerStack::AddLayer: Added layer '{}' (total layers: {})", layerName, m_Layers.size());
+        TILES_ENGINE_INFO("LayerStack::AddLayer: Added layer '{}' (total layers: {})", layerName, m_Layers.size());
     }
 
     void LayerStack::RemoveLayer(size_t index)
     {
         if (!IsValidLayerIndex(index))
         {
-            TILES_LOG_INFO("LayerStack::RemoveLayer: Invalid index {} (layer count: {})", index, m_Layers.size());
+            TILES_ENGINE_INFO("LayerStack::RemoveLayer: Invalid index {} (layer count: {})", index, m_Layers.size());
             return;
         }
 
         std::string layerName = m_Layers[index].GetName();
         m_Layers.erase(m_Layers.begin() + index);
-        TILES_LOG_INFO("LayerStack::RemoveLayer: Removed layer '{}' (remaining: {})", layerName, m_Layers.size());
+        TILES_ENGINE_INFO("LayerStack::RemoveLayer: Removed layer '{}' (remaining: {})", layerName, m_Layers.size());
     }
 
     void LayerStack::ClearLayer(size_t index)
     {
         if (!IsValidLayerIndex(index))
         {
-            TILES_LOG_INFO("LayerStack::ClearLayer: Attempted to clear layer at invalid index {} (layer count: {})", index, m_Layers.size());
+            TILES_ENGINE_INFO("LayerStack::ClearLayer: Attempted to clear layer at invalid index {} (layer count: {})", index, m_Layers.size());
             return;
         }
 
-        TILES_LOG_INFO("LayerStack::ClearLayer: Clearing layer at index {}", index);
+        TILES_ENGINE_INFO("LayerStack::ClearLayer: Clearing layer at index {}", index);
         m_Layers[index].Clear();
     }
 
@@ -64,23 +64,23 @@ namespace Tiles
         auto it = m_Layers.insert(m_Layers.begin() + index, TileLayer(m_Width, m_Height));
         it->SetName(layerName);
 
-        TILES_LOG_INFO("LayerStack::InsertLayer: Inserted layer '{}' at index {} (total: {})", layerName, index, m_Layers.size());
+        TILES_ENGINE_INFO("LayerStack::InsertLayer: Inserted layer '{}' at index {} (total: {})", layerName, index, m_Layers.size());
     }
 
     void LayerStack::ReplaceLayer(size_t index, const TileLayer& layer)
     {
         if (!IsValidLayerIndex(index))
         {
-            TILES_LOG_INFO("LayerStack::ReplaceLayer: Attempted to replace layer at invalid index {} (layer count: {})", index, m_Layers.size());
+            TILES_ENGINE_INFO("LayerStack::ReplaceLayer: Attempted to replace layer at invalid index {} (layer count: {})", index, m_Layers.size());
             return;
         }
 
-        TILES_LOG_INFO("LayerStack::ReplaceLayer: Replacing layer at index {}", index);
+        TILES_ENGINE_INFO("LayerStack::ReplaceLayer: Replacing layer at index {}", index);
         m_Layers[index] = layer;
 
         if (layer.GetWidth() != m_Width || layer.GetHeight() != m_Height)
         {
-            TILES_LOG_INFO("LayerStack::ReplaceLayer: Resizing replaced layer from {}x{} to {}x{}", layer.GetWidth(), layer.GetHeight(), m_Width, m_Height);
+            TILES_ENGINE_INFO("LayerStack::ReplaceLayer: Resizing replaced layer from {}x{} to {}x{}", layer.GetWidth(), layer.GetHeight(), m_Width, m_Height);
             m_Layers[index].Resize(m_Width, m_Height);
         }
     }
@@ -92,7 +92,7 @@ namespace Tiles
 
         if (layerCount > 0)
         {
-            TILES_LOG_INFO("LayerStack::ClearAllLayers: Cleared {} layers", layerCount);
+            TILES_ENGINE_INFO("LayerStack::ClearAllLayers: Cleared {} layers", layerCount);
         }
     }
 
@@ -100,17 +100,17 @@ namespace Tiles
     {
         if (!IsValidLayerIndex(index))
         {
-            TILES_LOG_INFO("LayerStack::MoveLayerUp: Invalid layer index {} (layer count: {})", index, m_Layers.size());
+            TILES_ENGINE_INFO("LayerStack::MoveLayerUp: Invalid layer index {} (layer count: {})", index, m_Layers.size());
             return;
         }
 
         if (index == 0)
         {
-            TILES_LOG_INFO("LayerStack::MoveLayerUp: Layer at index {} is already at the top", index);
+            TILES_ENGINE_INFO("LayerStack::MoveLayerUp: Layer at index {} is already at the top", index);
             return;
         }
 
-        TILES_LOG_INFO("LayerStack::MoveLayerUp: Moving layer from index {} to {}", index, index - 1);
+        TILES_ENGINE_INFO("LayerStack::MoveLayerUp: Moving layer from index {} to {}", index, index - 1);
         std::swap(m_Layers[index], m_Layers[index - 1]);
     }
 
@@ -118,17 +118,17 @@ namespace Tiles
     {
         if (!IsValidLayerIndex(index))
         {
-            TILES_LOG_INFO("LayerStack::MoveLayerDown: Invalid layer index {} (layer count: {})", index, m_Layers.size());
+            TILES_ENGINE_INFO("LayerStack::MoveLayerDown: Invalid layer index {} (layer count: {})", index, m_Layers.size());
             return;
         }
 
         if (index >= m_Layers.size() - 1)
         {
-            TILES_LOG_INFO("LayerStack::MoveLayerDown: Layer at index {} is already at the bottom", index);
+            TILES_ENGINE_INFO("LayerStack::MoveLayerDown: Layer at index {} is already at the bottom", index);
             return;
         }
 
-        TILES_LOG_INFO("LayerStack::MoveLayerDown: Moving layer from index {} to {}", index, index + 1);
+        TILES_ENGINE_INFO("LayerStack::MoveLayerDown: Moving layer from index {} to {}", index, index + 1);
         std::swap(m_Layers[index], m_Layers[index + 1]);
     }
 
@@ -136,13 +136,13 @@ namespace Tiles
     {
         if (width == 0 || height == 0)
         {
-            TILES_LOG_INFO("LayerStack::Resize: Warning - Resizing LayerStack to zero dimensions ({}x{})", width, height);
+            TILES_ENGINE_INFO("LayerStack::Resize: Warning - Resizing LayerStack to zero dimensions ({}x{})", width, height);
         }
 
         width = Grid::ClampDimension(width);
         height = Grid::ClampDimension(height);
 
-        TILES_LOG_INFO("LayerStack::Resize: Resizing LayerStack from {}x{} to {}x{} ({} layers)", m_Width, m_Height, width, height, m_Layers.size());
+        TILES_ENGINE_INFO("LayerStack::Resize: Resizing LayerStack from {}x{} to {}x{} ({} layers)", m_Width, m_Height, width, height, m_Layers.size());
 
         m_Width = width;
         m_Height = height;
@@ -152,7 +152,7 @@ namespace Tiles
             m_Layers[i].Resize(width, height);
         }
 
-        TILES_LOG_INFO("LayerStack::Resize: LayerStack resize completed");
+        TILES_ENGINE_INFO("LayerStack::Resize: LayerStack resize completed");
     }
 
     TileLayer& LayerStack::GetLayer(size_t index)
@@ -200,7 +200,7 @@ namespace Tiles
     {
         if (!jsonLayerStack.contains(JSON::LayerStack::Width) || !jsonLayerStack.contains(JSON::LayerStack::Height))
         {
-            TILES_LOG_INFO("LayerStack::FromJSON: JSON missing required Width or Height fields");
+            TILES_ENGINE_INFO("LayerStack::FromJSON: JSON missing required Width or Height fields");
             return LayerStack(0, 0);
         }
 
@@ -230,13 +230,13 @@ namespace Tiles
                 }
                 catch (const std::exception& e)
                 {
-                    TILES_LOG_INFO("LayerStack::FromJSON: Failed to load layer: {}", e.what());
+                    TILES_ENGINE_INFO("LayerStack::FromJSON: Failed to load layer: {}", e.what());
                 }
             }
 
             if (loadedCount != layersArray.size())
             {
-                TILES_LOG_INFO("LayerStack::FromJSON: Loaded {} out of {} layers", loadedCount, layersArray.size());
+                TILES_ENGINE_INFO("LayerStack::FromJSON: Loaded {} out of {} layers", loadedCount, layersArray.size());
             }
         }
 

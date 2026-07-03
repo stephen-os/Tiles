@@ -11,7 +11,7 @@ namespace Tiles
 	{
 		if (width != m_Width || height != m_Height)
 		{
-			TILES_LOG_INFO("TileLayer::TileLayer: Clamped dimensions from {}x{} to {}x{}", width, height, m_Width, m_Height);
+			TILES_ENGINE_INFO("TileLayer::TileLayer: Clamped dimensions from {}x{} to {}x{}", width, height, m_Width, m_Height);
 		}
 
 		m_Tiles.resize(Grid::TileCount(m_Width, m_Height));
@@ -49,14 +49,14 @@ namespace Tiles
 	{
 		if (name.empty())
 		{
-			TILES_LOG_INFO("TileLayer::SetName: Empty name provided, using default");
+			TILES_ENGINE_INFO("TileLayer::SetName: Empty name provided, using default");
 			m_Name = "New Layer";
 			return;
 		}
 
 		if (name != m_Name)
 		{
-			TILES_LOG_INFO("TileLayer::SetName: Changed layer name from '{}' to '{}'", m_Name, name);
+			TILES_ENGINE_INFO("TileLayer::SetName: Changed layer name from '{}' to '{}'", m_Name, name);
 			m_Name = name;
 		}
 	}

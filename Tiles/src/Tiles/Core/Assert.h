@@ -3,14 +3,18 @@
 #include "Log.h"
 #include <cstdlib>
 
+#define TILES_STRINGIFY2(x) #x
+#define TILES_STRINGIFY(x)  TILES_STRINGIFY2(x)
+
 #ifdef TILES_DEBUG
 
 // Logs the failed condition with a formatted message and aborts (debug builds
 // only; compiles to a no-op in release).
-#define TILES_ASSERT(condition, fmt, ...) \
+#define TILES_ASSERT(condition, ...) \
 	do { \
 		if (!(condition)) { \
-			::Tiles::Assert::LogFailure(#condition, __FILE__, __LINE__, fmt, ##__VA_ARGS__); \
+			::Tiles::Logger::Get().PrintAssertMessage(::Tiles::Logger::Type::Core, \
+				"Assertion (" #condition ") failed at " __FILE__ ":" TILES_STRINGIFY(__LINE__), __VA_ARGS__); \
 			std::abort(); \
 		} \
 	} while (0)
@@ -18,20 +22,6 @@
 #else
 
 // No-op in release builds
-#define TILES_ASSERT(condition, fmt, ...) do { (void)sizeof(condition); } while (0)
+#define TILES_ASSERT(condition, ...) do { (void)sizeof(condition); } while (0)
 
 #endif
-
-namespace Tiles::Assert
-{
-	template<typename... Args>
-	inline void LogFailure(const char* condition, const char* file, int line, const char* fmt, Args&&... args)
-	{
-		TILES_LOG_ERROR("[ASSERT FAILED] Condition: {}\nMessage: {}\nFile: {}\nLine: {}",
-			condition,
-			fmt::format(fmt::runtime(fmt), std::forward<Args>(args)...),
-			file,
-			line
-		);
-	}
-}

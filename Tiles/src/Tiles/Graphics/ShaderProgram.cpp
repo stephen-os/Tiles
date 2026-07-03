@@ -40,7 +40,7 @@ namespace Tiles
             GLCALL(glDeleteProgram(m_ShaderProgramID));
             m_ShaderProgramID = 0;
 
-            TILES_LOG_ERROR("Shader program linking error:\n{0}", message);
+            TILES_ENGINE_ERROR("Shader program linking error:\n{0}", message);
         }
 
         // Cache the location of every active uniform so SetUniform* can look up
@@ -101,7 +101,7 @@ namespace Tiles
             GLCALL(glDeleteShader(shader));
 
 
-            TILES_LOG_ERROR("Shader compilation error: {}\n{0}", (type == GL_VERTEX_SHADER ? "Vertex" : "Fragment"), message);
+            TILES_ENGINE_ERROR("Shader compilation error: {}\n{}", (type == GL_VERTEX_SHADER ? "Vertex" : "Fragment"), message);
         }
 
         return shader;
@@ -113,7 +113,7 @@ namespace Tiles
         location = glGetAttribLocation(m_ShaderProgramID, name.c_str());
         if (location == -1)
         {
-            TILES_LOG_ERROR("Attribute location for {0} is not found", name);
+            TILES_ENGINE_ERROR("Attribute location for {0} is not found", name);
             return -1;
         }
         return location;
@@ -134,7 +134,7 @@ namespace Tiles
     {
         if (m_Uniforms.find(name) == m_Uniforms.end())
         {
-            TILES_LOG_ERROR("{0} isn't a valid uniform.", name);
+            TILES_ENGINE_ERROR("{0} isn't a valid uniform.", name);
         }
     }
 

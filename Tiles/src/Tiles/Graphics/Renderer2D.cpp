@@ -15,7 +15,7 @@ namespace Tiles
 
 	void Renderer2D::Init()
 	{
-		TILES_LOG_INFO("Renderer2D: Initializing...");
+		TILES_ENGINE_INFO("Renderer2D: Initializing...");
 
 		s_State = std::make_unique<RendererState>();
 
@@ -67,12 +67,12 @@ namespace Tiles
 		s_State->TexCoords[2] = { 1.0f, 1.0f };
 		s_State->TexCoords[3] = { 0.0f, 1.0f };
 
-		TILES_LOG_INFO("Renderer2D: Initialization complete");
+		TILES_ENGINE_INFO("Renderer2D: Initialization complete");
 	}
 
 	void Renderer2D::Shutdown()
 	{
-		TILES_LOG_INFO("Renderer2D: Shutting down...");
+		TILES_ENGINE_INFO("Renderer2D: Shutting down...");
 
 		s_State->DefaultRenderTarget.reset();
 		s_State->CurrentRenderTarget.reset();
@@ -90,7 +90,7 @@ namespace Tiles
 
 		s_State.reset();
 
-		TILES_LOG_INFO("Renderer2D: Shutdown complete");
+		TILES_ENGINE_INFO("Renderer2D: Shutdown complete");
 	}
 
 	void Renderer2D::Begin(std::shared_ptr<OrthographicCamera> camera)

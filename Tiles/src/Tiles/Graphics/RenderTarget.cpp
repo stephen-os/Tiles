@@ -57,7 +57,7 @@ namespace Tiles
 		size_t dotPos = path.find_last_of('.');
 		if (dotPos == std::string::npos)
 		{
-			TILES_LOG_ERROR("RenderTarget::SaveToFile: Path has no file extension: {}", path);
+			TILES_ENGINE_ERROR("RenderTarget::SaveToFile: Path has no file extension: {}", path);
 			return false;
 		}
 
@@ -83,17 +83,17 @@ namespace Tiles
 		}
 		else
 		{
-			TILES_LOG_ERROR("Unsupported file format: {}", extension);
+			TILES_ENGINE_ERROR("Unsupported file format: {}", extension);
 			return false;
 		}
 
 		if (result == 0)
 		{
-			TILES_LOG_ERROR("Failed to save render target to file: {}", path);
+			TILES_ENGINE_ERROR("Failed to save render target to file: {}", path);
 			return false;
 		}
 
-		TILES_LOG_INFO("Successfully saved render target to: {}", path);
+		TILES_ENGINE_INFO("Successfully saved render target to: {}", path);
 		return true;
 	}
 }

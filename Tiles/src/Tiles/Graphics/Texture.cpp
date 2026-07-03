@@ -23,7 +23,7 @@ namespace Tiles
 		TextureFormat format = TextureFormats::FromComponentCount(components);
 		if (format == TextureFormat::None)
 		{
-			TILES_LOG_ERROR("Unsupported component count: {0}", components);
+			TILES_ENGINE_ERROR("Unsupported component count: {0}", components);
 			return nullptr;
 		}
 
@@ -49,7 +49,7 @@ namespace Tiles
 	{
 		if (faces.size() != 6)
 		{
-			TILES_LOG_ERROR("Cubemap requires exactly 6 face textures, got {0}", faces.size());
+			TILES_ENGINE_ERROR("Cubemap requires exactly 6 face textures, got {0}", faces.size());
 			return nullptr;
 		}
 
@@ -67,7 +67,7 @@ namespace Tiles
 
 			if (!data)
 			{
-				TILES_LOG_ERROR("Failed to load cubemap face: {0}", faces[i]);
+				TILES_ENGINE_ERROR("Failed to load cubemap face: {0}", faces[i]);
 
 				GLCALL(glDeleteTextures(1, &texture->m_BufferID));
 				texture->m_BufferID = 0;
@@ -91,7 +91,7 @@ namespace Tiles
 			}
 			else if (faceWidth != width || faceHeight != height)
 			{
-				TILES_LOG_ERROR("All cubemap faces must have the same dimensions");
+				TILES_ENGINE_ERROR("All cubemap faces must have the same dimensions");
 
 				stbi_image_free(data);
 				GLCALL(glDeleteTextures(1, &texture->m_BufferID));
@@ -217,7 +217,7 @@ namespace Tiles
 	{
 		if (!data)
 		{
-			TILES_LOG_ERROR("Cannot set null data to texture");
+			TILES_ENGINE_ERROR("Cannot set null data to texture");
 			return;
 		}
 

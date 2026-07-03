@@ -2,10 +2,6 @@
 
 namespace Tiles
 {
-	std::shared_ptr<spdlog::logger> Log::s_Logger;
-	std::vector<spdlog::sink_ptr> Log::s_Sinks;
-	bool Log::s_Initialized = false;
-
 	std::unique_ptr<spdlog::formatter> LogFormatter::clone() const
 	{
 		return std::make_unique<LogFormatter>();
@@ -44,108 +40,96 @@ namespace Tiles
 		}
 	}
 
-	void Log::Init(std::string& name)
+	Logger& Logger::Get()
 	{
-		if (s_Initialized)
-			return;
+		static Logger instance;
+		return instance;
+	}
 
+	void Logger::Init()
+	{
 		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 		console_sink->set_formatter(std::make_unique<LogFormatter>());
-		s_Sinks.push_back(console_sink);
 
-		s_Logger = std::make_shared<spdlog::logger>(name, s_Sinks.begin(), s_Sinks.end());
-		s_Logger->set_level(spdlog::level::trace);
-		s_Logger->flush_on(spdlog::level::err);
-		spdlog::register_logger(s_Logger);
+		m_EngineLogger = std::make_shared<spdlog::logger>("ENGINE", console_sink);
+		m_EngineLogger->set_level(spdlog::level::trace);
+		m_EngineLogger->flush_on(spdlog::level::err);
 
-		TILES_LOG_INFO("Log: Initializing...");
-
-		s_Initialized = true;
-
-		TILES_LOG_INFO("Log: Initialization complete");
+		m_ClientLogger = std::make_shared<spdlog::logger>("CLIENT", console_sink);
+		m_ClientLogger->set_level(spdlog::level::trace);
+		m_ClientLogger->flush_on(spdlog::level::err);
 	}
 
-	void Log::Shutdown()
+	void Logger::Shutdown()
 	{
-		if (!s_Initialized)
-			return;
-
-		TILES_LOG_INFO("Log: Shutting down...");
-
-		if (s_Logger)
-			s_Logger->flush();
+		if (m_EngineLogger)
+			m_EngineLogger->flush();
+		if (m_ClientLogger)
+			m_ClientLogger->flush();
 
 		spdlog::shutdown();
-		s_Initialized = false;
 
-		TILES_LOG_INFO("Log: Shutdown complete");
+		m_EngineLogger.reset();
+		m_ClientLogger.reset();
 	}
 
-	void Log::SetLogLevel(spdlog::level::level_enum level)
+	void Logger::PrintMessageInternal(Type type, Level level, std::string_view message)
 	{
-		if (!s_Initialized || !s_Logger)
+		std::shared_ptr<spdlog::logger>& logger = (type == Type::Core) ? m_EngineLogger : m_ClientLogger;
+		if (!logger)
 			return;
 
-		s_Logger->set_level(level);
-	}
-
-	void Log::EnableFileLogging(const std::string& filename)
-	{
-		if (!s_Initialized || !s_Logger)
-			return;
-
-		try
+		// Log the already-formatted string literally: passing it as the sole
+		// argument selects spdlog's single-value overload, so any '{}' in the
+		// message is not reinterpreted as a format placeholder.
+		switch (level)
 		{
-			auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filename, 5 * 1024 * 1024, 3);
-			file_sink->set_pattern("[%T] [%n] [%l] %v");  // Plain format for files
-			s_Sinks.push_back(file_sink);
-
-			s_Logger->sinks().push_back(file_sink);
-
-			TILES_LOG_INFO("File logging enabled: {}", filename);
-		}
-		catch (const std::exception& ex)
-		{
-			TILES_LOG_ERROR("Failed to enable file logging: {}", ex.what());
+		case Level::Trace: logger->trace(message);    break;
+		case Level::Info:  logger->info(message);     break;
+		case Level::Warn:  logger->warn(message);     break;
+		case Level::Error: logger->error(message);    break;
+		case Level::Fatal: logger->critical(message); break;
 		}
 	}
 
-	std::string Log::Format(const std::string& format)
+	void Logger::PrintMessageTagInternal(Type type, Level level, std::string_view tag, std::string_view message)
 	{
-		std::string result = format;
-		size_t pos = 0;
-
-		while ((pos = result.find("{}", pos)) != std::string::npos)
+		auto it = m_EnabledTags.find(std::string(tag));
+		if (it != m_EnabledTags.end())
 		{
-			std::string replacement = std::string(LogColors::YELLOW) + "{}" + LogColors::WHITE;
-			result.replace(pos, 2, replacement);
-			pos += replacement.length();
+			const TagDetails& details = it->second;
+			if (!details.Enabled || level < details.LevelFilter)
+				return;
 		}
 
-		pos = 0;
-		while ((pos = result.find("{", pos)) != std::string::npos)
-		{
-			size_t end_pos = result.find("}", pos);
-			if (end_pos != std::string::npos)
-			{
-				std::string placeholder = result.substr(pos, end_pos - pos + 1);
-				if (placeholder.find("\033[") == std::string::npos)
-				{
-					std::string replacement = std::string(LogColors::YELLOW) + placeholder + LogColors::WHITE;
-					result.replace(pos, end_pos - pos + 1, replacement);
-					pos += replacement.length();
-				}
-				else
-				{
-					pos = end_pos + 1;
-				}
-			}
-			else
-			{
-				break;
-			}
-		}
+		PrintMessageInternal(type, level, std::format("[{}] {}", tag, message));
+	}
 
-		return result;
+	void Logger::PrintAssertMessage(Type type, std::string_view prefix)
+	{
+		PrintMessageInternal(type, Level::Error, prefix);
+	}
+
+	const char* Logger::LevelToString(Level level)
+	{
+		switch (level)
+		{
+		case Level::Trace: return "Trace";
+		case Level::Info:  return "Info";
+		case Level::Warn:  return "Warn";
+		case Level::Error: return "Error";
+		case Level::Fatal: return "Fatal";
+		}
+		return "Trace";
+	}
+
+	Logger::Level Logger::LevelFromString(std::string_view s)
+	{
+		if (s == "Trace") return Level::Trace;
+		if (s == "Info")  return Level::Info;
+		if (s == "Warn")  return Level::Warn;
+		if (s == "Error") return Level::Error;
+		if (s == "Fatal") return Level::Fatal;
+		return Level::Trace;
 	}
 }

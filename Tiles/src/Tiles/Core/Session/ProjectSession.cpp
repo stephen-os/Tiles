@@ -44,7 +44,7 @@ namespace Tiles
         m_Project->UpdateLastAccessed();
         m_History.AddProject(path, m_Project->GetProjectName());
 
-        TILES_LOG_INFO("ProjectSession::Save: Successfully saved project '{}'", m_Project->GetProjectName());
+        TILES_ENGINE_INFO("ProjectSession::Save: Successfully saved project '{}'", m_Project->GetProjectName());
         return result;
     }
 
@@ -65,7 +65,7 @@ namespace Tiles
         m_Project->UpdateLastAccessed();
         m_History.AddProject(path, m_Project->GetProjectName());
 
-        TILES_LOG_INFO("ProjectSession::SaveAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
+        TILES_ENGINE_INFO("ProjectSession::SaveAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
         return result;
     }
 
@@ -73,7 +73,7 @@ namespace Tiles
     {
         if (!std::filesystem::exists(path))
         {
-            TILES_LOG_INFO("ProjectSession::Load: File does not exist: {}", path.string());
+            TILES_ENGINE_INFO("ProjectSession::Load: File does not exist: {}", path.string());
             m_History.RemoveProject(path);
             return { false, "File does not exist." };
         }
@@ -82,7 +82,7 @@ namespace Tiles
         ProjectResult result = ProjectSerializer::Load(path, project);
         if (!result.Success)
         {
-            TILES_LOG_INFO("ProjectSession::Load: Load failed: {}", result.Message);
+            TILES_ENGINE_INFO("ProjectSession::Load: Load failed: {}", result.Message);
             return result;
         }
 
@@ -93,7 +93,7 @@ namespace Tiles
         m_Project = project;
         m_History.AddProject(path, m_Project->GetProjectName());
 
-        TILES_LOG_INFO("ProjectSession::Load: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
+        TILES_ENGINE_INFO("ProjectSession::Load: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
         return result;
     }
 

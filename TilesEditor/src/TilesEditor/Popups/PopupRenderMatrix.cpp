@@ -91,7 +91,7 @@ namespace Tiles::Editor
                 m_LayerToRenderGroup[i] = std::max(-1, std::min(renderGroupValue, 99));
             }
 
-            TILES_LOG_INFO("PopupRenderMatrix::InitializeDialog: Initialized dialog for project '{}'", projectName);
+            TILES_INFO("PopupRenderMatrix::InitializeDialog: Initialized dialog for project '{}'", projectName);
         }
     }
 
@@ -354,7 +354,7 @@ namespace Tiles::Editor
         }
 
         m_ShowSuccessMessage = false;
-        TILES_LOG_INFO("PopupRenderMatrix::ResetToDefaults: Reset to layer's current render groups");
+        TILES_INFO("PopupRenderMatrix::ResetToDefaults: Reset to layer's current render groups");
     }
 
     void PopupRenderMatrix::ApplyRenderGroupChanges()
@@ -376,7 +376,7 @@ namespace Tiles::Editor
                 {
                     layer.SetRenderGroup(newGroup);
                     hasChanges = true;
-                    TILES_LOG_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Set layer '{}' to render group {}",
+                    TILES_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Set layer '{}' to render group {}",
                         layer.GetName(), renderGroup);
                 }
             }
@@ -385,7 +385,7 @@ namespace Tiles::Editor
         if (hasChanges)
         {
             m_Context->GetProject()->MarkAsModified();
-            TILES_LOG_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Applied render group changes to project");
+            TILES_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Applied render group changes to project");
         }
     }
 
