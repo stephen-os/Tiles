@@ -84,8 +84,8 @@ namespace Tiles
 		float Fade = 0.0f;
 	};
 
-	/// Immediate-mode-style 2D batch renderer. Primitives are configured through
-	/// Set*/Draw* calls between Begin() and End(); geometry accumulates into
+	/// Immediate-mode 2D batch renderer. Primitives are drawn with DrawQuad/
+	/// DrawCircle/DrawLine(params) between Begin() and End(); geometry accumulates into
 	/// per-primitive vertex buffers and is flushed in as few draw calls as
 	/// possible. All state is global (single static instance).
 	class Renderer2D
@@ -115,21 +115,9 @@ namespace Tiles
 		static void SetRenderMode(PolygonMode mode);
 		static void* GetImage();
 
-		static void SetGridPosition(const glm::vec3& position);
-		static void SetGridRotation(const glm::vec3& rotation);
-		static void SetGridSize(const glm::vec2& size);
-		static void SetGridCellSize(float gridSize);
-		static void SetGridColor(const glm::vec4& color);
-		static void SetGridLineWidth(float lineWidth);
-		static void SetGridShowCheckerboard(bool showCheckerboard);
-		static void SetGridCheckerColor1(const glm::vec4& checkerColor1);
-		static void SetGridCheckerColor2(const glm::vec4& checkerColor2);
-		static void ResetGridState();
-
 		static void DrawQuad(const QuadParams& params);
 		static void DrawCircle(const CircleParams& params);
 		static void DrawLine(const LineParams& params);
-		static void DrawGrid();
 
 		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);
 		static void SetRenderTarget(std::nullptr_t);
@@ -142,13 +130,12 @@ namespace Tiles
 			uint32_t QuadCount = 0;
 			uint32_t CircleCount = 0;
 			uint32_t LineCount = 0;
-			uint32_t GridCount = 0;
 			uint32_t TexturesUsed = 0;
 			uint32_t ShadersUsed = 0;
 			uint32_t DataSize = 0;
 
-			uint32_t GetTotalVertexCount() const { return QuadCount * 4 + CircleCount * 4 + LineCount * 2 + GridCount * 4; }
-			uint32_t GetTotalIndexCount() const { return QuadCount * 6 + CircleCount * 6 + GridCount * 6; }
+			uint32_t GetTotalVertexCount() const { return QuadCount * 4 + CircleCount * 4 + LineCount * 2; }
+			uint32_t GetTotalIndexCount() const { return QuadCount * 6 + CircleCount * 6; }
 		};
 
 		static Statistics GetStats();

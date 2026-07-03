@@ -150,22 +150,13 @@ namespace Tiles::Editor
     void PanelViewport::RenderGrid()
     {
         auto camera = m_Context->GetViewportCamera();
-        glm::vec3 cameraPos = camera->GetPosition();
-        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
 
-        Tiles::Renderer2D::SetGridPosition({
-            cameraPos.x + m_TileSize / 2,
-            cameraPos.y + m_TileSize / 2,
-            Viewport::Depth::Grid
-            });
-        Tiles::Renderer2D::SetGridSize({ 16384.0f, 16384.0f });
-        Tiles::Renderer2D::SetGridCellSize(m_TileSize / 2);
-        Tiles::Renderer2D::SetGridColor(Viewport::Grid::GridColor);
-        Tiles::Renderer2D::SetGridLineWidth(2.0f);
-        Tiles::Renderer2D::SetGridShowCheckerboard(true);
-        Tiles::Renderer2D::SetGridCheckerColor1(Viewport::Grid::CheckerColor1);
-        Tiles::Renderer2D::SetGridCheckerColor2(Viewport::Grid::CheckerColor2);
-        Tiles::Renderer2D::DrawGrid();
+        // Colors live in GridParams' defaults; supply the camera and cell size
+        // (one grid cell per tile).
+        m_GridRenderer.Draw({
+            .ViewProjection = camera->GetViewProjectionMatrix(),
+            .CellSize = m_TileSize,
+        });
 
         RenderLayerBoundaries();
     }

@@ -14,7 +14,6 @@ namespace Tiles
 	constexpr uint32_t MaxQuads = 10000;
 	constexpr uint32_t MaxCircles = 10000;
 	constexpr uint32_t MaxLines = 10000;
-	constexpr uint32_t MaxGrids = 1000;
 
 	constexpr uint32_t MaxVertices = MaxQuads * 4;
 	constexpr uint32_t MaxIndices = MaxQuads * 6;
@@ -45,22 +44,6 @@ namespace Tiles
 		glm::vec4 Color;
 	};
 
-	struct GridVertex
-	{
-		glm::vec3 Position;
-		glm::vec4 Color;
-		glm::vec2 TexCoord;
-		float TexIndex;
-		glm::vec3 GridPosition;
-		glm::vec2 GridSize;
-		float CellSize;
-		glm::vec4 GridColor;
-		float LineWidth;
-		float ShowCheckerboard;
-		glm::vec4 CheckerColor1;
-		glm::vec4 CheckerColor2;
-	};
-
 	// Byte distance a write pointer advanced past its base; used to size buffer
 	// uploads. Asserts the pointer is in range and the size fits a uint32_t.
 	inline uint32_t CalculateBufferSize(const void* ptr, const void* base)
@@ -77,7 +60,6 @@ namespace Tiles
 #include "QuadBatch.h"
 #include "CircleBatch.h"
 #include "LineBatch.h"
-#include "GridBatch.h"
 
 namespace Tiles
 {
@@ -98,7 +80,7 @@ namespace Tiles
 		PolygonMode PolygonMode = PolygonMode::Fill;
 		glm::vec3 WireFrameColor = { 0.0f, 1.0f, 0.0f };
 
-		// Unit-quad corners shared by the quad, circle, and grid batchers.
+		// Unit-quad corners shared by the quad and circle batchers.
 		glm::vec4 QuadVertexPositions[4];
 		glm::vec3 CircleVertexPositions[4];
 		glm::vec2 TexCoords[4];
@@ -110,6 +92,5 @@ namespace Tiles
 		QuadBatch Quad;
 		CircleBatch Circle;
 		LineBatch Line;
-		GridBatch Grid;
 	};
 }

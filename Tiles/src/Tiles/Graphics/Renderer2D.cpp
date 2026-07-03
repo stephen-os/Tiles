@@ -23,7 +23,7 @@ namespace Tiles
 		s_State->DefaultRenderTarget = RenderTarget::Create(800, 600);
 		s_State->CurrentRenderTarget = s_State->DefaultRenderTarget;
 
-		// Quad index pattern reused by every indexed batcher (quad/circle/grid).
+		// Quad index pattern reused by every indexed batcher (quad/circle).
 		std::vector<uint32_t> quadIndices(MaxIndices);
 		uint32_t offset = 0;
 		for (uint32_t i = 0; i < MaxIndices; i += 6)
@@ -40,7 +40,6 @@ namespace Tiles
 		s_State->Quad.Init(quadIndices);
 		s_State->Circle.Init(quadIndices);
 		s_State->Line.Init();
-		s_State->Grid.Init(quadIndices);
 
 		s_State->Textures.Init();
 		// Slot overflow flushes the whole renderer so the new texture starts fresh.
@@ -74,7 +73,6 @@ namespace Tiles
 		s_State->Quad.Shutdown();
 		s_State->Circle.Shutdown();
 		s_State->Line.Shutdown();
-		s_State->Grid.Shutdown();
 
 		s_State->Textures.Shutdown();
 
@@ -115,7 +113,6 @@ namespace Tiles
 		s_State->Quad.Reset();
 		s_State->Circle.Reset();
 		s_State->Line.Reset();
-		s_State->Grid.Reset();
 
 		s_State->Textures.Reset();
 	}
@@ -129,7 +126,6 @@ namespace Tiles
 		if (s_State->Quad.Upload(*s_State)) issueDraw = true;
 		if (s_State->Circle.Upload(*s_State)) issueDraw = true;
 		if (s_State->Line.Upload(*s_State)) issueDraw = true;
-		if (s_State->Grid.Upload(*s_State)) issueDraw = true;
 
 		if (issueDraw)
 			Flush();
@@ -144,7 +140,6 @@ namespace Tiles
 		s_State->Quad.Flush(*s_State);
 		s_State->Circle.Flush(*s_State);
 		s_State->Line.Flush(*s_State);
-		s_State->Grid.Flush(*s_State);
 
 		s_State->Textures.Unbind();
 
@@ -187,64 +182,6 @@ namespace Tiles
 		return s_State->Textures.ComputeTextureIndex(texture);
 	}
 
-	void Renderer2D::SetGridPosition(const glm::vec3& position)
-	{
-		s_State->Grid.Position = position;
-	}
-
-	void Renderer2D::SetGridRotation(const glm::vec3& rotation)
-	{
-		s_State->Grid.Rotation = rotation;
-	}
-
-	void Renderer2D::SetGridSize(const glm::vec2& size)
-	{
-		s_State->Grid.Size = size;
-	}
-
-	void Renderer2D::SetGridCellSize(float gridSize)
-	{
-		s_State->Grid.CellSize = gridSize;
-	}
-
-	void Renderer2D::SetGridColor(const glm::vec4& color)
-	{
-		s_State->Grid.Color = color;
-	}
-
-	void Renderer2D::SetGridLineWidth(float lineWidth)
-	{
-		s_State->Grid.LineWidth = lineWidth;
-	}
-
-	void Renderer2D::SetGridShowCheckerboard(bool showCheckerboard)
-	{
-		s_State->Grid.ShowCheckerboard = showCheckerboard;
-	}
-
-	void Renderer2D::SetGridCheckerColor1(const glm::vec4& checkerColor1)
-	{
-		s_State->Grid.CheckerColor1 = checkerColor1;
-	}
-
-	void Renderer2D::SetGridCheckerColor2(const glm::vec4& checkerColor2)
-	{
-		s_State->Grid.CheckerColor2 = checkerColor2;
-	}
-
-	void Renderer2D::ResetGridState()
-	{
-		s_State->Grid.Position = { 0.0f, 0.0f, 0.0f };
-		s_State->Grid.Rotation = { 0.0f, 0.0f, 0.0f };
-		s_State->Grid.Size = { 1000.0f, 1000.0f };
-		s_State->Grid.CellSize = 1.0f;
-		s_State->Grid.Color = { 0.3f, 0.3f, 0.3f, 0.8f };
-		s_State->Grid.LineWidth = 1.0f;
-		s_State->Grid.ShowCheckerboard = true;
-		s_State->Grid.CheckerColor1 = { 0.9f, 0.9f, 0.9f, 0.2f };
-		s_State->Grid.CheckerColor2 = { 0.8f, 0.8f, 0.8f, 0.2f };
-	}
-
 	void Renderer2D::DrawQuad(const QuadParams& params)
 	{
 		if (s_State->Quad.IndexCount >= MaxIndices)
@@ -283,17 +220,6 @@ namespace Tiles
 		}
 
 		s_State->Line.Append(*s_State, params);
-	}
-
-	void Renderer2D::DrawGrid()
-	{
-		if (s_State->Grid.IndexCount >= MaxIndices)
-		{
-			EndBatch();
-			StartBatch();
-		}
-
-		s_State->Grid.Append(*s_State);
 	}
 
 	void Renderer2D::SetRenderTarget(std::shared_ptr<RenderTarget> target)
