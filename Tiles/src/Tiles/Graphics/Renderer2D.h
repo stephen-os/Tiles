@@ -58,34 +58,52 @@ namespace Tiles
 	class Renderer2D
 	{
 	public:
+
+		/// Initializes the renderer. Must be called before any other functions.
 		static void Init();
+
+		/// Shuts down the renderer.
 		static void Shutdown();
 
 		/// Begins a frame: sets the view-projection, binds the current render
 		/// target, clears it, and starts a fresh batch.
 		static void Begin(std::shared_ptr<OrthographicCamera> camera);
+		
 		/// Begins a frame with an explicit view-projection and no target setup.
 		static void Begin(glm::mat4& viewProjection);
+		
 		/// Ends the frame, flushing any pending geometry and unbinding the target.
 		static void End();
 
 		static void StartBatch();
+		
 		/// Uploads accumulated vertex data to the GPU and issues the draw calls.
 		static void EndBatch();
+		
+		/// Uploads accumulated vertex data to the GPU and issues the draw calls.
 		static void Flush();
 
+		/// Sets the pixel resolution of the render target.
 		static void SetResolution(uint32_t width, uint32_t height);
-		static void SetResolution(float width, float height);
-		static void SetResolution(const glm::vec2& resolution);
-		static glm::vec2 GetResolution();
 
+		/// Sets the render mode.
 		static void SetRenderMode(PolygonMode mode);
+		
+		/// Returns image data.
+		/// TODO: Not sure if we should use a void ptr here. 
 		static void* GetImage();
 
+		/// Draws one quad.
 		static void DrawQuad(const QuadParams& params);
+
+		/// Draws one circle.
 		static void DrawCircle(const CircleParams& params);
+		
+		/// Draws one line.
 		static void DrawLine(const LineParams& params);
 
+		/// Sets the current render target.
+		/// TODO: So we need the nullptr overload?
 		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);
 		static void SetRenderTarget(std::nullptr_t);
 		static std::shared_ptr<RenderTarget> GetCurrentRenderTarget();

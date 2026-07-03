@@ -152,21 +152,6 @@ namespace Tiles
 		s_State->Height = height;
 	}
 
-	void Renderer2D::SetResolution(float width, float height)
-	{
-		SetResolution(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
-	}
-
-	void Renderer2D::SetResolution(const glm::vec2& resolution)
-	{
-		SetResolution(static_cast<uint32_t>(resolution.x), static_cast<uint32_t>(resolution.y));
-	}
-
-	glm::vec2 Renderer2D::GetResolution()
-	{
-		return { s_State->Width, s_State->Height };
-	}
-
 	void Renderer2D::SetRenderMode(PolygonMode mode)
 	{
 		s_State->PolygonMode = mode;

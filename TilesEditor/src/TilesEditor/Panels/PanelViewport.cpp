@@ -48,7 +48,7 @@ namespace Tiles::Editor
         camera->SetSize(m_ViewportSize.x, m_ViewportSize.y);
 
         Tiles::Renderer2D::SetRenderTarget(m_RenderTarget);
-        Tiles::Renderer2D::SetResolution(m_ViewportSize.x, m_ViewportSize.y);
+        Tiles::Renderer2D::SetResolution(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
         Tiles::Renderer2D::Begin(camera);
 
         RenderGrid();
