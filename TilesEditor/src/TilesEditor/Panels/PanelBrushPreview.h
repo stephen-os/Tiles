@@ -44,7 +44,6 @@ namespace Tiles::Editor
         void RenderComponentSpacing();
 
     private:
-        std::shared_ptr<Tiles::OrthographicCamera> m_Camera;
         std::shared_ptr<Tiles::RenderTarget> m_PreviewRenderTarget;
 
         bool m_ShowGrid = true;

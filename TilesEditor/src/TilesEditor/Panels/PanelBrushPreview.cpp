@@ -8,13 +8,6 @@ namespace Tiles::Editor
 {
     PanelBrushPreview::PanelBrushPreview(std::shared_ptr<Context> context) : Panel(context)
     {
-        m_Camera = std::make_shared<Tiles::OrthographicCamera>();
-
-        auto bounds = CameraConstants::Settings::DefaultBounds;
-        m_Camera->SetBounds(-bounds, bounds, -bounds, bounds);
-        m_Camera->SetPosition({ 0.0f, 0.0f, 1.0f });
-        m_Camera->LookAt({ 0.0f, 0.0f, 0.0f });
-
         m_PreviewRenderTarget = Tiles::RenderTarget::Create(512, 512);
     }
 
@@ -74,22 +67,19 @@ namespace Tiles::Editor
         float previewSize = std::min(windowSize.x, windowSize.y);
         ImVec2 previewDimensions(previewSize, previewSize);
 
-        // Update camera bounds based on zoom and pan
+        // Build the view from pan and zoom: a fixed world region of half-extent
+        // DefaultBounds/zoom, centred on the pan offset.
         float bounds = CameraConstants::Settings::DefaultBounds / m_ZoomLevel;
-        m_Camera->SetBounds(
-            -bounds + m_PanOffset.x,
-            bounds + m_PanOffset.x,
-            -bounds + m_PanOffset.y,
-            bounds + m_PanOffset.y
-        );
+        Tiles::Camera2D camera;
+        camera.Center = m_PanOffset;
+        camera.Zoom = previewDimensions.x / (2.0f * bounds);
 
         uint32_t resolutionX = static_cast<uint32_t>(previewDimensions.x);
         uint32_t resolutionY = static_cast<uint32_t>(previewDimensions.y);
 
-        // Begin 3D rendering
         Tiles::Renderer2D::SetRenderTarget(m_PreviewRenderTarget);
         Tiles::Renderer2D::SetResolution(resolutionX, resolutionY);
-        Tiles::Renderer2D::BeginFrame(m_Camera->GetViewProjectionMatrix());
+        Tiles::Renderer2D::BeginFrame(camera.ViewProjection({ previewDimensions.x, previewDimensions.y }));
 
         // Render background
         Tiles::Renderer2D::DrawQuad({
