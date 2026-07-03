@@ -515,21 +515,18 @@ namespace Tiles::Editor
         uint32_t height = layerStack.GetHeight() * Viewport::Render::DefaultTileSize;
 
         auto renderTarget = Tiles::RenderTarget::Create(width, height);
-        auto camera = std::make_shared<Tiles::OrthographicCamera>();
 
-        camera->SetPosition({
+        Tiles::Camera2D camera;
+        camera.Center = {
             width * 0.5f + Viewport::Render::DefaultTileSize * 0.5f,
-            height * 0.5f + Viewport::Render::DefaultTileSize * 0.5f,
-            1.0f
-            });
-        camera->SetSize(width, height);
-        camera->SetZoom(1.0f);
+            height * 0.5f + Viewport::Render::DefaultTileSize * 0.5f
+        };
+        camera.Zoom = 1.0f;
 
         Tiles::Renderer2D::SetRenderTarget(renderTarget);
         Tiles::Renderer2D::SetResolution(width, height);
-        Tiles::Renderer2D::BeginFrame(camera->GetViewProjectionMatrix());
+        Tiles::Renderer2D::BeginFrame(camera.ViewProjection({ static_cast<float>(width), static_cast<float>(height) }));
 
-        glm::vec3 cameraPos = camera->GetPosition();
         const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
         float tileSize = Viewport::Render::DefaultTileSize;
 
@@ -539,7 +536,7 @@ namespace Tiles::Editor
                 continue;
 
             const auto& layer = layerStack.GetLayer(layerIdx);
-            DrawTileLayer(layer, layerIdx, cameraPos, tileSize, textureAtlases, 0.0f);
+            DrawTileLayer(layer, layerIdx, tileSize, textureAtlases, 0.0f);
         }
 
         Tiles::Renderer2D::EndFrame();

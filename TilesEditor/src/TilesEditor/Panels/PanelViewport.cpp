@@ -31,13 +31,7 @@ namespace Tiles::Editor
             return;
         }
 
-        auto camera = m_Context->GetViewportCamera();
-        if (!camera)
-        {
-            ImGui::TextColored(UI::Color::TextError, "No camera available");
-            ImGui::End();
-            return;
-        }
+        Camera2D& camera = m_Context->GetViewportCamera();
 
         m_CurrentMousePosition = ImGui::GetMousePos();
         m_ViewportPosition = ImGui::GetCursorScreenPos();
@@ -45,11 +39,9 @@ namespace Tiles::Editor
         m_ViewportSize.x = std::max(m_ViewportSize.x, m_TileSize);
         m_ViewportSize.y = std::max(m_ViewportSize.y, m_TileSize);
 
-        camera->SetSize(m_ViewportSize.x, m_ViewportSize.y);
-
         Tiles::Renderer2D::SetRenderTarget(m_RenderTarget);
         Tiles::Renderer2D::SetResolution(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
-        Tiles::Renderer2D::BeginFrame(camera->GetViewProjectionMatrix());
+        Tiles::Renderer2D::BeginFrame(camera.ViewProjection({ m_ViewportSize.x, m_ViewportSize.y }));
 
         RenderGrid();
         RenderLayers();
@@ -82,37 +74,38 @@ namespace Tiles::Editor
 
     void PanelViewport::HandleCameraMovement()
     {
-        auto camera = m_Context->GetViewportCamera();
-        if (!camera) return;
+        Camera2D& camera = m_Context->GetViewportCamera();
 
         if (Input::IsKeyPressed(KeyCode::W))
-            camera->MoveUp(Viewport::Input::CameraMoveSpeed);
+            camera.Center.y += Viewport::Input::CameraMoveSpeed;
         if (Input::IsKeyPressed(KeyCode::S))
-            camera->MoveUp(-Viewport::Input::CameraMoveSpeed);
+            camera.Center.y -= Viewport::Input::CameraMoveSpeed;
         if (Input::IsKeyPressed(KeyCode::A))
-            camera->MoveRight(Viewport::Input::CameraMoveSpeed);
+            camera.Center.x -= Viewport::Input::CameraMoveSpeed;
         if (Input::IsKeyPressed(KeyCode::D))
-            camera->MoveRight(-Viewport::Input::CameraMoveSpeed);
+            camera.Center.x += Viewport::Input::CameraMoveSpeed;
+
+        if (Input::IsKeyPressed(KeyCode::Q))
+            camera.Zoom = std::min(camera.Zoom * 1.02f, Viewport::Render::MaxZoom);
+        if (Input::IsKeyPressed(KeyCode::E))
+            camera.Zoom = std::max(camera.Zoom / 1.02f, Viewport::Render::MinZoom);
     }
 
     void PanelViewport::HandleZoom()
     {
-        auto camera = m_Context->GetViewportCamera();
-        if (!camera || m_MouseDelta == 0) return;
+        Camera2D& camera = m_Context->GetViewportCamera();
+        if (m_MouseDelta == 0) return;
 
-        float zoomChange = m_MouseDelta * Viewport::Render::ZoomSensitivity;
-        float newZoom = std::clamp(
-            camera->GetZoom() + zoomChange,
+        camera.Zoom = std::clamp(
+            camera.Zoom + m_MouseDelta * Viewport::Render::ZoomSensitivity,
             Viewport::Render::MinZoom,
             Viewport::Render::MaxZoom
         );
-        camera->SetZoom(newZoom);
     }
 
     void PanelViewport::HandleMouseDragging()
     {
-        auto camera = m_Context->GetViewportCamera();
-        if (!camera) return;
+        Camera2D& camera = m_Context->GetViewportCamera();
 
         // A pan begins on middle-button press and ends only when middle is
         // released; while dragging, either middle or right may hold the pan.
@@ -131,13 +124,11 @@ namespace Tiles::Editor
             };
 
             float dragSensitivity = CameraConstants::Settings::DragSensitivity;
-            float zoom = camera->GetZoom();
+            float zoom = camera.Zoom;
 
-            glm::vec3 cameraPos = camera->GetPosition();
-            cameraPos.x -= mouseDelta.x * dragSensitivity / zoom;
-            cameraPos.y += mouseDelta.y * dragSensitivity / zoom;
+            camera.Center.x -= mouseDelta.x * dragSensitivity / zoom;
+            camera.Center.y += mouseDelta.y * dragSensitivity / zoom;
 
-            camera->SetPosition(cameraPos);
             m_PreviousMousePosition = m_CurrentMousePosition;
         }
 
@@ -159,8 +150,6 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderLayerBoundaries()
     {
-        auto camera = m_Context->GetViewportCamera();
-        glm::vec3 cameraPos = camera->GetPosition();
         const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
 
         const float gridWidth = layerStack.GetWidth();
@@ -172,49 +161,49 @@ namespace Tiles::Editor
         line.Thickness = 2.0f;
 
         line.Start = {
-            offset + cameraPos.x,
-            offset + cameraPos.y,
+            offset,
+            offset,
             Viewport::Depth::Outline
             };
         line.End = {
-            m_TileSize * gridWidth + offset + cameraPos.x,
-            offset + cameraPos.y,
+            m_TileSize * gridWidth + offset,
+            offset,
             Viewport::Depth::Outline
             };
         Tiles::Renderer2D::DrawLine(line);
 
         line.Start = {
-            offset + cameraPos.x,
-            offset + cameraPos.y,
+            offset,
+            offset,
             Viewport::Depth::Outline
             };
         line.End = {
-            offset + cameraPos.x,
-            m_TileSize * gridHeight + offset + cameraPos.y,
+            offset,
+            m_TileSize * gridHeight + offset,
             Viewport::Depth::Outline
             };
         Tiles::Renderer2D::DrawLine(line);
 
         line.Start = {
-            m_TileSize * gridWidth + offset + cameraPos.x,
-            m_TileSize * gridHeight + offset + cameraPos.y,
+            m_TileSize * gridWidth + offset,
+            m_TileSize * gridHeight + offset,
             Viewport::Depth::Outline
             };
         line.End = {
-            offset + cameraPos.x,
-            m_TileSize * gridHeight + offset + cameraPos.y,
+            offset,
+            m_TileSize * gridHeight + offset,
             Viewport::Depth::Outline
             };
         Tiles::Renderer2D::DrawLine(line);
 
         line.Start = {
-            m_TileSize * gridWidth + offset + cameraPos.x,
-            m_TileSize * gridHeight + offset + cameraPos.y,
+            m_TileSize * gridWidth + offset,
+            m_TileSize * gridHeight + offset,
             Viewport::Depth::Outline
             };
         line.End = {
-            m_TileSize * gridWidth + offset + cameraPos.x,
-            offset + cameraPos.y,
+            m_TileSize * gridWidth + offset,
+            offset,
             Viewport::Depth::Outline
             };
         Tiles::Renderer2D::DrawLine(line);
@@ -223,21 +212,19 @@ namespace Tiles::Editor
     void PanelViewport::RenderLayers()
     {
         const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
-        auto camera = m_Context->GetViewportCamera();
-        glm::vec3 cameraPos = camera->GetPosition();
 
         for (size_t layerIdx = 0; layerIdx < layerStack.GetLayerCount(); ++layerIdx)
         {
             const TileLayer& layer = layerStack.GetLayer(layerIdx);
             if (!layer.GetVisibility()) continue;
-            RenderLayer(layer, layerIdx, cameraPos);
+            RenderLayer(layer, layerIdx);
         }
     }
 
-    void PanelViewport::RenderLayer(const TileLayer& layer, size_t layerIndex, const glm::vec3& cameraPos)
+    void PanelViewport::RenderLayer(const TileLayer& layer, size_t layerIndex)
     {
         const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
-        DrawTileLayer(layer, layerIndex, cameraPos, m_TileSize, textureAtlases, Viewport::Depth::Tile);
+        DrawTileLayer(layer, layerIndex, m_TileSize, textureAtlases, Viewport::Depth::Tile);
     }
 
     void PanelViewport::RenderHoverTile()
@@ -245,15 +232,13 @@ namespace Tiles::Editor
         if (!ImGui::IsWindowHovered()) return;
 
         const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
-        auto camera = m_Context->GetViewportCamera();
-        glm::vec3 cameraPos = camera->GetPosition();
 
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
         if (!IsValidGridPosition(gridPos)) return;
 
         glm::vec2 gridCenter = {
-            gridPos.x * m_TileSize + cameraPos.x,
-            gridPos.y * m_TileSize + cameraPos.y
+            gridPos.x * m_TileSize,
+            gridPos.y * m_TileSize
         };
 
         m_MouseFollowQuadPosition = {
@@ -268,7 +253,7 @@ namespace Tiles::Editor
         switch (mode)
         {
         case PaintingMode::Brush:
-            RenderBrushPreview(brush, cameraPos);
+            RenderBrushPreview(brush);
             break;
         case PaintingMode::Eraser:
             RenderEraserPreview();
@@ -282,7 +267,7 @@ namespace Tiles::Editor
         }
     }
 
-    void PanelViewport::RenderBrushPreview(const Tile& brush, const glm::vec3& cameraPos)
+    void PanelViewport::RenderBrushPreview(const Tile& brush)
     {
         glm::vec2 brushSize = brush.GetSize();
 
@@ -385,21 +370,11 @@ namespace Tiles::Editor
 
     glm::vec2 PanelViewport::ScreenToWorld() const
     {
-        auto camera = m_Context->GetViewportCamera();
-        glm::vec3 cameraPosition = camera->GetPosition();
-        float zoom = camera->GetZoom();
-
-        ImVec2 relativeMousePosition = {
+        const Camera2D& camera = m_Context->GetViewportCamera();
+        glm::vec2 relativeMouse = {
             m_CurrentMousePosition.x - m_ViewportPosition.x,
             m_CurrentMousePosition.y - m_ViewportPosition.y
         };
-
-        float centeredX = relativeMousePosition.x - m_ViewportSize.x / 2.0f;
-        float centeredY = relativeMousePosition.y - m_ViewportSize.y / 2.0f;
-
-        float worldX = cameraPosition.x + centeredX / zoom;
-        float worldY = cameraPosition.y - centeredY / zoom;
-
-        return { worldX, worldY };
+        return camera.ScreenToWorld(relativeMouse, { m_ViewportSize.x, m_ViewportSize.y });
     }
 }

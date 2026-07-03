@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "../../Graphics/OrthographicCamera.h"
+#include "../../Graphics/Camera2D.h"
 
 namespace Tiles
 {
@@ -15,7 +15,8 @@ namespace Tiles
     public:
         ViewportCameraController();
 
-        std::shared_ptr<OrthographicCamera> GetCamera() const { return m_Camera; }
+        Camera2D& GetCamera() { return m_Camera; }
+        const Camera2D& GetCamera() const { return m_Camera; }
 
         /// Centers the camera on the grid at default zoom.
         void Initialize(uint32_t gridWidth, uint32_t gridHeight);
@@ -27,6 +28,6 @@ namespace Tiles
         void FollowResize(uint32_t oldWidth, uint32_t oldHeight, uint32_t newWidth, uint32_t newHeight);
 
     private:
-        std::shared_ptr<OrthographicCamera> m_Camera;
+        Camera2D m_Camera;
     };
 }

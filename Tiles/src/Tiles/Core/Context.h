@@ -27,8 +27,8 @@ namespace Tiles
         Context();
         ~Context() = default;
 
-        std::shared_ptr<Tiles::OrthographicCamera> GetViewportCamera() { return m_CameraController.GetCamera(); }
-        const std::shared_ptr<Tiles::OrthographicCamera> GetViewportCamera() const { return m_CameraController.GetCamera(); }
+        Camera2D& GetViewportCamera() { return m_CameraController.GetCamera(); }
+        const Camera2D& GetViewportCamera() const { return m_CameraController.GetCamera(); }
         /// Recenters the camera on the project at default zoom.
         void ResetViewportCamera();
         /// Centers and zooms the camera so the whole project fits in view.

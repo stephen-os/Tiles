@@ -6,30 +6,24 @@
 
 namespace Tiles
 {
-    ViewportCameraController::ViewportCameraController()
-        : m_Camera(std::make_shared<OrthographicCamera>())
-    {
-    }
+    ViewportCameraController::ViewportCameraController() {}
 
     void ViewportCameraController::Initialize(uint32_t gridWidth, uint32_t gridHeight)
     {
-        m_Camera->SetPosition({
+        m_Camera.Center = {
             Viewport::Render::DefaultTileSize * (static_cast<float>(gridWidth) * 0.5f),
-            Viewport::Render::DefaultTileSize * (static_cast<float>(gridHeight) * 0.5f),
-            1.0f
-            });
+            Viewport::Render::DefaultTileSize * (static_cast<float>(gridHeight) * 0.5f)
+        };
 
-        m_Camera->SetZoom(1.0f);
+        m_Camera.Zoom = 1.0f;
     }
 
     void ViewportCameraController::Center(uint32_t gridWidth, uint32_t gridHeight)
     {
-        glm::vec3 currentPos = m_Camera->GetPosition();
-        m_Camera->SetPosition({
+        m_Camera.Center = {
             Viewport::Render::DefaultTileSize * (static_cast<float>(gridWidth) * 0.5f),
-            Viewport::Render::DefaultTileSize * (static_cast<float>(gridHeight) * 0.5f),
-            currentPos.z
-            });
+            Viewport::Render::DefaultTileSize * (static_cast<float>(gridHeight) * 0.5f)
+        };
     }
 
     void ViewportCameraController::Fit(uint32_t gridWidth, uint32_t gridHeight)
@@ -49,22 +43,20 @@ namespace Tiles
         const float fitZoom = std::min(zoomX, zoomY) * 0.9f;
 
         const float clampedZoom = std::clamp(fitZoom, Viewport::Render::MinZoom, Viewport::Render::MaxZoom);
-        m_Camera->SetZoom(clampedZoom);
+        m_Camera.Zoom = clampedZoom;
     }
 
     void ViewportCameraController::FollowResize(uint32_t oldWidth, uint32_t oldHeight, uint32_t newWidth, uint32_t newHeight)
     {
-        glm::vec3 currentPos = m_Camera->GetPosition();
-        const float relativeX = currentPos.x / (static_cast<float>(oldWidth) * Viewport::Render::DefaultTileSize);
-        const float relativeY = currentPos.y / (static_cast<float>(oldHeight) * Viewport::Render::DefaultTileSize);
+        const float relativeX = m_Camera.Center.x / (static_cast<float>(oldWidth) * Viewport::Render::DefaultTileSize);
+        const float relativeY = m_Camera.Center.y / (static_cast<float>(oldHeight) * Viewport::Render::DefaultTileSize);
 
         const float clampedX = std::clamp(relativeX, 0.0f, 1.0f);
         const float clampedY = std::clamp(relativeY, 0.0f, 1.0f);
 
-        m_Camera->SetPosition({
+        m_Camera.Center = {
             clampedX * newWidth * Viewport::Render::DefaultTileSize,
-            clampedY * newHeight * Viewport::Render::DefaultTileSize,
-            currentPos.z
-            });
+            clampedY * newHeight * Viewport::Render::DefaultTileSize
+        };
     }
 }

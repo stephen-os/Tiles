@@ -20,14 +20,12 @@ namespace Tiles::Editor
     /// coords so stale texture state never carries over between tiles.
     /// @param layer Layer whose painted tiles are drawn.
     /// @param layerIndex Position in the stack; scales the per-layer depth nudge.
-    /// @param cameraPos World-space camera offset added to every tile position.
     /// @param tileSize Edge length of one tile in world units.
     /// @param textureAtlases Atlases indexed by each tile's atlas index.
     /// @param baseDepth Depth of the layer before the per-layer nudge is added.
     void DrawTileLayer(
         const Tiles::TileLayer& layer,
         size_t layerIndex,
-        const glm::vec3& cameraPos,
         float tileSize,
         const std::vector<std::shared_ptr<Tiles::TextureAtlas>>& textureAtlases,
         float baseDepth);

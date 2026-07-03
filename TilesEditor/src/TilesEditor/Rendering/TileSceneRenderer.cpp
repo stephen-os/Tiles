@@ -10,7 +10,6 @@ namespace Tiles::Editor
     void DrawTileLayer(
         const Tiles::TileLayer& layer,
         size_t layerIndex,
-        const glm::vec3& cameraPos,
         float tileSize,
         const std::vector<std::shared_ptr<Tiles::TextureAtlas>>& textureAtlases,
         float baseDepth)
@@ -25,8 +24,8 @@ namespace Tiles::Editor
                 // The (x + 1, y + 1) offset matches the viewport's one-tile border,
                 // keeping exported output aligned with what the editor shows.
                 glm::vec2 tileWorldPos = {
-                    (x + 1) * tileSize + cameraPos.x,
-                    (y + 1) * tileSize + cameraPos.y
+                    (x + 1) * tileSize,
+                    (y + 1) * tileSize
                 };
 
                 glm::vec2 tileSizeMultiplier = tile.GetSize();

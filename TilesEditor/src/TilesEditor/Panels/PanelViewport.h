@@ -37,9 +37,9 @@ namespace Tiles::Editor
         void RenderGrid();
         void RenderLayerBoundaries();
         void RenderLayers();
-        void RenderLayer(const TileLayer& layer, size_t layerIndex, const glm::vec3& cameraPos);
+        void RenderLayer(const TileLayer& layer, size_t layerIndex);
         void RenderHoverTile();
-        void RenderBrushPreview(const Tile& brush, const glm::vec3& cameraPos);
+        void RenderBrushPreview(const Tile& brush);
         void RenderEraserPreview();
         void RenderFillPreview();
         void RenderBasicHover();
