@@ -375,6 +375,12 @@ namespace Tiles::Editor
             m_CurrentMousePosition.x - m_ViewportPosition.x,
             m_CurrentMousePosition.y - m_ViewportPosition.y
         };
+
+        // The scene is rendered to a bottom-left-origin GL texture and shown via
+        // ImGui::Image with default UVs, i.e. vertically mirrored. Camera2D only
+        // inverts the projection, so undo that display mirror on the pixel Y here.
+        relativeMouse.y = m_ViewportSize.y - relativeMouse.y;
+
         return camera.ScreenToWorld(relativeMouse, { m_ViewportSize.x, m_ViewportSize.y });
     }
 }
