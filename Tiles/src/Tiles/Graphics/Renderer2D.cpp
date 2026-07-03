@@ -214,19 +214,9 @@ namespace Tiles
 		}
 	}
 
-	void Renderer2D::SetRenderTarget(std::nullptr_t)
-	{
-		s_State->CurrentRenderTarget = s_State->DefaultRenderTarget;
-	}
-
 	std::shared_ptr<RenderTarget> Renderer2D::GetCurrentRenderTarget()
 	{
 		return s_State->CurrentRenderTarget;
-	}
-
-	std::shared_ptr<RenderTarget> Renderer2D::CreateRenderTarget(uint32_t width, uint32_t height)
-	{
-		return RenderTarget::Create(width, height);
 	}
 
 	Renderer2D::Statistics Renderer2D::GetStats()

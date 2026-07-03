@@ -12,7 +12,7 @@ namespace Tiles::Editor
     PanelViewport::PanelViewport(std::shared_ptr<Context> context)
         : Panel(context), m_TileSize(Viewport::Render::DefaultTileSize)
     {
-        m_RenderTarget = Tiles::Renderer2D::CreateRenderTarget(512, 512);
+        m_RenderTarget = Tiles::RenderTarget::Create(512, 512);
         m_MouseFollowQuadSize = { m_TileSize * 0.5f, m_TileSize * 0.5f };
         m_MouseFollowQuadColor = Viewport::Grid::HoverColor;
     }

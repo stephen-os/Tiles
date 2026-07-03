@@ -1,4 +1,5 @@
 #pragma once
+
 #include <memory>
 #include <cstdint>
 
@@ -103,16 +104,11 @@ namespace Tiles
 		/// Draws one line.
 		static void DrawLine(const LineParams& params);
 
-		/// Sets the current render target.
-		/// TODO: So we need the nullptr overload?
+		/// Sets the current render target; a null target resets to the default.
 		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);
-		static void SetRenderTarget(std::nullptr_t);
 
 		/// Returns the current render target.
 		static std::shared_ptr<RenderTarget> GetCurrentRenderTarget();
-
-		/// TODO: Do we need a create here? 
-		static std::shared_ptr<RenderTarget> CreateRenderTarget(uint32_t width, uint32_t height);
 
 		/// Renderer statistics
 		struct Statistics

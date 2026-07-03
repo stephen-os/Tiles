@@ -514,7 +514,7 @@ namespace Tiles::Editor
         uint32_t width = layerStack.GetWidth() * Viewport::Render::DefaultTileSize;
         uint32_t height = layerStack.GetHeight() * Viewport::Render::DefaultTileSize;
 
-        auto renderTarget = Tiles::Renderer2D::CreateRenderTarget(width, height);
+        auto renderTarget = Tiles::RenderTarget::Create(width, height);
         auto camera = std::make_shared<Tiles::OrthographicCamera>();
 
         camera->SetPosition({

@@ -15,7 +15,7 @@ namespace Tiles::Editor
         m_Camera->SetPosition({ 0.0f, 0.0f, 1.0f });
         m_Camera->LookAt({ 0.0f, 0.0f, 0.0f });
 
-        m_PreviewRenderTarget = Tiles::Renderer2D::CreateRenderTarget(512, 512);
+        m_PreviewRenderTarget = Tiles::RenderTarget::Create(512, 512);
     }
 
     void PanelBrushPreview::Render()
