@@ -5,7 +5,6 @@
 #include "Tiles.h"
 #include "imgui.h"
 
-#include "../Rendering/GridRenderer.h"
 
 
 namespace Tiles::Editor
@@ -54,7 +53,6 @@ namespace Tiles::Editor
 
     private:
         std::shared_ptr<RenderTarget> m_RenderTarget;
-        GridRenderer m_GridRenderer;
 
         float m_TileSize;
         float m_MouseDelta = 0.0f;

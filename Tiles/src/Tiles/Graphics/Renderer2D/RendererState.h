@@ -60,6 +60,7 @@ namespace Tiles
 #include "QuadBatch.h"
 #include "CircleBatch.h"
 #include "LineBatch.h"
+#include "GridPass.h"
 
 namespace Tiles
 {
@@ -92,5 +93,6 @@ namespace Tiles
 		QuadBatch Quad;
 		CircleBatch Circle;
 		LineBatch Line;
+		GridPass Grid;
 	};
 }

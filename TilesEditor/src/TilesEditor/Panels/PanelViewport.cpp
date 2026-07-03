@@ -149,14 +149,10 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderGrid()
     {
-        auto camera = m_Context->GetViewportCamera();
-
-        // Colors live in GridParams' defaults; supply the camera and cell size
-        // (one grid cell per tile).
-        m_GridRenderer.Draw({
-            .ViewProjection = camera->GetViewProjectionMatrix(),
-            .CellSize = m_TileSize,
-        });
+        // Colors come from GridParams' defaults; the grid reconstructs world
+        // space from the frame's view-projection (set by BeginFrame). One grid
+        // cell per tile.
+        Tiles::Renderer2D::DrawGrid({ .CellSize = m_TileSize });
 
         RenderLayerBoundaries();
     }

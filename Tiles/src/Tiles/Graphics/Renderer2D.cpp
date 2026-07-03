@@ -40,6 +40,7 @@ namespace Tiles
 		s_State->Quad.Init(quadIndices);
 		s_State->Circle.Init(quadIndices);
 		s_State->Line.Init();
+		s_State->Grid.Init();
 
 		s_State->Textures.Init();
 		// Slot overflow flushes the whole renderer so the new texture starts fresh.
@@ -73,6 +74,7 @@ namespace Tiles
 		s_State->Quad.Shutdown();
 		s_State->Circle.Shutdown();
 		s_State->Line.Shutdown();
+		s_State->Grid.Shutdown();
 
 		s_State->Textures.Shutdown();
 
@@ -194,6 +196,11 @@ namespace Tiles
 		}
 
 		s_State->Line.Append(*s_State, params);
+	}
+
+	void Renderer2D::DrawGrid(const GridParams& params)
+	{
+		s_State->Grid.Draw(*s_State, params);
 	}
 
 	void Renderer2D::SetRenderTarget(std::shared_ptr<RenderTarget> target)

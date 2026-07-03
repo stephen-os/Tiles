@@ -50,6 +50,17 @@ namespace Tiles
 		float Fade = 0.0f;
 	};
 
+	// Configuration for one infinite-grid draw. The view-projection is taken from
+	// the current frame (BeginFrame), so it is not part of the params.
+	struct GridParams
+	{
+		float CellSize = 1.0f;          // minor cell size, world units
+		float MajorEvery = 10.0f;       // a major line every N minor cells
+		glm::vec4 LineColor{ 0.30f, 0.30f, 0.33f, 1.0f };
+		glm::vec4 MajorLineColor{ 0.50f, 0.50f, 0.55f, 1.0f };
+		glm::vec4 BackgroundColor{ 0.13f, 0.13f, 0.15f, 1.0f };
+	};
+
 	// Immediate-mode 2D batch renderer. Primitives are drawn with DrawQuad/
 	// DrawCircle/DrawLine(params) between BeginFrame() and EndFrame(); geometry accumulates into
 	// per-primitive vertex buffers and is flushed in as few draw calls as
@@ -98,6 +109,10 @@ namespace Tiles
 		
 		// Draws one line.
 		static void DrawLine(const LineParams& params);
+
+		// Draws a fullscreen infinite grid behind everything (no depth write),
+		// using the current frame's view-projection. Call after BeginFrame.
+		static void DrawGrid(const GridParams& params);
 
 		// Sets the current render target; a null target resets to the default.
 		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);
