@@ -12,6 +12,8 @@
 #include "Panels/PanelViewport.h"
 #include "Panels/PanelDebug.h"
 
+#include "EditorTheme.h"
+
 class TilesEditorLayer : public Tiles::Layer
 {
 public:
@@ -69,6 +71,7 @@ public:
 
 	void OnCreate() override
 	{
+		Tiles::Editor::ApplyTheme();
 		PushLayer<TilesEditorLayer>();
 	}
 	void OnDestroy() override

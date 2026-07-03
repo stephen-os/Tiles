@@ -32,8 +32,6 @@ namespace Tiles
 		/// last windowed position/size, per the current Fullscreen spec flag.
 		void SetWindowFullscreen();
 
-		void ApplyTilesTheme();
-
 		/// Requests the run loop to exit at the end of the current frame.
 		void Shutdown() { m_Running = false; };
 
