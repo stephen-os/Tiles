@@ -58,7 +58,6 @@ namespace Tiles::Editor
         Tiles::Renderer2D::End();
         Tiles::Renderer2D::SetRenderTarget(nullptr);
 
-        Tiles::Renderer2D::ResetQuadState();
 		Tiles::Renderer2D::ResetLineState();
 
         ImGui::Image((void*)m_RenderTarget->GetTexture(), m_ViewportSize);
@@ -298,15 +297,13 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderBrushPreview(const Tile& brush, const glm::vec3& cameraPos)
     {
-        Tiles::Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
-        Tiles::Renderer2D::SetQuadRotation(brush.GetRotation());
-        Tiles::Renderer2D::SetQuadTintColor(brush.GetTint());
-
         glm::vec2 brushSize = brush.GetSize();
-        Tiles::Renderer2D::SetQuadSize({
-            m_TileSize * brushSize.x,
-            m_TileSize * brushSize.y
-            });
+
+        Tiles::QuadParams params;
+        params.Position = m_MouseFollowQuadPosition;
+        params.Rotation = brush.GetRotation();
+        params.Tint = brush.GetTint();
+        params.Size = { m_TileSize * brushSize.x, m_TileSize * brushSize.y };
 
         const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
         if (brush.IsTextured() && brush.HasValidAtlas() && brush.GetAtlasIndex() < textureAtlases.size())
@@ -314,50 +311,39 @@ namespace Tiles::Editor
             auto atlas = textureAtlases[brush.GetAtlasIndex()];
             if (atlas && atlas->HasTexture())
             {
-                Tiles::Renderer2D::SetQuadTexture(atlas->GetTexture());
-                Tiles::Renderer2D::SetQuadTextureCoords(brush.GetTextureCoords());
+                params.Texture = atlas->GetTexture();
+                params.TexCoords = brush.GetTextureCoords();
             }
-            else
-            {
-                Tiles::Renderer2D::SetQuadTexture(nullptr);
-            }
-        }
-        else
-        {
-            Tiles::Renderer2D::SetQuadTexture(nullptr);
         }
 
-        Tiles::Renderer2D::DrawQuad();
+        Tiles::Renderer2D::DrawQuad(params);
     }
 
     void PanelViewport::RenderEraserPreview()
     {
-        Tiles::Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
-        Tiles::Renderer2D::SetQuadSize({ m_TileSize, m_TileSize });
-        Tiles::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
-        Tiles::Renderer2D::SetQuadTintColor({ 1.0f, 0.0f, 0.0f, 0.3f });
-        Tiles::Renderer2D::SetQuadTexture(nullptr);
-        Tiles::Renderer2D::DrawQuad();
+        Tiles::Renderer2D::DrawQuad({
+            .Position = m_MouseFollowQuadPosition,
+            .Size = { m_TileSize, m_TileSize },
+            .Tint = { 1.0f, 0.0f, 0.0f, 0.3f },
+        });
     }
 
     void PanelViewport::RenderFillPreview()
     {
-        Tiles::Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
-        Tiles::Renderer2D::SetQuadSize({ m_TileSize, m_TileSize });
-        Tiles::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
-        Tiles::Renderer2D::SetQuadTintColor({ 0.0f, 0.0f, 1.0f, 0.3f });
-        Tiles::Renderer2D::SetQuadTexture(nullptr);
-        Tiles::Renderer2D::DrawQuad();
+        Tiles::Renderer2D::DrawQuad({
+            .Position = m_MouseFollowQuadPosition,
+            .Size = { m_TileSize, m_TileSize },
+            .Tint = { 0.0f, 0.0f, 1.0f, 0.3f },
+        });
     }
 
     void PanelViewport::RenderBasicHover()
     {
-        Tiles::Renderer2D::SetQuadPosition(m_MouseFollowQuadPosition);
-        Tiles::Renderer2D::SetQuadSize(m_MouseFollowQuadSize);
-        Tiles::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
-        Tiles::Renderer2D::SetQuadTintColor(m_MouseFollowQuadColor);
-        Tiles::Renderer2D::SetQuadTexture(nullptr);
-        Tiles::Renderer2D::DrawQuad();
+        Tiles::Renderer2D::DrawQuad({
+            .Position = m_MouseFollowQuadPosition,
+            .Size = m_MouseFollowQuadSize,
+            .Tint = m_MouseFollowQuadColor,
+        });
     }
 
     void PanelViewport::HandleInput()

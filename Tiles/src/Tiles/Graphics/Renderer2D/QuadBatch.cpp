@@ -42,22 +42,22 @@ namespace Tiles
 		Ptr = nullptr;
 	}
 
-	void QuadBatch::Append(RendererState& state)
+	void QuadBatch::Append(RendererState& state, const QuadParams& params)
 	{
 		TILES_ASSERT(Ptr >= Base, "Vertex buffer pointer underflow");
 
-		glm::mat4 translation = glm::translate(glm::mat4(1.0f), Position);
-		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), glm::radians(Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 translation = glm::translate(glm::mat4(1.0f), params.Position);
+		glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), glm::radians(params.Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), glm::radians(params.Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), glm::radians(params.Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 rotation = rotationZ * rotationY * rotationX;
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(Size, 1.0f));
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(params.Size, 1.0f));
 		glm::mat4 transform = translation * rotation * scale;
 
-		float texIndex = state.Textures.ComputeTextureIndex(Texture);
+		float texIndex = state.Textures.ComputeTextureIndex(params.Texture);
 
-		glm::vec2 uvMin = { TextureCoords.x, TextureCoords.y };
-		glm::vec2 uvMax = { TextureCoords.z, TextureCoords.w };
+		glm::vec2 uvMin = { params.TexCoords.x, params.TexCoords.y };
+		glm::vec2 uvMax = { params.TexCoords.z, params.TexCoords.w };
 
 		glm::vec2 uvs[4] =
 		{
@@ -70,7 +70,7 @@ namespace Tiles
 		for (size_t i = 0; i < 4; i++)
 		{
 			Ptr->Position = transform * state.QuadVertexPositions[i];
-			Ptr->Color = TintColor;
+			Ptr->Color = params.Tint;
 			Ptr->TexCoord = uvs[i];
 			Ptr->TexIndex = texIndex;
 			Ptr++;

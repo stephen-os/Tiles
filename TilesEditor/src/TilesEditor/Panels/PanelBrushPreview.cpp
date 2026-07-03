@@ -92,11 +92,11 @@ namespace Tiles::Editor
         Tiles::Renderer2D::Begin(m_Camera);
 
         // Render background
-        Tiles::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Background });
-        Tiles::Renderer2D::SetQuadSize({ Render2D::Grid::BackgroundSize, Render2D::Grid::BackgroundSize });
-        Tiles::Renderer2D::SetQuadTintColor({ m_BackgroundBrightness, m_BackgroundBrightness, m_BackgroundBrightness, 1.0f });
-        Tiles::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
-        Tiles::Renderer2D::DrawQuad();
+        Tiles::Renderer2D::DrawQuad({
+            .Position = { 0.0f, 0.0f, Render2D::Depth::Background },
+            .Size = { Render2D::Grid::BackgroundSize, Render2D::Grid::BackgroundSize },
+            .Tint = { m_BackgroundBrightness, m_BackgroundBrightness, m_BackgroundBrightness, 1.0f },
+        });
 
         // Render grid if enabled
         if (m_ShowGrid)
@@ -123,35 +123,34 @@ namespace Tiles::Editor
 
         // Render brush
         auto& brush = m_Context->GetBrush();
-        Tiles::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Brush });
-        Tiles::Renderer2D::SetQuadSize(brush.GetSize());
-        Tiles::Renderer2D::SetQuadRotation(brush.GetRotation());
-        Tiles::Renderer2D::SetQuadTextureCoords(brush.GetTextureCoords());
-        Tiles::Renderer2D::SetQuadTintColor(brush.GetTint());
+
+        Tiles::QuadParams brushQuad;
+        brushQuad.Position = { 0.0f, 0.0f, Render2D::Depth::Brush };
+        brushQuad.Size = brush.GetSize();
+        brushQuad.Rotation = brush.GetRotation();
+        brushQuad.Tint = brush.GetTint();
+        brushQuad.TexCoords = brush.GetTextureCoords();
 
         if (brush.IsTextured() && brush.HasValidAtlas())
         {
-            auto texture = m_Context->GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
-            Tiles::Renderer2D::SetQuadTexture(texture);
+            brushQuad.Texture = m_Context->GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
         }
 
-        Tiles::Renderer2D::DrawQuad();
+        Tiles::Renderer2D::DrawQuad(brushQuad);
 
         // Render bounds if enabled
         if (m_ShowBounds)
         {
-            Tiles::Renderer2D::SetQuadPosition({ 0.0f, 0.0f, Render2D::Depth::Bounds });
-            Tiles::Renderer2D::SetQuadSize({ brush.GetSize().x + Render2D::Bounds::Offset,
-                                      brush.GetSize().y + Render2D::Bounds::Offset });
-            Tiles::Renderer2D::SetQuadTintColor(Render2D::Bounds::Color);
-            Tiles::Renderer2D::SetQuadRotation({ 0.0f, 0.0f, 0.0f });
-            Tiles::Renderer2D::DrawQuad();
+            Tiles::Renderer2D::DrawQuad({
+                .Position = { 0.0f, 0.0f, Render2D::Depth::Bounds },
+                .Size = { brush.GetSize().x + Render2D::Bounds::Offset, brush.GetSize().y + Render2D::Bounds::Offset },
+                .Tint = Render2D::Bounds::Color,
+            });
         }
 
         Tiles::Renderer2D::End();
         Tiles::Renderer2D::SetRenderTarget(nullptr);
 
-		Tiles::Renderer2D::ResetQuadState();
         Tiles::Renderer2D::ResetLineState();
 
         // An InvisibleButton reserves the canvas rect and captures hover/drag for

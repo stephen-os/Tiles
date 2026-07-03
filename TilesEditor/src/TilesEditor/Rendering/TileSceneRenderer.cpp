@@ -29,42 +29,27 @@ namespace Tiles::Editor
                     (y + 1) * tileSize + cameraPos.y
                 };
 
-                // Nudge each layer's depth so higher layers draw above lower ones.
-                Tiles::Renderer2D::SetQuadPosition({
-                    tileWorldPos.x,
-                    tileWorldPos.y,
-                    baseDepth + layerIndex * 0.01f
-                    });
-                Tiles::Renderer2D::SetQuadRotation(tile.GetRotation());
-                Tiles::Renderer2D::SetQuadTintColor(tile.GetTint());
-
                 glm::vec2 tileSizeMultiplier = tile.GetSize();
-                Tiles::Renderer2D::SetQuadSize({
-                    tileSize * tileSizeMultiplier.x,
-                    tileSize * tileSizeMultiplier.y
-                    });
 
+                Tiles::QuadParams params;
+                // Nudge each layer's depth so higher layers draw above lower ones.
+                params.Position = { tileWorldPos.x, tileWorldPos.y, baseDepth + layerIndex * 0.01f };
+                params.Rotation = tile.GetRotation();
+                params.Tint = tile.GetTint();
+                params.Size = { tileSize * tileSizeMultiplier.x, tileSize * tileSizeMultiplier.y };
+
+                // Untextured tiles keep the defaults (no texture, full coords).
                 if (tile.IsTextured() && tile.GetAtlasIndex() < textureAtlases.size())
                 {
                     auto atlas = textureAtlases[tile.GetAtlasIndex()];
                     if (atlas && atlas->HasTexture())
                     {
-                        Tiles::Renderer2D::SetQuadTexture(atlas->GetTexture());
-                        Tiles::Renderer2D::SetQuadTextureCoords(tile.GetTextureCoords());
+                        params.Texture = atlas->GetTexture();
+                        params.TexCoords = tile.GetTextureCoords();
                     }
-                    else
-                    {
-                        Tiles::Renderer2D::SetQuadTexture(nullptr);
-                        Tiles::Renderer2D::SetQuadTextureCoords({ 0.0f, 0.0f, 1.0f, 1.0f });
-                    }
-                }
-                else
-                {
-                    Tiles::Renderer2D::SetQuadTexture(nullptr);
-                    Tiles::Renderer2D::SetQuadTextureCoords({ 0.0f, 0.0f, 1.0f, 1.0f });
                 }
 
-                Tiles::Renderer2D::DrawQuad();
+                Tiles::Renderer2D::DrawQuad(params);
             }
         }
     }

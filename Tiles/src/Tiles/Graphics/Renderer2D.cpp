@@ -187,46 +187,6 @@ namespace Tiles
 		return s_State->Textures.ComputeTextureIndex(texture);
 	}
 
-	void Renderer2D::SetQuadPosition(const glm::vec3& position)
-	{
-		s_State->Quad.Position = position;
-	}
-
-	void Renderer2D::SetQuadRotation(const glm::vec3& rotation)
-	{
-		s_State->Quad.Rotation = rotation;
-	}
-
-	void Renderer2D::SetQuadSize(const glm::vec2& size)
-	{
-		s_State->Quad.Size = size;
-	}
-
-	void Renderer2D::SetQuadTexture(const std::shared_ptr<Texture>& texture)
-	{
-		s_State->Quad.Texture = texture;
-	}
-
-	void Renderer2D::SetQuadTextureCoords(const glm::vec4& textureCoords)
-	{
-		s_State->Quad.TextureCoords = textureCoords;
-	}
-
-	void Renderer2D::SetQuadTintColor(const glm::vec4& tintColor)
-	{
-		s_State->Quad.TintColor = tintColor;
-	}
-
-	void Renderer2D::ResetQuadState()
-	{
-		s_State->Quad.Position = { 0.0f, 0.0f, 0.0f };
-		s_State->Quad.Rotation = { 0.0f, 0.0f, 0.0f };
-		s_State->Quad.Size = { 1.0f, 1.0f };
-		s_State->Quad.Texture = nullptr;
-		s_State->Quad.TextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
-		s_State->Quad.TintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	}
-
 	void Renderer2D::SetCirclePosition(const glm::vec3& position)
 	{
 		s_State->Circle.Position = position;
@@ -365,7 +325,7 @@ namespace Tiles
 		s_State->Grid.CheckerColor2 = { 0.8f, 0.8f, 0.8f, 0.2f };
 	}
 
-	void Renderer2D::DrawQuad()
+	void Renderer2D::DrawQuad(const QuadParams& params)
 	{
 		if (s_State->Quad.IndexCount >= MaxIndices)
 		{
@@ -373,7 +333,7 @@ namespace Tiles
 			StartBatch();
 		}
 
-		s_State->Quad.Append(*s_State);
+		s_State->Quad.Append(*s_State, params);
 	}
 
 	void Renderer2D::DrawCircle()

@@ -18,7 +18,7 @@ namespace Tiles
 		void Init(const std::vector<uint32_t>& quadIndices);
 		void Shutdown();
 
-		void Append(RendererState& state);
+		void Append(RendererState& state, const QuadParams& params);
 		void Reset();
 		bool Upload(RendererState& state);
 		void Flush(RendererState& state);
@@ -31,12 +31,5 @@ namespace Tiles
 		uint32_t IndexCount = 0;
 		QuadVertex* Base = nullptr;
 		QuadVertex* Ptr = nullptr;
-
-		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 Rotation = { 0.0f, 0.0f, 0.0f };
-		glm::vec2 Size = { 1.0f, 1.0f };
-		std::shared_ptr<Texture> Texture = nullptr;
-		glm::vec4 TextureCoords = { 0.0f, 0.0f, 1.0f, 1.0f };
-		glm::vec4 TintColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 	};
 }

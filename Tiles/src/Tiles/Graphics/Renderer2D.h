@@ -48,6 +48,18 @@ namespace Tiles
 		Center = 2
 	};
 
+	/// Parameters for one quad draw. Set only what you need; the rest fall back to
+	/// sensible defaults (unit size, no rotation, full white tint, untextured).
+	struct QuadParams
+	{
+		glm::vec3 Position{ 0.0f };
+		glm::vec2 Size{ 1.0f };
+		glm::vec3 Rotation{ 0.0f };
+		glm::vec4 Tint{ 1.0f };
+		std::shared_ptr<Texture> Texture = nullptr;
+		glm::vec4 TexCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
+	};
+
 	/// Immediate-mode-style 2D batch renderer. Primitives are configured through
 	/// Set*/Draw* calls between Begin() and End(); geometry accumulates into
 	/// per-primitive vertex buffers and is flushed in as few draw calls as
@@ -79,14 +91,6 @@ namespace Tiles
 		static void SetRenderMode(PolygonMode mode);
 		static void* GetImage();
 
-		static void SetQuadPosition(const glm::vec3& position);
-		static void SetQuadRotation(const glm::vec3& rotation);
-		static void SetQuadSize(const glm::vec2& size);
-		static void SetQuadTexture(const std::shared_ptr<Texture>& texture);
-		static void SetQuadTextureCoords(const glm::vec4& textureCoords);
-		static void SetQuadTintColor(const glm::vec4& tintColor);
-		static void ResetQuadState();
-
 		static void SetCirclePosition(const glm::vec3& position);
 		static void SetCircleRotation(const glm::vec3& rotation);
 		static void SetCircleRadius(const glm::vec2& radius);
@@ -114,7 +118,7 @@ namespace Tiles
 		static void SetGridCheckerColor2(const glm::vec4& checkerColor2);
 		static void ResetGridState();
 
-		static void DrawQuad();
+		static void DrawQuad(const QuadParams& params);
 		static void DrawCircle();
 		static void DrawLine();
 		static void DrawGrid();
