@@ -13,7 +13,7 @@
 #include "Graphics/Texture.h"
 #include "Graphics/TextureAtlas.h"
 #include "Graphics/RenderTarget.h"
-#include "Graphics/Cameras/OrthographicCamera.h"
+#include "Graphics/OrthographicCamera.h"
 
 // Utils
 #include "Utils/Timer.h"

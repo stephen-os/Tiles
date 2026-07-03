@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "../../Graphics/Cameras/OrthographicCamera.h"
+#include "../../Graphics/OrthographicCamera.h"
 
 namespace Tiles
 {

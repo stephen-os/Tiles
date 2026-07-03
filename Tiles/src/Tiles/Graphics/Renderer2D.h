@@ -11,7 +11,7 @@
 #include <glm/glm.hpp>
 #include <string>
 
-#include "Cameras/OrthographicCamera.h"
+#include "OrthographicCamera.h"
 
 namespace Tiles
 {
