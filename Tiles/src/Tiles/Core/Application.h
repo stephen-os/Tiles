@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Layer.h"
+#include "ApplicationSettings.h"
 #include "../Utils/Timer.h"
 
 #include <string>
@@ -13,23 +14,6 @@
 
 namespace Tiles
 {
-
-	struct ApplicationSettings
-	{
-		std::string Name = "Tiles App";
-		std::string Icon = "";
-
-		uint32_t Width = 1600;
-		uint32_t Height = 900;
-		int32_t PositionX = 100;
-		int32_t PositionY = 100;
-
-		bool Use2DRenderer = false;
-
-		bool Fullscreen = false;
-		bool Maximized = false;
-	};
-
 	class Application
 	{
 	public:
@@ -71,6 +55,10 @@ namespace Tiles
 		}
 
 	private:
+		/// Captures the current window geometry (size/position/maximized/
+		/// fullscreen) and writes it to the settings file for the next run.
+		void SaveSettings();
+
 		GLFWwindow* m_Window = nullptr;
 
 		bool m_Running = true;

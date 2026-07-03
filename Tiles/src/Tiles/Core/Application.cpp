@@ -18,12 +18,16 @@
 
 #include "Log.h"
 #include "Assert.h"
+#include "ApplicationSettingsSerializer.h"
 
 #include "../Graphics/Renderer2D.h"
 
 namespace Tiles
 {
     static Tiles::Application* s_Instance = nullptr;
+
+    // Window state is persisted here, in the working directory alongside imgui.ini.
+    static constexpr const char* SETTINGS_FILE = "settings.json";
 
     Application& Application::GetInstance() { return *s_Instance; }
 
@@ -39,6 +43,10 @@ namespace Tiles
 
         TILES_LOGGER_INIT();
         TILES_ENGINE_INFO("Starting Tiles Application: {}", m_Settings.Name);
+
+        // Restore persisted window geometry over the code-provided defaults; a
+        // first run (no file yet) leaves the defaults in place.
+        ApplicationSettingsSerializer::Load(SETTINGS_FILE, m_Settings);
 
         glfwSetErrorCallback(GLFWErrorCallback);
 
@@ -119,6 +127,10 @@ namespace Tiles
         const char* glsl_version = "#version 130";
         ImGui_ImplOpenGL3_Init(glsl_version);
 
+        // Restore the windowed position before maximizing/fullscreening, so the
+        // window returns here when the user later un-maximizes.
+        glfwSetWindowPos(m_Window, m_Settings.PositionX, m_Settings.PositionY);
+
 		// Maximize Window
         if (m_Settings.Maximized)
         {
@@ -143,6 +155,8 @@ namespace Tiles
         // ImGui backends were initialized, so their teardown must be skipped.
         if (m_Window)
         {
+            SaveSettings();
+
             if (m_Settings.Use2DRenderer)
                 Renderer2D::Shutdown();
 
@@ -280,6 +294,28 @@ namespace Tiles
             glfwSetWindowMonitor(m_Window, nullptr, m_Settings.PositionX, m_Settings.PositionY,
                 m_Settings.Width, m_Settings.Height, 0);
         }
+    }
+
+    void Application::SaveSettings()
+    {
+        if (m_Window)
+        {
+            m_Settings.Maximized = glfwGetWindowAttrib(m_Window, GLFW_MAXIMIZED) == GLFW_TRUE;
+
+            // Persist the floating geometry, not the maximized/fullscreen size, so
+            // the window restores to where it last was in windowed mode.
+            if (!m_Settings.Maximized && !m_Settings.Fullscreen)
+            {
+                glfwGetWindowPos(m_Window, &m_Settings.PositionX, &m_Settings.PositionY);
+
+                int width = 0, height = 0;
+                glfwGetWindowSize(m_Window, &width, &height);
+                m_Settings.Width = static_cast<uint32_t>(width);
+                m_Settings.Height = static_cast<uint32_t>(height);
+            }
+        }
+
+        ApplicationSettingsSerializer::Save(SETTINGS_FILE, m_Settings);
     }
 
     void Application::ApplyTilesTheme()
