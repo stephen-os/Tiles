@@ -3,7 +3,7 @@
 #include <functional>
 #include <memory>
 
-#include "../CommandHistory.h"
+#include "Commands/CommandHistory.h"
 
 namespace Tiles
 {

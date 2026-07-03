@@ -1,4 +1,4 @@
-#include "CommandHistory.h"
+#include "Commands/CommandHistory.h"
 
 #include "Commands/Command.h"
 

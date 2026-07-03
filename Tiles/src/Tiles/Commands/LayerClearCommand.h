@@ -1,16 +1,16 @@
 #pragma once
-#include "Command.h"
-#include "../LayerStack.h"
-#include "../TileLayer.h"
+#include "Commands/Command.h"
+#include "Domain/LayerStack.h"
+#include "Domain/TileLayer.h"
 
 namespace Tiles
 {
-    /// Removes a layer, snapshotting it on first Execute so Undo can reinsert it
-    /// at the same index with its original contents.
-    class LayerDeleteCommand : public Command
+    /// Clears every tile on a layer, snapshotting the layer on first Execute so
+    /// Undo can restore its contents.
+    class LayerClearCommand : public Command
     {
     public:
-        LayerDeleteCommand(size_t index)
+        LayerClearCommand(size_t index)
             : m_Index(index), m_HasExecuted(false)
         {
         }
@@ -23,12 +23,11 @@ namespace Tiles
                 m_HasExecuted = true;
             }
 
-            layerStack.RemoveLayer(m_Index);
+            layerStack.ClearLayer(m_Index);
         }
 
         virtual void Undo(LayerStack& layerStack) override
         {
-            layerStack.InsertLayer(m_Index, m_PreviousLayer.GetName());
             layerStack.ReplaceLayer(m_Index, m_PreviousLayer);
         }
 

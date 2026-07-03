@@ -1,7 +1,7 @@
 #include "TileSceneRenderer.h"
 
-#include "Core/Tile.h"
-#include "Core/TileLayer.h"
+#include "Domain/Tile.h"
+#include "Domain/TileLayer.h"
 #include "Graphics/Renderer2D.h"
 #include "Graphics/TextureAtlas.h"
 

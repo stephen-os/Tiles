@@ -2,10 +2,10 @@
 #include <string>
 #include <vector>
 
-#include "Tile.h"
+#include "Domain/Tile.h"
 #include "json.hpp"
 
-#include "Constants.h" 
+#include "Core/Constants.h" 
 
 namespace Tiles
 {

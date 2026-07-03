@@ -1,8 +1,8 @@
-#include "TileLayer.h"
+#include "Domain/TileLayer.h"
 
-#include "Assert.h"
+#include "Core/Assert.h"
 
-#include "Constants.h"
+#include "Core/Constants.h"
 
 namespace Tiles
 {

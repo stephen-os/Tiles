@@ -1,10 +1,10 @@
-#include "ProjectSerializer.h"
+#include "Domain/ProjectSerializer.h"
 
 #include <fstream>
 
 #include "json.hpp"
 
-#include "Project.h"
+#include "Domain/Project.h"
 
 namespace Tiles
 {

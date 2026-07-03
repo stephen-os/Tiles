@@ -1,9 +1,9 @@
-#include "Project.h"
+#include "Domain/Project.h"
 
 #include "Core/Log.h"
 #include "Core/Assert.h"
 
-#include "Constants.h"
+#include "Core/Constants.h"
 
 #include <filesystem>
 #include <fstream>

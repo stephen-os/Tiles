@@ -1,9 +1,9 @@
 #include "EditingState.h"
 
-#include "../LayerStack.h"
-#include "../Commands/TilePaintCommand.h"
-#include "../Commands/TileEraseCommand.h"
-#include "../Commands/LayerFillCommand.h"
+#include "Domain/LayerStack.h"
+#include "Commands/TilePaintCommand.h"
+#include "Commands/TileEraseCommand.h"
+#include "Commands/LayerFillCommand.h"
 
 namespace Tiles
 {

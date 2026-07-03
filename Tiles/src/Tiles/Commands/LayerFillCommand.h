@@ -2,10 +2,10 @@
 
 #include <queue>
 
-#include "Command.h"
+#include "Commands/Command.h"
 
-#include "../Tile.h"
-#include "../TileLayer.h"
+#include "Domain/Tile.h"
+#include "Domain/TileLayer.h"
 
 namespace Tiles
 {

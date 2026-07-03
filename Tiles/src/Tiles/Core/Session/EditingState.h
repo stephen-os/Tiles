@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <memory>
 
-#include "../Tile.h"
+#include "Domain/Tile.h"
 
 namespace Tiles
 {

@@ -8,10 +8,10 @@
 
 #include "json.hpp"
 
-#include "Base.h"
-#include "Tile.h"
-#include "TileLayer.h"
-#include "LayerStack.h"
+#include "Core/Base.h"
+#include "Domain/Tile.h"
+#include "Domain/TileLayer.h"
+#include "Domain/LayerStack.h"
 
 #include "../Graphics/TextureAtlas.h"
 

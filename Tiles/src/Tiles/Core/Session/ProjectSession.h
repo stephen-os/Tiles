@@ -5,9 +5,9 @@
 #include <memory>
 #include <string>
 
-#include "../Project.h"
-#include "../ProjectHistory.h"
-#include "../ProjectSerializer.h"
+#include "Domain/Project.h"
+#include "Domain/ProjectHistory.h"
+#include "Domain/ProjectSerializer.h"
 
 namespace Tiles
 {

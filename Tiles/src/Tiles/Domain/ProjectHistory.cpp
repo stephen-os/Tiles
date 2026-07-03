@@ -1,5 +1,5 @@
-#include "ProjectHistory.h"
-#include "Log.h"
+#include "Domain/ProjectHistory.h"
+#include "Core/Log.h"
 #include <fstream>
 #include <algorithm>
 #include <cstdint>

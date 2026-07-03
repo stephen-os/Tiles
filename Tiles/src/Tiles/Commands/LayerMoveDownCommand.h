@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Command.h"
+#include "Commands/Command.h"
 
-#include "../LayerStack.h"
+#include "Domain/LayerStack.h"
 
 namespace Tiles
 {

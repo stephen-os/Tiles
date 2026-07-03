@@ -1,7 +1,7 @@
 #pragma once
-#include "Command.h"
-#include "../Tile.h"
-#include "../LayerStack.h"
+#include "Commands/Command.h"
+#include "Domain/Tile.h"
+#include "Domain/LayerStack.h"
 
 namespace Tiles
 {

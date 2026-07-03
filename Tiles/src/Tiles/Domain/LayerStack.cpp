@@ -1,7 +1,7 @@
-#include "LayerStack.h"
-#include "Assert.h"
-#include "Log.h"
-#include "Constants.h"
+#include "Domain/LayerStack.h"
+#include "Core/Assert.h"
+#include "Core/Log.h"
+#include "Core/Constants.h"
 
 namespace Tiles
 {
