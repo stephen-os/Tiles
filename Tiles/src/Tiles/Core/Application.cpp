@@ -24,18 +24,24 @@
 
 namespace Tiles
 {
+    /// Static singleton
     static Tiles::Application* s_Instance = nullptr;
-
-    // Window state is persisted here, in the working directory alongside imgui.ini.
+    
+    /// Window state is persisted here, in the working directory alongside imgui.ini.
+    /// TODO: This filename should be in the ApplicationSettings file
     static constexpr const char* SETTINGS_FILE = "settings.json";
 
+    /// Static accessor
     Application& Application::GetInstance() { return *s_Instance; }
 
+    /// GLFW error callback
+    /// TODO: This should be in a window abstraction. 
     static void GLFWErrorCallback(int error, const char* description)
     {
         TILES_ENGINE_ERROR("[GLFW ERROR] {}: {}", error, description);
     }
 
+    /// Constructor
     Application::Application(const ApplicationSettings& settings)
     {
 		s_Instance = this;
@@ -144,7 +150,7 @@ namespace Tiles
         }
     }
 
-
+    /// Application destructor
     Application::~Application()
     {
 		s_Instance = nullptr;
@@ -170,11 +176,13 @@ namespace Tiles
         TILES_LOGGER_SHUTDOWN();
     }
 
+    /// Application entry point
     void Application::Create()
     {
         OnCreate();
     }
     
+    /// Application exit point
     void Application::Destroy()
     {
         for (auto& layer : m_LayerStack)
@@ -185,6 +193,7 @@ namespace Tiles
         OnDestroy();
     }
 
+    /// Application run loop
     void Application::Run()
     {
         if (!m_Window)
@@ -271,6 +280,7 @@ namespace Tiles
         }
     }
 
+    /// Sets the window to fullscreen
     void Application::SetWindowFullscreen()
     {
         if (m_Settings.Fullscreen)
@@ -294,6 +304,9 @@ namespace Tiles
         }
     }
 
+    /// Saves the application settings
+    /// TODO: this should be moved to ApplicationSettingsSerializer
+    /// TODO: this should be called on shutdown
     void Application::SaveSettings()
     {
         if (m_Window)

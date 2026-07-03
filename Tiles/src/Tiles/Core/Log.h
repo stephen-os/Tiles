@@ -10,8 +10,13 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+/// TODO: Rename this file to Logger.h
+/// TODO: Add comments to each funciton, matching look of Application.h
+/// TODO: Simplify logging. We dont need this many macros. Lets keep what we need. 
 namespace Tiles
 {
+
+	/// TODO: move these to constants
 	namespace LogColors
 	{
 		constexpr const char* RESET = "\033[0m";
