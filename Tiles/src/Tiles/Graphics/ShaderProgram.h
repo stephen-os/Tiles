@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+#include <cstdint>
 
 #include <string>
 #include <iostream>
@@ -7,7 +9,6 @@
 
 #include <glm/glm.hpp>
 
-#include "Core/Base.h"
 
 namespace Tiles
 {

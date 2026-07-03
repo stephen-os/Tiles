@@ -1,4 +1,5 @@
 #include "RendererState.h"
+#include "Core/Assert.h"
 
 #include "Utils/FileReader.h"
 

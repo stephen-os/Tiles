@@ -1,4 +1,5 @@
 #include "ProjectSession.h"
+#include "Core/Log.h"
 
 namespace Tiles
 {

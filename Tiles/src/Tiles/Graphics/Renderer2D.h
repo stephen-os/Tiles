@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+#include <cstdint>
 
 #include "VertexArray.h"
 #include "Texture.h"
@@ -10,7 +12,6 @@
 #include <unordered_map>
 #include <string>
 
-#include "../Core/Base.h"
 #include "Cameras/OrthographicCamera.h"
 
 namespace Tiles

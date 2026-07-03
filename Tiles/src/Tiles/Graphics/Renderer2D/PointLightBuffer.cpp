@@ -1,4 +1,5 @@
 #include "RendererState.h"
+#include "Core/Log.h"
 
 namespace Tiles
 {

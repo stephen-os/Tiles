@@ -1,6 +1,6 @@
 #pragma once
+#include <memory>
 
-#include "Core/Base.h"
 #include "Core/Context.h"
 
 namespace Tiles::Editor

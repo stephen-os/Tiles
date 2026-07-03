@@ -1,8 +1,8 @@
 #pragma once
+#include <memory>
 
 #include <cstdint>
 
-#include "Core/Base.h"
 
 #include "BufferLayout.h"
 

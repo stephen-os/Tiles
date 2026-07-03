@@ -1,8 +1,9 @@
 #pragma once
+#include <memory>
+#include <cstdint>
 
 #include "VertexArray.h"
 
-#include "Core/Base.h"
 
 namespace Tiles::GL
 {

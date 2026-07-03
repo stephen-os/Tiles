@@ -1,4 +1,5 @@
 #include "RenderCommands.h"
+#include "Core/Assert.h"
 
 #include <glad/gl.h>
 

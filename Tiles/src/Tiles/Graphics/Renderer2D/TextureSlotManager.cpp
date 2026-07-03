@@ -1,4 +1,5 @@
 #include "RendererState.h"
+#include "Core/Assert.h"
 
 namespace Tiles
 {

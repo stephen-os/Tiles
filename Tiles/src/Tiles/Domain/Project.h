@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 #include <string>
 #include <memory>
@@ -8,7 +9,6 @@
 
 #include "json.hpp"
 
-#include "Core/Base.h"
 #include "Domain/Tile.h"
 #include "Domain/TileLayer.h"
 #include "Domain/LayerStack.h"

@@ -1,10 +1,10 @@
 #pragma once
+#include <memory>
 
 #include "Panel.h"
 #include "Tiles.h"
 #include "imgui.h"
 
-#include "Core/Base.h"
 
 namespace Tiles::Editor
 {

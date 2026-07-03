@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "Core/Assert.h"
 
 #include "RenderCommands.h"
 

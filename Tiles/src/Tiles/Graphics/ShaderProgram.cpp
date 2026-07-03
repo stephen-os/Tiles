@@ -1,4 +1,5 @@
 #include "ShaderProgram.h"
+#include "Core/Assert.h"
 
 #include "../Utils/FileReader.h"
 #include "RenderCommands.h"

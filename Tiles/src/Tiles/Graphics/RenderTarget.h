@@ -1,6 +1,8 @@
 #pragma once
+#include <memory>
+#include <string>
+#include <cstdint>
 
-#include "Core/Base.h"
 
 #include "FrameBuffer.h"
 

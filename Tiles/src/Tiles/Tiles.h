@@ -1,7 +1,6 @@
 #pragma once
 
 // Core
-#include "Core/Base.h"
 #include "Core/Application.h"
 #include "Core/Layer.h"
 #include "Core/Input.h"

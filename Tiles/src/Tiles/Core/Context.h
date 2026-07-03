@@ -1,4 +1,7 @@
 #pragma once
+#include <memory>
+#include <string>
+#include <cstdint>
 
 #include <filesystem>
 
@@ -11,7 +14,6 @@
 #include "Session/ViewportCameraController.h"
 #include "Session/EditingState.h"
 
-#include "Base.h"
 
 namespace Tiles
 {

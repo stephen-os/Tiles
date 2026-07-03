@@ -8,7 +8,6 @@
 
 #include <glm/glm.hpp>
 
-#include "Core/Base.h"
 
 namespace Tiles
 {
