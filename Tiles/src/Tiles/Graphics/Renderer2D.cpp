@@ -1,7 +1,7 @@
-#include "Renderer.h"
+#include "Renderer2D.h"
 #include "Core/Log.h"
 
-#include "Renderer/RendererState.h"
+#include "Renderer2D/RendererState.h"
 
 #include <memory>
 #include <vector>
@@ -14,9 +14,9 @@ namespace Tiles
 	// thin facade over this state and its per-primitive batchers.
 	static std::unique_ptr<RendererState> s_State;
 
-	void Renderer::Init()
+	void Renderer2D::Init()
 	{
-		TILES_ENGINE_INFO("Renderer: Initializing...");
+		TILES_ENGINE_INFO("Renderer2D: Initializing...");
 
 		s_State = std::make_unique<RendererState>();
 
@@ -60,12 +60,12 @@ namespace Tiles
 		s_State->TexCoords[2] = { 1.0f, 1.0f };
 		s_State->TexCoords[3] = { 0.0f, 1.0f };
 
-		TILES_ENGINE_INFO("Renderer: Initialization complete");
+		TILES_ENGINE_INFO("Renderer2D: Initialization complete");
 	}
 
-	void Renderer::Shutdown()
+	void Renderer2D::Shutdown()
 	{
-		TILES_ENGINE_INFO("Renderer: Shutting down...");
+		TILES_ENGINE_INFO("Renderer2D: Shutting down...");
 
 		s_State->DefaultRenderTarget.reset();
 		s_State->CurrentRenderTarget.reset();
@@ -78,10 +78,10 @@ namespace Tiles
 
 		s_State.reset();
 
-		TILES_ENGINE_INFO("Renderer: Shutdown complete");
+		TILES_ENGINE_INFO("Renderer2D: Shutdown complete");
 	}
 
-	void Renderer::BeginFrame(std::shared_ptr<OrthographicCamera> camera)
+	void Renderer2D::BeginFrame(std::shared_ptr<OrthographicCamera> camera)
 	{
 		s_State->ViewProjectionMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix();
 
@@ -96,19 +96,19 @@ namespace Tiles
 		StartBatch();
 	}
 
-	void Renderer::BeginFrame(glm::mat4& viewProjection)
+	void Renderer2D::BeginFrame(glm::mat4& viewProjection)
 	{
 		s_State->ViewProjectionMatrix = viewProjection;
 		StartBatch();
 	}
 
-	void Renderer::EndFrame()
+	void Renderer2D::EndFrame()
 	{
 		EndBatch();
 		s_State->CurrentRenderTarget->Unbind();
 	}
 
-	void Renderer::StartBatch()
+	void Renderer2D::StartBatch()
 	{
 		s_State->Quad.Reset();
 		s_State->Circle.Reset();
@@ -119,7 +119,7 @@ namespace Tiles
 
 	// Uploads whatever geometry each primitive accumulated this batch, then
 	// flushes once if any primitive produced vertices.
-	void Renderer::EndBatch()
+	void Renderer2D::EndBatch()
 	{
 		bool issueDraw = false;
 
@@ -133,7 +133,7 @@ namespace Tiles
 
 	// Binds textures once, then draws each non-empty primitive batch with its
 	// shader and shared uniforms, and resets the per-batch counters.
-	void Renderer::Flush()
+	void Renderer2D::Flush()
 	{
 		s_State->Textures.Bind();
 
@@ -146,23 +146,23 @@ namespace Tiles
 		s_State->Stats.TexturesUsed = s_State->Textures.Index - 1;
 	}
 
-	void Renderer::SetResolution(uint32_t width, uint32_t height)
+	void Renderer2D::SetResolution(uint32_t width, uint32_t height)
 	{
 		s_State->Width = width;
 		s_State->Height = height;
 	}
 
-	void Renderer::SetRenderMode(PolygonMode mode)
+	void Renderer2D::SetRenderMode(PolygonMode mode)
 	{
 		s_State->PolygonMode = mode;
 	}
 
-	float Renderer::ComputeTextureIndex(const std::shared_ptr<Texture>& texture)
+	float Renderer2D::ComputeTextureIndex(const std::shared_ptr<Texture>& texture)
 	{
 		return s_State->Textures.ComputeTextureIndex(texture);
 	}
 
-	void Renderer::DrawQuad(const QuadParams& params)
+	void Renderer2D::DrawQuad(const QuadParams& params)
 	{
 		if (s_State->Quad.IndexCount >= MaxIndices)
 		{
@@ -173,7 +173,7 @@ namespace Tiles
 		s_State->Quad.Append(*s_State, params);
 	}
 
-	void Renderer::DrawCircle(const CircleParams& params)
+	void Renderer2D::DrawCircle(const CircleParams& params)
 	{
 		if (s_State->Circle.IndexCount >= MaxIndices)
 		{
@@ -184,7 +184,7 @@ namespace Tiles
 		s_State->Circle.Append(*s_State, params);
 	}
 
-	void Renderer::DrawLine(const LineParams& params)
+	void Renderer2D::DrawLine(const LineParams& params)
 	{
 		if (s_State->Line.VertexCount >= MaxVertices)
 		{
@@ -202,7 +202,7 @@ namespace Tiles
 		s_State->Line.Append(*s_State, params);
 	}
 
-	void Renderer::SetRenderTarget(std::shared_ptr<RenderTarget> target)
+	void Renderer2D::SetRenderTarget(std::shared_ptr<RenderTarget> target)
 	{
 		if (target)
 		{
@@ -214,17 +214,17 @@ namespace Tiles
 		}
 	}
 
-	std::shared_ptr<RenderTarget> Renderer::GetCurrentRenderTarget()
+	std::shared_ptr<RenderTarget> Renderer2D::GetCurrentRenderTarget()
 	{
 		return s_State->CurrentRenderTarget;
 	}
 
-	Renderer::Statistics Renderer::GetStats()
+	Renderer2D::Statistics Renderer2D::GetStats()
 	{
 		return s_State->Stats;
 	}
 
-	void Renderer::ResetStats()
+	void Renderer2D::ResetStats()
 	{
 		memset(&s_State->Stats, 0, sizeof(Statistics));
 	}

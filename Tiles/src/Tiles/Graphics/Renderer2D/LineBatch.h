@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Renderer.h"
+#include "../Renderer2D.h"
 
 #include <glm/glm.hpp>
 #include <memory>

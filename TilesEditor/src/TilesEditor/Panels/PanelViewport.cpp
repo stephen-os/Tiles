@@ -47,16 +47,16 @@ namespace Tiles::Editor
 
         camera->SetSize(m_ViewportSize.x, m_ViewportSize.y);
 
-        Tiles::Renderer::SetRenderTarget(m_RenderTarget);
-        Tiles::Renderer::SetResolution(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
-        Tiles::Renderer::BeginFrame(camera);
+        Tiles::Renderer2D::SetRenderTarget(m_RenderTarget);
+        Tiles::Renderer2D::SetResolution(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
+        Tiles::Renderer2D::BeginFrame(camera);
 
         RenderGrid();
         RenderLayers();
         RenderHoverTile();
 
-        Tiles::Renderer::EndFrame();
-        Tiles::Renderer::SetRenderTarget(nullptr);
+        Tiles::Renderer2D::EndFrame();
+        Tiles::Renderer2D::SetRenderTarget(nullptr);
 
 
         ImGui::Image((void*)m_RenderTarget->GetTexture(), m_ViewportSize);
@@ -185,7 +185,7 @@ namespace Tiles::Editor
             offset + cameraPos.y,
             Viewport::Depth::Outline
             };
-        Tiles::Renderer::DrawLine(line);
+        Tiles::Renderer2D::DrawLine(line);
 
         line.Start = {
             offset + cameraPos.x,
@@ -197,7 +197,7 @@ namespace Tiles::Editor
             m_TileSize * gridHeight + offset + cameraPos.y,
             Viewport::Depth::Outline
             };
-        Tiles::Renderer::DrawLine(line);
+        Tiles::Renderer2D::DrawLine(line);
 
         line.Start = {
             m_TileSize * gridWidth + offset + cameraPos.x,
@@ -209,7 +209,7 @@ namespace Tiles::Editor
             m_TileSize * gridHeight + offset + cameraPos.y,
             Viewport::Depth::Outline
             };
-        Tiles::Renderer::DrawLine(line);
+        Tiles::Renderer2D::DrawLine(line);
 
         line.Start = {
             m_TileSize * gridWidth + offset + cameraPos.x,
@@ -221,7 +221,7 @@ namespace Tiles::Editor
             offset + cameraPos.y,
             Viewport::Depth::Outline
             };
-        Tiles::Renderer::DrawLine(line);
+        Tiles::Renderer2D::DrawLine(line);
     }
 
     void PanelViewport::RenderLayers()
@@ -307,12 +307,12 @@ namespace Tiles::Editor
             }
         }
 
-        Tiles::Renderer::DrawQuad(params);
+        Tiles::Renderer2D::DrawQuad(params);
     }
 
     void PanelViewport::RenderEraserPreview()
     {
-        Tiles::Renderer::DrawQuad({
+        Tiles::Renderer2D::DrawQuad({
             .Position = m_MouseFollowQuadPosition,
             .Size = { m_TileSize, m_TileSize },
             .Tint = { 1.0f, 0.0f, 0.0f, 0.3f },
@@ -321,7 +321,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderFillPreview()
     {
-        Tiles::Renderer::DrawQuad({
+        Tiles::Renderer2D::DrawQuad({
             .Position = m_MouseFollowQuadPosition,
             .Size = { m_TileSize, m_TileSize },
             .Tint = { 0.0f, 0.0f, 1.0f, 0.3f },
@@ -330,7 +330,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderBasicHover()
     {
-        Tiles::Renderer::DrawQuad({
+        Tiles::Renderer2D::DrawQuad({
             .Position = m_MouseFollowQuadPosition,
             .Size = m_MouseFollowQuadSize,
             .Tint = m_MouseFollowQuadColor,

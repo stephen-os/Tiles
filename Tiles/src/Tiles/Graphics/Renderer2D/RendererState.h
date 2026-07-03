@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Renderer.h"
+#include "../Renderer2D.h"
 
 #include "Core/Assert.h"
 
@@ -49,8 +49,8 @@ namespace Tiles
 	inline uint32_t CalculateBufferSize(const void* ptr, const void* base)
 	{
 		ptrdiff_t diff = static_cast<const uint8_t*>(ptr) - static_cast<const uint8_t*>(base);
-		TILES_ASSERT(diff >= 0, "Renderer: Buffer pointer is before base pointer!");
-		TILES_ASSERT(diff <= UINT32_MAX, "Renderer: Buffer size exceeds uint32_t limit!");
+		TILES_ASSERT(diff >= 0, "Renderer2D: Buffer pointer is before base pointer!");
+		TILES_ASSERT(diff <= UINT32_MAX, "Renderer2D: Buffer size exceeds uint32_t limit!");
 		return static_cast<uint32_t>(diff);
 	}
 }
@@ -63,10 +63,10 @@ namespace Tiles
 
 namespace Tiles
 {
-	// Aggregates all renderer state behind the Renderer facade: shared frame
+	// Aggregates all renderer state behind the Renderer2D facade: shared frame
 	// state, the shared quad geometry, statistics, the texture slot manager, and
 	// one batcher per primitive. A single instance lives as a file-static in
-	// Renderer.cpp, constructed in Init() once a GL context is current.
+	// Renderer2D.cpp, constructed in Init() once a GL context is current.
 	struct RendererState
 	{
 		std::shared_ptr<RenderTarget> DefaultRenderTarget;
@@ -85,7 +85,7 @@ namespace Tiles
 		glm::vec3 CircleVertexPositions[4];
 		glm::vec2 TexCoords[4];
 
-		Renderer::Statistics Stats;
+		Renderer2D::Statistics Stats;
 
 		TextureSlotManager Textures;
 

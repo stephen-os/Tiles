@@ -16,8 +16,8 @@
 
 namespace Tiles
 {
-	/// Parameters for one quad draw. Set only what you need; the rest fall back to
-	/// sensible defaults (unit size, no rotation, full white tint, untextured).
+	// Parameters for one quad draw. Set only what you need; the rest fall back to
+	// sensible defaults (unit size, no rotation, full white tint, untextured).
 	struct QuadParams
 	{
 		glm::vec3 Position{ 0.0f };
@@ -28,8 +28,8 @@ namespace Tiles
 		glm::vec4 TexCoords{ 0.0f, 0.0f, 1.0f, 1.0f };
 	};
 
-	/// Parameters for one line draw. Lines batch by thickness: drawing lines of
-	/// differing thickness flushes the batch between them (one GL width per batch).
+	// Parameters for one line draw. Lines batch by thickness: drawing lines of
+	// differing thickness flushes the batch between them (one GL width per batch).
 	struct LineParams
 	{
 		glm::vec3 Start{ 0.0f };
@@ -38,8 +38,8 @@ namespace Tiles
 		float Thickness = 1.0f;
 	};
 
-	/// Parameters for one circle draw. Radius is per-axis; Thickness and Fade
-	/// control the SDF ring (Thickness 1, Fade 0 renders a filled disc).
+	// Parameters for one circle draw. Radius is per-axis; Thickness and Fade
+	// control the SDF ring (Thickness 1, Fade 0 renders a filled disc).
 	struct CircleParams
 	{
 		glm::vec3 Position{ 0.0f };
@@ -52,65 +52,65 @@ namespace Tiles
 		float Fade = 0.0f;
 	};
 
-	/// Immediate-mode 2D batch renderer. Primitives are drawn with DrawQuad/
-	/// DrawCircle/DrawLine(params) between BeginFrame() and EndFrame(); geometry accumulates into
-	/// per-primitive vertex buffers and is flushed in as few draw calls as
-	/// possible. All state is global (single static instance).
-	class Renderer
+	// Immediate-mode 2D batch renderer. Primitives are drawn with DrawQuad/
+	// DrawCircle/DrawLine(params) between BeginFrame() and EndFrame(); geometry accumulates into
+	// per-primitive vertex buffers and is flushed in as few draw calls as
+	// possible. All state is global (single static instance).
+	class Renderer2D
 	{
 	public:
 
-		/// Initializes the renderer. Must be called before any other functions.
+		// Initializes the renderer. Must be called before any other functions.
 		static void Init();
 
-		/// Shuts down the renderer.
+		// Shuts down the renderer.
 		static void Shutdown();
 
-		/// Begins a frame: sets the view-projection, binds the current render
-		/// target, clears it, and starts a fresh batch.
+		// Begins a frame: sets the view-projection, binds the current render
+		// target, clears it, and starts a fresh batch.
 		static void BeginFrame(std::shared_ptr<OrthographicCamera> camera);
 		
-		/// Begins a frame with an explicit view-projection and no target setup.
+		// Begins a frame with an explicit view-projection and no target setup.
 		static void BeginFrame(glm::mat4& viewProjection);
 		
-		/// Ends the frame, flushing any pending geometry and unbinding 
-		/// the target.
+		// Ends the frame, flushing any pending geometry and unbinding 
+		// the target.
 		static void EndFrame();
 		
-		/// Starts a new batch. Accumulates geometry until 
-		/// EndBatch() is called.
+		// Starts a new batch. Accumulates geometry until 
+		// EndBatch() is called.
 		static void StartBatch();
 		
-		/// Uploads accumulated vertex data to the GPU and issues the 
-		/// draw calls.
+		// Uploads accumulated vertex data to the GPU and issues the 
+		// draw calls.
 		static void EndBatch();
 		
-		/// Uploads accumulated vertex data to the GPU and issues the 
-		/// draw calls.
+		// Uploads accumulated vertex data to the GPU and issues the 
+		// draw calls.
 		static void Flush();
 
-		/// Sets the pixel resolution of the render target.
+		// Sets the pixel resolution of the render target.
 		static void SetResolution(uint32_t width, uint32_t height);
 
-		/// Sets the render mode.
+		// Sets the render mode.
 		static void SetRenderMode(PolygonMode mode);
 
-		/// Draws one quad.
+		// Draws one quad.
 		static void DrawQuad(const QuadParams& params);
 
-		/// Draws one circle.
+		// Draws one circle.
 		static void DrawCircle(const CircleParams& params);
 		
-		/// Draws one line.
+		// Draws one line.
 		static void DrawLine(const LineParams& params);
 
-		/// Sets the current render target; a null target resets to the default.
+		// Sets the current render target; a null target resets to the default.
 		static void SetRenderTarget(std::shared_ptr<RenderTarget> target);
 
-		/// Returns the current render target.
+		// Returns the current render target.
 		static std::shared_ptr<RenderTarget> GetCurrentRenderTarget();
 
-		/// Renderer statistics
+		// Renderer2D statistics
 		struct Statistics
 		{
 			uint32_t DrawCalls = 0;
@@ -121,22 +121,22 @@ namespace Tiles
 			uint32_t ShadersUsed = 0;
 			uint32_t DataSize = 0;
 
-			/// Returns the total number of vertices used.
+			// Returns the total number of vertices used.
 			uint32_t GetTotalVertexCount() const { return QuadCount * 4 + CircleCount * 4 + LineCount * 2; }
 			
-			/// Returns the total number of indices used.
+			// Returns the total number of indices used.
 			uint32_t GetTotalIndexCount() const { return QuadCount * 6 + CircleCount * 6; }
 		};
 
-		/// Returns the current statistics.
+		// Returns the current statistics.
 		static Statistics GetStats();
 
-		/// Resets the statistics.
+		// Resets the statistics.
 		static void ResetStats();
 
 	private:
 
-		/// Computes the index of the texture in the texture slot manager.
+		// Computes the index of the texture in the texture slot manager.
 		static float ComputeTextureIndex(const std::shared_ptr<Texture>& texture);
 	};
 }

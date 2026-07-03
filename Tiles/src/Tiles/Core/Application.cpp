@@ -20,7 +20,7 @@
 #include "Assert.h"
 #include "ApplicationSettingsSerializer.h"
 
-#include "../Graphics/Renderer.h"
+#include "../Graphics/Renderer2D.h"
 
 namespace Tiles
 {
@@ -111,7 +111,7 @@ namespace Tiles
         TILES_ENGINE_INFO("OpenGL Version: {}", version);
 
         if (m_Settings.Use2DRenderer)
-            Renderer::Init();
+            Renderer2D::Init();
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -162,7 +162,7 @@ namespace Tiles
             SaveSettings();
 
             if (m_Settings.Use2DRenderer)
-                Renderer::Shutdown();
+                Renderer2D::Shutdown();
 
             ImGui_ImplOpenGL3_Shutdown();
             ImGui_ImplGlfw_Shutdown();
