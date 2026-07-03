@@ -89,7 +89,7 @@ namespace Tiles::Editor
         // Begin 3D rendering
         Tiles::Renderer2D::SetRenderTarget(m_PreviewRenderTarget);
         Tiles::Renderer2D::SetResolution(resolutionX, resolutionY);
-        Tiles::Renderer2D::BeginFrame(m_Camera);
+        Tiles::Renderer2D::BeginFrame(m_Camera->GetViewProjectionMatrix());
 
         // Render background
         Tiles::Renderer2D::DrawQuad({

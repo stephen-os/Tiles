@@ -12,8 +12,6 @@
 #include <glm/glm.hpp>
 #include <string>
 
-#include "OrthographicCamera.h"
-
 namespace Tiles
 {
 	// Parameters for one quad draw. Set only what you need; the rest fall back to
@@ -66,12 +64,9 @@ namespace Tiles
 		// Shuts down the renderer.
 		static void Shutdown();
 
-		// Begins a frame: sets the view-projection, binds the current render
-		// target, clears it, and starts a fresh batch.
-		static void BeginFrame(std::shared_ptr<OrthographicCamera> camera);
-		
-		// Begins a frame with an explicit view-projection and no target setup.
-		static void BeginFrame(glm::mat4& viewProjection);
+		// Begins a frame: sets the view-projection, binds and clears the current
+		// render target, and starts a fresh batch.
+		static void BeginFrame(const glm::mat4& viewProjection);
 		
 		// Ends the frame, flushing any pending geometry and unbinding 
 		// the target.

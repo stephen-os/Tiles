@@ -49,7 +49,7 @@ namespace Tiles::Editor
 
         Tiles::Renderer2D::SetRenderTarget(m_RenderTarget);
         Tiles::Renderer2D::SetResolution(static_cast<uint32_t>(m_ViewportSize.x), static_cast<uint32_t>(m_ViewportSize.y));
-        Tiles::Renderer2D::BeginFrame(camera);
+        Tiles::Renderer2D::BeginFrame(camera->GetViewProjectionMatrix());
 
         RenderGrid();
         RenderLayers();

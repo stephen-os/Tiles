@@ -527,7 +527,7 @@ namespace Tiles::Editor
 
         Tiles::Renderer2D::SetRenderTarget(renderTarget);
         Tiles::Renderer2D::SetResolution(width, height);
-        Tiles::Renderer2D::BeginFrame(camera);
+        Tiles::Renderer2D::BeginFrame(camera->GetViewProjectionMatrix());
 
         glm::vec3 cameraPos = camera->GetPosition();
         const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();

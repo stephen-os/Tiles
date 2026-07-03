@@ -81,9 +81,9 @@ namespace Tiles
 		TILES_ENGINE_INFO("Renderer2D: Shutdown complete");
 	}
 
-	void Renderer2D::BeginFrame(std::shared_ptr<OrthographicCamera> camera)
+	void Renderer2D::BeginFrame(const glm::mat4& viewProjection)
 	{
-		s_State->ViewProjectionMatrix = camera->GetProjectionMatrix() * camera->GetViewMatrix();
+		s_State->ViewProjectionMatrix = viewProjection;
 
 		s_State->CurrentRenderTarget->Bind();
 		s_State->CurrentRenderTarget->Resize(s_State->Width, s_State->Height);
@@ -93,12 +93,6 @@ namespace Tiles
 		RenderCommands::EnableDepthTest();
 		RenderCommands::SetPolygonMode(s_State->PolygonMode);
 
-		StartBatch();
-	}
-
-	void Renderer2D::BeginFrame(glm::mat4& viewProjection)
-	{
-		s_State->ViewProjectionMatrix = viewProjection;
 		StartBatch();
 	}
 
