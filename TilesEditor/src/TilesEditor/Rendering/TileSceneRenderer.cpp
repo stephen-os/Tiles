@@ -13,8 +13,7 @@ namespace Tiles::Editor
         const glm::vec3& cameraPos,
         float tileSize,
         const std::vector<std::shared_ptr<Tiles::TextureAtlas>>& textureAtlases,
-        float baseDepth,
-        bool resetTextureFallback)
+        float baseDepth)
     {
         for (size_t y = 0; y < layer.GetHeight(); ++y)
         {
@@ -53,7 +52,7 @@ namespace Tiles::Editor
                         Tiles::Renderer2D::SetQuadTexture(atlas->GetTexture());
                         Tiles::Renderer2D::SetQuadTextureCoords(tile.GetTextureCoords());
                     }
-                    else if (resetTextureFallback)
+                    else
                     {
                         Tiles::Renderer2D::SetQuadTexture(nullptr);
                         Tiles::Renderer2D::SetQuadTextureCoords({ 0.0f, 0.0f, 1.0f, 1.0f });
@@ -62,10 +61,7 @@ namespace Tiles::Editor
                 else
                 {
                     Tiles::Renderer2D::SetQuadTexture(nullptr);
-                    if (resetTextureFallback)
-                    {
-                        Tiles::Renderer2D::SetQuadTextureCoords({ 0.0f, 0.0f, 1.0f, 1.0f });
-                    }
+                    Tiles::Renderer2D::SetQuadTextureCoords({ 0.0f, 0.0f, 1.0f, 1.0f });
                 }
 
                 Tiles::Renderer2D::DrawQuad();

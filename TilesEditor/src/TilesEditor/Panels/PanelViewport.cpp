@@ -251,7 +251,7 @@ namespace Tiles::Editor
     void PanelViewport::RenderLayer(const TileLayer& layer, size_t layerIndex, const glm::vec3& cameraPos)
     {
         const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
-        DrawTileLayer(layer, layerIndex, cameraPos, m_TileSize, textureAtlases, Viewport::Depth::Tile, true);
+        DrawTileLayer(layer, layerIndex, cameraPos, m_TileSize, textureAtlases, Viewport::Depth::Tile);
     }
 
     void PanelViewport::RenderHoverTile()
