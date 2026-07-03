@@ -5,7 +5,7 @@
 
 #include "Panel.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
 	class PanelManager
 	{

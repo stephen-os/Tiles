@@ -4,7 +4,7 @@
 
 #include "Tiles.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     /// Panel for the project's texture atlases: a tab per atlas, controls to
     /// add/remove atlases and set an atlas image and grid dimensions, and a tile

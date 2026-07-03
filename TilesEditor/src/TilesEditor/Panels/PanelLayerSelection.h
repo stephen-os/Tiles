@@ -12,7 +12,10 @@ namespace Tiles
     class Command;
     class LayerStack;
     class TileLayer;
+}
 
+namespace Tiles::Editor
+{
     /// Panel for managing the project's layer stack: the layer list with
     /// per-layer visibility, selection of the working layer, add/delete/clear and
     /// reorder operations, and editing of the selected layer's name/render group.

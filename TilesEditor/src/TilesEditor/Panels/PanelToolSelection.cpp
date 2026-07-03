@@ -1,8 +1,8 @@
 #include "PanelToolSelection.h"
-#include "Core/Constants.h"
+#include "../UIConstants.h"
 #include "imgui.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     PanelToolSelection::PanelToolSelection(std::shared_ptr<Context> context) : Panel(context)
     {

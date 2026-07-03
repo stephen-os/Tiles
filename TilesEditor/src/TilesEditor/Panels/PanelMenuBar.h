@@ -7,7 +7,7 @@
 #include "../Popups/PopupSaveAs.h"
 #include "../Popups/PopupOpenProject.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     /// The application's main menu bar (File/Edit/Project/View/Help), the source
     /// of the global keyboard shortcuts, and the host for the New/Resize/About

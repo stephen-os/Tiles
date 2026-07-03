@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 
-namespace Tiles
+namespace Tiles::Editor
 {
     /// Tool palette for the three painting modes (Brush/Eraser/Fill). The active
     /// tool is stored on the Context as its PaintingMode. Also draws a texture as

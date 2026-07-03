@@ -1,6 +1,6 @@
 #include "Popup.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     Popup::Popup(std::shared_ptr<Context> context) : m_Context(context){}
 

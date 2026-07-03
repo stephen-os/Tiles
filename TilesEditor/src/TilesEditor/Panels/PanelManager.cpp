@@ -1,6 +1,6 @@
 #include "PanelManager.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
 	void PanelManager::Render()
 	{

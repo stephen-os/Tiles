@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <sstream>
 
-namespace Tiles
+namespace Tiles::Editor
 {
     PanelDebug::PanelDebug(std::shared_ptr<Context> context)
         : Panel(context), m_LastUpdateTime(std::chrono::steady_clock::now())

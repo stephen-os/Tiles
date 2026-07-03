@@ -5,7 +5,7 @@
 #include "imgui.h"
 #include <string>
 
-namespace Tiles
+namespace Tiles::Editor
 {
     /// Editor for the current brush's rotation, size, and tint. Controls read and
     /// write the Context's brush directly, with drag fields, preset buttons, and a

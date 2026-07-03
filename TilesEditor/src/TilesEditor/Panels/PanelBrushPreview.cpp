@@ -1,10 +1,10 @@
 #include "PanelBrushPreview.h"
 
-#include "Core/Constants.h"
+#include "../UIConstants.h"
 
 #include "Core/Log.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     PanelBrushPreview::PanelBrushPreview(std::shared_ptr<Context> context) : Panel(context)
     {

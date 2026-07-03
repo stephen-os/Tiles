@@ -23,15 +23,15 @@ public:
 		// same project, brush, working layer, and command history.
 		std::shared_ptr<Tiles::Context> context = Tiles::Context::Create();
 
-		m_PanelManager.RegisterPanel<Tiles::PanelLayerSelection>(context);
-		m_PanelManager.RegisterPanel<Tiles::PanelToolSelection>(context);
-		m_PanelManager.RegisterPanel<Tiles::PanelTextureSelection>(context);
-		m_PanelManager.RegisterPanel<Tiles::PanelBrushPreview>(context);
-		m_PanelManager.RegisterPanel<Tiles::PanelBrushAttributes>(context);
-		m_PanelManager.RegisterPanel<Tiles::PanelMenuBar>(context);
-		m_PanelManager.RegisterPanel<Tiles::PanelViewport>(context);
+		m_PanelManager.RegisterPanel<Tiles::Editor::PanelLayerSelection>(context);
+		m_PanelManager.RegisterPanel<Tiles::Editor::PanelToolSelection>(context);
+		m_PanelManager.RegisterPanel<Tiles::Editor::PanelTextureSelection>(context);
+		m_PanelManager.RegisterPanel<Tiles::Editor::PanelBrushPreview>(context);
+		m_PanelManager.RegisterPanel<Tiles::Editor::PanelBrushAttributes>(context);
+		m_PanelManager.RegisterPanel<Tiles::Editor::PanelMenuBar>(context);
+		m_PanelManager.RegisterPanel<Tiles::Editor::PanelViewport>(context);
 #ifdef TILES_DEBUG
-		m_PanelManager.RegisterPanel<Tiles::PanelDebug>(context);
+		m_PanelManager.RegisterPanel<Tiles::Editor::PanelDebug>(context);
 #endif
 	}
 
@@ -56,7 +56,7 @@ public:
 	}
 
 private:
-	Tiles::PanelManager m_PanelManager;
+	Tiles::Editor::PanelManager m_PanelManager;
 };
 
 class TilesEditor : public Tiles::Application

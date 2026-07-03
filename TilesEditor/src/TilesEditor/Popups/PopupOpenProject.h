@@ -3,7 +3,7 @@
 #include <string>
 #include <filesystem>
 
-namespace Tiles
+namespace Tiles::Editor
 {
     /// Open-Project dialog: browse to or type a .tiles file, validate that it
     /// exists and has the right extension, then load it via Context::LoadProject.

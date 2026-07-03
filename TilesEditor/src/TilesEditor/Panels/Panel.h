@@ -4,7 +4,7 @@
 
 #include "Tiles.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     /// Base class for editor panels. Each panel holds a shared reference to the
     /// editor Context (the single source of project/brush/command state) and is

@@ -1,6 +1,6 @@
 #include "PanelLayerSelection.h"
 
-#include "Core/Constants.h"
+#include "../UIConstants.h"
 
 #include "Core/Log.h"
 
@@ -12,7 +12,7 @@
 
 #include "imgui.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     void PanelLayerSelection::Render()
     {

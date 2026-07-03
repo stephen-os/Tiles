@@ -3,7 +3,7 @@
 #include "Tiles.h"
 #include "imgui.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     /// Debug-only inspector (registered only in TILES_DEBUG builds) exposing live
     /// Context, project, layer-stack, brush, command-history, atlas, and timing

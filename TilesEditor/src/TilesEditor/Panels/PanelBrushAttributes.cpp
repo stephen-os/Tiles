@@ -1,8 +1,8 @@
 #include "PanelBrushAttributes.h"
 
-#include "Core/Constants.h"
+#include "../UIConstants.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     void PanelBrushAttributes::Render()
     {

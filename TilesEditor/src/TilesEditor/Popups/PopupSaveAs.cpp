@@ -1,11 +1,12 @@
 #include "PopupSaveAs.h"
 #include "Core/Constants.h"
+#include "../UIConstants.h"
 #include "ImGuiFileDialog.h"
 #include <filesystem>
 #include <algorithm>
 #include <cstring>
 
-namespace Tiles
+namespace Tiles::Editor
 {
     PopupSaveAs::PopupSaveAs(std::shared_ptr<Context> context) : Popup(context) {}
 

@@ -1,11 +1,11 @@
 #include "PanelTextureSelection.h"
-#include "Core/Constants.h"
+#include "../UIConstants.h"
 #include "ImGuiFileDialog.h"
 #include "Core/Log.h"
 #include <filesystem>
 #include <algorithm>
 
-namespace Tiles
+namespace Tiles::Editor
 {
     PanelTextureSelection::PanelTextureSelection(std::shared_ptr<Context> context) : Panel(context)
     {

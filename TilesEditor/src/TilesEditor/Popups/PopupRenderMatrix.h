@@ -5,7 +5,7 @@
 #include <map>
 #include <filesystem>
 
-namespace Tiles
+namespace Tiles::Editor
 {
     enum class ExportFormat
     {

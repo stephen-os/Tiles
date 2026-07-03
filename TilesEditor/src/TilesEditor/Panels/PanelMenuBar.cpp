@@ -1,11 +1,11 @@
 #include "PanelMenuBar.h"
-#include "Core/Constants.h"
+#include "../UIConstants.h"
 #include "ImGuiFileDialog.h"
 #include <filesystem>
 
 #include "Core/Application.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     PanelMenuBar::PanelMenuBar(std::shared_ptr<Context> context) : Panel(context), 
 		m_PopupSaveAs(context), m_PopupOpenProject(context), m_PopupRenderMatrix(context)

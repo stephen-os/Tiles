@@ -1,11 +1,11 @@
 #include "PopupOpenProject.h"
-#include "Core/Constants.h"
+#include "../UIConstants.h"
 #include "ImGuiFileDialog.h"
 #include <filesystem>
 #include <cstring>
 #include <algorithm>
 
-namespace Tiles
+namespace Tiles::Editor
 {
     PopupOpenProject::PopupOpenProject(std::shared_ptr<Context> context) : Popup(context) {}
 

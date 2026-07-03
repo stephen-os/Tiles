@@ -6,7 +6,7 @@
 
 #include "Core/Base.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
     /// The main editing canvas. Draws the grid, layers, and a hover/brush preview
     /// into an offscreen RenderTarget each frame and blits it via ImGui::Image.

@@ -3,7 +3,7 @@
 #include "Core/Base.h"
 #include "Core/Context.h"
 
-namespace Tiles
+namespace Tiles::Editor
 {
 	/// Base class for dialog-style popups owned by a panel. Tracks a visibility
 	/// flag toggled via Show/Hide/Toggle; Render() and Update() dispatch to the
