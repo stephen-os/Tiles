@@ -77,10 +77,10 @@ namespace Tiles
             ExecuteCommand(m_EditingState.BuildEraseCommand(m_EditingState.GetWorkingLayer(), x, y));
     }
 
-    void Context::FillLayer(int x, int y)
+    void Context::FillLayer(int x, int y, const glm::ivec4& bounds)
     {
         if (HasWorkingLayer())
-            ExecuteCommand(m_EditingState.BuildFillCommand(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush()));
+            ExecuteCommand(m_EditingState.BuildFillCommand(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush(), bounds));
     }
 
     void Context::ExecuteCommand(std::unique_ptr<Command> command)

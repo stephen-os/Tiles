@@ -30,14 +30,14 @@ namespace Tiles
 
         const float tileSize = Viewport::Render::DefaultTileSize;
 
-        // A tile at coord (cx, cy) is centered at world (cx * tileSize, cy * tileSize),
-        // so the painted content spans one extra tile in each dimension.
+        // A tile at coord (cx, cy) fills the cell [cx, cx+1], centered at
+        // (cx + 0.5) * tileSize, so the content spans [minX, maxX+1] in tiles.
         const float minX = bounds->x, minY = bounds->y;
         const float maxX = bounds->z, maxY = bounds->w;
 
         m_Camera.Center = {
-            (minX + maxX) * 0.5f * tileSize,
-            (minY + maxY) * 0.5f * tileSize
+            (minX + maxX + 1.0f) * 0.5f * tileSize,
+            (minY + maxY + 1.0f) * 0.5f * tileSize
         };
 
         const float contentWidth = (maxX - minX + 1.0f) * tileSize;

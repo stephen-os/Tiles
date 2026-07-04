@@ -527,12 +527,13 @@ namespace Tiles::Editor
 
         auto renderTarget = Tiles::RenderTarget::Create(width, height);
 
-        // A tile at coord (cx, cy) is centered at world (cx * tileSize, cy * tileSize),
-        // so the content-bbox center is the mid-coord scaled by tileSize.
+        // A tile at coord (cx, cy) fills the cell [cx, cx+1], centered at
+        // (cx + 0.5) * tileSize, so the content spans [minX, maxX+1] in tiles and
+        // its centre is the mid of those edges.
         Tiles::Camera2D camera;
         camera.Center = {
-            (minX + maxX) * 0.5f * tileSize,
-            (minY + maxY) * 0.5f * tileSize
+            (minX + maxX + 1) * 0.5f * tileSize,
+            (minY + maxY + 1) * 0.5f * tileSize
         };
         camera.Zoom = 1.0f;
 

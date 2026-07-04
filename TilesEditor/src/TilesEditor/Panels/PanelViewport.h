@@ -27,14 +27,20 @@ namespace Tiles::Editor
         /// accounting for the viewport origin, its centered projection, and zoom.
         glm::vec2 ScreenToWorld() const;
 
-        /// Returns the signed tile coord under the mouse, rounding world position to
-        /// the nearest cell center. Any coord (including negative) is paintable.
+        /// Returns the signed tile coord under the mouse (the cell containing the
+        /// world point). Any coord (including negative) is paintable.
         glm::ivec2 GetGridPositionUnderMouse() const;
 
         void RenderGrid();
+        /// Draws red X/Y axes through the world origin, spanning the visible view.
+        void RenderOrigin();
         void RenderLayers();
         void RenderLayer(const TileLayer& layer, size_t layerIndex);
         void RenderHoverTile();
+
+        /// ImGui overlay drawn over the blitted viewport: origin/fit buttons and
+        /// the hovered tile coordinate. Sets m_PointerOverOverlay.
+        void RenderOverlay();
         void RenderBrushPreview(const Tile& brush);
         void RenderEraserPreview();
         void RenderFillPreview();
@@ -53,7 +59,8 @@ namespace Tiles::Editor
         float m_TileSize;
         float m_MouseDelta = 0.0f;
         bool m_IsDragging = false;
-        bool m_IsWindowFocused = false; 
+        bool m_IsWindowFocused = false;
+        bool m_PointerOverOverlay = false;   // pointer is over the overlay controls; suppresses painting
 
         ImVec2 m_CurrentMousePosition = { 0.0f, 0.0f };
         ImVec2 m_PreviousMousePosition = { 0, 0 };

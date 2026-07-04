@@ -47,7 +47,7 @@ namespace Tiles
         /// Builds the command for the current painting mode; null for None.
         std::unique_ptr<Command> BuildModeCommand(size_t layerIndex, int x, int y, const Tile& tile) const;
         std::unique_ptr<Command> BuildEraseCommand(size_t layerIndex, int x, int y) const;
-        std::unique_ptr<Command> BuildFillCommand(size_t layerIndex, int x, int y, const Tile& tile) const;
+        std::unique_ptr<Command> BuildFillCommand(size_t layerIndex, int x, int y, const Tile& tile, const glm::ivec4& bounds) const;
 
     private:
         size_t m_WorkingLayer = 0;

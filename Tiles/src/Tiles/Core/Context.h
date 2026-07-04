@@ -55,7 +55,7 @@ namespace Tiles
         /// layer at (x, y), issuing the matching command. No-op for an invalid layer.
         void PaintTileOnLayer(size_t layerIndex, int x, int y, const Tile& tile);
         void EraseTile(int x, int y);
-        void FillLayer(int x, int y);
+        void FillLayer(int x, int y, const glm::ivec4& bounds);
 
         /// Runs a command through the history (recording it for undo) and marks
         /// the project modified. Null commands and a missing project are ignored.

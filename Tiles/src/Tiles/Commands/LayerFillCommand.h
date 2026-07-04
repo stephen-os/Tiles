@@ -15,8 +15,8 @@ namespace Tiles
     class LayerFillCommand : public Command
     {
     public:
-        LayerFillCommand(int x, int y, size_t index, const Tile& fillTile)
-            : m_X(x), m_Y(y), m_Index(index), m_FillTile(fillTile), m_HasExecuted(false)
+        LayerFillCommand(int x, int y, size_t index, const Tile& fillTile, const glm::ivec4& bounds)
+            : m_X(x), m_Y(y), m_Index(index), m_FillTile(fillTile), m_Bounds(bounds), m_HasExecuted(false)
         {
         }
 
@@ -52,33 +52,22 @@ namespace Tiles
 
     private:
         /// Breadth-first 4-connected fill: replaces every tile reachable from
-        /// (startX, startY) that equals targetTile with the fill tile. The board is
-        /// unbounded, so the flood is confined to the layer's painted bounding box
-        /// expanded to include the start cell; this keeps filling an empty region
-        /// finite while still filling enclosed gaps within painted content.
+        /// (startX, startY) that equals targetTile with the fill tile, clipped to
+        /// m_Bounds (the visible tile region). Bounding to the view keeps a fill on
+        /// the unbounded board finite and intuitive -- it fills what you can see.
         void FloodFill(TileLayer& layer, int startX, int startY, const Tile& targetTile)
         {
-            // Bound the flood to the layer's painted extent. A click on empty
-            // space outside that extent (or on an empty layer) fills only the
-            // clicked cell, so a fill can never run away across the unbounded
-            // board -- the safety net for an infinite canvas.
-            auto bounds = layer.GetBounds();
-            if (!bounds
-                || startX < bounds->x || startX > bounds->z
-                || startY < bounds->y || startY > bounds->w)
-            {
-                layer.SetTile(startX, startY, m_FillTile);
-                return;
-            }
+            const int minX = m_Bounds.x, minY = m_Bounds.y, maxX = m_Bounds.z, maxY = m_Bounds.w;
 
-            const int minX = bounds->x, minY = bounds->y, maxX = bounds->z, maxY = bounds->w;
+            if (startX < minX || startX > maxX || startY < minY || startY > maxY)
+                return;
 
             std::queue<std::pair<int, int>> tileQueue;
             tileQueue.push({ startX, startY });
 
             const std::pair<int, int> directions[] = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
 
-            // Backstop against a pathologically large (sparse) bounding box.
+            // Backstop in case the visible region is enormous (zoomed far out).
             size_t filled = 0;
             constexpr size_t MaxFillCells = 1'000'000;
 
@@ -106,6 +95,7 @@ namespace Tiles
         int m_X, m_Y;
         size_t m_Index;
         Tile m_FillTile;
+        glm::ivec4 m_Bounds;          // visible tile region (minX, minY, maxX, maxY) the flood is clipped to
         TileLayer m_PreviousLayer;
         bool m_HasExecuted;
     };

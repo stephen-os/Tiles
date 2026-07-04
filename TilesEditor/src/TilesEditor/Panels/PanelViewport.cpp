@@ -6,6 +6,7 @@
 #include "Core/Input.h"
 #include "../Rendering/TileSceneRenderer.h"
 #include <algorithm>
+#include <cmath>
 
 namespace Tiles::Editor
 {
@@ -45,13 +46,15 @@ namespace Tiles::Editor
 
         RenderGrid();
         RenderLayers();
+        RenderOrigin();
         RenderHoverTile();
 
         Tiles::Renderer2D::EndFrame();
         Tiles::Renderer2D::SetRenderTarget(nullptr);
 
-
         ImGui::Image((void*)m_RenderTarget->GetTexture(), m_ViewportSize);
+
+        RenderOverlay();
 
         m_MouseDelta = ImGui::GetIO().MouseWheel;
 
@@ -141,13 +144,58 @@ namespace Tiles::Editor
     void PanelViewport::RenderGrid()
     {
         // Colors come from GridParams' defaults; the grid reconstructs world
-        // space from the frame's view-projection (set by BeginFrame). One grid
-        // cell per tile, shifted half a cell so tiles sit inside the cells
-        // rather than centred on the line intersections.
-        Tiles::Renderer2D::DrawGrid({
-            .CellSize = m_TileSize,
-            .Offset = { m_TileSize * 0.5f, m_TileSize * 0.5f },
-        });
+        // space from the frame's view-projection (set by BeginFrame). Grid lines
+        // fall on integer tile boundaries (so they pass through the origin); a
+        // tile at (cx, cy) fills the cell between them.
+        Tiles::Renderer2D::DrawGrid({ .CellSize = m_TileSize });
+    }
+
+    void PanelViewport::RenderOrigin()
+    {
+        const Camera2D& camera = m_Context->GetViewportCamera();
+
+        // Axes span the visible extent so they read as reference lines through the
+        // world origin (only visible when the origin is in view).
+        float halfWidth = m_ViewportSize.x / camera.Zoom * 0.5f;
+        float halfHeight = m_ViewportSize.y / camera.Zoom * 0.5f;
+
+        Tiles::LineParams line;
+        line.Color = Viewport::Grid::BoundaryColor;   // red
+        line.Thickness = 2.0f;
+
+        line.Start = { camera.Center.x - halfWidth, 0.0f, Viewport::Depth::Outline };
+        line.End = { camera.Center.x + halfWidth, 0.0f, Viewport::Depth::Outline };
+        Tiles::Renderer2D::DrawLine(line);
+
+        line.Start = { 0.0f, camera.Center.y - halfHeight, Viewport::Depth::Outline };
+        line.End = { 0.0f, camera.Center.y + halfHeight, Viewport::Depth::Outline };
+        Tiles::Renderer2D::DrawLine(line);
+    }
+
+    void PanelViewport::RenderOverlay()
+    {
+        Camera2D& camera = m_Context->GetViewportCamera();
+
+        ImGui::SetCursorScreenPos({ m_ViewportPosition.x + 8.0f, m_ViewportPosition.y + 8.0f });
+        ImGui::BeginGroup();
+
+        if (ImGui::Button("Origin"))
+            camera.Center = { 0.0f, 0.0f };
+        ImGui::SameLine();
+        if (ImGui::Button("Fit"))
+            m_Context->FitViewportCameraToProject();
+
+        if (ImGui::IsWindowHovered())
+        {
+            glm::ivec2 coord = GetGridPositionUnderMouse();
+            ImGui::Text("( %d, %d )", coord.x, coord.y);
+        }
+
+        ImGui::EndGroup();
+
+        // Suppress painting while the pointer is over these controls, so clicking
+        // a button doesn't also drop a tile underneath it.
+        m_PointerOverOverlay = ImGui::IsMouseHoveringRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
     }
 
     void PanelViewport::RenderLayers()
@@ -175,8 +223,8 @@ namespace Tiles::Editor
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
 
         glm::vec2 gridCenter = {
-            gridPos.x * m_TileSize,
-            gridPos.y * m_TileSize
+            (gridPos.x + 0.5f) * m_TileSize,
+            (gridPos.y + 0.5f) * m_TileSize
         };
 
         m_MouseFollowQuadPosition = {
@@ -258,6 +306,10 @@ namespace Tiles::Editor
 
     void PanelViewport::HandleInput()
     {
+        // Don't paint through the overlay controls.
+        if (m_PointerOverOverlay)
+            return;
+
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
 
         if (Input::IsMouseButtonPressed(MouseCode::Left))
@@ -280,8 +332,21 @@ namespace Tiles::Editor
             m_Context->EraseTile(gridPos.x, gridPos.y);
             break;
         case PaintingMode::Fill:
-            m_Context->FillLayer(gridPos.x, gridPos.y);
+        {
+            // Bound the flood to the visible tile region, so a fill on the
+            // unbounded board fills what's on screen rather than running away.
+            const Camera2D& camera = m_Context->GetViewportCamera();
+            float halfWidth = m_ViewportSize.x / camera.Zoom * 0.5f;
+            float halfHeight = m_ViewportSize.y / camera.Zoom * 0.5f;
+            glm::ivec4 visibleTiles = {
+                static_cast<int>(std::floor((camera.Center.x - halfWidth) / m_TileSize)),
+                static_cast<int>(std::floor((camera.Center.y - halfHeight) / m_TileSize)),
+                static_cast<int>(std::floor((camera.Center.x + halfWidth) / m_TileSize)),
+                static_cast<int>(std::floor((camera.Center.y + halfHeight) / m_TileSize))
+            };
+            m_Context->FillLayer(gridPos.x, gridPos.y, visibleTiles);
             break;
+        }
         default:
             break;
         }
@@ -290,9 +355,11 @@ namespace Tiles::Editor
     glm::ivec2 PanelViewport::GetGridPositionUnderMouse() const
     {
         auto worldPosition = ScreenToWorld();
+        // A tile at (cx, cy) fills the cell [cx, cx+1], so floor maps a world
+        // point to the cell that contains it (correct for negatives too).
         return {
-            static_cast<int>(round(worldPosition.x / m_TileSize)),
-            static_cast<int>(round(worldPosition.y / m_TileSize))
+            static_cast<int>(std::floor(worldPosition.x / m_TileSize)),
+            static_cast<int>(std::floor(worldPosition.y / m_TileSize))
         };
     }
 
