@@ -6,7 +6,7 @@ project "Tiles"
 
    flags { "MultiProcessorCompile" }
 
-   files { "../src/**.h", "../src/**.cpp" }
+   files { "../src/**.h", "../src/**.cpp", "../vendor/miniz/miniz.c", "../vendor/miniz/miniz.h" }
 
    includedirs
    {
@@ -19,7 +19,8 @@ project "Tiles"
       "../vendor/imguifd",
       "../vendor/spdlog/include",
       "../vendor/stb",
-      "../vendor/json"
+      "../vendor/json",
+      "../vendor/miniz"
    }
 
     links
