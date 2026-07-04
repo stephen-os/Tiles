@@ -6,6 +6,7 @@ in vec2 v_WorldPos;
 
 uniform float u_CellSize;      // minor grid spacing, world units
 uniform float u_MajorEvery;    // a major line every N minor cells
+uniform vec2  u_GridOffset;    // world-space shift of the grid origin
 uniform vec4  u_LineColor;
 uniform vec4  u_MajorLineColor;
 uniform vec4  u_BackgroundColor;
@@ -24,8 +25,9 @@ float gridCoverage(vec2 worldPos, float cell)
 
 void main()
 {
-    float minor = gridCoverage(v_WorldPos, u_CellSize);
-    float major = gridCoverage(v_WorldPos, u_CellSize * u_MajorEvery);
+    vec2 p = v_WorldPos - u_GridOffset;
+    float minor = gridCoverage(p, u_CellSize);
+    float major = gridCoverage(p, u_CellSize * u_MajorEvery);
 
     vec4 color = u_BackgroundColor;
     color = mix(color, u_LineColor, minor);

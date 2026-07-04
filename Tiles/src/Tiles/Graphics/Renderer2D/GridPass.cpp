@@ -41,6 +41,7 @@ namespace Tiles
 		m_Shader->SetUniformMat4("u_InvViewProjection", glm::inverse(state.ViewProjectionMatrix));
 		m_Shader->SetUniformFloat("u_CellSize", params.CellSize);
 		m_Shader->SetUniformFloat("u_MajorEvery", params.MajorEvery);
+		m_Shader->SetUniformVec2("u_GridOffset", params.Offset);
 		m_Shader->SetUniformVec4("u_LineColor", params.LineColor);
 		m_Shader->SetUniformVec4("u_MajorLineColor", params.MajorLineColor);
 		m_Shader->SetUniformVec4("u_BackgroundColor", params.BackgroundColor);

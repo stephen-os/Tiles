@@ -56,6 +56,7 @@ namespace Tiles
 	{
 		float CellSize = 1.0f;          // minor cell size, world units
 		float MajorEvery = 10.0f;       // a major line every N minor cells
+		glm::vec2 Offset{ 0.0f };       // world-space shift of the grid origin
 		glm::vec4 LineColor{ 0.30f, 0.30f, 0.33f, 1.0f };
 		glm::vec4 MajorLineColor{ 0.50f, 0.50f, 0.55f, 1.0f };
 		glm::vec4 BackgroundColor{ 0.13f, 0.13f, 0.15f, 1.0f };

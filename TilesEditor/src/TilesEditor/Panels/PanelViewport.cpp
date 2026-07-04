@@ -142,10 +142,12 @@ namespace Tiles::Editor
     {
         // Colors come from GridParams' defaults; the grid reconstructs world
         // space from the frame's view-projection (set by BeginFrame). One grid
-        // cell per tile.
-        Tiles::Renderer2D::DrawGrid({ .CellSize = m_TileSize });
-
-        RenderLayerBoundaries();
+        // cell per tile, shifted half a cell so tiles sit inside the cells
+        // rather than centred on the line intersections.
+        Tiles::Renderer2D::DrawGrid({
+            .CellSize = m_TileSize,
+            .Offset = { m_TileSize * 0.5f, m_TileSize * 0.5f },
+        });
     }
 
     void PanelViewport::RenderLayerBoundaries()
