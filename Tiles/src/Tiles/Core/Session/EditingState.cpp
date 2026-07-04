@@ -31,7 +31,7 @@ namespace Tiles
         }
     }
 
-    std::unique_ptr<Command> EditingState::BuildModeCommand(size_t layerIndex, size_t x, size_t y, const Tile& tile) const
+    std::unique_ptr<Command> EditingState::BuildModeCommand(size_t layerIndex, int x, int y, const Tile& tile) const
     {
         switch (m_PaintingMode)
         {
@@ -46,12 +46,12 @@ namespace Tiles
         }
     }
 
-    std::unique_ptr<Command> EditingState::BuildEraseCommand(size_t layerIndex, size_t x, size_t y) const
+    std::unique_ptr<Command> EditingState::BuildEraseCommand(size_t layerIndex, int x, int y) const
     {
         return std::make_unique<TileEraseCommand>(x, y, layerIndex);
     }
 
-    std::unique_ptr<Command> EditingState::BuildFillCommand(size_t layerIndex, size_t x, size_t y, const Tile& tile) const
+    std::unique_ptr<Command> EditingState::BuildFillCommand(size_t layerIndex, int x, int y, const Tile& tile) const
     {
         return std::make_unique<LayerFillCommand>(x, y, layerIndex, tile);
     }

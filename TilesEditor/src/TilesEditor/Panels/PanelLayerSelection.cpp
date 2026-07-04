@@ -394,13 +394,6 @@ namespace Tiles::Editor
             ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed, 120.0f);
             ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
-            // Dimensions
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), " Dimensions:");
-            ImGui::TableNextColumn();
-            ImGui::TextColored(UI::Layer::OrangeAccent, "%dx%d", layer.GetWidth(), layer.GetHeight());
-
             // Tile Count
             ImGui::TableNextRow();
             ImGui::TableNextColumn();

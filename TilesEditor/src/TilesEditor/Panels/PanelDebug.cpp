@@ -108,7 +108,6 @@ namespace Tiles::Editor
     {
         const auto& layerStack = m_Context->GetProject()->GetLayerStack();
 
-        ImGui::Text("Dimensions: %d x %d", layerStack.GetWidth(), layerStack.GetHeight());
         ImGui::Text("Layer Count: %zu", layerStack.GetLayerCount());
         ImGui::Text("Is Empty: %s", layerStack.IsEmpty() ? "Yes" : "No");
 
@@ -124,20 +123,14 @@ namespace Tiles::Editor
                 if (ImGui::TreeNode(("Layer " + std::to_string(i)).c_str()))
                 {
                     ImGui::Text("  Name: %s", layer.GetName().c_str());
-                    ImGui::Text("  Dimensions: %d x %d", layer.GetWidth(), layer.GetHeight());
                     ImGui::Text("  Visible: %s", layer.GetVisibility() ? "Yes" : "No");
                     ImGui::Text("  Render Group: %d", layer.GetRenderGroup());
                     ImGui::Text("  Rendering Enabled: %s", layer.IsRenderingEnabled() ? "Yes" : "No");
                     ImGui::Text("  Tile Count: %zu", layer.GetTileCount());
                     ImGui::Text("  Is Empty: %s", layer.IsEmpty() ? "Yes" : "No");
 
-                    // Count painted tiles
-                    size_t paintedTiles = 0;
-                    for (const auto& tile : layer)
-                    {
-                        if (tile.IsPainted()) paintedTiles++;
-                    }
-                    ImGui::Text("  Painted Tiles: %zu", paintedTiles);
+                    // Every stored cell is painted, so the count is the tile count.
+                    ImGui::Text("  Painted Tiles: %zu", layer.GetTileCount());
 
                     ImGui::TreePop();
                 }
@@ -156,18 +149,12 @@ namespace Tiles::Editor
             ImGui::Separator();
             ImGui::Text("Working Layer Details:");
             ImGui::Text("  Name: %s", workingLayer.GetName().c_str());
-            ImGui::Text("  Dimensions: %d x %d", workingLayer.GetWidth(), workingLayer.GetHeight());
             ImGui::Text("  Visible: %s", workingLayer.GetVisibility() ? "Yes" : "No");
             ImGui::Text("  Render Group: %d", workingLayer.GetRenderGroup());
             ImGui::Text("  Tile Count: %zu", workingLayer.GetTileCount());
 
-            // Count painted tiles in working layer
-            size_t paintedTiles = 0;
-            for (const auto& tile : workingLayer)
-            {
-                if (tile.IsPainted()) paintedTiles++;
-            }
-            ImGui::Text("  Painted Tiles: %zu", paintedTiles);
+            // Every stored cell is painted, so the count is the tile count.
+            ImGui::Text("  Painted Tiles: %zu", workingLayer.GetTileCount());
         }
     }
 

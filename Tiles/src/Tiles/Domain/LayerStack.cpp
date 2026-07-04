@@ -3,25 +3,13 @@
 #include "Core/Log.h"
 #include "Core/Constants.h"
 
+#include <algorithm>
+
 namespace Tiles
 {
-    LayerStack::LayerStack(uint32_t width, uint32_t height)
-        : m_Width(Grid::ClampDimension(width)), m_Height(Grid::ClampDimension(height))
-    {
-        if (width == 0 || height == 0)
-        {
-            TILES_ENGINE_INFO("LayerStack::LayerStack: Warning - LayerStack created with zero dimensions ({}x{})", width, height);
-        }
-
-        if (width != m_Width || height != m_Height)
-        {
-            TILES_ENGINE_INFO("LayerStack::LayerStack: Clamped dimensions from {}x{} to {}x{}", width, height, m_Width, m_Height);
-        }
-    }
-
     void LayerStack::AddLayer(const std::string& name)
     {
-        m_Layers.emplace_back(m_Width, m_Height);
+        m_Layers.emplace_back();
         std::string layerName = name.empty() ? "New Layer" : name;
         m_Layers.back().SetName(layerName);
 
@@ -49,7 +37,6 @@ namespace Tiles
             return;
         }
 
-        TILES_ENGINE_INFO("LayerStack::ClearLayer: Clearing layer at index {}", index);
         m_Layers[index].Clear();
     }
 
@@ -61,7 +48,7 @@ namespace Tiles
         }
 
         std::string layerName = name.empty() ? "New Layer" : name;
-        auto it = m_Layers.insert(m_Layers.begin() + index, TileLayer(m_Width, m_Height));
+        auto it = m_Layers.insert(m_Layers.begin() + index, TileLayer());
         it->SetName(layerName);
 
         TILES_ENGINE_INFO("LayerStack::InsertLayer: Inserted layer '{}' at index {} (total: {})", layerName, index, m_Layers.size());
@@ -75,14 +62,7 @@ namespace Tiles
             return;
         }
 
-        TILES_ENGINE_INFO("LayerStack::ReplaceLayer: Replacing layer at index {}", index);
         m_Layers[index] = layer;
-
-        if (layer.GetWidth() != m_Width || layer.GetHeight() != m_Height)
-        {
-            TILES_ENGINE_INFO("LayerStack::ReplaceLayer: Resizing replaced layer from {}x{} to {}x{}", layer.GetWidth(), layer.GetHeight(), m_Width, m_Height);
-            m_Layers[index].Resize(m_Width, m_Height);
-        }
     }
 
     void LayerStack::ClearAllLayers()
@@ -105,12 +85,8 @@ namespace Tiles
         }
 
         if (index == 0)
-        {
-            TILES_ENGINE_INFO("LayerStack::MoveLayerUp: Layer at index {} is already at the top", index);
             return;
-        }
 
-        TILES_ENGINE_INFO("LayerStack::MoveLayerUp: Moving layer from index {} to {}", index, index - 1);
         std::swap(m_Layers[index], m_Layers[index - 1]);
     }
 
@@ -123,36 +99,9 @@ namespace Tiles
         }
 
         if (index >= m_Layers.size() - 1)
-        {
-            TILES_ENGINE_INFO("LayerStack::MoveLayerDown: Layer at index {} is already at the bottom", index);
             return;
-        }
 
-        TILES_ENGINE_INFO("LayerStack::MoveLayerDown: Moving layer from index {} to {}", index, index + 1);
         std::swap(m_Layers[index], m_Layers[index + 1]);
-    }
-
-    void LayerStack::Resize(uint32_t width, uint32_t height)
-    {
-        if (width == 0 || height == 0)
-        {
-            TILES_ENGINE_INFO("LayerStack::Resize: Warning - Resizing LayerStack to zero dimensions ({}x{})", width, height);
-        }
-
-        width = Grid::ClampDimension(width);
-        height = Grid::ClampDimension(height);
-
-        TILES_ENGINE_INFO("LayerStack::Resize: Resizing LayerStack from {}x{} to {}x{} ({} layers)", m_Width, m_Height, width, height, m_Layers.size());
-
-        m_Width = width;
-        m_Height = height;
-
-        for (size_t i = 0; i < m_Layers.size(); ++i)
-        {
-            m_Layers[i].Resize(width, height);
-        }
-
-        TILES_ENGINE_INFO("LayerStack::Resize: LayerStack resize completed");
     }
 
     TileLayer& LayerStack::GetLayer(size_t index)
@@ -167,24 +116,45 @@ namespace Tiles
         return m_Layers[index];
     }
 
-    Tile& LayerStack::GetTile(size_t x, size_t y, size_t index)
+    const Tile& LayerStack::GetTile(int x, int y, size_t index) const
     {
         TILES_ASSERT(IsValidLayerIndex(index), "LayerStack::GetTile: Invalid layer index {} (layer count: {})", index, m_Layers.size());
         return m_Layers[index].GetTile(x, y);
     }
 
-    const Tile& LayerStack::GetTile(size_t x, size_t y, size_t index) const
+    void LayerStack::SetTile(int x, int y, size_t index, const Tile& tile)
     {
-        TILES_ASSERT(IsValidLayerIndex(index), "LayerStack::GetTile: Invalid layer index {} (layer count: {})", index, m_Layers.size());
-        return m_Layers[index].GetTile(x, y);
+        TILES_ASSERT(IsValidLayerIndex(index), "LayerStack::SetTile: Invalid layer index {} (layer count: {})", index, m_Layers.size());
+        m_Layers[index].SetTile(x, y, tile);
+    }
+
+    std::optional<glm::ivec4> LayerStack::GetBounds() const
+    {
+        std::optional<glm::ivec4> bounds;
+        for (const auto& layer : m_Layers)
+        {
+            auto layerBounds = layer.GetBounds();
+            if (!layerBounds)
+                continue;
+
+            if (!bounds)
+            {
+                bounds = layerBounds;
+            }
+            else
+            {
+                bounds->x = std::min(bounds->x, layerBounds->x);
+                bounds->y = std::min(bounds->y, layerBounds->y);
+                bounds->z = std::max(bounds->z, layerBounds->z);
+                bounds->w = std::max(bounds->w, layerBounds->w);
+            }
+        }
+        return bounds;
     }
 
     nlohmann::json LayerStack::ToJSON() const
     {
         nlohmann::json jsonLayerStack;
-
-        jsonLayerStack[JSON::LayerStack::Width] = GetWidth();
-        jsonLayerStack[JSON::LayerStack::Height] = GetHeight();
 
         nlohmann::json layersArray = nlohmann::json::array();
         for (const auto& layer : m_Layers)
@@ -198,16 +168,7 @@ namespace Tiles
 
     LayerStack LayerStack::FromJSON(const nlohmann::json& jsonLayerStack)
     {
-        if (!jsonLayerStack.contains(JSON::LayerStack::Width) || !jsonLayerStack.contains(JSON::LayerStack::Height))
-        {
-            TILES_ENGINE_INFO("LayerStack::FromJSON: JSON missing required Width or Height fields");
-            return LayerStack(0, 0);
-        }
-
-        uint32_t width = jsonLayerStack.at(JSON::LayerStack::Width).get<uint32_t>();
-        uint32_t height = jsonLayerStack.at(JSON::LayerStack::Height).get<uint32_t>();
-
-        LayerStack layerStack(width, height);
+        LayerStack layerStack;
 
         if (jsonLayerStack.contains(JSON::LayerStack::TileLayers))
         {
@@ -218,14 +179,7 @@ namespace Tiles
             {
                 try
                 {
-                    TileLayer layer = TileLayer::FromJSON(layerJson);
-
-                    if (layer.GetWidth() != width || layer.GetHeight() != height)
-                    {
-                        layer.Resize(width, height);
-                    }
-
-                    layerStack.m_Layers.push_back(layer);
+                    layerStack.m_Layers.push_back(TileLayer::FromJSON(layerJson));
                     loadedCount++;
                 }
                 catch (const std::exception& e)

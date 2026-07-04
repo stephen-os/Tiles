@@ -511,15 +511,28 @@ namespace Tiles::Editor
 
         const auto& layerStack = m_Context->GetProject()->GetLayerStack();
 
-        uint32_t width = layerStack.GetWidth() * Viewport::Render::DefaultTileSize;
-        uint32_t height = layerStack.GetHeight() * Viewport::Render::DefaultTileSize;
+        const float tileSize = Viewport::Render::DefaultTileSize;
+
+        // Frame the export on the painted content's bounding box; nothing painted
+        // means there is nothing to export.
+        auto bounds = layerStack.GetBounds();
+        if (!bounds)
+            return;
+
+        const int minX = bounds->x, minY = bounds->y;
+        const int maxX = bounds->z, maxY = bounds->w;
+
+        uint32_t width = static_cast<uint32_t>((maxX - minX + 1) * tileSize);
+        uint32_t height = static_cast<uint32_t>((maxY - minY + 1) * tileSize);
 
         auto renderTarget = Tiles::RenderTarget::Create(width, height);
 
+        // A tile at coord (cx, cy) is centered at world (cx * tileSize, cy * tileSize),
+        // so the content-bbox center is the mid-coord scaled by tileSize.
         Tiles::Camera2D camera;
         camera.Center = {
-            width * 0.5f + Viewport::Render::DefaultTileSize * 0.5f,
-            height * 0.5f + Viewport::Render::DefaultTileSize * 0.5f
+            (minX + maxX) * 0.5f * tileSize,
+            (minY + maxY) * 0.5f * tileSize
         };
         camera.Zoom = 1.0f;
 
@@ -528,7 +541,6 @@ namespace Tiles::Editor
         Tiles::Renderer2D::BeginFrame(camera.ViewProjection({ static_cast<float>(width), static_cast<float>(height) }));
 
         const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
-        float tileSize = Viewport::Render::DefaultTileSize;
 
         for (size_t layerIdx : layerIndices)
         {

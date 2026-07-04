@@ -150,67 +150,6 @@ namespace Tiles::Editor
         });
     }
 
-    void PanelViewport::RenderLayerBoundaries()
-    {
-        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
-
-        const float gridWidth = layerStack.GetWidth();
-        const float gridHeight = layerStack.GetHeight();
-        const float offset = m_TileSize * 0.5f;
-
-        Tiles::LineParams line;
-        line.Color = Viewport::Grid::BoundaryColor;
-        line.Thickness = 2.0f;
-
-        line.Start = {
-            offset,
-            offset,
-            Viewport::Depth::Outline
-            };
-        line.End = {
-            m_TileSize * gridWidth + offset,
-            offset,
-            Viewport::Depth::Outline
-            };
-        Tiles::Renderer2D::DrawLine(line);
-
-        line.Start = {
-            offset,
-            offset,
-            Viewport::Depth::Outline
-            };
-        line.End = {
-            offset,
-            m_TileSize * gridHeight + offset,
-            Viewport::Depth::Outline
-            };
-        Tiles::Renderer2D::DrawLine(line);
-
-        line.Start = {
-            m_TileSize * gridWidth + offset,
-            m_TileSize * gridHeight + offset,
-            Viewport::Depth::Outline
-            };
-        line.End = {
-            offset,
-            m_TileSize * gridHeight + offset,
-            Viewport::Depth::Outline
-            };
-        Tiles::Renderer2D::DrawLine(line);
-
-        line.Start = {
-            m_TileSize * gridWidth + offset,
-            m_TileSize * gridHeight + offset,
-            Viewport::Depth::Outline
-            };
-        line.End = {
-            m_TileSize * gridWidth + offset,
-            offset,
-            Viewport::Depth::Outline
-            };
-        Tiles::Renderer2D::DrawLine(line);
-    }
-
     void PanelViewport::RenderLayers()
     {
         const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
@@ -233,10 +172,7 @@ namespace Tiles::Editor
     {
         if (!ImGui::IsWindowHovered()) return;
 
-        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
-
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
-        if (!IsValidGridPosition(gridPos)) return;
 
         glm::vec2 gridCenter = {
             gridPos.x * m_TileSize,
@@ -323,8 +259,6 @@ namespace Tiles::Editor
     void PanelViewport::HandleInput()
     {
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
-        if (!IsValidGridPosition(gridPos)) 
-            return;
 
         if (Input::IsMouseButtonPressed(MouseCode::Left))
         {
@@ -336,18 +270,17 @@ namespace Tiles::Editor
     {
         PaintingMode mode = m_Context->GetPaintingMode();
 
-        // gridPos is 1-based (see GetGridPositionUnderMouse); layers are indexed
-        // from zero, hence the -1 on each coordinate.
+        // Any signed coord is paintable; it maps directly to a sparse cell.
         switch (mode)
         {
         case PaintingMode::Brush:
-            m_Context->PaintTile(gridPos.x - 1, gridPos.y - 1);
+            m_Context->PaintTile(gridPos.x, gridPos.y);
             break;
         case PaintingMode::Eraser:
-            m_Context->EraseTile(gridPos.x - 1, gridPos.y - 1);
+            m_Context->EraseTile(gridPos.x, gridPos.y);
             break;
         case PaintingMode::Fill:
-            m_Context->FillLayer(gridPos.x - 1, gridPos.y - 1);
+            m_Context->FillLayer(gridPos.x, gridPos.y);
             break;
         default:
             break;
@@ -361,13 +294,6 @@ namespace Tiles::Editor
             static_cast<int>(round(worldPosition.x / m_TileSize)),
             static_cast<int>(round(worldPosition.y / m_TileSize))
         };
-    }
-
-    bool PanelViewport::IsValidGridPosition(const glm::ivec2& gridPos) const
-    {
-        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
-        return gridPos.x >= 1 && gridPos.x <= static_cast<int>(layerStack.GetWidth()) &&
-            gridPos.y >= 1 && gridPos.y <= static_cast<int>(layerStack.GetHeight());
     }
 
     glm::vec2 PanelViewport::ScreenToWorld() const

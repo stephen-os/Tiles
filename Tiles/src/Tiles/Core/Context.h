@@ -50,12 +50,12 @@ namespace Tiles
         Tile& GetBrush() { return m_EditingState.GetBrush(); }
 
         /// Applies the current painting mode/brush to the working layer at (x, y).
-        void PaintTile(size_t x, size_t y);
+        void PaintTile(int x, int y);
         /// Dispatches the current painting mode (brush/eraser/fill) to the given
         /// layer at (x, y), issuing the matching command. No-op for an invalid layer.
-        void PaintTileOnLayer(size_t layerIndex, size_t x, size_t y, const Tile& tile);
-        void EraseTile(size_t x, size_t y);
-        void FillLayer(size_t x, size_t y);
+        void PaintTileOnLayer(size_t layerIndex, int x, int y, const Tile& tile);
+        void EraseTile(int x, int y);
+        void FillLayer(int x, int y);
 
         /// Runs a command through the history (recording it for undo) and marks
         /// the project modified. Null commands and a missing project are ignored.
@@ -73,7 +73,7 @@ namespace Tiles
 
         /// Replaces the current project with a fresh one, resetting brush,
         /// painting mode, working layer, and command history.
-        void CreateProject(const std::string& name, uint32_t width, uint32_t height);
+        void CreateProject(const std::string& name);
         /// Serializes the project to its existing file path.
         /// @return Failure if there is no project or no path yet (use SaveProjectAs).
         ProjectResult SaveProject();
@@ -82,8 +82,6 @@ namespace Tiles
         /// Loads a project from path, replacing the current one and resetting
         /// editing state. A missing file is dropped from recent projects.
         ProjectResult LoadProject(const std::filesystem::path& path);
-        /// Resizes the grid, keeping the camera focused on the same relative point.
-        void ResizeProject(uint32_t width, uint32_t height);
         bool HasProject() const { return m_ProjectSession.HasProject(); }
         /// Project name, suffixed with "(Unsaved)" while it has no file path.
         std::string GetProjectDisplayName() const { return m_ProjectSession.GetDisplayName(); }

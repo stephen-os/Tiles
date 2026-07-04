@@ -1,15 +1,17 @@
 #pragma once
 
-#include <cstdint>
-#include <memory>
+#include <optional>
+
+#include <glm/glm.hpp>
 
 #include "../../Graphics/Camera2D.h"
 
 namespace Tiles
 {
-    /// Owns the viewport camera and the framing math that positions it relative
-    /// to the project grid. Grid dimensions are passed in, so the controller has
-    /// no dependency on Project or the rest of the editor state.
+    /// Owns the viewport camera and the framing math that positions it on the
+    /// unbounded board. The world origin (0, 0) is the reference point; painted
+    /// content is framed via its bounding box, so the controller has no dependency
+    /// on Project or the rest of the editor state.
     class ViewportCameraController
     {
     public:
@@ -18,14 +20,14 @@ namespace Tiles
         Camera2D& GetCamera() { return m_Camera; }
         const Camera2D& GetCamera() const { return m_Camera; }
 
-        /// Centers the camera on the grid at default zoom.
-        void Initialize(uint32_t gridWidth, uint32_t gridHeight);
-        /// Centers the camera on the grid, preserving the current depth/zoom.
-        void Center(uint32_t gridWidth, uint32_t gridHeight);
-        /// Centers and zooms so the whole grid fits within a nominal viewport.
-        void Fit(uint32_t gridWidth, uint32_t gridHeight);
-        /// Keeps the camera focused on the same relative point after a resize.
-        void FollowResize(uint32_t oldWidth, uint32_t oldHeight, uint32_t newWidth, uint32_t newHeight);
+        /// Centers the camera on the world origin at default zoom.
+        void Initialize();
+        /// Centers the camera on the world origin, preserving the current zoom.
+        void Center();
+        /// Centers and zooms so the painted content's bounding box fits within a
+        /// nominal viewport; falls back to the origin at default zoom if empty.
+        /// @param bounds Inclusive tile bounds (minX, minY, maxX, maxY), or nullopt.
+        void Fit(const std::optional<glm::ivec4>& bounds);
 
     private:
         Camera2D m_Camera;

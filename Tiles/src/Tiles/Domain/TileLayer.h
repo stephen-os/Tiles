@@ -1,11 +1,13 @@
 #pragma once
 #include <string>
-#include <vector>
+#include <unordered_map>
+#include <optional>
+#include <cstdint>
+
+#include <glm/glm.hpp>
 
 #include "Domain/Tile.h"
 #include "json.hpp"
-
-#include "Core/Constants.h" 
 
 namespace Tiles
 {
@@ -69,33 +71,44 @@ namespace Tiles
             return GetAllRenderGroups().size();
         }
     }
-    
-    /// A single grid of tiles with a name, visibility, and render group.
-    /// Tiles are stored row-major and addressed by (x, y).
+
+    /// Hash for signed integer tile coordinates used as sparse-map keys.
+    struct TileCoordHash
+    {
+        size_t operator()(const glm::ivec2& c) const noexcept
+        {
+            // Pack the two 32-bit coords into one 64-bit key, then hash.
+            uint64_t key = (static_cast<uint64_t>(static_cast<uint32_t>(c.x)) << 32)
+                | static_cast<uint32_t>(c.y);
+            return std::hash<uint64_t>()(key);
+        }
+    };
+
+    /// A sparse grid of tiles with a name, visibility, and render group. Only
+    /// painted cells are stored, addressed by signed (x, y), so the board is
+    /// unbounded in every direction and empty cells cost nothing.
     class TileLayer
     {
     public:
+        using TileMap = std::unordered_map<glm::ivec2, Tile, TileCoordHash>;
+
         TileLayer() = default;
-        /// @param width,height Grid size in tiles; clamped to Grid::MaxDimension.
-        TileLayer(uint32_t width, uint32_t height);
         ~TileLayer() = default;
 
-        /// Resets every tile to its default (unpainted) state.
+        /// Removes every painted tile.
         void Clear();
-        /// Resizes the grid, preserving tiles within the overlapping region.
-        void Resize(uint32_t width, uint32_t height);
 
-        // Tile access; (x, y) must satisfy IsValidPosition or the call asserts.
-        const Tile& GetTile(size_t x, size_t y) const;
-        Tile& GetTile(size_t x, size_t y);
+        /// The tile at (x, y), or a shared empty (unpainted) tile if none exists.
+        const Tile& GetTile(int x, int y) const;
+        bool HasTile(int x, int y) const;
+
+        /// Paints (x, y). An unpainted tile erases the cell, keeping the map minimal.
+        void SetTile(int x, int y, const Tile& tile);
+        /// Clears a single cell.
+        void EraseTile(int x, int y);
 
         const std::string& GetName() const { return m_Name; }
         void SetName(const std::string& name);
-
-        uint32_t GetWidth() const { return m_Width; }
-        uint32_t GetHeight() const { return m_Height; }
-        void SetWidth(uint32_t width);
-        void SetHeight(uint32_t height);
 
         bool GetVisibility() const { return m_Visible; }
         void SetVisibility(bool visible) { m_Visible = visible; }
@@ -107,25 +120,24 @@ namespace Tiles
 
         size_t GetTileCount() const { return m_Tiles.size(); }
         bool IsEmpty() const { return m_Tiles.empty(); }
-        bool IsValidPosition(size_t x, size_t y) const { return x < m_Width && y < m_Height; }
 
-        auto begin() { return m_Tiles.begin(); }
-        auto end() { return m_Tiles.end(); }
-        auto begin() const { return m_Tiles.begin(); }
-        auto end() const { return m_Tiles.end(); }
+        // Iteration yields (const glm::ivec2 coord, Tile) pairs for painted cells only.
+        TileMap::iterator begin() { return m_Tiles.begin(); }
+        TileMap::iterator end() { return m_Tiles.end(); }
+        TileMap::const_iterator begin() const { return m_Tiles.begin(); }
+        TileMap::const_iterator end() const { return m_Tiles.end(); }
+
+        /// Inclusive bounding box of painted tiles as (minX, minY, maxX, maxY),
+        /// or nullopt when the layer is empty.
+        std::optional<glm::ivec4> GetBounds() const;
 
         nlohmann::json ToJSON() const;
         static TileLayer FromJSON(const nlohmann::json& jsonLayer);
 
     private:
-        void ResizeInternal(uint32_t width, uint32_t height);
-
-    private:
         std::string m_Name = "New Layer";                       // Display name of the layer
-        uint32_t m_Width = 0;                                   // Width in tiles
-        uint32_t m_Height = 0;                                  // Height in tiles
         bool m_Visible = true;                                  // Whether layer is visible in editor/game
         RenderGroup m_RenderGroup = RenderGroup::Background;    // Rendering order group
-        std::vector<Tile> m_Tiles;                              // Flat array of tiles (row-major order)
+        TileMap m_Tiles;                                        // Sparse map of painted tiles by coordinate
     };
 }

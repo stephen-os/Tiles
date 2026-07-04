@@ -27,7 +27,7 @@ namespace Tiles
         /// @return Null if the required layer-stack field is missing.
         static std::shared_ptr<Project> FromJSON(const nlohmann::json& json);
 
-        Project(uint32_t width, uint32_t height, const std::string& name = "Untitled Project");
+        explicit Project(const std::string& name = "Untitled Project");
         ~Project() = default;
 
         const std::string& GetProjectName() const { return m_ProjectName; }

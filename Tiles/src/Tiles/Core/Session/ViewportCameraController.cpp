@@ -8,55 +8,50 @@ namespace Tiles
 {
     ViewportCameraController::ViewportCameraController() {}
 
-    void ViewportCameraController::Initialize(uint32_t gridWidth, uint32_t gridHeight)
+    void ViewportCameraController::Initialize()
     {
-        m_Camera.Center = {
-            Viewport::Render::DefaultTileSize * (static_cast<float>(gridWidth) * 0.5f),
-            Viewport::Render::DefaultTileSize * (static_cast<float>(gridHeight) * 0.5f)
-        };
-
+        m_Camera.Center = { 0.0f, 0.0f };
         m_Camera.Zoom = 1.0f;
     }
 
-    void ViewportCameraController::Center(uint32_t gridWidth, uint32_t gridHeight)
+    void ViewportCameraController::Center()
     {
-        m_Camera.Center = {
-            Viewport::Render::DefaultTileSize * (static_cast<float>(gridWidth) * 0.5f),
-            Viewport::Render::DefaultTileSize * (static_cast<float>(gridHeight) * 0.5f)
-        };
+        m_Camera.Center = { 0.0f, 0.0f };
     }
 
-    void ViewportCameraController::Fit(uint32_t gridWidth, uint32_t gridHeight)
+    void ViewportCameraController::Fit(const std::optional<glm::ivec4>& bounds)
     {
-        const float projectWidth = gridWidth * Viewport::Render::DefaultTileSize;
-        const float projectHeight = gridHeight * Viewport::Render::DefaultTileSize;
+        // With nothing painted there is no content to frame; sit at the origin.
+        if (!bounds)
+        {
+            Initialize();
+            return;
+        }
 
-        Center(gridWidth, gridHeight);
+        const float tileSize = Viewport::Render::DefaultTileSize;
+
+        // A tile at coord (cx, cy) is centered at world (cx * tileSize, cy * tileSize),
+        // so the painted content spans one extra tile in each dimension.
+        const float minX = bounds->x, minY = bounds->y;
+        const float maxX = bounds->z, maxY = bounds->w;
+
+        m_Camera.Center = {
+            (minX + maxX) * 0.5f * tileSize,
+            (minY + maxY) * 0.5f * tileSize
+        };
+
+        const float contentWidth = (maxX - minX + 1.0f) * tileSize;
+        const float contentHeight = (maxY - minY + 1.0f) * tileSize;
 
         // Assumes a nominal viewport size; the 0.9 factor leaves a margin so the
-        // grid does not sit flush against the edges.
+        // content does not sit flush against the edges.
         const float viewportWidth = 800.0f;
         const float viewportHeight = 600.0f;
 
-        const float zoomX = viewportWidth / projectWidth;
-        const float zoomY = viewportHeight / projectHeight;
+        const float zoomX = viewportWidth / contentWidth;
+        const float zoomY = viewportHeight / contentHeight;
         const float fitZoom = std::min(zoomX, zoomY) * 0.9f;
 
-        const float clampedZoom = std::clamp(fitZoom, Viewport::Render::MinZoom, Viewport::Render::MaxZoom);
-        m_Camera.Zoom = clampedZoom;
-    }
-
-    void ViewportCameraController::FollowResize(uint32_t oldWidth, uint32_t oldHeight, uint32_t newWidth, uint32_t newHeight)
-    {
-        const float relativeX = m_Camera.Center.x / (static_cast<float>(oldWidth) * Viewport::Render::DefaultTileSize);
-        const float relativeY = m_Camera.Center.y / (static_cast<float>(oldHeight) * Viewport::Render::DefaultTileSize);
-
-        const float clampedX = std::clamp(relativeX, 0.0f, 1.0f);
-        const float clampedY = std::clamp(relativeY, 0.0f, 1.0f);
-
-        m_Camera.Center = {
-            clampedX * newWidth * Viewport::Render::DefaultTileSize,
-            clampedY * newHeight * Viewport::Render::DefaultTileSize
-        };
+        m_Camera.Zoom = std::clamp(fitZoom, Viewport::Render::MinZoom, Viewport::Render::MaxZoom);
     }
 }

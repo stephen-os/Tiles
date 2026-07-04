@@ -14,42 +14,36 @@ namespace Tiles::Editor
         const std::vector<std::shared_ptr<Tiles::TextureAtlas>>& textureAtlases,
         float baseDepth)
     {
-        for (size_t y = 0; y < layer.GetHeight(); ++y)
+        // The map holds only painted cells, so every entry is drawn. A tile at
+        // signed coord (cx, cy) is centered at world (cx * tileSize, cy * tileSize).
+        for (const auto& [coord, tile] : layer)
         {
-            for (size_t x = 0; x < layer.GetWidth(); ++x)
+            glm::vec2 tileWorldPos = {
+                coord.x * tileSize,
+                coord.y * tileSize
+            };
+
+            glm::vec2 tileSizeMultiplier = tile.GetSize();
+
+            Tiles::QuadParams params;
+            // Nudge each layer's depth so higher layers draw above lower ones.
+            params.Position = { tileWorldPos.x, tileWorldPos.y, baseDepth + layerIndex * 0.01f };
+            params.Rotation = tile.GetRotation();
+            params.Tint = tile.GetTint();
+            params.Size = { tileSize * tileSizeMultiplier.x, tileSize * tileSizeMultiplier.y };
+
+            // Untextured tiles keep the defaults (no texture, full coords).
+            if (tile.IsTextured() && tile.GetAtlasIndex() < textureAtlases.size())
             {
-                const Tile& tile = layer.GetTile(x, y);
-                if (!tile.IsPainted()) continue;
-
-                // The (x + 1, y + 1) offset matches the viewport's one-tile border,
-                // keeping exported output aligned with what the editor shows.
-                glm::vec2 tileWorldPos = {
-                    (x + 1) * tileSize,
-                    (y + 1) * tileSize
-                };
-
-                glm::vec2 tileSizeMultiplier = tile.GetSize();
-
-                Tiles::QuadParams params;
-                // Nudge each layer's depth so higher layers draw above lower ones.
-                params.Position = { tileWorldPos.x, tileWorldPos.y, baseDepth + layerIndex * 0.01f };
-                params.Rotation = tile.GetRotation();
-                params.Tint = tile.GetTint();
-                params.Size = { tileSize * tileSizeMultiplier.x, tileSize * tileSizeMultiplier.y };
-
-                // Untextured tiles keep the defaults (no texture, full coords).
-                if (tile.IsTextured() && tile.GetAtlasIndex() < textureAtlases.size())
+                auto atlas = textureAtlases[tile.GetAtlasIndex()];
+                if (atlas && atlas->HasTexture())
                 {
-                    auto atlas = textureAtlases[tile.GetAtlasIndex()];
-                    if (atlas && atlas->HasTexture())
-                    {
-                        params.Texture = atlas->GetTexture();
-                        params.TexCoords = tile.GetTextureCoords();
-                    }
+                    params.Texture = atlas->GetTexture();
+                    params.TexCoords = tile.GetTextureCoords();
                 }
-
-                Tiles::Renderer2D::DrawQuad(params);
             }
+
+            Tiles::Renderer2D::DrawQuad(params);
         }
     }
 }

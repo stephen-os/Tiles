@@ -85,6 +85,8 @@ namespace Tiles
             static constexpr const char* Visible = "tile_layer_visible";
             static constexpr const char* RenderGroup = "tile_layer_render_group";
             static constexpr const char* Tiles = "tile_layer_tiles";
+            static constexpr const char* TileX = "x";   // sparse tile-entry coordinate
+            static constexpr const char* TileY = "y";
         }
 
         namespace LayerStack

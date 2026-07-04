@@ -10,9 +10,13 @@
 
 namespace Tiles
 {
-    Project::Project(uint32_t width, uint32_t height, const std::string& name) : m_ProjectName(name), m_LayerStack(width, height)
+    Project::Project(const std::string& name) : m_ProjectName(name)
     {
-        TILES_ENGINE_INFO("Project::Project: Creating new project: '{}' with dimensions {}x{}", name, width, height);
+        TILES_ENGINE_INFO("Project::Project: Creating new project: '{}'", name);
+
+        // The board is sparse and unbounded; a fresh project still needs one layer
+        // to paint on.
+        m_LayerStack.AddLayer("Layer 1");
         UpdateLastAccessed();
     }
 
@@ -113,10 +117,10 @@ namespace Tiles
         LayerStack layerStack = LayerStack::FromJSON(json.at(JSON::Project::LayerStack));
         std::string projectName = json.value(JSON::Project::Name, "Loaded Project");
 
-        TILES_ENGINE_INFO("Project::FromJSON: Creating project '{}' with dimensions {}x{}", projectName, layerStack.GetWidth(), layerStack.GetHeight());
+        TILES_ENGINE_INFO("Project::FromJSON: Creating project '{}'", projectName);
 
-        std::shared_ptr<Project> project = std::make_shared<Project>(layerStack.GetWidth(), layerStack.GetHeight(), projectName);
-        project->m_LayerStack = layerStack;
+        std::shared_ptr<Project> project = std::make_shared<Project>(projectName);
+        project->m_LayerStack = std::move(layerStack);
 
         if (json.contains(JSON::Atlas::Array))
         {

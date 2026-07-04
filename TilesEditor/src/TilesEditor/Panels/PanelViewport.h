@@ -27,15 +27,11 @@ namespace Tiles::Editor
         /// accounting for the viewport origin, its centered projection, and zoom.
         glm::vec2 ScreenToWorld() const;
 
-        /// Returns the tile grid cell under the mouse. Cells are 1-based: (1,1) is
-        /// the first tile, matching the one-tile border offset used when drawing.
+        /// Returns the signed tile coord under the mouse, rounding world position to
+        /// the nearest cell center. Any coord (including negative) is paintable.
         glm::ivec2 GetGridPositionUnderMouse() const;
 
-        /// True when gridPos falls within the layer stack's 1-based tile bounds.
-        bool IsValidGridPosition(const glm::ivec2& gridPos) const;
-
         void RenderGrid();
-        void RenderLayerBoundaries();
         void RenderLayers();
         void RenderLayer(const TileLayer& layer, size_t layerIndex);
         void RenderHoverTile();

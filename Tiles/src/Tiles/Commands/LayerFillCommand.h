@@ -1,6 +1,7 @@
 #pragma once
 
 #include <queue>
+#include <algorithm>
 
 #include "Commands/Command.h"
 
@@ -14,7 +15,7 @@ namespace Tiles
     class LayerFillCommand : public Command
     {
     public:
-        LayerFillCommand(size_t x, size_t y, size_t index, const Tile& fillTile)
+        LayerFillCommand(int x, int y, size_t index, const Tile& fillTile)
             : m_X(x), m_Y(y), m_Index(index), m_FillTile(fillTile), m_HasExecuted(false)
         {
         }
@@ -29,7 +30,7 @@ namespace Tiles
                 m_HasExecuted = true;
             }
 
-            const Tile& targetTile = layer.GetTile(m_X, m_Y);
+            const Tile targetTile = layer.GetTile(m_X, m_Y);
             if (targetTile == m_FillTile)
                 return;
 
@@ -51,10 +52,22 @@ namespace Tiles
 
     private:
         /// Breadth-first 4-connected fill: replaces every tile reachable from
-        /// (startX, startY) that equals targetTile with the fill tile.
-        void FloodFill(TileLayer& layer, size_t startX, size_t startY, const Tile& targetTile)
+        /// (startX, startY) that equals targetTile with the fill tile. The board is
+        /// unbounded, so the flood is confined to the layer's painted bounding box
+        /// expanded to include the start cell; this keeps filling an empty region
+        /// finite while still filling enclosed gaps within painted content.
+        void FloodFill(TileLayer& layer, int startX, int startY, const Tile& targetTile)
         {
-            std::queue<std::pair<size_t, size_t>> tileQueue;
+            int minX = startX, minY = startY, maxX = startX, maxY = startY;
+            if (auto bounds = layer.GetBounds())
+            {
+                minX = std::min(minX, bounds->x);
+                minY = std::min(minY, bounds->y);
+                maxX = std::max(maxX, bounds->z);
+                maxY = std::max(maxY, bounds->w);
+            }
+
+            std::queue<std::pair<int, int>> tileQueue;
             tileQueue.push({ startX, startY });
 
             const std::vector<std::pair<int, int>> directions = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
@@ -64,29 +77,24 @@ namespace Tiles
                 auto [x, y] = tileQueue.front();
                 tileQueue.pop();
 
-                if (!layer.IsValidPosition(x, y))
+                if (x < minX || x > maxX || y < minY || y > maxY)
                     continue;
 
-                Tile& tile = layer.GetTile(x, y);
-                if (tile != targetTile)
+                // Already filled cells no longer equal targetTile, ending each branch.
+                if (layer.GetTile(x, y) != targetTile)
                     continue;
 
-                tile = m_FillTile;
+                layer.SetTile(x, y, m_FillTile);
 
                 for (const auto& [dx, dy] : directions)
                 {
-                    int newX = static_cast<int>(x) + dx;
-                    int newY = static_cast<int>(y) + dy;
-
-                    if (newX >= 0 && newY >= 0)
-                    {
-                        tileQueue.push({ static_cast<size_t>(newX), static_cast<size_t>(newY) });
-                    }
+                    tileQueue.push({ x + dx, y + dy });
                 }
             }
         }
 
-        size_t m_X, m_Y, m_Index;
+        int m_X, m_Y;
+        size_t m_Index;
         Tile m_FillTile;
         TileLayer m_PreviousLayer;
         bool m_HasExecuted;

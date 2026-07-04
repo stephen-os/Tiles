@@ -17,26 +17,23 @@ namespace Tiles
                 ValidateWorkingLayer();
             });
 
-        const auto& layerStack = m_ProjectSession.GetProject()->GetLayerStack();
-        m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
+        m_CameraController.Initialize();
     }
 
     void Context::ResetViewportCamera()
     {
-        const auto& layerStack = m_ProjectSession.GetProject()->GetLayerStack();
-        m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
+        m_CameraController.Initialize();
     }
 
     void Context::FitViewportCameraToProject()
     {
         const auto& layerStack = m_ProjectSession.GetProject()->GetLayerStack();
-        m_CameraController.Fit(layerStack.GetWidth(), layerStack.GetHeight());
+        m_CameraController.Fit(layerStack.GetBounds());
     }
 
     void Context::CenterViewportCameraOnProject()
     {
-        const auto& layerStack = m_ProjectSession.GetProject()->GetLayerStack();
-        m_CameraController.Center(layerStack.GetWidth(), layerStack.GetHeight());
+        m_CameraController.Center();
     }
 
     void Context::SetWorkingLayer(size_t index)
@@ -60,13 +57,13 @@ namespace Tiles
         return m_ProjectSession.GetProject()->GetLayerStack().GetLayer(m_EditingState.GetWorkingLayer());
     }
 
-    void Context::PaintTile(size_t x, size_t y)
+    void Context::PaintTile(int x, int y)
     {
         if (HasWorkingLayer())
             PaintTileOnLayer(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush());
     }
 
-    void Context::PaintTileOnLayer(size_t layerIndex, size_t x, size_t y, const Tile& tile)
+    void Context::PaintTileOnLayer(size_t layerIndex, int x, int y, const Tile& tile)
     {
         if (!m_ProjectSession.GetProject()->GetLayerStack().IsValidLayerIndex(layerIndex))
             return;
@@ -74,13 +71,13 @@ namespace Tiles
         ExecuteCommand(m_EditingState.BuildModeCommand(layerIndex, x, y, tile));
     }
 
-    void Context::EraseTile(size_t x, size_t y)
+    void Context::EraseTile(int x, int y)
     {
         if (HasWorkingLayer())
             ExecuteCommand(m_EditingState.BuildEraseCommand(m_EditingState.GetWorkingLayer(), x, y));
     }
 
-    void Context::FillLayer(size_t x, size_t y)
+    void Context::FillLayer(int x, int y)
     {
         if (HasWorkingLayer())
             ExecuteCommand(m_EditingState.BuildFillCommand(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush()));
@@ -109,14 +106,13 @@ namespace Tiles
         m_EditingState.ValidateWorkingLayer(m_ProjectSession.GetProject()->GetLayerStack());
     }
 
-    void Context::CreateProject(const std::string& name, uint32_t width, uint32_t height)
+    void Context::CreateProject(const std::string& name)
     {
         m_CommandDispatcher.Clear();
-        m_ProjectSession.Create(name, width, height);
+        m_ProjectSession.Create(name);
         m_EditingState.Reset();
 
-        const auto& layerStack = m_ProjectSession.GetProject()->GetLayerStack();
-        m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
+        m_CameraController.Initialize();
     }
 
     ProjectResult Context::SaveProject()
@@ -140,23 +136,8 @@ namespace Tiles
         m_EditingState.Reset();
         ValidateWorkingLayer();
 
-        const auto& layerStack = m_ProjectSession.GetProject()->GetLayerStack();
-        m_CameraController.Initialize(layerStack.GetWidth(), layerStack.GetHeight());
+        m_CameraController.Initialize();
 
         return result;
-    }
-
-    void Context::ResizeProject(uint32_t width, uint32_t height)
-    {
-        if (!m_ProjectSession.HasProject())
-            return;
-
-        const uint32_t oldWidth = m_ProjectSession.GetProject()->GetLayerStack().GetWidth();
-        const uint32_t oldHeight = m_ProjectSession.GetProject()->GetLayerStack().GetHeight();
-
-        m_ProjectSession.Resize(width, height);
-        ValidateWorkingLayer();
-
-        m_CameraController.FollowResize(oldWidth, oldHeight, width, height);
     }
 }

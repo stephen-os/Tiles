@@ -4,7 +4,7 @@
 namespace Tiles
 {
     ProjectSession::ProjectSession()
-        : m_Project(std::make_shared<Project>(16, 16, "Untitled"))
+        : m_Project(std::make_shared<Project>("Untitled"))
     {
         m_Project->UpdateLastAccessed();
     }
@@ -21,9 +21,9 @@ namespace Tiles
         return name;
     }
 
-    void ProjectSession::Create(const std::string& name, uint32_t width, uint32_t height)
+    void ProjectSession::Create(const std::string& name)
     {
-        m_Project = std::make_shared<Project>(width, height, name);
+        m_Project = std::make_shared<Project>(name);
         m_Project->UpdateLastAccessed();
     }
 
@@ -96,15 +96,5 @@ namespace Tiles
 
         TILES_ENGINE_INFO("ProjectSession::Load: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
         return result;
-    }
-
-    void ProjectSession::Resize(uint32_t width, uint32_t height)
-    {
-        if (!m_Project)
-            return;
-
-        m_Project->GetLayerStack().Resize(width, height);
-        m_Project->MarkAsModified();
-        m_Project->UpdateLastAccessed();
     }
 }

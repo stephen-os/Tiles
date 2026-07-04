@@ -44,11 +44,6 @@ namespace Tiles::Editor
             ShowNewProjectDialog();
         }
 
-        if (m_ShowResizeProjectDialog)
-        {
-            ShowResizeProjectDialog();
-        }
-
         if (m_ShowAboutDialog)
         {
             ShowAboutDialog();
@@ -289,20 +284,6 @@ namespace Tiles::Editor
         {
             bool hasProject = m_Context && m_Context->HasProject();
 
-            if (ImGui::MenuItem("Resize Project", nullptr, false, hasProject))
-            {
-                if (hasProject)
-                {
-                    // Initialize resize dialog with current dimensions
-                    const auto& layerStack = m_Context->GetProject()->GetLayerStack();
-                    m_ResizeWidth = layerStack.GetWidth();
-                    m_ResizeHeight = layerStack.GetHeight();
-                    m_ShowResizeProjectDialog = true;
-                }
-            }
-
-            ImGui::Separator();
-
             if (ImGui::BeginMenu("Project Info", hasProject))
             {
                 if (hasProject)
@@ -311,7 +292,6 @@ namespace Tiles::Editor
                     const auto& layerStack = project->GetLayerStack();
 
                     ImGui::Text("Name: %s", project->GetProjectName().c_str());
-                    ImGui::Text("Dimensions: %dx%d", layerStack.GetWidth(), layerStack.GetHeight());
                     ImGui::Text("Layers: %zu", layerStack.GetLayerCount());
                     ImGui::Text("Atlases: %zu", project->GetTextureAtlasCount());
 
@@ -382,22 +362,7 @@ namespace Tiles::Editor
         if (!m_Context)
             return;
 
-        m_Context->CreateProject(
-            std::string(m_NewProjectName),
-            static_cast<uint32_t>(m_NewProjectWidth),
-            static_cast<uint32_t>(m_NewProjectHeight)
-        );
-    }
-
-    void PanelMenuBar::ResizeCurrentProject()
-    {
-        if (!m_Context || !m_Context->HasProject())
-            return;
-
-        m_Context->ResizeProject(
-            static_cast<uint32_t>(m_ResizeWidth),
-            static_cast<uint32_t>(m_ResizeHeight)
-        );
+        m_Context->CreateProject(std::string(m_NewProjectName));
     }
 
     void PanelMenuBar::ShowNewProjectDialog()
@@ -416,19 +381,6 @@ namespace Tiles::Editor
             ImGui::InputText("##ProjectName", m_NewProjectName, sizeof(m_NewProjectName));
 
             ImGui::Spacing();
-
-            ImGui::Text("Dimensions:");
-            ImGui::SetNextItemWidth(UI::Component::InputWidth);
-            ImGui::InputInt("Width##NewProject", &m_NewProjectWidth);
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(UI::Component::InputWidth);
-            ImGui::InputInt("Height##NewProject", &m_NewProjectHeight);
-
-            // Clamp values
-            m_NewProjectWidth = std::max(1, std::min(1024, m_NewProjectWidth));
-            m_NewProjectHeight = std::max(1, std::min(1024, m_NewProjectHeight));
-
-            ImGui::Spacing();
             ImGui::Separator();
 
             float buttonWidth = 80.0f;
@@ -445,53 +397,6 @@ namespace Tiles::Editor
             if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
             {
                 m_ShowNewProjectDialog = false;
-            }
-        }
-        ImGui::End();
-    }
-
-    void PanelMenuBar::ShowResizeProjectDialog()
-    {
-        ImGui::SetNextWindowSize(ImVec2(350, 150), ImGuiCond_FirstUseEver);
-        ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-        if (ImGui::Begin("Resize Project", &m_ShowResizeProjectDialog,
-            ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize))
-        {
-            ImGui::Text("Resize the current project");
-            ImGui::Separator();
-
-            ImGui::Text("New Dimensions:");
-            ImGui::SetNextItemWidth(UI::Component::InputWidth);
-            ImGui::InputInt("Width##ResizeProject", &m_ResizeWidth);
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(UI::Component::InputWidth);
-            ImGui::InputInt("Height##ResizeProject", &m_ResizeHeight);
-
-            // Clamp values
-            m_ResizeWidth = std::max(1, std::min(1024, m_ResizeWidth));
-            m_ResizeHeight = std::max(1, std::min(1024, m_ResizeHeight));
-
-            ImGui::Spacing();
-            ImGui::TextColored(UI::Color::TextHint, "Warning: This may remove tiles outside new bounds");
-
-            ImGui::Spacing();
-            ImGui::Separator();
-
-            float buttonWidth = 80.0f;
-            float spacing = ImGui::GetContentRegionAvail().x - (buttonWidth * 2 + UI::Component::SpaceBetween);
-
-            if (ImGui::Button("Resize", ImVec2(buttonWidth, 0)))
-            {
-                ResizeCurrentProject();
-                m_ShowResizeProjectDialog = false;
-            }
-
-            ImGui::SameLine(0, spacing);
-
-            if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
-            {
-                m_ShowResizeProjectDialog = false;
             }
         }
         ImGui::End();

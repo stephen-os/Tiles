@@ -26,8 +26,8 @@ namespace Tiles
         /// Project name, suffixed with "(Unsaved)" while it has no file path.
         std::string GetDisplayName() const;
 
-        /// Replaces the project with a fresh one of the given size.
-        void Create(const std::string& name, uint32_t width, uint32_t height);
+        /// Replaces the project with a fresh, empty one.
+        void Create(const std::string& name);
         /// Serializes to the project's existing file path.
         ProjectResult Save();
         /// Serializes to path and adopts it as the project's file path.
@@ -35,8 +35,6 @@ namespace Tiles
         /// Loads path into the active project, recording it in the history.
         /// A missing file is dropped from the history and reported as a failure.
         ProjectResult Load(const std::filesystem::path& path);
-        /// Resizes the grid and marks the project modified.
-        void Resize(uint32_t width, uint32_t height);
 
         size_t GetRecentCount() const { return m_History.GetCount(); }
         bool HasRecent() const { return !m_History.IsEmpty(); }

@@ -10,14 +10,14 @@ namespace Tiles
     class TileEraseCommand : public Command
     {
     public:
-        TileEraseCommand(size_t x, size_t y, size_t index)
+        TileEraseCommand(int x, int y, size_t index)
             : m_X(x), m_Y(y), m_Index(index), m_HasExecuted(false)
         {
         }
 
         virtual void Execute(LayerStack& layerStack) override
         {
-            Tile& currentTile = layerStack.GetTile(m_X, m_Y, m_Index);
+            const Tile& currentTile = layerStack.GetTile(m_X, m_Y, m_Index);
 
             if (!m_HasExecuted)
             {
@@ -29,13 +29,13 @@ namespace Tiles
             if (currentTile == emptyTile)
                 return;
 
-            currentTile.Reset();
+            // An unpainted tile clears the sparse cell.
+            layerStack.SetTile(m_X, m_Y, m_Index, Tile());
         }
 
         virtual void Undo(LayerStack& layerStack) override
         {
-            Tile& currentTile = layerStack.GetTile(m_X, m_Y, m_Index);
-            currentTile = m_PreviousTile;
+            layerStack.SetTile(m_X, m_Y, m_Index, m_PreviousTile);
         }
 
         virtual bool Validate(const Command& other) const override
@@ -47,7 +47,8 @@ namespace Tiles
         }
 
     private:
-        size_t m_X, m_Y, m_Index;
+        int m_X, m_Y;
+        size_t m_Index;
         Tile m_PreviousTile;
         bool m_HasExecuted;
     };
