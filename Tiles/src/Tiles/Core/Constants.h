@@ -105,7 +105,8 @@ namespace Tiles
         namespace Atlas
         {
             static constexpr const char* Array = "atlas_array";
-			static constexpr const char* Path = "atlas_path";
+			static constexpr const char* Path = "atlas_path";       // legacy: external image path
+			static constexpr const char* Image = "atlas_image";     // v2: embedded image entry name
 			static constexpr const char* Width = "atlas_width";
 			static constexpr const char* Height = "atlas_height";
         }
