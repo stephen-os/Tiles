@@ -58,6 +58,10 @@ namespace Tiles
 		int GetComponentCount() const;
 		const std::string& GetPath() const { return m_Path; }
 
+		/// Reads the texture back from the GPU as tightly-packed RGBA8 pixels
+		/// (width*height*4 bytes), so an atlas can be embedded in a saved project.
+		std::vector<uint8_t> ReadPixels() const;
+
 		bool IsCubemap() const { return m_IsCubemap; }
 
 	private:

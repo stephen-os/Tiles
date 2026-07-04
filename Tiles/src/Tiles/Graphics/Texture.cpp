@@ -46,6 +46,14 @@ namespace Tiles
 		return texture;
 	}
 
+	std::vector<uint8_t> Texture::ReadPixels() const
+	{
+		std::vector<uint8_t> pixels(static_cast<size_t>(m_Width) * m_Height * 4);
+		GLCALL(glGetTextureImage(m_BufferID, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			static_cast<GLsizei>(pixels.size()), pixels.data()));
+		return pixels;
+	}
+
 	std::shared_ptr<Texture> Texture::CreateCubemap(const std::vector<std::string>& faces)
 	{
 		if (faces.size() != 6)

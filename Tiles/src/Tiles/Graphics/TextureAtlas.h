@@ -16,14 +16,19 @@ namespace Tiles
 	public:
 		static std::shared_ptr<TextureAtlas> Create(std::string& source, int width, int height);
 		static std::shared_ptr<TextureAtlas> Create(int width, int height);
+		/// Builds an atlas over an already-created texture (e.g. one decoded from
+		/// an embedded image on load).
+		static std::shared_ptr<TextureAtlas> Create(std::shared_ptr<Texture> texture, int width, int height);
 
 
 		TextureAtlas(int width, int height);
 		TextureAtlas(std::string& source, int width, int height);
+		TextureAtlas(std::shared_ptr<Texture> texture, int width, int height);
 		~TextureAtlas() = default;
 
 		void Resize(int width, int height);
 		void SetTexture(const std::string& source);
+		void SetTexture(std::shared_ptr<Texture> texture);
 
 		int GetWidth() const { return m_GridWidth; }
 		int GetHeight() const { return m_GridHeight; }

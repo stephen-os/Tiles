@@ -14,6 +14,11 @@ namespace Tiles
 		return std::make_shared<TextureAtlas>(width, height);
 	}
 
+	std::shared_ptr<TextureAtlas> TextureAtlas::Create(std::shared_ptr<Texture> texture, int width, int height)
+	{
+		return std::make_shared<TextureAtlas>(std::move(texture), width, height);
+	}
+
 	TextureAtlas::TextureAtlas(int width, int height)
 	{
 		Resize(width, height);
@@ -22,6 +27,12 @@ namespace Tiles
 	TextureAtlas::TextureAtlas(std::string& source, int width, int height)
 	{
 		SetTexture(source);
+		Resize(width, height);
+	}
+
+	TextureAtlas::TextureAtlas(std::shared_ptr<Texture> texture, int width, int height)
+	{
+		SetTexture(std::move(texture));
 		Resize(width, height);
 	}
 
@@ -57,6 +68,12 @@ namespace Tiles
 		m_Texture = Texture::Create(source);
 
 		m_HasTexture = true;
+	}
+
+	void TextureAtlas::SetTexture(std::shared_ptr<Texture> texture)
+	{
+		m_Texture = std::move(texture);
+		m_HasTexture = (m_Texture != nullptr);
 	}
 
 	void TextureAtlas::RemoveTexture()
