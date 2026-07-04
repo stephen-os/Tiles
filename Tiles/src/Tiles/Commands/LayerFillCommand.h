@@ -58,19 +58,29 @@ namespace Tiles
         /// finite while still filling enclosed gaps within painted content.
         void FloodFill(TileLayer& layer, int startX, int startY, const Tile& targetTile)
         {
-            int minX = startX, minY = startY, maxX = startX, maxY = startY;
-            if (auto bounds = layer.GetBounds())
+            // Bound the flood to the layer's painted extent. A click on empty
+            // space outside that extent (or on an empty layer) fills only the
+            // clicked cell, so a fill can never run away across the unbounded
+            // board -- the safety net for an infinite canvas.
+            auto bounds = layer.GetBounds();
+            if (!bounds
+                || startX < bounds->x || startX > bounds->z
+                || startY < bounds->y || startY > bounds->w)
             {
-                minX = std::min(minX, bounds->x);
-                minY = std::min(minY, bounds->y);
-                maxX = std::max(maxX, bounds->z);
-                maxY = std::max(maxY, bounds->w);
+                layer.SetTile(startX, startY, m_FillTile);
+                return;
             }
+
+            const int minX = bounds->x, minY = bounds->y, maxX = bounds->z, maxY = bounds->w;
 
             std::queue<std::pair<int, int>> tileQueue;
             tileQueue.push({ startX, startY });
 
-            const std::vector<std::pair<int, int>> directions = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
+            const std::pair<int, int> directions[] = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
+
+            // Backstop against a pathologically large (sparse) bounding box.
+            size_t filled = 0;
+            constexpr size_t MaxFillCells = 1'000'000;
 
             while (!tileQueue.empty())
             {
@@ -85,11 +95,11 @@ namespace Tiles
                     continue;
 
                 layer.SetTile(x, y, m_FillTile);
+                if (++filled >= MaxFillCells)
+                    break;
 
                 for (const auto& [dx, dy] : directions)
-                {
                     tileQueue.push({ x + dx, y + dy });
-                }
             }
         }
 
