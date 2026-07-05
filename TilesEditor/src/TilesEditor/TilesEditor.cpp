@@ -1,5 +1,8 @@
 #include "Tiles.h"
 
+#include "Core/Event.h"
+#include "Core/Log.h"
+
 #include "EntryPoint.h"
 
 #include "Panels/PanelManager.h"
@@ -54,10 +57,98 @@ public:
 
 	void OnEvent(Tiles::Event& event) override
 	{
-
+		Tiles::EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<Tiles::KeyPressedEvent>([this](Tiles::KeyPressedEvent& e) { return OnKeyPressed(e); });
+		dispatcher.Dispatch<Tiles::MouseButtonPressedEvent>([this](Tiles::MouseButtonPressedEvent& e) { return OnMouseButtonPressed(e); });
+		dispatcher.Dispatch<Tiles::MouseScrolledEvent>([this](Tiles::MouseScrolledEvent& e) { return OnMouseScrolled(e); });
 	}
 
 private:
+	// SCAFFOLD: mirrors the keybinds the editor currently drives via Input polling
+	// (viewport) and ImGui shortcuts (menu bar). Each case only logs its intent for
+	// now; the real actions get wired here once popups/commands are made agnostic to
+	// the panel they live in. NOTE: KeyPressedEvent carries no modifier state yet, so
+	// the Ctrl-combos can't be told apart from the bare keys until modifiers are added
+	// to the event -- both intents are documented per key.
+	bool OnKeyPressed(Tiles::KeyPressedEvent& e)
+	{
+		switch (e.GetKey())
+		{
+		// Ctrl+N -> create a new project
+		case Tiles::KeyCode::N:
+			TILES_INFO("[Event] Key N -> New Project (Ctrl+N)");
+			break;
+		// Ctrl+O -> open an existing project
+		case Tiles::KeyCode::O:
+			TILES_INFO("[Event] Key O -> Open Project (Ctrl+O)");
+			break;
+		// Ctrl+E -> open the Export (Render Matrix) popup;  E -> zoom the viewport out
+		case Tiles::KeyCode::E:
+			TILES_INFO("[Event] Key E -> Export (Ctrl+E) / zoom out (viewport)");
+			break;
+		// Ctrl+S -> save the project (Save As when it is new)
+		case Tiles::KeyCode::S:
+			TILES_INFO("[Event] Key S -> Save (Ctrl+S) / pan camera down (viewport)");
+			break;
+		// Ctrl+Z -> undo;  Ctrl+Shift+Z -> redo
+		case Tiles::KeyCode::Z:
+			TILES_INFO("[Event] Key Z -> Undo (Ctrl+Z) / Redo (Ctrl+Shift+Z)");
+			break;
+		// Ctrl+Y -> redo
+		case Tiles::KeyCode::Y:
+			TILES_INFO("[Event] Key Y -> Redo (Ctrl+Y)");
+			break;
+		// W -> pan the viewport camera up
+		case Tiles::KeyCode::W:
+			TILES_INFO("[Event] Key W -> pan camera up (viewport)");
+			break;
+		// A -> pan the viewport camera left
+		case Tiles::KeyCode::A:
+			TILES_INFO("[Event] Key A -> pan camera left (viewport)");
+			break;
+		// D -> pan the viewport camera right
+		case Tiles::KeyCode::D:
+			TILES_INFO("[Event] Key D -> pan camera right (viewport)");
+			break;
+		// Q -> zoom the viewport camera in
+		case Tiles::KeyCode::Q:
+			TILES_INFO("[Event] Key Q -> zoom in (viewport)");
+			break;
+		default:
+			break;
+		}
+		return false;   // scaffold: never consumes the event
+	}
+
+	bool OnMouseButtonPressed(Tiles::MouseButtonPressedEvent& e)
+	{
+		switch (e.GetButton())
+		{
+		// Left click -> paint the active tool (brush / eraser / fill) at the hovered cell
+		case Tiles::MouseCode::Left:
+			TILES_INFO("[Event] Mouse Left -> paint action (brush/erase/fill)");
+			break;
+		// Middle button -> begin a camera pan drag in the viewport
+		case Tiles::MouseCode::Middle:
+			TILES_INFO("[Event] Mouse Middle -> begin camera pan (viewport)");
+			break;
+		// Right button -> continue the camera pan while a drag is active
+		case Tiles::MouseCode::Right:
+			TILES_INFO("[Event] Mouse Right -> pan camera while dragging (viewport)");
+			break;
+		default:
+			break;
+		}
+		return false;   // scaffold: never consumes the event
+	}
+
+	bool OnMouseScrolled(Tiles::MouseScrolledEvent& e)
+	{
+		// Mouse wheel -> zoom the viewport camera
+		TILES_INFO("[Event] Mouse wheel {} -> zoom camera (viewport)", e.GetYOffset());
+		return false;   // scaffold: never consumes the event
+	}
+
 	Tiles::Editor::PanelManager m_PanelManager;
 };
 
