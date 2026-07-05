@@ -110,6 +110,16 @@ namespace Tiles
 			static constexpr const char* Width = "atlas_width";
 			static constexpr const char* Height = "atlas_height";
         }
+
+        namespace Region
+        {
+            static constexpr const char* Object = "export_region";
+            static constexpr const char* X = "x";
+            static constexpr const char* Y = "y";
+            static constexpr const char* Width = "width";
+            static constexpr const char* Height = "height";
+            static constexpr const char* Enabled = "enabled";
+        }
     }
 
     namespace File

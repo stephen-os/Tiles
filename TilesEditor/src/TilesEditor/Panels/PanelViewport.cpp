@@ -47,6 +47,7 @@ namespace Tiles::Editor
         RenderGrid();
         RenderLayers();
         RenderOrigin();
+        RenderExportRegion();
         RenderHoverTile();
 
         Tiles::Renderer2D::EndFrame();
@@ -77,6 +78,11 @@ namespace Tiles::Editor
 
     void PanelViewport::HandleCameraMovement()
     {
+        // A held modifier means a menu shortcut (e.g. Ctrl+E to export), not
+        // camera input -- don't pan/zoom underneath it.
+        if (ImGui::GetIO().KeyCtrl || ImGui::GetIO().KeyAlt || ImGui::GetIO().KeySuper)
+            return;
+
         Camera2D& camera = m_Context->GetViewportCamera();
 
         if (Input::IsKeyPressed(KeyCode::W))
@@ -170,6 +176,36 @@ namespace Tiles::Editor
         line.Start = { 0.0f, camera.Center.y - halfHeight, Viewport::Depth::Outline };
         line.End = { 0.0f, camera.Center.y + halfHeight, Viewport::Depth::Outline };
         Tiles::Renderer2D::DrawLine(line);
+    }
+
+    void PanelViewport::RenderExportRegion()
+    {
+        const ExportRegion& region = m_Context->GetProject()->GetExportRegion();
+        if (!region.Enabled)
+            return;
+
+        // Region covers tiles [Min, Min+Size); a tile at (cx,cy) fills cell
+        // [cx, cx+1], so the rectangle spans Min*tileSize to (Min+Size)*tileSize.
+        float x0 = region.Min.x * m_TileSize;
+        float y0 = region.Min.y * m_TileSize;
+        float x1 = (region.Min.x + region.Size.x) * m_TileSize;
+        float y1 = (region.Min.y + region.Size.y) * m_TileSize;
+
+        Tiles::LineParams line;
+        line.Color = { 0.2f, 0.8f, 1.0f, 1.0f };   // cyan, distinct from the red origin axes
+        line.Thickness = 2.0f;
+
+        auto edge = [&](float ax, float ay, float bx, float by)
+        {
+            line.Start = { ax, ay, Viewport::Depth::Outline };
+            line.End = { bx, by, Viewport::Depth::Outline };
+            Tiles::Renderer2D::DrawLine(line);
+        };
+
+        edge(x0, y0, x1, y0);
+        edge(x1, y0, x1, y1);
+        edge(x1, y1, x0, y1);
+        edge(x0, y1, x0, y0);
     }
 
     void PanelViewport::RenderOverlay()

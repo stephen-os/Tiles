@@ -271,7 +271,40 @@ namespace Tiles::Editor
         ImGui::SameLine();
         ImGui::Checkbox("Invisible", &m_ExportInvisible);
 
-        ImGui::Checkbox("Use Project Bounds", &m_UseProjectBounds);
+        // --- Export region ---
+        ImGui::Spacing();
+        if (m_Context && m_Context->HasProject())
+        {
+            Tiles::ExportRegion& region = m_Context->GetProject()->GetExportRegion();
+            ImGui::Checkbox("Use Export Region", &region.Enabled);
+
+            if (region.Enabled)
+            {
+                int position[2] = { region.Min.x, region.Min.y };
+                int size[2] = { region.Size.x, region.Size.y };
+
+                ImGui::SetNextItemWidth(160.0f);
+                if (ImGui::InputInt2("Position (tiles)", position))
+                    region.Min = { position[0], position[1] };
+
+                ImGui::SetNextItemWidth(160.0f);
+                if (ImGui::InputInt2("Size (tiles)", size))
+                    region.Size = { std::max(1, size[0]), std::max(1, size[1]) };
+
+                if (ImGui::Button("Fit to Content"))
+                {
+                    if (auto bounds = m_Context->GetProject()->GetLayerStack().GetBounds())
+                    {
+                        region.Min = { bounds->x, bounds->y };
+                        region.Size = { bounds->z - bounds->x + 1, bounds->w - bounds->y + 1 };
+                    }
+                }
+            }
+            else
+            {
+                ImGui::TextDisabled("Export uses the painted content's bounds.");
+            }
+        }
     }
 
     void PopupRenderMatrix::RenderActionButtons()
@@ -509,18 +542,30 @@ namespace Tiles::Editor
         if (layerIndices.empty() || !m_Context || !m_Context->HasProject())
             return;
 
-        const auto& layerStack = m_Context->GetProject()->GetLayerStack();
+        const auto& project = *m_Context->GetProject();
+        const auto& layerStack = project.GetLayerStack();
 
         const float tileSize = Viewport::Render::DefaultTileSize;
 
-        // Frame the export on the painted content's bounding box; nothing painted
-        // means there is nothing to export.
-        auto bounds = layerStack.GetBounds();
-        if (!bounds)
-            return;
-
-        const int minX = bounds->x, minY = bounds->y;
-        const int maxX = bounds->z, maxY = bounds->w;
+        // Frame the export on the user's export region when enabled; otherwise on
+        // the painted content's bounding box (nothing painted -> nothing to export).
+        int minX, minY, maxX, maxY;
+        const Tiles::ExportRegion& region = project.GetExportRegion();
+        if (region.Enabled)
+        {
+            minX = region.Min.x;
+            minY = region.Min.y;
+            maxX = region.Min.x + region.Size.x - 1;
+            maxY = region.Min.y + region.Size.y - 1;
+        }
+        else
+        {
+            auto bounds = layerStack.GetBounds();
+            if (!bounds)
+                return;
+            minX = bounds->x; minY = bounds->y;
+            maxX = bounds->z; maxY = bounds->w;
+        }
 
         uint32_t width = static_cast<uint32_t>((maxX - minX + 1) * tileSize);
         uint32_t height = static_cast<uint32_t>((maxY - minY + 1) * tileSize);

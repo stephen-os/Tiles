@@ -87,6 +87,15 @@ namespace Tiles
         manifest[JSON::Project::Name] = project.GetProjectName();
         manifest[JSON::Project::LayerStack] = project.GetLayerStack().ToJSON();
 
+        const ExportRegion& region = project.GetExportRegion();
+        manifest[JSON::Region::Object] = {
+            { JSON::Region::X, region.Min.x },
+            { JSON::Region::Y, region.Min.y },
+            { JSON::Region::Width, region.Size.x },
+            { JSON::Region::Height, region.Size.y },
+            { JSON::Region::Enabled, region.Enabled },
+        };
+
         nlohmann::json atlasArray = nlohmann::json::array();
         const auto& atlases = project.GetTextureAtlases();
         for (size_t i = 0; i < atlases.size(); ++i)
@@ -199,6 +208,15 @@ namespace Tiles
             std::string name = manifest.value(JSON::Project::Name, "Untitled Project");
             project = std::make_shared<Project>(name);
             project->GetLayerStack() = LayerStack::FromJSON(manifest.at(JSON::Project::LayerStack));
+
+            if (manifest.contains(JSON::Region::Object))
+            {
+                const auto& regionJson = manifest[JSON::Region::Object];
+                ExportRegion& region = project->GetExportRegion();
+                region.Min = { regionJson.value(JSON::Region::X, 0), regionJson.value(JSON::Region::Y, 0) };
+                region.Size = { regionJson.value(JSON::Region::Width, 16), regionJson.value(JSON::Region::Height, 16) };
+                region.Enabled = regionJson.value(JSON::Region::Enabled, false);
+            }
 
             if (manifest.contains(JSON::Atlas::Array))
             {

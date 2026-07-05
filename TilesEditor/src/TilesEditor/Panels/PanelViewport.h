@@ -34,6 +34,8 @@ namespace Tiles::Editor
         void RenderGrid();
         /// Draws red X/Y axes through the world origin, spanning the visible view.
         void RenderOrigin();
+        /// Draws the project's export-region rectangle when it is enabled.
+        void RenderExportRegion();
         void RenderLayers();
         void RenderLayer(const TileLayer& layer, size_t layerIndex);
         void RenderHoverTile();

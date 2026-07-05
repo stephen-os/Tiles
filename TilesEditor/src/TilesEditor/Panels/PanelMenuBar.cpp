@@ -114,7 +114,12 @@ namespace Tiles::Editor
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_O, false))
             {
-				m_PopupOpenProject.Toggle(); 
+				m_PopupOpenProject.Toggle();
+            }
+            else if (ImGui::IsKeyPressed(ImGuiKey_E, false))
+            {
+                if (m_Context->HasProject())
+                    m_PopupRenderMatrix.Show();
             }
             else if (ImGui::IsKeyPressed(ImGuiKey_S, false))
             {

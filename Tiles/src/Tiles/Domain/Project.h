@@ -17,6 +17,16 @@
 
 namespace Tiles
 {
+    /// A user-defined rectangular export region in tile coordinates. When enabled
+    /// it defines what the exporter renders, and is drawn as a guide in the
+    /// viewport; otherwise export falls back to the painted content's bounds.
+    struct ExportRegion
+    {
+        glm::ivec2 Min{ 0, 0 };       // bottom-left tile (inclusive)
+        glm::ivec2 Size{ 16, 16 };    // size in tiles
+        bool Enabled = false;
+    };
+
     /// A document: the layer stack, its texture atlases, and file/dirty
     /// bookkeeping. A project with no file path is considered "new" (unsaved).
     class Project
@@ -51,6 +61,9 @@ namespace Tiles
         LayerStack& GetLayerStack() { return m_LayerStack; }
         const LayerStack& GetLayerStack() const { return m_LayerStack; }
 
+        ExportRegion& GetExportRegion() { return m_ExportRegion; }
+        const ExportRegion& GetExportRegion() const { return m_ExportRegion; }
+
         void AddTextureAtlas(std::shared_ptr<Tiles::TextureAtlas> atlas);
         std::shared_ptr<Tiles::TextureAtlas> GetTextureAtlas(size_t index);
         void RemoveTextureAtlas(size_t index);
@@ -65,5 +78,6 @@ namespace Tiles
         bool m_HasUnsavedChanges = false;                                       // Flag indicating unsaved modifications exist
         std::vector<std::shared_ptr<Tiles::TextureAtlas>> m_TextureAtlases;                // Collection of texture atlases for sprites/tiles
         LayerStack m_LayerStack;                                                // Stack of tile layers containing the actual tile data
+        ExportRegion m_ExportRegion;                                            // User-defined export/canvas region (tile space)
     };
 }
