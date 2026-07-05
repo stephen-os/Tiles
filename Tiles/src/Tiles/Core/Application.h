@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 
-#include <GLFW/glfw3.h>
+#include "Window.h"
 
 #include "Layer.h"
 #include "ApplicationSettings.h"
@@ -43,8 +43,8 @@ namespace Tiles
 		/// Gets the instance of this application
 		static Application& GetInstance();
 
-		/// Gets the window handle of this application
-		GLFWwindow* GetWindowHandle() const { return m_Window; };
+		/// Gets the native window handle of this application
+		GLFWwindow* GetWindowHandle() const { return m_Window ? m_Window->GetNativeWindow() : nullptr; };
 
 	protected:
 		/// Client side create
@@ -68,8 +68,8 @@ namespace Tiles
 		/// fullscreen) and writes it to the settings file for the next run.
 		void SaveSettings();
 
-	private: 
-		GLFWwindow* m_Window = nullptr;						/// Window 
+	private:
+		std::unique_ptr<Window> m_Window;					/// Owns the OS window + GL context
 		bool m_Running = true;
 		std::vector<std::shared_ptr<Layer>> m_LayerStack;
 		ApplicationSettings m_Settings;

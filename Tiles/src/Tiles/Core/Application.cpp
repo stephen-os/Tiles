@@ -1,4 +1,5 @@
 #include <glad/gl.h>
+#include <GLFW/glfw3.h>
 
 #include "Application.h"
 
@@ -34,13 +35,6 @@ namespace Tiles
     /// Static accessor
     Application& Application::GetInstance() { return *s_Instance; }
 
-    /// GLFW error callback
-    /// TODO: This should be in a window abstraction. 
-    static void GLFWErrorCallback(int error, const char* description)
-    {
-        TILES_ENGINE_ERROR("[GLFW ERROR] {}: {}", error, description);
-    }
-
     /// Constructor
     Application::Application(const ApplicationSettings& settings)
     {
@@ -54,53 +48,20 @@ namespace Tiles
         // first run (no file yet) leaves the defaults in place.
         ApplicationSettingsSerializer::Load(SETTINGS_FILE, m_Settings);
 
-        glfwSetErrorCallback(GLFWErrorCallback);
+        // The Window owns GLFW init, the OS window, its icon, and the OpenGL
+        // context the app renders into. It is created hidden and shown after setup.
+        WindowSpec spec;
+        spec.Title = m_Settings.Name;
+        spec.Width = m_Settings.Width;
+        spec.Height = m_Settings.Height;
+        spec.IconPath = m_Settings.Icon;
+        spec.VSync = true;
 
-        if (!glfwInit())
+        m_Window = std::make_unique<Window>(spec);
+        if (!m_Window->GetNativeWindow())
         {
-            TILES_ENGINE_ERROR("GLFW failed to initialize.");
+            TILES_ENGINE_ERROR("Failed to create the application window.");
             return;
-        }
-
-        // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-
-        m_Window = glfwCreateWindow(m_Settings.Width, m_Settings.Height, m_Settings.Name.c_str(), NULL, NULL);
-        if (!m_Window)
-        {
-            TILES_ENGINE_ERROR("Failed to create GLFW window.");
-            glfwTerminate();
-            return;
-        }
-
-        glfwMakeContextCurrent(m_Window);
-        glfwSwapInterval(1);
-
-        // Custom GLFW functions not available in standard GLFW
-        // glfwSetWindowTitleBarColor(m_Window, 45, 45, 45);
-        // glfwSetWindowTitleBarTextColor(m_Window, 255, 153, 51);
-
-        // A missing or undecodable icon is non-fatal: log it and fall back to the
-        // window system's default icon (nothing set).
-        if (!m_Settings.Icon.empty())
-        {
-            if (!std::filesystem::exists(m_Settings.Icon))
-            {
-                TILES_ENGINE_WARN("Application: Window icon '{}' not found; using the default.", m_Settings.Icon);
-            }
-            else
-            {
-                GLFWimage icon;
-                icon.pixels = stbi_load(m_Settings.Icon.c_str(), &icon.width, &icon.height, 0, 4);
-                if (icon.pixels)
-                {
-                    glfwSetWindowIcon(m_Window, 1, &icon);
-                    stbi_image_free(icon.pixels);
-                }
-                else
-                {
-                    TILES_ENGINE_WARN("Application: Failed to decode window icon '{}'; using the default.", m_Settings.Icon);
-                }
-            }
         }
 
         int status = gladLoadGL((GLADloadfunc)glfwGetProcAddress);
@@ -129,25 +90,22 @@ namespace Tiles
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-        ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
+        ImGui_ImplGlfw_InitForOpenGL(m_Window->GetNativeWindow(), true);
         const char* glsl_version = "#version 130";
         ImGui_ImplOpenGL3_Init(glsl_version);
 
         // Restore the windowed position before maximizing/fullscreening, so the
         // window returns here when the user later un-maximizes.
-        glfwSetWindowPos(m_Window, m_Settings.PositionX, m_Settings.PositionY);
+        m_Window->SetPosition(m_Settings.PositionX, m_Settings.PositionY);
 
-		// Maximize Window
         if (m_Settings.Maximized)
-        {
-            glfwMaximizeWindow(m_Window);
-        }
+            m_Window->Maximize();
 
-        // Fullscreen
         if (m_Settings.Fullscreen)
-        {
-            SetWindowFullscreen();
-        }
+            m_Window->SetFullscreen(true);
+
+        // Created hidden; reveal it now that GL and ImGui are initialized.
+        m_Window->Show();
     }
 
     /// Application destructor
@@ -168,10 +126,10 @@ namespace Tiles
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
 
-            glfwDestroyWindow(m_Window);
+            m_Window.reset();
         }
 
-        glfwTerminate();
+        Window::TerminateGLFW();
 
         TILES_LOGGER_SHUTDOWN();
     }
@@ -196,13 +154,13 @@ namespace Tiles
     /// Application run loop
     void Application::Run()
     {
-        if (!m_Window)
+        if (!m_Window || !m_Window->GetNativeWindow())
         {
             TILES_ENGINE_ERROR("Application::Run: Window was not created; aborting run loop.");
             return;
         }
 
-        while (!glfwWindowShouldClose(m_Window) && m_Running)
+        while (!m_Window->ShouldClose() && m_Running)
         {
             m_TimeStep = m_FrameTimer.Elapsed();
             m_FrameTimer.Reset();
@@ -210,7 +168,7 @@ namespace Tiles
             for (auto& layer : m_LayerStack)
                 layer->OnUpdate(m_TimeStep);
 
-            glfwPollEvents();
+            m_Window->Update();
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
@@ -276,32 +234,15 @@ namespace Tiles
             }
 
             if (!main_is_minimized)
-                glfwSwapBuffers(m_Window);
+                m_Window->SwapBuffers();
         }
     }
 
-    /// Sets the window to fullscreen
+    /// Applies the current Fullscreen setting to the window.
     void Application::SetWindowFullscreen()
     {
-        if (m_Settings.Fullscreen)
-        {
-            glfwGetWindowPos(m_Window, &m_Settings.PositionX, &m_Settings.PositionY);
-            glfwGetWindowSize(m_Window, (int*)&m_Settings.Width, (int*)&m_Settings.Height);
-
-            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-            TILES_ASSERT(monitor, "Failed to get primary monitor.");
-            if (!monitor) return;
-
-            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-            TILES_ASSERT(mode, "Failed to get monitor video mode.");
-
-            glfwSetWindowMonitor(m_Window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-        }
-        else
-        {
-            glfwSetWindowMonitor(m_Window, nullptr, m_Settings.PositionX, m_Settings.PositionY,
-                m_Settings.Width, m_Settings.Height, 0);
-        }
+        if (m_Window)
+            m_Window->SetFullscreen(m_Settings.Fullscreen);
     }
 
     /// Saves the application settings
@@ -311,18 +252,15 @@ namespace Tiles
     {
         if (m_Window)
         {
-            m_Settings.Maximized = glfwGetWindowAttrib(m_Window, GLFW_MAXIMIZED) == GLFW_TRUE;
+            m_Settings.Maximized = m_Window->IsMaximized();
 
             // Persist the floating geometry, not the maximized/fullscreen size, so
             // the window restores to where it last was in windowed mode.
             if (!m_Settings.Maximized && !m_Settings.Fullscreen)
             {
-                glfwGetWindowPos(m_Window, &m_Settings.PositionX, &m_Settings.PositionY);
-
-                int width = 0, height = 0;
-                glfwGetWindowSize(m_Window, &width, &height);
-                m_Settings.Width = static_cast<uint32_t>(width);
-                m_Settings.Height = static_cast<uint32_t>(height);
+                m_Window->GetPosition(m_Settings.PositionX, m_Settings.PositionY);
+                m_Settings.Width = m_Window->GetWidth();
+                m_Settings.Height = m_Window->GetHeight();
             }
         }
 

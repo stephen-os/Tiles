@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Tiles
 {
 	typedef enum class KeyCode : uint16_t
