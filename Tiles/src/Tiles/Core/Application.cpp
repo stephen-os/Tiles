@@ -94,6 +94,9 @@ namespace Tiles
         const char* glsl_version = "#version 130";
         ImGui_ImplOpenGL3_Init(glsl_version);
 
+        // Route OS window/input events through the application to the layers.
+        m_Window->SetEventCallback([this](Event& e) { OnEvent(e); });
+
         // Restore the windowed position before maximizing/fullscreening, so the
         // window returns here when the user later un-maximizes.
         m_Window->SetPosition(m_Settings.PositionX, m_Settings.PositionY);
@@ -235,6 +238,26 @@ namespace Tiles
 
             if (!main_is_minimized)
                 m_Window->SwapBuffers();
+        }
+    }
+
+    /// Dispatches an event from the window to the app and its layers.
+    void Application::OnEvent(Event& event)
+    {
+        EventDispatcher dispatcher(event);
+        dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent&)
+        {
+            m_Running = false;
+            return true;
+        });
+
+        // Deliver top-down; a layer that marks the event handled stops it from
+        // reaching layers beneath.
+        for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+        {
+            if (event.IsHandled())
+                break;
+            (*it)->OnEvent(event);
         }
     }
 

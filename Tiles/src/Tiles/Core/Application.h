@@ -64,6 +64,10 @@ namespace Tiles
 		}
 
 	private:
+		/// Receives window/input events from the Window and dispatches them to
+		/// layers (top-down, stopping once an event is marked handled).
+		void OnEvent(Event& event);
+
 		/// Captures the current window geometry (size/position/maximized/
 		/// fullscreen) and writes it to the settings file for the next run.
 		void SaveSettings();

@@ -52,7 +52,7 @@ public:
 		m_PanelManager.Render();
 	}
 
-	void OnEvent() override
+	void OnEvent(Tiles::Event& event) override
 	{
 
 	}
