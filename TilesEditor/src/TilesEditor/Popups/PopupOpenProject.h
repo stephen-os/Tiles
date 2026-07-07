@@ -5,13 +5,13 @@
 
 namespace Tiles::Editor
 {
-    /// Open-Project dialog: browse to or type a .tiles file, validate that it
-    /// exists and has the right extension, then load it via Context::LoadProject.
-    /// Shows an inline status message and auto-closes shortly after a successful open.
+    // Open-Project dialog: browse to or type a .tiles file, validate that it
+    // exists and has the right extension, then load it via Context::LoadProject.
+    // Shows an inline status message and auto-closes shortly after a successful open.
     class PopupOpenProject : public Popup
     {
     public:
-        PopupOpenProject(std::shared_ptr<Context> context);
+        PopupOpenProject(EditorHost& host);
         ~PopupOpenProject() = default;
 
     protected:

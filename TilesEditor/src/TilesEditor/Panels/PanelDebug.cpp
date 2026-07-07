@@ -5,8 +5,8 @@
 
 namespace Tiles::Editor
 {
-    PanelDebug::PanelDebug(std::shared_ptr<Context> context)
-        : Panel(context), m_LastUpdateTime(std::chrono::steady_clock::now())
+    PanelDebug::PanelDebug(EditorHost& host)
+        : Panel(host), m_LastUpdateTime(std::chrono::steady_clock::now())
     {
     }
 
@@ -22,15 +22,8 @@ namespace Tiles::Editor
     {
         auto renderStart = std::chrono::steady_clock::now();
 
-        if (!ImGui::Begin("Debug Panel"))
+        if (!ImGui::Begin("Debug Panel", OpenFlag()))
         {
-            ImGui::End();
-            return;
-        }
-
-        if (!m_Context)
-        {
-            ImGui::Text("No Context Available");
             ImGui::End();
             return;
         }
@@ -86,14 +79,13 @@ namespace Tiles::Editor
 
     void PanelDebug::RenderContextInfo()
     {
-        ImGui::Text("Context Address: %p", m_Context.get());
-        ImGui::Text("Context Valid: %s", m_Context ? "Yes" : "No");
-        ImGui::Text("Is Dirty: %s", m_Context->IsDirty() ? "Yes" : "No");
+        ImGui::Text("Context Address: %p", (void*)&Ctx());
+        ImGui::Text("Is Dirty: %s", Ctx().IsDirty() ? "Yes" : "No");
     }
 
     void PanelDebug::RenderProjectInfo()
     {
-        const auto& project = m_Context->GetProject();
+        const auto& project = Ctx().GetProject();
 
         ImGui::Text("Project Name: %s", project->GetProjectName().c_str());
         ImGui::Text("File Path: %s", project->GetFilePath().string().c_str());
@@ -106,7 +98,7 @@ namespace Tiles::Editor
 
     void PanelDebug::RenderLayerStackInfo()
     {
-        const auto& layerStack = m_Context->GetProject()->GetLayerStack();
+        const auto& layerStack = Ctx().GetProject()->GetLayerStack();
 
         ImGui::Text("Layer Count: %zu", layerStack.GetLayerCount());
         ImGui::Text("Is Empty: %s", layerStack.IsEmpty() ? "Yes" : "No");
@@ -140,12 +132,12 @@ namespace Tiles::Editor
 
     void PanelDebug::RenderWorkingLayerInfo()
     {
-        ImGui::Text("Working Layer Index: %zu", m_Context->GetWorkingLayer());
-        ImGui::Text("Has Working Layer: %s", m_Context->HasWorkingLayer() ? "Yes" : "No");
+        ImGui::Text("Working Layer Index: %zu", Ctx().GetWorkingLayer());
+        ImGui::Text("Has Working Layer: %s", Ctx().HasWorkingLayer() ? "Yes" : "No");
 
-        if (m_Context->HasWorkingLayer())
+        if (Ctx().HasWorkingLayer())
         {
-            const auto& workingLayer = m_Context->GetWorkingLayerRef();
+            const auto& workingLayer = Ctx().GetWorkingLayerRef();
             ImGui::Separator();
             ImGui::Text("Working Layer Details:");
             ImGui::Text("  Name: %s", workingLayer.GetName().c_str());
@@ -160,9 +152,9 @@ namespace Tiles::Editor
 
     void PanelDebug::RenderPaintingInfo()
     {
-        ImGui::Text("Painting Mode: %s", GetPaintingModeString(m_Context->GetPaintingMode()));
+        ImGui::Text("Painting Mode: %s", GetPaintingModeString(Ctx().GetPaintingMode()));
 
-        const auto& brush = m_Context->GetBrush();
+        const auto& brush = Ctx().GetBrush();
         ImGui::Separator();
         ImGui::Text("Brush Information:");
         ImGui::Text("  Is Painted: %s", brush.IsPainted() ? "Yes" : "No");
@@ -186,18 +178,18 @@ namespace Tiles::Editor
 
     void PanelDebug::RenderCommandHistoryInfo()
     {
-        ImGui::Text("Can Undo: %s", m_Context->CanUndo() ? "Yes" : "No");
-        ImGui::Text("Can Redo: %s", m_Context->CanRedo() ? "Yes" : "No");
+        ImGui::Text("Can Undo: %s", Ctx().CanUndo() ? "Yes" : "No");
+        ImGui::Text("Can Redo: %s", Ctx().CanRedo() ? "Yes" : "No");
 
         if (ImGui::Button("Clear History"))
         {
-            m_Context->ClearHistory();
+            Ctx().ClearHistory();
         }
     }
 
     void PanelDebug::RenderTextureAtlasInfo()
     {
-        const auto& project = m_Context->GetProject();
+        const auto& project = Ctx().GetProject();
         ImGui::Text("Atlas Count: %zu", project->GetTextureAtlasCount());
 
         if (project->GetTextureAtlasCount() > 0)
@@ -228,7 +220,7 @@ namespace Tiles::Editor
         ImGui::Separator();
         ImGui::Text("Memory Usage (approximate):");
 
-        const auto& project = m_Context->GetProject();
+        const auto& project = Ctx().GetProject();
         const auto& layerStack = project->GetLayerStack();
 
         size_t totalTiles = 0;

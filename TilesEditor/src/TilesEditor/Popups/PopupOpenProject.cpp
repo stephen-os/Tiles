@@ -7,7 +7,7 @@
 
 namespace Tiles::Editor
 {
-    PopupOpenProject::PopupOpenProject(std::shared_ptr<Context> context) : Popup(context) {}
+    PopupOpenProject::PopupOpenProject(EditorHost& host) : Popup(host) {}
 
     void PopupOpenProject::OnRender()
     {
@@ -194,15 +194,6 @@ namespace Tiles::Editor
 
     void PopupOpenProject::ExecuteOpen()
     {
-        if (!m_Context)
-        {
-            m_Message = "No context available!";
-            m_ShowMessage = true;
-            m_MessageTimer = 0.0f;
-            m_ProjectOpenedSuccessfully = false;
-            return;
-        }
-
         if (!m_FilePathValid || m_FileNameBuffer[0] == '\0')
         {
             m_Message = "No valid file selected!";
@@ -212,7 +203,7 @@ namespace Tiles::Editor
             return;
         }
 
-        auto result = m_Context->LoadProject(GetFullFilePath());
+        auto result = Ctx().LoadProject(GetFullFilePath());
 
         m_Message = result.Message;
         m_ShowMessage = true;

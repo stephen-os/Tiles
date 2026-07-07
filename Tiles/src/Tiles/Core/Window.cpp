@@ -381,18 +381,6 @@ namespace Tiles
 		return glfwGetWindowAttrib(m_Window, GLFW_ICONIFIED) == GLFW_TRUE;
 	}
 
-	bool Window::IsKeyPressed(Input::KeyCode key) const
-	{
-		int state = glfwGetKey(m_Window, static_cast<int>(key));
-		return state == GLFW_PRESS || state == GLFW_REPEAT;
-	}
-
-	bool Window::IsMouseButtonPressed(Input::MouseCode button) const
-	{
-		int state = glfwGetMouseButton(m_Window, static_cast<int>(button));
-		return state == GLFW_PRESS;
-	}
-
 	void Window::SetIcon(const std::string& iconPath)
 	{
 		int width, height, channels;

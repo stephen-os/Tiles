@@ -7,13 +7,13 @@
 
 namespace Tiles::Editor
 {
-    /// Editor for the current brush's rotation, size, and tint. Controls read and
-    /// write the Context's brush directly, with drag fields, preset buttons, and a
-    /// colour picker; changes take effect immediately (no undo step).
+    // Editor for the current brush's rotation, size, and tint. Controls read and
+    // write the Context's brush directly, with drag fields, preset buttons, and a
+    // colour picker; changes take effect immediately (no undo step).
     class PanelBrushAttributes : public Panel
     {
     public:
-        PanelBrushAttributes(std::shared_ptr<Context> context) : Panel(context) {}
+        PanelBrushAttributes(EditorHost& host) : Panel(host) {}
         ~PanelBrushAttributes() = default;
 
         void Render() override;

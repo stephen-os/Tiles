@@ -8,14 +8,7 @@ namespace Tiles::Editor
 {
     void PanelBrushAttributes::Render()
     {
-        ImGui::Begin("Brush Attributes", nullptr, ImGuiWindowFlags_NoScrollWithMouse);
-
-        if (!m_Context)
-        {
-            ImGui::TextColored(UI::Color::TextError, "No project loaded");
-            ImGui::End();
-            return;
-        }
+        ImGui::Begin("Brush Attributes", OpenFlag(), ImGuiWindowFlags_NoScrollWithMouse);
 
         RenderBlockBrushAttributes();
 
@@ -44,7 +37,7 @@ namespace Tiles::Editor
 
     void PanelBrushAttributes::RenderSectionRotation()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
         auto rotation = brush.GetRotation();
 
         RenderComponentTitle("Rotation");
@@ -95,7 +88,7 @@ namespace Tiles::Editor
 
     void PanelBrushAttributes::RenderSectionSize()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
         auto size = brush.GetSize();
 
         RenderComponentTitle("Size");
@@ -146,7 +139,7 @@ namespace Tiles::Editor
 
     void PanelBrushAttributes::RenderSectionTint()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
         auto& tint = brush.GetTint();
 
         RenderComponentTitle("Tint");
@@ -199,7 +192,7 @@ namespace Tiles::Editor
 
     void PanelBrushAttributes::RenderSectionReset()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
 
         RenderComponentTitle("Reset");
 

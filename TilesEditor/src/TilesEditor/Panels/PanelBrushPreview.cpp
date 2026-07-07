@@ -6,21 +6,14 @@
 
 namespace Tiles::Editor
 {
-    PanelBrushPreview::PanelBrushPreview(std::shared_ptr<Context> context) : Panel(context)
+    PanelBrushPreview::PanelBrushPreview(EditorHost& host) : Panel(host)
     {
         m_PreviewRenderTarget = Tiles::RenderTarget::Create(512, 512);
     }
 
     void PanelBrushPreview::Render()
     {
-        ImGui::Begin("Brush Preview", nullptr, ImGuiWindowFlags_MenuBar);
-
-        if (!m_Context)
-        {
-            ImGui::TextColored(UI::Color::TextError, "No project loaded");
-            ImGui::End();
-            return;
-        }
+        ImGui::Begin("Brush Preview", OpenFlag(), ImGuiWindowFlags_MenuBar);
 
         // Menu bar controls
         if (ImGui::BeginMenuBar())
@@ -113,7 +106,7 @@ namespace Tiles::Editor
         }
 
         // Render brush
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
 
         Tiles::QuadParams brushQuad;
         brushQuad.Position = { 0.0f, 0.0f, Render2D::Depth::Brush };
@@ -124,7 +117,7 @@ namespace Tiles::Editor
 
         if (brush.IsTextured() && brush.HasValidAtlas())
         {
-            brushQuad.Texture = m_Context->GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
+            brushQuad.Texture = Ctx().GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
         }
 
         Tiles::Renderer2D::DrawQuad(brushQuad);
@@ -202,7 +195,7 @@ namespace Tiles::Editor
 
     void PanelBrushPreview::RenderSectionRotation()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
         auto rotation = brush.GetRotation();
 
         RenderComponentTitle("Rotation");
@@ -211,7 +204,7 @@ namespace Tiles::Editor
 
     void PanelBrushPreview::RenderSectionSize()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
         auto size = brush.GetSize();
 
         RenderComponentTitle("Size");
@@ -220,7 +213,7 @@ namespace Tiles::Editor
 
     void PanelBrushPreview::RenderSectionTint()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
         auto tint = brush.GetTint();
 
         RenderComponentTitle("Tint");
@@ -230,7 +223,7 @@ namespace Tiles::Editor
 
     void PanelBrushPreview::RenderSectionUVs()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
         auto uvs = brush.GetTextureCoords();
 
         RenderComponentTitle("UVs");
@@ -239,7 +232,7 @@ namespace Tiles::Editor
 
     void PanelBrushPreview::RenderSectionAtlas()
     {
-        auto& brush = m_Context->GetBrush();
+        auto& brush = Ctx().GetBrush();
 
         if (brush.IsTextured())
         {

@@ -8,7 +8,7 @@
 
 namespace Tiles::Editor
 {
-    PopupSaveAs::PopupSaveAs(std::shared_ptr<Context> context) : Popup(context) {}
+    PopupSaveAs::PopupSaveAs(EditorHost& host) : Popup(host) {}
 
     void PopupSaveAs::OnRender()
     {
@@ -30,7 +30,7 @@ namespace Tiles::Editor
 
         if (ImGui::Begin("Save Project As", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
         {
-            if (!m_Context || !m_Context->HasProject())
+            if (!Ctx().HasProject())
             {
                 ImGui::Text("No project to save!");
                 ImGui::End();
@@ -107,10 +107,10 @@ namespace Tiles::Editor
 
     void PopupSaveAs::InitializeFromCurrentProject()
     {
-        if (!m_Context || !m_Context->HasProject())
+        if (!Ctx().HasProject())
             return;
 
-        auto project = m_Context->GetProject();
+        auto project = Ctx().GetProject();
         std::string projectName = project->GetProjectName();
 
         size_t extensionPos = projectName.find_last_of('.');
@@ -187,7 +187,7 @@ namespace Tiles::Editor
         if (ImGui::Button("Save", ImVec2(buttonWidth, 0)) && canSave)
         {
             std::filesystem::path fullPath = GetFullFilePath();
-            auto result = m_Context->SaveProjectAs(fullPath);
+            auto result = Ctx().SaveProjectAs(fullPath);
 
             m_SaveMessage = result.Message;
             m_ShowMessage = true;

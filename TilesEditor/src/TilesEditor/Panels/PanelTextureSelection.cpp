@@ -7,21 +7,14 @@
 
 namespace Tiles::Editor
 {
-    PanelTextureSelection::PanelTextureSelection(std::shared_ptr<Context> context) : Panel(context)
+    PanelTextureSelection::PanelTextureSelection(EditorHost& host) : Panel(host)
     {
         m_CheckerboardTexture = Tiles::Texture::Create(AssetPath::Checkerboard);
     }
 
     void PanelTextureSelection::Render()
     {
-        ImGui::Begin("Texture Selection");
-
-        if (!m_Context)
-        {
-            ImGui::TextColored(UI::Color::TextHint, "No active project");
-            ImGui::End();
-            return;
-        }
+        ImGui::Begin("Texture Selection", OpenFlag());
 
         ImGui::PushID("TextureSelection");
 
@@ -43,7 +36,7 @@ namespace Tiles::Editor
 
     void PanelTextureSelection::RenderBlockAtlasTabs()
     {
-        auto& atlases = m_Context->GetProject()->GetTextureAtlases();
+        auto& atlases = Ctx().GetProject()->GetTextureAtlases();
 
         if (atlases.empty())
         {
@@ -110,7 +103,7 @@ namespace Tiles::Editor
 
     void PanelTextureSelection::RenderSectionAtlasPath()
     {
-        auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
 
         ImGui::AlignTextToFramePadding();
         ImGui::Text("Atlas:");
@@ -136,7 +129,7 @@ namespace Tiles::Editor
             if (ImGui::Button("Remove"))
             {
                 atlas->RemoveTexture();
-                m_Context->GetProject()->MarkAsModified();
+                Ctx().GetProject()->MarkAsModified();
             }
         }
     }
@@ -150,7 +143,7 @@ namespace Tiles::Editor
 
     void PanelTextureSelection::RenderSectionAtlasDimensions()
     {
-        auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
 
         ImGui::Text("Atlas Dimensions");
         ImGui::PushItemWidth(UI::Component::InputWidth);
@@ -160,7 +153,7 @@ namespace Tiles::Editor
         if (width != atlas->GetWidth())
         {
             atlas->Resize(std::max(1, width), atlas->GetHeight());
-            m_Context->GetProject()->MarkAsModified();
+            Ctx().GetProject()->MarkAsModified();
         }
 
         int height = atlas->GetHeight();
@@ -168,7 +161,7 @@ namespace Tiles::Editor
         if (height != atlas->GetHeight())
         {
             atlas->Resize(atlas->GetWidth(), std::max(1, height));
-            m_Context->GetProject()->MarkAsModified();
+            Ctx().GetProject()->MarkAsModified();
         }
 
         ImGui::PopItemWidth();
@@ -182,7 +175,7 @@ namespace Tiles::Editor
 
     void PanelTextureSelection::RenderSectionTextureGrid()
     {
-        auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
 
         // Set up grid styling for seamless tiles
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -227,7 +220,7 @@ namespace Tiles::Editor
 
     void PanelTextureSelection::RenderComponentTextureGridItem(const char* id, int index, int x, int y, size_t atlasIndex, float tileSize)
     {
-        auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
 
         ImVec2 buttonSize(tileSize, tileSize);
 
@@ -266,8 +259,8 @@ namespace Tiles::Editor
 
     void PanelTextureSelection::RenderComponentSelectionBorder(const char* id, int index, size_t atlasIndex, float tileSize)
     {
-        auto atlas = m_Context->GetProject()->GetTextureAtlas(atlasIndex);
-        auto& brush = m_Context->GetBrush();
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
+        auto& brush = Ctx().GetBrush();
 
         ImVec2 itemMin = ImGui::GetItemRectMin();
         ImVec2 itemMax = ImGui::GetItemRectMax();
@@ -333,20 +326,20 @@ namespace Tiles::Editor
     {
         if (std::filesystem::exists(newPath))
         {
-            auto atlas = m_Context->GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
+            auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
             if (atlas)
             {
                 std::filesystem::path relativePath = std::filesystem::relative(newPath, std::filesystem::current_path());
                 atlas->SetTexture(relativePath.string());
-                m_Context->GetProject()->MarkAsModified();
+                Ctx().GetProject()->MarkAsModified();
             }
         }
     }
 
     void PanelTextureSelection::HandleTextureSelection(int index, size_t atlasIndex)
     {
-        auto atlas = m_Context->GetProject()->GetTextureAtlas(atlasIndex);
-        auto& brush = m_Context->GetBrush();
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
+        auto& brush = Ctx().GetBrush();
         glm::vec4 texCoords = atlas->GetTextureCoords(index);
 
         // Check if this texture is already selected
@@ -360,7 +353,7 @@ namespace Tiles::Editor
             Tile newBrush = brush;
             newBrush.SetTextured(false);
             newBrush.SetAtlasIndex(Tile::INVALID_ATLAS_INDEX);
-            m_Context->SetBrush(newBrush);
+            Ctx().SetBrush(newBrush);
         }
         else
         {
@@ -369,10 +362,10 @@ namespace Tiles::Editor
             newBrush.SetTextured(true);
             newBrush.SetAtlasIndex(atlasIndex);
             newBrush.SetTextureCoords(texCoords);
-            m_Context->SetBrush(newBrush);
+            Ctx().SetBrush(newBrush);
         }
 
-        m_Context->GetProject()->MarkAsModified();
+        Ctx().GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::OpenFileDialog()
@@ -402,20 +395,20 @@ namespace Tiles::Editor
     void PanelTextureSelection::AddNewAtlas()
     {
         auto newAtlas = Tiles::TextureAtlas::Create(TextureConstants::Atlas::DefaultWidth, TextureConstants::Atlas::DefaultHeight);
-        m_Context->GetProject()->AddTextureAtlas(newAtlas);
-        SetCurrentAtlasIndex(m_Context->GetProject()->GetTextureAtlasCount() - 1);
-        m_Context->GetProject()->MarkAsModified();
+        Ctx().GetProject()->AddTextureAtlas(newAtlas);
+        SetCurrentAtlasIndex(Ctx().GetProject()->GetTextureAtlasCount() - 1);
+        Ctx().GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::RemoveCurrentAtlas()
     {
-        auto& atlases = m_Context->GetProject()->GetTextureAtlases();
+        auto& atlases = Ctx().GetProject()->GetTextureAtlases();
         if (atlases.empty())
         {
             return;
         }
 
-        m_Context->GetProject()->RemoveTextureAtlas(m_CurrentAtlasIndex);
+        Ctx().GetProject()->RemoveTextureAtlas(m_CurrentAtlasIndex);
 
         // Adjust current index if necessary
         if (m_CurrentAtlasIndex >= atlases.size() && !atlases.empty())
@@ -427,12 +420,12 @@ namespace Tiles::Editor
             m_CurrentAtlasIndex = 0;
         }
 
-        m_Context->GetProject()->MarkAsModified();
+        Ctx().GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::SetCurrentAtlasIndex(size_t index)
     {
-        auto& atlases = m_Context->GetProject()->GetTextureAtlases();
+        auto& atlases = Ctx().GetProject()->GetTextureAtlases();
         if (index < atlases.size())
         {
             m_CurrentAtlasIndex = index;
@@ -441,7 +434,7 @@ namespace Tiles::Editor
 
     bool PanelTextureSelection::HasValidCurrentAtlas() const
     {
-        auto& atlases = m_Context->GetProject()->GetTextureAtlases();
+        auto& atlases = Ctx().GetProject()->GetTextureAtlases();
         return m_CurrentAtlasIndex < atlases.size();
     }
 }

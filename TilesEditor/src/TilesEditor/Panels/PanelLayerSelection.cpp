@@ -16,14 +16,7 @@ namespace Tiles::Editor
 {
     void PanelLayerSelection::Render()
     {
-        ImGui::Begin("Layer Selection");
-
-        if (!m_Context)
-        {
-            ImGui::TextColored(UI::Color::TextHint, "No active project->");
-            ImGui::End();
-            return;
-        }
+        ImGui::Begin("Layer Selection", OpenFlag());
 
         ImGui::PushID("LayerSelection");
 
@@ -44,7 +37,7 @@ namespace Tiles::Editor
 
     void PanelLayerSelection::RenderBlockProjectInfo()
     {
-        auto project = m_Context->GetProject();
+        auto project = Ctx().GetProject();
 
         // Section title
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
@@ -78,7 +71,7 @@ namespace Tiles::Editor
 
         if (ImGui::InputText(inputId.c_str(), buffer, sizeof(buffer)))
         {
-            m_Context->GetProject()->SetProjectName(std::string(buffer));
+            Ctx().GetProject()->SetProjectName(std::string(buffer));
         }
 
         ImGui::PopStyleColor(4);
@@ -87,7 +80,7 @@ namespace Tiles::Editor
 
     void PanelLayerSelection::RenderBlockLayerList()
     {
-        LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
+        LayerStack& layerStack = Ctx().GetProject()->GetLayerStack();
 
         // Section title
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
@@ -121,7 +114,7 @@ namespace Tiles::Editor
     void PanelLayerSelection::RenderComponentLayerItem(const char* id, size_t layerIndex, LayerStack& layerStack)
     {
         TileLayer& layer = layerStack.GetLayer(layerIndex);
-        bool isSelected = (layerIndex == m_Context->GetWorkingLayer());
+        bool isSelected = (layerIndex == Ctx().GetWorkingLayer());
 
         ImGui::PushID(id);
 
@@ -138,7 +131,7 @@ namespace Tiles::Editor
         if (ImGui::Checkbox("##Visible", &isVisible))
         {
             layer.SetVisibility(isVisible);
-            m_Context->GetProject()->MarkAsModified();
+            Ctx().GetProject()->MarkAsModified();
         }
 
         ImGui::PopStyleColor(5);
@@ -165,7 +158,7 @@ namespace Tiles::Editor
 
         if (ImGui::Selectable(layer.GetName().c_str(), isSelected))
         {
-            m_Context->SetWorkingLayer(layerIndex);
+            Ctx().SetWorkingLayer(layerIndex);
         }
 
         ImGui::PopStyleColor(4);
@@ -208,14 +201,14 @@ namespace Tiles::Editor
             ImGui::TableNextColumn();
             if (ImGui::Button("Move Up", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
             {
-                auto command = std::make_unique<LayerMoveUpCommand>(m_Context->GetWorkingLayer());
+                auto command = std::make_unique<LayerMoveUpCommand>(Ctx().GetWorkingLayer());
                 ExecuteLayerCommand(std::move(command));
             }
 
             ImGui::TableNextColumn();
             if (ImGui::Button("Move Down", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
             {
-                auto command = std::make_unique<LayerMoveDownCommand>(m_Context->GetWorkingLayer());
+                auto command = std::make_unique<LayerMoveDownCommand>(Ctx().GetWorkingLayer());
                 ExecuteLayerCommand(std::move(command));
             }
 
@@ -238,7 +231,7 @@ namespace Tiles::Editor
 
         // Deleting the final layer would leave the project with no layers, so
         // the Delete button stays disabled until at least two exist.
-        size_t layerCount = m_Context ? m_Context->GetProject()->GetLayerStack().GetLayerCount() : 0;
+        size_t layerCount = Ctx().GetProject()->GetLayerStack().GetLayerCount();
         bool canDeleteLayer = hasWorkingLayer && layerCount > 1;
 
         // Style for buttons
@@ -270,7 +263,7 @@ namespace Tiles::Editor
             ImGui::BeginDisabled(!canDeleteLayer);
             if (ImGui::Button("Delete Layer", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
             {
-                auto command = std::make_unique<LayerDeleteCommand>(m_Context->GetWorkingLayer());
+                auto command = std::make_unique<LayerDeleteCommand>(Ctx().GetWorkingLayer());
                 ExecuteLayerCommand(std::move(command));
             }
             ImGui::EndDisabled();
@@ -279,7 +272,7 @@ namespace Tiles::Editor
             ImGui::BeginDisabled(!hasLayers || !hasWorkingLayer);
             if (ImGui::Button("Clear Layer", ImVec2(ImGui::GetContentRegionAvail().x, UI::Component::ButtonHeight)))
             {
-                auto command = std::make_unique<LayerClearCommand>(m_Context->GetWorkingLayer());
+                auto command = std::make_unique<LayerClearCommand>(Ctx().GetWorkingLayer());
                 ExecuteLayerCommand(std::move(command));
             }
             ImGui::EndDisabled();
@@ -298,8 +291,8 @@ namespace Tiles::Editor
             return;
         }
 
-        LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
-        TileLayer& layer = layerStack.GetLayer(m_Context->GetWorkingLayer());
+        LayerStack& layerStack = Ctx().GetProject()->GetLayerStack();
+        TileLayer& layer = layerStack.GetLayer(Ctx().GetWorkingLayer());
 
         ImGui::Separator();
 
@@ -360,10 +353,10 @@ namespace Tiles::Editor
 
             if (ImGui::InputText(inputId.c_str(), buffer, sizeof(buffer)))
             {
-                LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
-                TileLayer& layer = layerStack.GetLayer(m_Context->GetWorkingLayer());
+                LayerStack& layerStack = Ctx().GetProject()->GetLayerStack();
+                TileLayer& layer = layerStack.GetLayer(Ctx().GetWorkingLayer());
                 layer.SetName(std::string(buffer));
-                m_Context->GetProject()->MarkAsModified();
+                Ctx().GetProject()->MarkAsModified();
             }
 
             ImGui::PopStyleColor(4);
@@ -490,7 +483,7 @@ namespace Tiles::Editor
                 if (layer.GetRenderGroup() != newGroup)
                 {
                     layer.SetRenderGroup(newGroup);
-                    m_Context->GetProject()->MarkAsModified();
+                    Ctx().GetProject()->MarkAsModified();
                 }
             }
 
@@ -505,19 +498,19 @@ namespace Tiles::Editor
 
     void PanelLayerSelection::ExecuteLayerCommand(std::unique_ptr<Command> command)
     {
-        if (command && m_Context)
+        if (command)
         {
-            m_Context->ExecuteCommand(std::move(command));
+            Ctx().ExecuteCommand(std::move(command));
         }
     }
 
     bool PanelLayerSelection::HasWorkingLayer() const
     {
-        return m_Context && m_Context->HasWorkingLayer();
+        return Ctx().HasWorkingLayer();
     }
 
     bool PanelLayerSelection::HasLayers() const
     {
-        return m_Context && !m_Context->GetProject()->GetLayerStack().IsEmpty();
+        return !Ctx().GetProject()->GetLayerStack().IsEmpty();
     }
 }

@@ -10,8 +10,8 @@
 
 namespace Tiles::Editor
 {
-    PanelViewport::PanelViewport(std::shared_ptr<Context> context)
-        : Panel(context), m_TileSize(Viewport::Render::DefaultTileSize)
+    PanelViewport::PanelViewport(EditorHost& host)
+        : Panel(host), m_TileSize(Viewport::Render::DefaultTileSize)
     {
         m_RenderTarget = Tiles::RenderTarget::Create(512, 512);
         m_MouseFollowQuadSize = { m_TileSize * 0.5f, m_TileSize * 0.5f };
@@ -21,18 +21,18 @@ namespace Tiles::Editor
     void PanelViewport::Render()
     {
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-        ImGui::Begin("Viewport", nullptr, flags);
+        ImGui::Begin("Viewport", OpenFlag(), flags);
 
 		m_IsWindowFocused = ImGui::IsWindowFocused();
 
-        if (!m_Context || !m_Context->HasProject())
+        if (!Ctx().HasProject())
         {
             ImGui::TextColored(UI::Color::TextError, "No project loaded");
             ImGui::End();
             return;
         }
 
-        Camera2D& camera = m_Context->GetViewportCamera();
+        Camera2D& camera = Ctx().GetViewportCamera();
 
         m_CurrentMousePosition = ImGui::GetMousePos();
         m_ViewportPosition = ImGui::GetCursorScreenPos();
@@ -64,7 +64,7 @@ namespace Tiles::Editor
 
     void PanelViewport::Update()
     {
-        if (!m_Context || !m_Context->HasProject())
+        if (!Ctx().HasProject())
             return;
 
         if (m_IsWindowFocused)
@@ -83,26 +83,26 @@ namespace Tiles::Editor
         if (ImGui::GetIO().KeyCtrl || ImGui::GetIO().KeyAlt || ImGui::GetIO().KeySuper)
             return;
 
-        Camera2D& camera = m_Context->GetViewportCamera();
+        Camera2D& camera = Ctx().GetViewportCamera();
 
-        if (Input::IsKeyPressed(KeyCode::W))
+        if (Input::IsKeyDown(Input::KeyCode::W))
             camera.Center.y += Viewport::Input::CameraMoveSpeed;
-        if (Input::IsKeyPressed(KeyCode::S))
+        if (Input::IsKeyDown(Input::KeyCode::S))
             camera.Center.y -= Viewport::Input::CameraMoveSpeed;
-        if (Input::IsKeyPressed(KeyCode::A))
+        if (Input::IsKeyDown(Input::KeyCode::A))
             camera.Center.x -= Viewport::Input::CameraMoveSpeed;
-        if (Input::IsKeyPressed(KeyCode::D))
+        if (Input::IsKeyDown(Input::KeyCode::D))
             camera.Center.x += Viewport::Input::CameraMoveSpeed;
 
-        if (Input::IsKeyPressed(KeyCode::Q))
+        if (Input::IsKeyDown(Input::KeyCode::Q))
             camera.Zoom = std::min(camera.Zoom * 1.02f, Viewport::Render::MaxZoom);
-        if (Input::IsKeyPressed(KeyCode::E))
+        if (Input::IsKeyDown(Input::KeyCode::E))
             camera.Zoom = std::max(camera.Zoom / 1.02f, Viewport::Render::MinZoom);
     }
 
     void PanelViewport::HandleZoom()
     {
-        Camera2D& camera = m_Context->GetViewportCamera();
+        Camera2D& camera = Ctx().GetViewportCamera();
         if (m_MouseDelta == 0) return;
 
         camera.Zoom = std::clamp(
@@ -114,18 +114,18 @@ namespace Tiles::Editor
 
     void PanelViewport::HandleMouseDragging()
     {
-        Camera2D& camera = m_Context->GetViewportCamera();
+        Camera2D& camera = Ctx().GetViewportCamera();
 
         // A pan begins on middle-button press and ends only when middle is
         // released; while dragging, either middle or right may hold the pan.
         // World Y grows upward, so the vertical delta is added rather than subtracted.
-        if (Input::IsMouseButtonPressed(MouseCode::Middle) && !m_IsDragging)
+        if (Input::IsMouseButtonDown(Input::MouseCode::Middle) && !m_IsDragging)
         {
             m_IsDragging = true;
             m_PreviousMousePosition = m_CurrentMousePosition;
         }
 
-        if (m_IsDragging && (Input::IsMouseButtonPressed(MouseCode::Right) || Input::IsMouseButtonPressed(MouseCode::Middle)))
+        if (m_IsDragging && (Input::IsMouseButtonDown(Input::MouseCode::Right) || Input::IsMouseButtonDown(Input::MouseCode::Middle)))
         {
             ImVec2 mouseDelta = {
                 m_CurrentMousePosition.x - m_PreviousMousePosition.x,
@@ -141,7 +141,7 @@ namespace Tiles::Editor
             m_PreviousMousePosition = m_CurrentMousePosition;
         }
 
-        if (m_IsDragging && !Input::IsMouseButtonPressed(MouseCode::Middle))
+        if (m_IsDragging && !Input::IsMouseButtonDown(Input::MouseCode::Middle))
         {
             m_IsDragging = false;
         }
@@ -158,7 +158,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderOrigin()
     {
-        const Camera2D& camera = m_Context->GetViewportCamera();
+        const Camera2D& camera = Ctx().GetViewportCamera();
 
         // Axes span the visible extent so they read as reference lines through the
         // world origin (only visible when the origin is in view).
@@ -180,7 +180,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderExportRegion()
     {
-        const ExportRegion& region = m_Context->GetProject()->GetExportRegion();
+        const ExportRegion& region = Ctx().GetProject()->GetExportRegion();
         if (!region.Enabled)
             return;
 
@@ -210,7 +210,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderOverlay()
     {
-        Camera2D& camera = m_Context->GetViewportCamera();
+        Camera2D& camera = Ctx().GetViewportCamera();
 
         ImGui::SetCursorScreenPos({ m_ViewportPosition.x + 8.0f, m_ViewportPosition.y + 8.0f });
         ImGui::BeginGroup();
@@ -219,7 +219,7 @@ namespace Tiles::Editor
             camera.Center = { 0.0f, 0.0f };
         ImGui::SameLine();
         if (ImGui::Button("Fit"))
-            m_Context->FitViewportCameraToProject();
+            Ctx().FitViewportCameraToProject();
 
         if (ImGui::IsWindowHovered())
         {
@@ -236,7 +236,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderLayers()
     {
-        const LayerStack& layerStack = m_Context->GetProject()->GetLayerStack();
+        const LayerStack& layerStack = Ctx().GetProject()->GetLayerStack();
 
         for (size_t layerIdx = 0; layerIdx < layerStack.GetLayerCount(); ++layerIdx)
         {
@@ -248,7 +248,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderLayer(const TileLayer& layer, size_t layerIndex)
     {
-        const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
+        const auto& textureAtlases = Ctx().GetProject()->GetTextureAtlases();
         DrawTileLayer(layer, layerIndex, m_TileSize, textureAtlases, Viewport::Depth::Tile);
     }
 
@@ -269,8 +269,8 @@ namespace Tiles::Editor
             Viewport::Depth::HoverTile
         };
 
-        const Tile& brush = m_Context->GetBrush();
-        PaintingMode mode = m_Context->GetPaintingMode();
+        const Tile& brush = Ctx().GetBrush();
+        PaintingMode mode = Ctx().GetPaintingMode();
 
         switch (mode)
         {
@@ -299,7 +299,7 @@ namespace Tiles::Editor
         params.Tint = brush.GetTint();
         params.Size = { m_TileSize * brushSize.x, m_TileSize * brushSize.y };
 
-        const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
+        const auto& textureAtlases = Ctx().GetProject()->GetTextureAtlases();
         if (brush.IsTextured() && brush.HasValidAtlas() && brush.GetAtlasIndex() < textureAtlases.size())
         {
             auto atlas = textureAtlases[brush.GetAtlasIndex()];
@@ -348,7 +348,7 @@ namespace Tiles::Editor
 
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
 
-        if (Input::IsMouseButtonPressed(MouseCode::Left))
+        if (Input::IsMouseButtonDown(Input::MouseCode::Left))
         {
             ExecutePaintAction(gridPos);
         }
@@ -356,22 +356,22 @@ namespace Tiles::Editor
 
     void PanelViewport::ExecutePaintAction(const glm::ivec2& gridPos)
     {
-        PaintingMode mode = m_Context->GetPaintingMode();
+        PaintingMode mode = Ctx().GetPaintingMode();
 
         // Any signed coord is paintable; it maps directly to a sparse cell.
         switch (mode)
         {
         case PaintingMode::Brush:
-            m_Context->PaintTile(gridPos.x, gridPos.y);
+            Ctx().PaintTile(gridPos.x, gridPos.y);
             break;
         case PaintingMode::Eraser:
-            m_Context->EraseTile(gridPos.x, gridPos.y);
+            Ctx().EraseTile(gridPos.x, gridPos.y);
             break;
         case PaintingMode::Fill:
         {
             // Bound the flood to the visible tile region, so a fill on the
             // unbounded board fills what's on screen rather than running away.
-            const Camera2D& camera = m_Context->GetViewportCamera();
+            const Camera2D& camera = Ctx().GetViewportCamera();
             float halfWidth = m_ViewportSize.x / camera.Zoom * 0.5f;
             float halfHeight = m_ViewportSize.y / camera.Zoom * 0.5f;
             glm::ivec4 visibleTiles = {
@@ -380,7 +380,7 @@ namespace Tiles::Editor
                 static_cast<int>(std::floor((camera.Center.x + halfWidth) / m_TileSize)),
                 static_cast<int>(std::floor((camera.Center.y + halfHeight) / m_TileSize))
             };
-            m_Context->FillLayer(gridPos.x, gridPos.y, visibleTiles);
+            Ctx().FillLayer(gridPos.x, gridPos.y, visibleTiles);
             break;
         }
         default:
@@ -401,7 +401,7 @@ namespace Tiles::Editor
 
     glm::vec2 PanelViewport::ScreenToWorld() const
     {
-        const Camera2D& camera = m_Context->GetViewportCamera();
+        const Camera2D& camera = Ctx().GetViewportCamera();
         glm::vec2 relativeMouse = {
             m_CurrentMousePosition.x - m_ViewportPosition.x,
             m_CurrentMousePosition.y - m_ViewportPosition.y

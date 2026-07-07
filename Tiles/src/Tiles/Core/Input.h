@@ -5,10 +5,21 @@
 
 namespace Tiles::Input
 {
-    // Polls whether a key is currently held. State comes from the window (GLFW),
-    // so this reflects the live keyboard, not the buffered event stream.
-    bool IsKeyPressed(KeyCode key);
+	// Live queries over the event-fed InputState -- the single source of input
+	// truth, updated in Application::OnEvent. Down = held this frame; Pressed and
+	// Released report the down/up edge on the frame it happens.
 
-    // Polls whether a mouse button is currently held.
-    bool IsMouseButtonPressed(MouseCode button);
+	// True while the key is held this frame.
+	bool IsKeyDown(KeyCode key);
+	// True only on the frame the key goes down.
+	bool IsKeyPressed(KeyCode key);
+	// True only on the frame the key comes up.
+	bool IsKeyReleased(KeyCode key);
+
+	// True while the mouse button is held this frame.
+	bool IsMouseButtonDown(MouseCode button);
+	// True only on the frame the mouse button goes down.
+	bool IsMouseButtonPressed(MouseCode button);
+	// True only on the frame the mouse button comes up.
+	bool IsMouseButtonReleased(MouseCode button);
 }

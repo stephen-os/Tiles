@@ -5,13 +5,13 @@
 
 namespace Tiles::Editor
 {
-    /// Debug-only inspector (registered only in TILES_DEBUG builds) exposing live
-    /// Context, project, layer-stack, brush, command-history, atlas, and timing
-    /// state in collapsible sections. Read-only apart from a Clear History button.
+    // Debug-only inspector (registered only in TILES_DEBUG builds) exposing live
+    // Context, project, layer-stack, brush, command-history, atlas, and timing
+    // state in collapsible sections. Read-only apart from a Clear History button.
     class PanelDebug : public Panel
     {
     public:
-        PanelDebug(std::shared_ptr<Context> context);
+        PanelDebug(EditorHost& host);
         ~PanelDebug() = default;
 
         void Render() override;

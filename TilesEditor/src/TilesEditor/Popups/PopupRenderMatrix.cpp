@@ -12,7 +12,7 @@
 
 namespace Tiles::Editor
 {
-    PopupRenderMatrix::PopupRenderMatrix(std::shared_ptr<Context> context) : Popup(context) {}
+    PopupRenderMatrix::PopupRenderMatrix(EditorHost& host) : Popup(host) {}
 
     void PopupRenderMatrix::OnRender()
     {
@@ -27,7 +27,7 @@ namespace Tiles::Editor
 
         if (ImGui::Begin("Export Render Matrix", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
         {
-            if (!m_Context || !m_Context->HasProject())
+            if (!Ctx().HasProject())
             {
                 ImGui::Text("No project loaded!");
                 ImGui::End();
@@ -69,9 +69,9 @@ namespace Tiles::Editor
 
     void PopupRenderMatrix::InitializeDialog()
     {
-        if (m_Context && m_Context->HasProject())
+        if (Ctx().HasProject())
         {
-            const auto& project = m_Context->GetProject();
+            const auto& project = Ctx().GetProject();
             std::string projectName = project->GetProjectName();
             std::transform(projectName.begin(), projectName.end(), projectName.begin(), ::tolower);
             std::replace(projectName.begin(), projectName.end(), ' ', '_');
@@ -97,10 +97,10 @@ namespace Tiles::Editor
 
     void PopupRenderMatrix::RenderLayerMatrix()
     {
-        if (!m_Context || !m_Context->HasProject())
+        if (!Ctx().HasProject())
             return;
 
-        const auto& layerStack = m_Context->GetProject()->GetLayerStack();
+        const auto& layerStack = Ctx().GetProject()->GetLayerStack();
         size_t layerCount = layerStack.GetLayerCount();
 
         ImGui::Text("Assign Layers to Render Groups");
@@ -273,9 +273,9 @@ namespace Tiles::Editor
 
         // --- Export region ---
         ImGui::Spacing();
-        if (m_Context && m_Context->HasProject())
+        if (Ctx().HasProject())
         {
-            Tiles::ExportRegion& region = m_Context->GetProject()->GetExportRegion();
+            Tiles::ExportRegion& region = Ctx().GetProject()->GetExportRegion();
             ImGui::Checkbox("Use Export Region", &region.Enabled);
 
             if (region.Enabled)
@@ -293,7 +293,7 @@ namespace Tiles::Editor
 
                 if (ImGui::Button("Fit to Content"))
                 {
-                    if (auto bounds = m_Context->GetProject()->GetLayerStack().GetBounds())
+                    if (auto bounds = Ctx().GetProject()->GetLayerStack().GetBounds())
                     {
                         region.Min = { bounds->x, bounds->y };
                         region.Size = { bounds->z - bounds->x + 1, bounds->w - bounds->y + 1 };
@@ -373,10 +373,10 @@ namespace Tiles::Editor
 
     void PopupRenderMatrix::ResetToDefaults()
     {
-        if (!m_Context || !m_Context->HasProject())
+        if (!Ctx().HasProject())
             return;
 
-        const auto& layerStack = m_Context->GetProject()->GetLayerStack();
+        const auto& layerStack = Ctx().GetProject()->GetLayerStack();
         m_LayerToRenderGroup.clear();
 
         for (size_t i = 0; i < layerStack.GetLayerCount(); ++i)
@@ -392,10 +392,10 @@ namespace Tiles::Editor
 
     void PopupRenderMatrix::ApplyRenderGroupChanges()
     {
-        if (!m_Context || !m_Context->HasProject())
+        if (!Ctx().HasProject())
             return;
 
-        auto& layerStack = m_Context->GetProject()->GetLayerStack();
+        auto& layerStack = Ctx().GetProject()->GetLayerStack();
         bool hasChanges = false;
 
         for (const auto& [layerIdx, renderGroup] : m_LayerToRenderGroup)
@@ -417,14 +417,14 @@ namespace Tiles::Editor
 
         if (hasChanges)
         {
-            m_Context->GetProject()->MarkAsModified();
+            Ctx().GetProject()->MarkAsModified();
             TILES_INFO("PopupRenderMatrix::ApplyRenderGroupChanges: Applied render group changes to project");
         }
     }
 
     void PopupRenderMatrix::ExecuteExport()
     {
-        if (!m_Context || !m_Context->HasProject())
+        if (!Ctx().HasProject())
             return;
 
         auto usedGroups = GetUsedRenderGroups();
@@ -437,7 +437,7 @@ namespace Tiles::Editor
         if (usedGroups.size() == 1)
         {
             std::vector<size_t> layerIndices;
-            const auto& layerStack = m_Context->GetProject()->GetLayerStack();
+            const auto& layerStack = Ctx().GetProject()->GetLayerStack();
 
             for (size_t i = 0; i < layerStack.GetLayerCount(); ++i)
             {
@@ -461,7 +461,7 @@ namespace Tiles::Editor
             for (size_t groupIdx = 0; groupIdx < usedGroups.size(); ++groupIdx)
             {
                 std::vector<size_t> layerIndices;
-                const auto& layerStack = m_Context->GetProject()->GetLayerStack();
+                const auto& layerStack = Ctx().GetProject()->GetLayerStack();
                 int renderGroup = std::stoi(usedGroups[groupIdx]);
 
                 for (size_t i = 0; i < layerStack.GetLayerCount(); ++i)
@@ -539,10 +539,10 @@ namespace Tiles::Editor
 
     void PopupRenderMatrix::ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName)
     {
-        if (layerIndices.empty() || !m_Context || !m_Context->HasProject())
+        if (layerIndices.empty() || !Ctx().HasProject())
             return;
 
-        const auto& project = *m_Context->GetProject();
+        const auto& project = *Ctx().GetProject();
         const auto& layerStack = project.GetLayerStack();
 
         const float tileSize = Viewport::Render::DefaultTileSize;
@@ -586,7 +586,7 @@ namespace Tiles::Editor
         Tiles::Renderer2D::SetResolution(width, height);
         Tiles::Renderer2D::BeginFrame(camera.ViewProjection({ static_cast<float>(width), static_cast<float>(height) }));
 
-        const auto& textureAtlases = m_Context->GetProject()->GetTextureAtlases();
+        const auto& textureAtlases = Ctx().GetProject()->GetTextureAtlases();
 
         for (size_t layerIdx : layerIndices)
         {

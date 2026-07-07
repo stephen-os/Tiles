@@ -2,9 +2,6 @@
 
 #include "Event.h"
 
-#include "Input/KeyCodes.h"
-#include "Input/MouseCodes.h"
-
 #include <string>
 #include <functional>
 
@@ -72,11 +69,6 @@ namespace Tiles
 		[[nodiscard]] bool IsMinimized() const;
 
 		[[nodiscard]] GLFWwindow* GetNativeWindow() const { return m_Window; }
-
-		// Live input polling -- current device state, as opposed to the buffered
-		// event stream delivered through the event callback.
-		[[nodiscard]] bool IsKeyPressed(Input::KeyCode key) const;
-		[[nodiscard]] bool IsMouseButtonPressed(Input::MouseCode button) const;
 
 		static void TerminateGLFW();
 

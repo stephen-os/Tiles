@@ -6,13 +6,13 @@
 
 namespace Tiles::Editor
 {
-    /// Panel for the project's texture atlases: a tab per atlas, controls to
-    /// add/remove atlases and set an atlas image and grid dimensions, and a tile
-    /// grid whose cells pick the texture applied to the current brush.
+    // Panel for the project's texture atlases: a tab per atlas, controls to
+    // add/remove atlases and set an atlas image and grid dimensions, and a tile
+    // grid whose cells pick the texture applied to the current brush.
     class PanelTextureSelection : public Panel
     {
     public:
-        PanelTextureSelection(std::shared_ptr<Context> context);
+        PanelTextureSelection(EditorHost& host);
         ~PanelTextureSelection() = default;
 
         void Render() override;
@@ -34,16 +34,16 @@ namespace Tiles::Editor
         void RenderComponentFilePathDisplay(const char* id, const std::string& path);
         void RenderComponentDimensionInput(const char* id, const char* label, int* value);
 
-        /// Chooses a grid cell size that fits atlasWidth cells across availableWidth,
-        /// clamped to min/max bounds and biased toward larger cells for small atlases.
+        // Chooses a grid cell size that fits atlasWidth cells across availableWidth,
+        // clamped to min/max bounds and biased toward larger cells for small atlases.
         float CalculateDynamicTileSize(float availableWidth, int atlasWidth) const;
 
-        /// Points the current atlas at newPath, stored relative to the working
-        /// directory so saved projects stay portable. No-op if the file is missing.
+        // Points the current atlas at newPath, stored relative to the working
+        // directory so saved projects stay portable. No-op if the file is missing.
         void HandleAtlasFileSelection(const std::string& newPath);
 
-        /// Applies the clicked tile to the brush, or clears the brush's texture if
-        /// that same tile is already selected (click-to-toggle).
+        // Applies the clicked tile to the brush, or clears the brush's texture if
+        // that same tile is already selected (click-to-toggle).
         void HandleTextureSelection(int index, size_t atlasIndex);
         void OpenFileDialog();
         void HandleFileDialogResult();

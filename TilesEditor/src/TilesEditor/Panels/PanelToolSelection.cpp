@@ -4,21 +4,14 @@
 
 namespace Tiles::Editor
 {
-    PanelToolSelection::PanelToolSelection(std::shared_ptr<Context> context) : Panel(context)
+    PanelToolSelection::PanelToolSelection(EditorHost& host) : Panel(host)
     {
         LoadTextures();
     }
 
     void PanelToolSelection::Render()
     {
-        ImGui::Begin("Tools");
-
-        if (!m_Context)
-        {
-            ImGui::TextColored(UI::Color::TextError, "No project loaded");
-            ImGui::End();
-            return;
-        }
+        ImGui::Begin("Tools", OpenFlag());
 
         RenderBlockToolButtons();
         ImGui::End();
@@ -123,12 +116,7 @@ namespace Tiles::Editor
 
     void PanelToolSelection::RenderBlockCustomCursor()
     {
-        if (!m_Context)
-        {
-            return;
-        }
-
-        PaintingMode currentMode = m_Context->GetPaintingMode();
+        PaintingMode currentMode = Ctx().GetPaintingMode();
 
         if (currentMode == PaintingMode::None)
         {
@@ -143,7 +131,7 @@ namespace Tiles::Editor
 
     void PanelToolSelection::RenderComponentCursorForMode(const char* id, PaintingMode mode, const std::shared_ptr<Tiles::Texture>& texture)
     {
-        if (m_Context->GetPaintingMode() != mode || !texture)
+        if (Ctx().GetPaintingMode() != mode || !texture)
         {
             return;
         }
@@ -177,24 +165,19 @@ namespace Tiles::Editor
 
     bool PanelToolSelection::IsToolSelected(PaintingMode mode) const
     {
-        return m_Context && m_Context->GetPaintingMode() == mode;
+        return Ctx().GetPaintingMode() == mode;
     }
 
     void PanelToolSelection::SetToolSelection(PaintingMode mode)
     {
-        if (!m_Context)
-        {
-            return;
-        }
-
         // Clicking the already-active tool toggles it off (back to None).
-        if (m_Context->GetPaintingMode() == mode)
+        if (Ctx().GetPaintingMode() == mode)
         {
-            m_Context->SetPaintingMode(PaintingMode::None);
+            Ctx().SetPaintingMode(PaintingMode::None);
         }
         else
         {
-            m_Context->SetPaintingMode(mode);
+            Ctx().SetPaintingMode(mode);
         }
     }
 }

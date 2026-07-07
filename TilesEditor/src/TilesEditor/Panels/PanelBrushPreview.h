@@ -11,13 +11,13 @@
 
 namespace Tiles::Editor
 {
-    /// Read-only preview of the current brush. Renders the brush quad with its own
-    /// camera into an offscreen target (pan by dragging, zoom with the wheel) and
-    /// lists the brush's rotation/size/tint/UVs/atlas below it.
+    // Read-only preview of the current brush. Renders the brush quad with its own
+    // camera into an offscreen target (pan by dragging, zoom with the wheel) and
+    // lists the brush's rotation/size/tint/UVs/atlas below it.
     class PanelBrushPreview : public Panel
     {
     public:
-        PanelBrushPreview(std::shared_ptr<Context> context);
+        PanelBrushPreview(EditorHost& host);
         ~PanelBrushPreview() = default;
 
         void Render() override;

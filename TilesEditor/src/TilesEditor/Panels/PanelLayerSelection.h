@@ -16,14 +16,14 @@ namespace Tiles
 
 namespace Tiles::Editor
 {
-    /// Panel for managing the project's layer stack: the layer list with
-    /// per-layer visibility, selection of the working layer, add/delete/clear and
-    /// reorder operations, and editing of the selected layer's name/render group.
-    /// Structural changes go through the Context command system so they are undoable.
+    // Panel for managing the project's layer stack: the layer list with
+    // per-layer visibility, selection of the working layer, add/delete/clear and
+    // reorder operations, and editing of the selected layer's name/render group.
+    // Structural changes go through the Context command system so they are undoable.
     class PanelLayerSelection : public Panel
     {
     public:
-        PanelLayerSelection(std::shared_ptr<Context> context) : Panel(context) {}
+        PanelLayerSelection(EditorHost& host) : Panel(host) {}
         ~PanelLayerSelection() = default;
 
         void Render() override;

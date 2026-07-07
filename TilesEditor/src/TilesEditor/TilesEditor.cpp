@@ -5,6 +5,9 @@
 
 #include "EntryPoint.h"
 
+#include "App/EditorHost.h"
+#include "App/ActionRegistry.h"
+
 #include "Panels/PanelManager.h"
 #include "Panels/PanelLayerSelection.h"
 #include "Panels/PanelToolSelection.h"
@@ -15,147 +18,197 @@
 #include "Panels/PanelViewport.h"
 #include "Panels/PanelDebug.h"
 
+#include "Popups/PopupNewProject.h"
+#include "Popups/PopupAbout.h"
+#include "Popups/PopupError.h"
+#include "Popups/PopupSaveAs.h"
+#include "Popups/PopupOpenProject.h"
+#include "Popups/PopupRenderMatrix.h"
+
 #include "EditorTheme.h"
 
-class TilesEditorLayer : public Tiles::Layer
+#include <memory>
+#include <string>
+
+using namespace Tiles;
+using namespace Tiles::Editor;
+
+// The editor's single application layer. It owns the shared Context, the panel/
+// popup registry, and the action map, and implements EditorHost so any panel or
+// popup can reach the document, open another view, or fire an action through the
+// same facade. Global keyboard shortcuts arrive via OnEvent and are resolved
+// against the action map here.
+class TilesEditorLayer : public Layer, public EditorHost
 {
 public:
 	TilesEditorLayer() : Layer("Tiles Editor Layer") {}
 
 	void OnAttach() override
 	{
-		// One Context is shared by every panel so they all read and mutate the
-		// same project, brush, working layer, and command history.
-		std::shared_ptr<Tiles::Context> context = Tiles::Context::Create();
+		// The layer solely owns one Context; every panel and popup borrows it
+		// through EditorHost::Doc(), so they all read and mutate the same project,
+		// brush, working layer, and command history.
+		m_Context = std::make_unique<Context>();
 
-		m_PanelManager.RegisterPanel<Tiles::Editor::PanelLayerSelection>(context);
-		m_PanelManager.RegisterPanel<Tiles::Editor::PanelToolSelection>(context);
-		m_PanelManager.RegisterPanel<Tiles::Editor::PanelTextureSelection>(context);
-		m_PanelManager.RegisterPanel<Tiles::Editor::PanelBrushPreview>(context);
-		m_PanelManager.RegisterPanel<Tiles::Editor::PanelBrushAttributes>(context);
-		m_PanelManager.RegisterPanel<Tiles::Editor::PanelMenuBar>(context);
-		m_PanelManager.RegisterPanel<Tiles::Editor::PanelViewport>(context);
-#ifdef TILES_DEBUG
-		m_PanelManager.RegisterPanel<Tiles::Editor::PanelDebug>(context);
-#endif
+		m_Panels.SetHost(*this);
+		RegisterPanels();
+		RegisterPopups();
+		RegisterActions();
 	}
 
 	void OnDetach() override
 	{
-		m_PanelManager.Clear();
+		m_Panels.Clear();
 	}
 
 	void OnUpdate(float timestep) override
 	{
-		m_PanelManager.Update();
+		m_Panels.Update();
 	}
 
 	void OnUIRender() override
 	{
-		m_PanelManager.Render();
+		m_Panels.Render();
 	}
 
-	void OnEvent(Tiles::Event& event) override
+	void OnEvent(Event& event) override
 	{
-		Tiles::EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<Tiles::KeyPressedEvent>([this](Tiles::KeyPressedEvent& e) { return OnKeyPressed(e); });
-		dispatcher.Dispatch<Tiles::MouseButtonPressedEvent>([this](Tiles::MouseButtonPressedEvent& e) { return OnMouseButtonPressed(e); });
-		dispatcher.Dispatch<Tiles::MouseScrolledEvent>([this](Tiles::MouseScrolledEvent& e) { return OnMouseScrolled(e); });
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) { return OnKeyPressed(e); });
+	}
+
+	// --- EditorHost ---------------------------------------------------------
+
+	Context& Doc() override { return *m_Context; }
+
+	void OpenPopup(PopupId id) override { m_Panels.OpenPopup(id); }
+	void ClosePopup(PopupId id) override { m_Panels.ClosePopup(id); }
+
+	void ShowPanel(PanelId id, bool open) override { m_Panels.ShowPanel(id, open); }
+	void TogglePanel(PanelId id) override { m_Panels.TogglePanel(id); }
+	bool IsPanelOpen(PanelId id) const override { return m_Panels.IsPanelOpen(id); }
+	const std::vector<std::pair<PanelId, std::string>>& ToggleablePanels() const override { return m_Panels.ToggleablePanels(); }
+
+	void Invoke(ActionId id) override { m_Actions.Invoke(id); }
+	std::string ShortcutLabel(ActionId id) const override { return m_Actions.GetShortcutLabel(id); }
+
+	void Notify(const std::string& message) override
+	{
+		if (auto* popup = m_Panels.GetPopupAs<PopupError>(PopupId::Error))
+		{
+			popup->SetMessage(message);
+			popup->Show();
+		}
 	}
 
 private:
-	// SCAFFOLD: mirrors the keybinds the editor currently drives via Input polling
-	// (viewport) and ImGui shortcuts (menu bar). Each case only logs its intent for
-	// now; the real actions get wired here once popups/commands are made agnostic to
-	// the panel they live in. NOTE: KeyPressedEvent carries no modifier state yet, so
-	// the Ctrl-combos can't be told apart from the bare keys until modifiers are added
-	// to the event -- both intents are documented per key.
-	bool OnKeyPressed(Tiles::KeyPressedEvent& e)
+	// Routes a key press to the action whose shortcut matches. Auto-repeat is
+	// ignored so command shortcuts fire once per press.
+	bool OnKeyPressed(KeyPressedEvent& e)
 	{
-		switch (e.GetKey())
+		if (e.IsRepeat())
+			return false;
+
+		Shortcut shortcut{ e.GetKey(), e.GetMods() };
+
+		// Ctrl+Shift+Z is a second binding for redo alongside Ctrl+Y; the action
+		// map holds one shortcut per action, so this alias is resolved here.
+		if (shortcut.Key == KeyCode::Z && shortcut.Mods == (KeyMods::Control | KeyMods::Shift))
 		{
-		// Ctrl+N -> create a new project
-		case Tiles::KeyCode::N:
-			TILES_INFO("[Event] Key N -> New Project (Ctrl+N)");
-			break;
-		// Ctrl+O -> open an existing project
-		case Tiles::KeyCode::O:
-			TILES_INFO("[Event] Key O -> Open Project (Ctrl+O)");
-			break;
-		// Ctrl+E -> open the Export (Render Matrix) popup;  E -> zoom the viewport out
-		case Tiles::KeyCode::E:
-			TILES_INFO("[Event] Key E -> Export (Ctrl+E) / zoom out (viewport)");
-			break;
-		// Ctrl+S -> save the project (Save As when it is new)
-		case Tiles::KeyCode::S:
-			TILES_INFO("[Event] Key S -> Save (Ctrl+S) / pan camera down (viewport)");
-			break;
-		// Ctrl+Z -> undo;  Ctrl+Shift+Z -> redo
-		case Tiles::KeyCode::Z:
-			TILES_INFO("[Event] Key Z -> Undo (Ctrl+Z) / Redo (Ctrl+Shift+Z)");
-			break;
-		// Ctrl+Y -> redo
-		case Tiles::KeyCode::Y:
-			TILES_INFO("[Event] Key Y -> Redo (Ctrl+Y)");
-			break;
-		// W -> pan the viewport camera up
-		case Tiles::KeyCode::W:
-			TILES_INFO("[Event] Key W -> pan camera up (viewport)");
-			break;
-		// A -> pan the viewport camera left
-		case Tiles::KeyCode::A:
-			TILES_INFO("[Event] Key A -> pan camera left (viewport)");
-			break;
-		// D -> pan the viewport camera right
-		case Tiles::KeyCode::D:
-			TILES_INFO("[Event] Key D -> pan camera right (viewport)");
-			break;
-		// Q -> zoom the viewport camera in
-		case Tiles::KeyCode::Q:
-			TILES_INFO("[Event] Key Q -> zoom in (viewport)");
-			break;
-		default:
-			break;
+			m_Actions.Invoke(ActionId::Redo);
+			return true;
 		}
-		return false;   // scaffold: never consumes the event
+
+		return m_Actions.InvokeFor(shortcut);
 	}
 
-	bool OnMouseButtonPressed(Tiles::MouseButtonPressedEvent& e)
+	void RegisterPanels()
 	{
-		switch (e.GetButton())
+		m_Panels.RegisterPanel<PanelMenuBar>(PanelId::MenuBar, "Menu Bar");
+		m_Panels.RegisterPanel<PanelViewport>(PanelId::Viewport, "Viewport");
+		m_Panels.RegisterPanel<PanelLayerSelection>(PanelId::LayerSelection, "Layer Selection");
+		m_Panels.RegisterPanel<PanelToolSelection>(PanelId::ToolSelection, "Tools");
+		m_Panels.RegisterPanel<PanelTextureSelection>(PanelId::TextureSelection, "Texture Selection");
+		m_Panels.RegisterPanel<PanelBrushPreview>(PanelId::BrushPreview, "Brush Preview");
+		m_Panels.RegisterPanel<PanelBrushAttributes>(PanelId::BrushAttributes, "Brush Attributes");
+#ifdef TILES_DEBUG
+		m_Panels.RegisterPanel<PanelDebug>(PanelId::Debug, "Debug Panel");
+#endif
+	}
+
+	void RegisterPopups()
+	{
+		m_Panels.RegisterPopup<PopupNewProject>(PopupId::NewProject);
+		m_Panels.RegisterPopup<PopupAbout>(PopupId::About);
+		m_Panels.RegisterPopup<PopupError>(PopupId::Error);
+		m_Panels.RegisterPopup<PopupSaveAs>(PopupId::SaveAs);
+		m_Panels.RegisterPopup<PopupOpenProject>(PopupId::OpenProject);
+		m_Panels.RegisterPopup<PopupRenderMatrix>(PopupId::Export);
+	}
+
+	void RegisterActions()
+	{
+		m_Actions.Register(ActionId::NewProject,
+			[this] { OpenPopup(PopupId::NewProject); },
+			{ KeyCode::N, KeyMods::Control });
+
+		m_Actions.Register(ActionId::OpenProject,
+			[this] { OpenPopup(PopupId::OpenProject); },
+			{ KeyCode::O, KeyMods::Control });
+
+		m_Actions.Register(ActionId::Save,
+			[this] { SaveProject(); },
+			{ KeyCode::S, KeyMods::Control });
+
+		m_Actions.Register(ActionId::SaveAs,
+			[this] { if (m_Context->HasProject()) OpenPopup(PopupId::SaveAs); },
+			{ KeyCode::S, KeyMods::Control | KeyMods::Shift });
+
+		m_Actions.Register(ActionId::Export,
+			[this] { if (m_Context->HasProject()) OpenPopup(PopupId::Export); },
+			{ KeyCode::E, KeyMods::Control });
+
+		m_Actions.Register(ActionId::Undo,
+			[this] { if (m_Context->CanUndo()) m_Context->Undo(); },
+			{ KeyCode::Z, KeyMods::Control });
+
+		m_Actions.Register(ActionId::Redo,
+			[this] { if (m_Context->CanRedo()) m_Context->Redo(); },
+			{ KeyCode::Y, KeyMods::Control });
+
+		m_Actions.Register(ActionId::ClearHistory,
+			[this] { if (m_Context->HasProject()) m_Context->ClearHistory(); });
+	}
+
+	// Saves in place, falling back to the Save-As dialog for a never-saved
+	// project; a failed save surfaces through the shared error popup.
+	void SaveProject()
+	{
+		if (!m_Context->HasProject())
+			return;
+
+		auto project = m_Context->GetProject();
+		if (project->IsNew() && project->HasUnsavedChanges())
 		{
-		// Left click -> paint the active tool (brush / eraser / fill) at the hovered cell
-		case Tiles::MouseCode::Left:
-			TILES_INFO("[Event] Mouse Left -> paint action (brush/erase/fill)");
-			break;
-		// Middle button -> begin a camera pan drag in the viewport
-		case Tiles::MouseCode::Middle:
-			TILES_INFO("[Event] Mouse Middle -> begin camera pan (viewport)");
-			break;
-		// Right button -> continue the camera pan while a drag is active
-		case Tiles::MouseCode::Right:
-			TILES_INFO("[Event] Mouse Right -> pan camera while dragging (viewport)");
-			break;
-		default:
-			break;
+			OpenPopup(PopupId::SaveAs);
 		}
-		return false;   // scaffold: never consumes the event
+		else
+		{
+			ProjectResult result = m_Context->SaveProject();
+			if (!result.Success)
+				Notify(result.Message);
+		}
 	}
 
-	bool OnMouseScrolled(Tiles::MouseScrolledEvent& e)
-	{
-		// Mouse wheel -> zoom the viewport camera
-		TILES_INFO("[Event] Mouse wheel {} -> zoom camera (viewport)", e.GetYOffset());
-		return false;   // scaffold: never consumes the event
-	}
-
-	Tiles::Editor::PanelManager m_PanelManager;
+	std::unique_ptr<Context> m_Context;
+	PanelManager m_Panels;
+	ActionRegistry m_Actions;
 };
 
-class TilesEditor : public Tiles::Application
+class TilesEditor : public Application
 {
 public:
-	TilesEditor(const Tiles::ApplicationSettings& spec)
+	TilesEditor(const ApplicationSettings& spec)
 		: Application(spec)
 	{
 	}
@@ -184,4 +237,3 @@ Tiles::Application* Tiles::CreateApplication(int argc, char** argv)
 
 	return app;
 }
-

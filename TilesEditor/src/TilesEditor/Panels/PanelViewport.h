@@ -9,39 +9,39 @@
 
 namespace Tiles::Editor
 {
-    /// The main editing canvas. Draws the grid, layers, and a hover/brush preview
-    /// into an offscreen RenderTarget each frame and blits it via ImGui::Image.
-    /// Paint and camera input are only processed while the window is focused, so
-    /// Render() builds the frame and Update() handles interaction.
+    // The main editing canvas. Draws the grid, layers, and a hover/brush preview
+    // into an offscreen RenderTarget each frame and blits it via ImGui::Image.
+    // Paint and camera input are only processed while the window is focused, so
+    // Render() builds the frame and Update() handles interaction.
     class PanelViewport : public Panel
     {
     public:
-        PanelViewport(std::shared_ptr<Context> context);
+        PanelViewport(EditorHost& host);
         ~PanelViewport() = default;
 
         void Render() override;
         void Update() override;
 
     private:
-        /// Maps the current mouse position from screen space into world space,
-        /// accounting for the viewport origin, its centered projection, and zoom.
+        // Maps the current mouse position from screen space into world space,
+        // accounting for the viewport origin, its centered projection, and zoom.
         glm::vec2 ScreenToWorld() const;
 
-        /// Returns the signed tile coord under the mouse (the cell containing the
-        /// world point). Any coord (including negative) is paintable.
+        // Returns the signed tile coord under the mouse (the cell containing the
+        // world point). Any coord (including negative) is paintable.
         glm::ivec2 GetGridPositionUnderMouse() const;
 
         void RenderGrid();
-        /// Draws red X/Y axes through the world origin, spanning the visible view.
+        // Draws red X/Y axes through the world origin, spanning the visible view.
         void RenderOrigin();
-        /// Draws the project's export-region rectangle when it is enabled.
+        // Draws the project's export-region rectangle when it is enabled.
         void RenderExportRegion();
         void RenderLayers();
         void RenderLayer(const TileLayer& layer, size_t layerIndex);
         void RenderHoverTile();
 
-        /// ImGui overlay drawn over the blitted viewport: origin/fit buttons and
-        /// the hovered tile coordinate. Sets m_PointerOverOverlay.
+        // ImGui overlay drawn over the blitted viewport: origin/fit buttons and
+        // the hovered tile coordinate. Sets m_PointerOverOverlay.
         void RenderOverlay();
         void RenderBrushPreview(const Tile& brush);
         void RenderEraserPreview();

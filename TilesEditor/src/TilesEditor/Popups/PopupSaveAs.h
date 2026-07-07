@@ -7,13 +7,13 @@
 
 namespace Tiles::Editor
 {
-    /// Save-As dialog: pick a directory and file name (project extension appended
-    /// automatically) and write the project via Context::SaveProjectAs. Shows an
-    /// inline status message and auto-closes a few seconds after a successful save.
+    // Save-As dialog: pick a directory and file name (project extension appended
+    // automatically) and write the project via Context::SaveProjectAs. Shows an
+    // inline status message and auto-closes a few seconds after a successful save.
     class PopupSaveAs : public Popup
     {
     public:
-        PopupSaveAs(std::shared_ptr<Context> context);
+        PopupSaveAs(EditorHost& host);
         ~PopupSaveAs() = default;
 
     protected:
