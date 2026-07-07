@@ -14,16 +14,16 @@ namespace Tiles
 
     static const size_t MAX_UNDO_STACK_SIZE = 1000;
 
-    /// Undo/redo stack over LayerStack edits. Executing a fresh command clears
-    /// the redo stack; the undo stack is capped at MAX_UNDO_STACK_SIZE.
+    // Undo/redo stack over LayerStack edits. Executing a fresh command clears
+    // the redo stack; the undo stack is capped at MAX_UNDO_STACK_SIZE.
     class CommandHistory
     {
     public:
         CommandHistory() = default;
 
-        /// Runs command against layerStack and pushes it onto the undo stack.
-        /// If the previous command reports it as a duplicate (Command::Validate),
-        /// the command is dropped to coalesce repeated identical edits.
+        // Runs command against layerStack and pushes it onto the undo stack.
+        // If the previous command reports it as a duplicate (Command::Validate),
+        // the command is dropped to coalesce repeated identical edits.
         void Execute(std::unique_ptr<Command> command, LayerStack& layerStack);
 
         void Undo(LayerStack& layerStack);

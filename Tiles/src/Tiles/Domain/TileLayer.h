@@ -72,7 +72,7 @@ namespace Tiles
         }
     }
 
-    /// Hash for signed integer tile coordinates used as sparse-map keys.
+    // Hash for signed integer tile coordinates used as sparse-map keys.
     struct TileCoordHash
     {
         size_t operator()(const glm::ivec2& c) const noexcept
@@ -84,9 +84,9 @@ namespace Tiles
         }
     };
 
-    /// A sparse grid of tiles with a name, visibility, and render group. Only
-    /// painted cells are stored, addressed by signed (x, y), so the board is
-    /// unbounded in every direction and empty cells cost nothing.
+    // A sparse grid of tiles with a name, visibility, and render group. Only
+    // painted cells are stored, addressed by signed (x, y), so the board is
+    // unbounded in every direction and empty cells cost nothing.
     class TileLayer
     {
     public:
@@ -95,16 +95,16 @@ namespace Tiles
         TileLayer() = default;
         ~TileLayer() = default;
 
-        /// Removes every painted tile.
+        // Removes every painted tile.
         void Clear();
 
-        /// The tile at (x, y), or a shared empty (unpainted) tile if none exists.
+        // The tile at (x, y), or a shared empty (unpainted) tile if none exists.
         const Tile& GetTile(int x, int y) const;
         bool HasTile(int x, int y) const;
 
-        /// Paints (x, y). An unpainted tile erases the cell, keeping the map minimal.
+        // Paints (x, y). An unpainted tile erases the cell, keeping the map minimal.
         void SetTile(int x, int y, const Tile& tile);
-        /// Clears a single cell.
+        // Clears a single cell.
         void EraseTile(int x, int y);
 
         const std::string& GetName() const { return m_Name; }
@@ -127,8 +127,8 @@ namespace Tiles
         TileMap::const_iterator begin() const { return m_Tiles.begin(); }
         TileMap::const_iterator end() const { return m_Tiles.end(); }
 
-        /// Inclusive bounding box of painted tiles as (minX, minY, maxX, maxY),
-        /// or nullopt when the layer is empty.
+        // Inclusive bounding box of painted tiles as (minX, minY, maxX, maxY),
+        // or nullopt when the layer is empty.
         std::optional<glm::ivec4> GetBounds() const;
 
         nlohmann::json ToJSON() const;

@@ -5,9 +5,9 @@
 
 namespace Tiles
 {
-	/// Window and startup configuration for the Application. The window-geometry
-	/// fields (size, position, maximized, fullscreen) are persisted between runs
-	/// by ApplicationSettingsSerializer; Name/Icon/Use2DRenderer are set in code.
+	// Window and startup configuration for the Application. The window-geometry
+	// fields (size, position, maximized, fullscreen) are persisted between runs
+	// by ApplicationSettingsSerializer; Name/Icon/Use2DRenderer are set in code.
 	struct ApplicationSettings
 	{
 		std::string Name = "Tiles App";

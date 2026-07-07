@@ -6,9 +6,9 @@
 
 namespace Tiles
 {
-	/// Vertex array object: binds a vertex buffer (wiring its layout to GL
-	/// attribute slots) and an optional index buffer. RAII wrapper owning a
-	/// single GL vertex-array handle.
+	// Vertex array object: binds a vertex buffer (wiring its layout to GL
+	// attribute slots) and an optional index buffer. RAII wrapper owning a
+	// single GL vertex-array handle.
 	class VertexArray
 	{
 	public:

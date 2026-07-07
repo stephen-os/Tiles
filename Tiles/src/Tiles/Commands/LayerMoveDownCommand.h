@@ -6,7 +6,7 @@
 
 namespace Tiles
 {
-    /// Moves a layer one position down in the stack; Undo moves it back up.
+    // Moves a layer one position down in the stack; Undo moves it back up.
     class LayerMoveDownCommand : public Command
     {
     public:

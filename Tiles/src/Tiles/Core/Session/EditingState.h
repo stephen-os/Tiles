@@ -18,10 +18,10 @@ namespace Tiles
         Fill
     };
 
-    /// Holds the transient editing selection - active layer, brush, and painting
-    /// mode - and builds the edit commands they imply. It owns no project state;
-    /// the one layer-count-dependent operation (working-layer validation) takes
-    /// the stack as a parameter.
+    // Holds the transient editing selection - active layer, brush, and painting
+    // mode - and builds the edit commands they imply. It owns no project state;
+    // the one layer-count-dependent operation (working-layer validation) takes
+    // the stack as a parameter.
     class EditingState
     {
     public:
@@ -37,14 +37,14 @@ namespace Tiles
         Tile& GetBrush() { return m_Brush; }
         void SetBrush(const Tile& brush) { m_Brush = brush; }
 
-        /// Restores the default selection: layer 0, no mode, a painted brush.
+        // Restores the default selection: layer 0, no mode, a painted brush.
         void Reset();
 
-        /// Clamps the working layer back into range after the layer count changes
-        /// (e.g. a delete applied via undo/redo).
+        // Clamps the working layer back into range after the layer count changes
+        // (e.g. a delete applied via undo/redo).
         void ValidateWorkingLayer(const LayerStack& layerStack);
 
-        /// Builds the command for the current painting mode; null for None.
+        // Builds the command for the current painting mode; null for None.
         std::unique_ptr<Command> BuildModeCommand(size_t layerIndex, int x, int y, const Tile& tile) const;
         std::unique_ptr<Command> BuildEraseCommand(size_t layerIndex, int x, int y) const;
         std::unique_ptr<Command> BuildFillCommand(size_t layerIndex, int x, int y, const Tile& tile, const glm::ivec4& bounds) const;

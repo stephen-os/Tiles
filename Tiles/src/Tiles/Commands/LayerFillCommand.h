@@ -10,8 +10,8 @@
 
 namespace Tiles
 {
-    /// Flood-fills the contiguous region matching the tile at (x, y) with a fill
-    /// tile, snapshotting the whole layer on first Execute so Undo can restore it.
+    // Flood-fills the contiguous region matching the tile at (x, y) with a fill
+    // tile, snapshotting the whole layer on first Execute so Undo can restore it.
     class LayerFillCommand : public Command
     {
     public:
@@ -51,10 +51,10 @@ namespace Tiles
         }
 
     private:
-        /// Breadth-first 4-connected fill: replaces every tile reachable from
-        /// (startX, startY) that equals targetTile with the fill tile, clipped to
-        /// m_Bounds (the visible tile region). Bounding to the view keeps a fill on
-        /// the unbounded board finite and intuitive -- it fills what you can see.
+        // Breadth-first 4-connected fill: replaces every tile reachable from
+        // (startX, startY) that equals targetTile with the fill tile, clipped to
+        // m_Bounds (the visible tile region). Bounding to the view keeps a fill on
+        // the unbounded board finite and intuitive -- it fills what you can see.
         void FloodFill(TileLayer& layer, int startX, int startY, const Tile& targetTile)
         {
             const int minX = m_Bounds.x, minY = m_Bounds.y, maxX = m_Bounds.z, maxY = m_Bounds.w;

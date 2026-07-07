@@ -5,8 +5,8 @@
 
 namespace Tiles
 {
-	/// Offscreen render target: a GL framebuffer with a color texture and a depth
-	/// renderbuffer. RAII wrapper owning those GL handles.
+	// Offscreen render target: a GL framebuffer with a color texture and a depth
+	// renderbuffer. RAII wrapper owning those GL handles.
 	class FrameBuffer
 	{
 	public:

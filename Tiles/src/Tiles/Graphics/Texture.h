@@ -10,23 +10,23 @@
 
 namespace Tiles
 {
-	/// 2D texture or cubemap; RAII wrapper owning a single GL texture object.
-	/// Created with immutable storage via direct state access (DSA).
+	// 2D texture or cubemap; RAII wrapper owning a single GL texture object.
+	// Created with immutable storage via direct state access (DSA).
 	class Texture
 	{
 	public:
-		/// Loads a texture from an image file on disk.
+		// Loads a texture from an image file on disk.
 		static std::shared_ptr<Texture> Create(const std::string& source);
-		/// Allocates an empty texture of the given size and format.
+		// Allocates an empty texture of the given size and format.
 		static std::shared_ptr<Texture> Create(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
 
-		/// Uploads pixel data, deriving the format from the channel count.
+		// Uploads pixel data, deriving the format from the channel count.
 		static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, int components);
 		static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format);
 
-		/// Builds a cubemap from six face image files (order: +X,-X,+Y,-Y,+Z,-Z).
+		// Builds a cubemap from six face image files (order: +X,-X,+Y,-Y,+Z,-Z).
 		static std::shared_ptr<Texture> CreateCubemap(const std::vector<std::string>& faces);
-		/// Builds a cubemap from six contiguous faces of raw RGBA8 pixel data.
+		// Builds a cubemap from six contiguous faces of raw RGBA8 pixel data.
 		static std::shared_ptr<Texture> CreateCubemap(uint32_t width, uint32_t height, const void* data);
 
 		Texture(const std::string& source);
@@ -44,10 +44,10 @@ namespace Tiles
 		void Unbind() const;
 
 		bool SetResolution(uint32_t width, uint32_t height);
-		/// Uploads @p size bytes into the existing storage; @p size must match the
-		/// current dimensions and format exactly.
+		// Uploads @p size bytes into the existing storage; @p size must match the
+		// current dimensions and format exactly.
 		void SetData(const void* data, uint32_t size);
-		/// Recreates the texture at the given size/format and uploads @p data.
+		// Recreates the texture at the given size/format and uploads @p data.
 		void SetData(const void* data, uint32_t width, uint32_t height, int components);
 		void SetData(const void* data, uint32_t width, uint32_t height, TextureFormat format);
 
@@ -58,8 +58,8 @@ namespace Tiles
 		int GetComponentCount() const;
 		const std::string& GetPath() const { return m_Path; }
 
-		/// Reads the texture back from the GPU as tightly-packed RGBA8 pixels
-		/// (width*height*4 bytes), so an atlas can be embedded in a saved project.
+		// Reads the texture back from the GPU as tightly-packed RGBA8 pixels
+		// (width*height*4 bytes), so an atlas can be embedded in a saved project.
 		std::vector<uint8_t> ReadPixels() const;
 
 		bool IsCubemap() const { return m_IsCubemap; }

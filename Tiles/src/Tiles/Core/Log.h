@@ -10,13 +10,13 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-/// TODO: Rename this file to Logger.h
-/// TODO: Add comments to each funciton, matching look of Application.h
-/// TODO: Simplify logging. We dont need this many macros. Lets keep what we need. 
+// TODO: Rename this file to Logger.h
+// TODO: Add comments to each funciton, matching look of Application.h
+// TODO: Simplify logging. We dont need this many macros. Lets keep what we need. 
 namespace Tiles
 {
 
-	/// TODO: move these to constants
+	// TODO: move these to constants
 	namespace LogColors
 	{
 		constexpr const char* RESET = "\033[0m";
@@ -30,8 +30,8 @@ namespace Tiles
 		constexpr const char* BOLD_RED = "\033[1;31m";
 	}
 
-	/// spdlog formatter rendering "[time] [logger] [level] message" with ANSI
-	/// color per field for the console sink.
+	// spdlog formatter rendering "[time] [logger] [level] message" with ANSI
+	// color per field for the console sink.
 	class LogFormatter : public spdlog::formatter
 	{
 	public:
@@ -43,8 +43,8 @@ namespace Tiles
 		std::string GetLevelColor(spdlog::level::level_enum level);
 	};
 
-	/// Tag-aware, std::format-based logger with distinct Core (ENGINE) and
-	/// Client (CLIENT) channels sharing a single colored console sink.
+	// Tag-aware, std::format-based logger with distinct Core (ENGINE) and
+	// Client (CLIENT) channels sharing a single colored console sink.
 	class Logger
 	{
 	public:
@@ -64,9 +64,9 @@ namespace Tiles
 		Logger(Logger&&) = delete;
 		Logger& operator=(Logger&&) = delete;
 
-		/// Creates the two console loggers sharing one colored stdout sink.
+		// Creates the two console loggers sharing one colored stdout sink.
 		void Init();
-		/// Flushes both loggers, shuts spdlog down, and releases the loggers.
+		// Flushes both loggers, shuts spdlog down, and releases the loggers.
 		void Shutdown();
 
 		std::shared_ptr<spdlog::logger>& GetEngineLogger() { return m_EngineLogger; }

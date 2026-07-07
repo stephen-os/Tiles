@@ -4,9 +4,9 @@
 
 namespace Tiles
 {
-    /// Appends a new layer to the top of the stack. On first Execute it records
-    /// the assigned index (and a default name if none was given) so Undo can
-    /// remove exactly that layer.
+    // Appends a new layer to the top of the stack. On first Execute it records
+    // the assigned index (and a default name if none was given) so Undo can
+    // remove exactly that layer.
     class LayerAddCommand : public Command
     {
     public:

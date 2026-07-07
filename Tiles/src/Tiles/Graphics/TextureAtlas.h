@@ -16,8 +16,8 @@ namespace Tiles
 	public:
 		static std::shared_ptr<TextureAtlas> Create(std::string& source, int width, int height);
 		static std::shared_ptr<TextureAtlas> Create(int width, int height);
-		/// Builds an atlas over an already-created texture (e.g. one decoded from
-		/// an embedded image on load).
+		// Builds an atlas over an already-created texture (e.g. one decoded from
+		// an embedded image on load).
 		static std::shared_ptr<TextureAtlas> Create(std::shared_ptr<Texture> texture, int width, int height);
 
 
@@ -38,12 +38,12 @@ namespace Tiles
 
 		const std::shared_ptr<Texture> GetTexture() const { return m_Texture; }
 
-		/// UV rectangle of cell @p index, packed as (uMin, vMin, uMax, vMax).
-		/// Returns a zero vector on out-of-range index.
+		// UV rectangle of cell @p index, packed as (uMin, vMin, uMax, vMax).
+		// Returns a zero vector on out-of-range index.
 		glm::vec4 GetTextureCoords(int index) const;
-		/// UV-space offset of cell @p index's lower-left corner.
+		// UV-space offset of cell @p index's lower-left corner.
 		glm::vec2 GetOffset(int index) const;
-		/// Grid (column, row) coordinates of cell @p index.
+		// Grid (column, row) coordinates of cell @p index.
 		glm::vec2 GetPosition(int index) const;
 
 	private:

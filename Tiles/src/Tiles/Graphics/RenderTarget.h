@@ -10,8 +10,8 @@
 
 namespace Tiles
 {
-	/// Off-screen render target backed by a FrameBuffer; drawing while bound
-	/// renders into its color attachment, which can be sampled or saved out.
+	// Off-screen render target backed by a FrameBuffer; drawing while bound
+	// renders into its color attachment, which can be sampled or saved out.
 	class RenderTarget
 	{
 	public:
@@ -26,9 +26,9 @@ namespace Tiles
 		void Resize(float width, float height);
 		void Resize(const glm::vec2& size);
 
-		/// Reads back the color attachment and writes it to @p path. The image
-		/// encoder is chosen from the extension (.png/.jpg/.jpeg/.bmp/.tga).
-		/// Returns false on an unsupported extension or a write failure.
+		// Reads back the color attachment and writes it to @p path. The image
+		// encoder is chosen from the extension (.png/.jpg/.jpeg/.bmp/.tga).
+		// Returns false on an unsupported extension or a write failure.
 		bool SaveToFile(const std::string& path);
 
 		uint32_t GetTexture() const { return m_FrameBuffer->GetColorAttachment(); }

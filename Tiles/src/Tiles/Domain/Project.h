@@ -17,9 +17,9 @@
 
 namespace Tiles
 {
-    /// A user-defined rectangular export region in tile coordinates. When enabled
-    /// it defines what the exporter renders, and is drawn as a guide in the
-    /// viewport; otherwise export falls back to the painted content's bounds.
+    // A user-defined rectangular export region in tile coordinates. When enabled
+    // it defines what the exporter renders, and is drawn as a guide in the
+    // viewport; otherwise export falls back to the painted content's bounds.
     struct ExportRegion
     {
         glm::ivec2 Min{ 0, 0 };       // bottom-left tile (inclusive)
@@ -27,14 +27,14 @@ namespace Tiles
         bool Enabled = false;
     };
 
-    /// A document: the layer stack, its texture atlases, and file/dirty
-    /// bookkeeping. A project with no file path is considered "new" (unsaved).
+    // A document: the layer stack, its texture atlases, and file/dirty
+    // bookkeeping. A project with no file path is considered "new" (unsaved).
     class Project
     {
     public:
         nlohmann::json ToJSON() const;
-        /// Reconstructs a project from JSON.
-        /// @return Null if the required layer-stack field is missing.
+        // Reconstructs a project from JSON.
+        // @return Null if the required layer-stack field is missing.
         static std::shared_ptr<Project> FromJSON(const nlohmann::json& json);
 
         explicit Project(const std::string& name = "Untitled Project");

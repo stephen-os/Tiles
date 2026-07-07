@@ -15,7 +15,7 @@ namespace Tiles
         Stream          // Data modified every frame (GL_STREAM_DRAW)
     };
 
-    /// GPU vertex buffer; RAII wrapper owning a single GL buffer object.
+    // GPU vertex buffer; RAII wrapper owning a single GL buffer object.
     class VertexBuffer
     {
     public:
@@ -53,7 +53,7 @@ namespace Tiles
         BufferLayout m_Layout;
     };
 
-    /// GPU element/index buffer; RAII wrapper owning a single GL buffer object.
+    // GPU element/index buffer; RAII wrapper owning a single GL buffer object.
     class IndexBuffer
     {
     public:
@@ -83,8 +83,8 @@ namespace Tiles
         BufferUsage m_Usage;
     };
 
-    /// GPU uniform buffer (UBO) for sharing uniform blocks across shaders;
-    /// RAII wrapper owning a single GL buffer object.
+    // GPU uniform buffer (UBO) for sharing uniform blocks across shaders;
+    // RAII wrapper owning a single GL buffer object.
     class UniformBuffer
     {
     public:
@@ -101,8 +101,8 @@ namespace Tiles
         UniformBuffer(UniformBuffer&& other) noexcept;
         UniformBuffer& operator=(UniformBuffer&& other) noexcept;
 
-        /// Binds the buffer to an indexed uniform binding point (glBindBufferBase)
-        /// and remembers it so Unbind() can release the same point.
+        // Binds the buffer to an indexed uniform binding point (glBindBufferBase)
+        // and remembers it so Unbind() can release the same point.
         void Bind(uint32_t bindingPoint) const;
         void Unbind() const;
 

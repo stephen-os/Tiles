@@ -13,11 +13,11 @@ namespace Tiles
         using std::runtime_error::runtime_error;
     };
 
-    /// Reads an entire file into a string.
-    /// @param filename Path to the file to read.
-    /// @param maxSize Upper bound on file size; larger files are rejected.
-    /// @return The file's raw bytes.
-    /// @throws FileReadError if the file cannot be opened, sized, read, or exceeds maxSize.
+    // Reads an entire file into a string.
+    // @param filename Path to the file to read.
+    // @param maxSize Upper bound on file size; larger files are rejected.
+    // @return The file's raw bytes.
+    // @throws FileReadError if the file cannot be opened, sized, read, or exceeds maxSize.
     [[nodiscard]] inline std::string ReadFile(const std::string& filename,
                                               size_t maxSize = MaxFileSize) {
         std::ifstream file(filename, std::ios::ate | std::ios::binary);

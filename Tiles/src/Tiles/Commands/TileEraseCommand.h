@@ -5,8 +5,8 @@
 
 namespace Tiles
 {
-    /// Resets a single tile to empty, capturing its prior state on first Execute
-    /// for Undo. Coalesces with an identical erase on the same cell.
+    // Resets a single tile to empty, capturing its prior state on first Execute
+    // for Undo. Coalesces with an identical erase on the same cell.
     class TileEraseCommand : public Command
     {
     public:

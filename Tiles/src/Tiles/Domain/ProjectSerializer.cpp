@@ -21,7 +21,7 @@ namespace Tiles
     {
         constexpr const char* ManifestEntry = "manifest.json";
 
-        /// Reads an entire file into a byte buffer (binary, no newline translation).
+        // Reads an entire file into a byte buffer (binary, no newline translation).
         bool ReadFileBytes(const std::filesystem::path& path, std::vector<uint8_t>& out)
         {
             std::ifstream file(path, std::ios::binary | std::ios::ate);
@@ -50,8 +50,8 @@ namespace Tiles
             return file.good();
         }
 
-        /// Loads the legacy path-referencing JSON format so pre-container projects
-        /// still open. Save always writes the self-contained container.
+        // Loads the legacy path-referencing JSON format so pre-container projects
+        // still open. Save always writes the self-contained container.
         ProjectResult LoadLegacyJSON(const std::vector<uint8_t>& bytes, std::shared_ptr<Project>& outProject)
         {
             try
