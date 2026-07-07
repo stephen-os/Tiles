@@ -1,20 +1,14 @@
 #pragma once
 
-#include <utility>
+#include "Input/KeyCodes.h"
+#include "Input/MouseCodes.h"
 
-#include "KeyCode.h"
-
-namespace Tiles
+namespace Tiles::Input
 {
-    class Input
-    {
-    public:
-        static bool IsKeyPressed(KeyCode keycode);
-        static bool IsMouseButtonPressed(MouseCode mousecode);
-        static std::pair<float, float> GetMousePosition();
-        static float GetMouseX();
-        static float GetMouseY();
+    // Polls whether a key is currently held. State comes from the window (GLFW),
+    // so this reflects the live keyboard, not the buffered event stream.
+    bool IsKeyPressed(KeyCode key);
 
-        static void SetCursorMode(CursorMode mode);
-    };
+    // Polls whether a mouse button is currently held.
+    bool IsMouseButtonPressed(MouseCode button);
 }
