@@ -1,7 +1,6 @@
 #include "Window.h"
 #include "Log.h"
 #include "Assert.h"
-#include "KeyCode.h"
 
 #include <GLFW/glfw3.h>
 
@@ -32,13 +31,13 @@ namespace Tiles
 		TILES_ENGINE_ERROR("[GLFW] Error {}: {}", error, description);
 	}
 
-	Window::Window(const WindowSpec& spec)
-		: m_Width(spec.Width)
-		, m_Height(spec.Height)
-		, m_WindowedWidth(spec.Width)
-		, m_WindowedHeight(spec.Height)
-		, m_VSync(spec.VSync)
-		, m_Fullscreen(spec.Fullscreen)
+	Window::Window(const WindowSettings& settings)
+		: m_Width(settings.Width)
+		, m_Height(settings.Height)
+		, m_WindowedWidth(settings.Width)
+		, m_WindowedHeight(settings.Height)
+		, m_VSync(settings.VSync)
+		, m_Fullscreen(settings.Fullscreen)
 	{
 		if (!s_GLFWInitialized)
 		{
@@ -55,13 +54,13 @@ namespace Tiles
 		// Window hints. Created hidden so the caller can finish GL/ImGui setup and
 		// call Show() without a flash of an unstyled window.
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-		glfwWindowHint(GLFW_RESIZABLE, spec.Resizable ? GLFW_TRUE : GLFW_FALSE);
-		glfwWindowHint(GLFW_DECORATED, spec.Decorated ? GLFW_TRUE : GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, settings.Resizable ? GLFW_TRUE : GLFW_FALSE);
+		glfwWindowHint(GLFW_DECORATED, settings.Decorated ? GLFW_TRUE : GLFW_FALSE);
 
 		m_Window = glfwCreateWindow(
-			static_cast<int>(spec.Width),
-			static_cast<int>(spec.Height),
-			spec.Title.c_str(),
+			static_cast<int>(settings.Width),
+			static_cast<int>(settings.Height),
+			settings.Title.c_str(),
 			nullptr,
 			nullptr
 		);
@@ -74,19 +73,19 @@ namespace Tiles
 
 		// This window owns the OpenGL context the rest of the app renders into.
 		glfwMakeContextCurrent(m_Window);
-		SetVSync(spec.VSync);
+		SetVSync(settings.VSync);
 
-		if (!spec.IconPath.empty())
-			SetIcon(spec.IconPath);
+		if (!settings.IconPath.empty())
+			SetIcon(settings.IconPath);
 
 		SetupCallbacks();
 
 		// Apply initial window state
-		if (spec.Fullscreen)
+		if (settings.Fullscreen)
 			SetFullscreen(true);
-		else if (spec.Maximized)
+		else if (settings.Maximized)
 			Maximize();
-		else if (spec.Centered)
+		else if (settings.Centered)
 			CenterOnMonitor();
 
 		TILES_ENGINE_INFO("Window created: {}x{}", m_Width, m_Height);
@@ -171,23 +170,26 @@ namespace Tiles
 			if (win->m_EventCallback)
 			{
 				KeyCode keycode = static_cast<KeyCode>(key);
+				// GLFW's mod bits match KeyMods 1:1; mask to the low nibble to drop
+				// the Caps/Num-lock bits we don't model.
+				KeyMods keymods = static_cast<KeyMods>(mods & 0x0F);
 				switch (action)
 				{
 				case GLFW_PRESS:
 				{
-					KeyPressedEvent e(keycode, false);
+					KeyPressedEvent e(keycode, keymods, false);
 					win->m_EventCallback(e);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					KeyReleasedEvent e(keycode);
+					KeyReleasedEvent e(keycode, keymods);
 					win->m_EventCallback(e);
 					break;
 				}
 				case GLFW_REPEAT:
 				{
-					KeyPressedEvent e(keycode, true);
+					KeyPressedEvent e(keycode, keymods, true);
 					win->m_EventCallback(e);
 					break;
 				}
@@ -211,17 +213,18 @@ namespace Tiles
 			if (win->m_EventCallback)
 			{
 				MouseCode mouseButton = static_cast<MouseCode>(button);
+				KeyMods keymods = static_cast<KeyMods>(mods & 0x0F);
 				switch (action)
 				{
 				case GLFW_PRESS:
 				{
-					MouseButtonPressedEvent e(mouseButton);
+					MouseButtonPressedEvent e(mouseButton, keymods);
 					win->m_EventCallback(e);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					MouseButtonReleasedEvent e(mouseButton);
+					MouseButtonReleasedEvent e(mouseButton, keymods);
 					win->m_EventCallback(e);
 					break;
 				}
@@ -376,6 +379,18 @@ namespace Tiles
 	bool Window::IsMinimized() const
 	{
 		return glfwGetWindowAttrib(m_Window, GLFW_ICONIFIED) == GLFW_TRUE;
+	}
+
+	bool Window::IsKeyPressed(Input::KeyCode key) const
+	{
+		int state = glfwGetKey(m_Window, static_cast<int>(key));
+		return state == GLFW_PRESS || state == GLFW_REPEAT;
+	}
+
+	bool Window::IsMouseButtonPressed(Input::MouseCode button) const
+	{
+		int state = glfwGetMouseButton(m_Window, static_cast<int>(button));
+		return state == GLFW_PRESS;
 	}
 
 	void Window::SetIcon(const std::string& iconPath)

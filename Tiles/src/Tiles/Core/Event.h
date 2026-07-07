@@ -1,6 +1,7 @@
 #pragma once
 
-#include "KeyCode.h"
+#include "Input/KeyCodes.h"
+#include "Input/MouseCodes.h"
 
 #include <string>
 #include <string_view>
@@ -9,6 +10,12 @@
 
 namespace Tiles
 {
+	// The event layer builds on the input-code types, which live in Tiles::Input;
+	// surface them here so events can name KeyCode/KeyMods/MouseCode directly.
+	using Input::KeyCode;
+	using Input::KeyMods;
+	using Input::MouseCode;
+
 	constexpr uint32_t Bit(uint32_t x) { return 1u << x; }
 
 	enum class EventType
@@ -120,9 +127,11 @@ namespace Tiles
 	class KeyEventBase : public EventBase<Derived, Type, EventCategory::Input | EventCategory::Keyboard>
 	{
 	public:
-		KeyEventBase(KeyCode key) : m_Key(key) {}
+		KeyEventBase(KeyCode key, KeyMods mods = KeyMods::None) : m_Key(key), m_Mods(mods) {}
 
 		KeyCode GetKey() const { return m_Key; }
+		KeyMods GetMods() const { return m_Mods; }
+		bool HasMod(KeyMods mod) const { return Input::HasMod(m_Mods, mod); }
 
 		std::string ToString() const override
 		{
@@ -131,15 +140,18 @@ namespace Tiles
 
 	protected:
 		KeyCode m_Key;
+		KeyMods m_Mods;
 	};
 
 	template<typename Derived, EventType Type>
 	class MouseButtonEventBase : public EventBase<Derived, Type, EventCategory::Input | EventCategory::Mouse | EventCategory::MouseButton>
 	{
 	public:
-		MouseButtonEventBase(MouseCode button) : m_Button(button) {}
+		MouseButtonEventBase(MouseCode button, KeyMods mods = KeyMods::None) : m_Button(button), m_Mods(mods) {}
 
 		MouseCode GetButton() const { return m_Button; }
+		KeyMods GetMods() const { return m_Mods; }
+		bool HasMod(KeyMods mod) const { return Input::HasMod(m_Mods, mod); }
 
 		std::string ToString() const override
 		{
@@ -148,6 +160,7 @@ namespace Tiles
 
 	protected:
 		MouseCode m_Button;
+		KeyMods m_Mods;
 	};
 
 	// Window events
@@ -207,8 +220,8 @@ namespace Tiles
 	class KeyPressedEvent final : public KeyEventBase<KeyPressedEvent, EventType::KeyPressed>
 	{
 	public:
-		KeyPressedEvent(KeyCode key, bool isRepeat = false)
-			: KeyEventBase(key), m_IsRepeat(isRepeat) {}
+		KeyPressedEvent(KeyCode key, KeyMods mods = KeyMods::None, bool isRepeat = false)
+			: KeyEventBase(key, mods), m_IsRepeat(isRepeat) {}
 
 		bool IsRepeat() const { return m_IsRepeat; }
 
@@ -226,7 +239,7 @@ namespace Tiles
 	class KeyReleasedEvent final : public KeyEventBase<KeyReleasedEvent, EventType::KeyReleased>
 	{
 	public:
-		KeyReleasedEvent(KeyCode key) : KeyEventBase(key) {}
+		KeyReleasedEvent(KeyCode key, KeyMods mods = KeyMods::None) : KeyEventBase(key, mods) {}
 	};
 
 	class KeyTypedEvent final : public EventBase<KeyTypedEvent, EventType::KeyTyped, EventCategory::Input | EventCategory::Keyboard>
@@ -249,13 +262,13 @@ namespace Tiles
 	class MouseButtonPressedEvent final : public MouseButtonEventBase<MouseButtonPressedEvent, EventType::MouseButtonPressed>
 	{
 	public:
-		MouseButtonPressedEvent(MouseCode button) : MouseButtonEventBase(button) {}
+		MouseButtonPressedEvent(MouseCode button, KeyMods mods = KeyMods::None) : MouseButtonEventBase(button, mods) {}
 	};
 
 	class MouseButtonReleasedEvent final : public MouseButtonEventBase<MouseButtonReleasedEvent, EventType::MouseButtonReleased>
 	{
 	public:
-		MouseButtonReleasedEvent(MouseCode button) : MouseButtonEventBase(button) {}
+		MouseButtonReleasedEvent(MouseCode button, KeyMods mods = KeyMods::None) : MouseButtonEventBase(button, mods) {}
 	};
 
 	class MouseMovedEvent final : public EventBase<MouseMovedEvent, EventType::MouseMoved, EventCategory::Input | EventCategory::Mouse>

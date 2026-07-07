@@ -2,6 +2,9 @@
 
 #include "Event.h"
 
+#include "Input/KeyCodes.h"
+#include "Input/MouseCodes.h"
+
 #include <string>
 #include <functional>
 
@@ -9,7 +12,7 @@ struct GLFWwindow;
 
 namespace Tiles
 {
-	struct WindowSpec
+	struct WindowSettings
 	{
 		std::string Title = "Tiles Application";
 		std::string IconPath;
@@ -23,24 +26,27 @@ namespace Tiles
 		bool VSync = true;
 	};
 
-	/// GLFW window owning an OpenGL context. Forwards OS input/window events to a
-	/// callback (unset for now -- event wiring lands in a later change).
+	// TODO: Implement rule of 5
+
 	class Window
 	{
 	public:
-		using EventCallback = std::function<void(Event&)>;
-
-		Window(const WindowSpec& spec);
+		Window(const WindowSettings& settings);
 		~Window();
 
 		Window(const Window&) = delete;
 		Window& operator=(const Window&) = delete;
 
-		void Update();               // polls OS events
-		void SwapBuffers();          // presents the GL back buffer
+		// Main loop operations
+		void Update();
+
+		// Buffer operations
+		void SwapBuffers();
+
+		// Event handling
 		[[nodiscard]] bool ShouldClose() const;
 
-		void SetEventCallback(const EventCallback& callback) { m_EventCallback = callback; }
+		void SetEventCallback(const std::function<void(Event&)>& callback) { m_EventCallback = callback; }
 
 		// Runtime operations
 		void SetVSync(bool enabled);
@@ -67,14 +73,21 @@ namespace Tiles
 
 		[[nodiscard]] GLFWwindow* GetNativeWindow() const { return m_Window; }
 
+		// Live input polling -- current device state, as opposed to the buffered
+		// event stream delivered through the event callback.
+		[[nodiscard]] bool IsKeyPressed(Input::KeyCode key) const;
+		[[nodiscard]] bool IsMouseButtonPressed(Input::MouseCode button) const;
+
 		static void TerminateGLFW();
 
 	private:
 		void SetupCallbacks();
 		void SetIcon(const std::string& iconPath);
 
+	private: 
+
 		GLFWwindow* m_Window = nullptr;
-		EventCallback m_EventCallback;
+		std::function<void(Event&)> m_EventCallback;
 
 		// Cached state
 		uint32_t m_Width = 0;

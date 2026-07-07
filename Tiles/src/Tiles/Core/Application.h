@@ -3,6 +3,7 @@
 #include "imgui.h"
 
 #include "Window.h"
+#include "Input/InputState.h"
 
 #include "Layer.h"
 #include "ApplicationSettings.h"
@@ -17,45 +18,51 @@ namespace Tiles
 	class Application
 	{
 	public:
-		/// Application constructor
+		// Application constructor
 		Application(const ApplicationSettings& settings = ApplicationSettings());
 		
-		/// Application destructor
+		// Application destructor
 		virtual ~Application();
 
-		/// Runs client setup (OnCreate); call once before Run.
+		// Runs client setup (OnCreate); call once before Run.
 		void Create();
 
-		/// Detaches all layers and runs client teardown (OnDestroy).
+		// Detaches all layers and runs client teardown (OnDestroy).
 		void Destroy();
 		
-		/// Drives the main loop: updates layers, renders the ImGui dockspace and
-		/// UI, and presents each frame until the window closes or Shutdown is called.
+		// Drives the main loop: updates layers, renders the ImGui dockspace and
+		// UI, and presents each frame until the window closes or Shutdown is called.
 		void Run();
 
-		/// Toggles between borderless-fullscreen on the primary monitor and the
-		/// last windowed position/size, per the current Fullscreen spec flag.
+		// Toggles between borderless-fullscreen on the primary monitor and the
+		// last windowed position/size, per the current Fullscreen spec flag.
 		void SetWindowFullscreen();
 
-		/// Requests the run loop to exit at the end of the current frame.
+		// Requests the run loop to exit at the end of the current frame.
 		void Shutdown() { m_Running = false; };
 
-		/// Gets the instance of this application
+		// Gets the instance of this application
 		static Application& GetInstance();
 
-		/// Gets the native window handle of this application
+		// Gets the native window handle of this application
 		GLFWwindow* GetWindowHandle() const { return m_Window ? m_Window->GetNativeWindow() : nullptr; };
 
+		// The owned window. Valid for the lifetime of the running application.
+		[[nodiscard]] Window& GetWindow() const { return *m_Window; }
+
+		// Frame-coherent keyboard/mouse state, fed by the event stream each frame.
+		[[nodiscard]] Input::InputState& GetInputState() { return m_InputState; }
+
 	protected:
-		/// Client side create
+		// Client side create
 		virtual void OnCreate() = 0;
 
-		/// Client side destroy
+		// Client side destroy
 		virtual void OnDestroy() = 0;
 
-		/// Constructs a layer of type T in place, takes ownership, and attaches it.
-		/// @tparam T Layer subclass to instantiate.
-		/// @param args Arguments forwarded to T's constructor.
+		// Constructs a layer of type T in place, takes ownership, and attaches it.
+		// @tparam T Layer subclass to instantiate.
+		// @param args Arguments forwarded to T's constructor.
 		template<typename T, typename... Args>
 		void PushLayer(Args&&... args)
 		{
@@ -64,16 +71,17 @@ namespace Tiles
 		}
 
 	private:
-		/// Receives window/input events from the Window and dispatches them to
-		/// layers (top-down, stopping once an event is marked handled).
+		// Receives window/input events from the Window and dispatches them to
+		// layers (top-down, stopping once an event is marked handled).
 		void OnEvent(Event& event);
 
-		/// Captures the current window geometry (size/position/maximized/
-		/// fullscreen) and writes it to the settings file for the next run.
+		// Captures the current window geometry (size/position/maximized/
+		// fullscreen) and writes it to the settings file for the next run.
 		void SaveSettings();
 
 	private:
-		std::unique_ptr<Window> m_Window;					/// Owns the OS window + GL context
+		std::unique_ptr<Window> m_Window;
+		Input::InputState m_InputState;
 		bool m_Running = true;
 		std::vector<std::shared_ptr<Layer>> m_LayerStack;
 		ApplicationSettings m_Settings;
@@ -81,7 +89,7 @@ namespace Tiles
 		Timer m_FrameTimer;
 	};
 
-	/// Factory implemented by the client to build the concrete Application.
-	/// Called by the entry point; the returned instance is owned by Main.
+	// Factory implemented by the client to build the concrete Application.
+	// Called by the entry point; the returned instance is owned by Main.
 	Application* CreateApplication(int argc, char** argv);
 }

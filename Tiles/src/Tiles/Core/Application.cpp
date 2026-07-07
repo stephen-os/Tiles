@@ -25,17 +25,17 @@
 
 namespace Tiles
 {
-    /// Static singleton
+    // Static singleton
     static Tiles::Application* s_Instance = nullptr;
     
-    /// Window state is persisted here, in the working directory alongside imgui.ini.
-    /// TODO: This filename should be in the ApplicationSettings file
+    // Window state is persisted here, in the working directory alongside imgui.ini.
+    // TODO: This filename should be in the ApplicationSettings file
     static constexpr const char* SETTINGS_FILE = "settings.json";
 
-    /// Static accessor
+    // Static accessor
     Application& Application::GetInstance() { return *s_Instance; }
 
-    /// Constructor
+    // Constructor
     Application::Application(const ApplicationSettings& settings)
     {
 		s_Instance = this;
@@ -50,14 +50,14 @@ namespace Tiles
 
         // The Window owns GLFW init, the OS window, its icon, and the OpenGL
         // context the app renders into. It is created hidden and shown after setup.
-        WindowSpec spec;
-        spec.Title = m_Settings.Name;
-        spec.Width = m_Settings.Width;
-        spec.Height = m_Settings.Height;
-        spec.IconPath = m_Settings.Icon;
-        spec.VSync = true;
+        WindowSettings windowSettings;
+        windowSettings.Title = m_Settings.Name;
+        windowSettings.Width = m_Settings.Width;
+        windowSettings.Height = m_Settings.Height;
+        windowSettings.IconPath = m_Settings.Icon;
+        windowSettings.VSync = true;
 
-        m_Window = std::make_unique<Window>(spec);
+        m_Window = std::make_unique<Window>(windowSettings);
         if (!m_Window->GetNativeWindow())
         {
             TILES_ENGINE_ERROR("Failed to create the application window.");
@@ -111,7 +111,7 @@ namespace Tiles
         m_Window->Show();
     }
 
-    /// Application destructor
+    // Application destructor
     Application::~Application()
     {
 		s_Instance = nullptr;
@@ -137,13 +137,13 @@ namespace Tiles
         TILES_LOGGER_SHUTDOWN();
     }
 
-    /// Application entry point
+    // Application entry point
     void Application::Create()
     {
         OnCreate();
     }
     
-    /// Application exit point
+    // Application exit point
     void Application::Destroy()
     {
         for (auto& layer : m_LayerStack)
@@ -154,7 +154,7 @@ namespace Tiles
         OnDestroy();
     }
 
-    /// Application run loop
+    // Application run loop
     void Application::Run()
     {
         if (!m_Window || !m_Window->GetNativeWindow())
@@ -171,6 +171,9 @@ namespace Tiles
             for (auto& layer : m_LayerStack)
                 layer->OnUpdate(m_TimeStep);
 
+            // Advance last frame's press/release edges to steady state before the
+            // window pumps this frame's events into the input state (in OnEvent).
+            m_InputState.NewFrame();
             m_Window->Update();
 
             ImGui_ImplOpenGL3_NewFrame();
@@ -241,7 +244,7 @@ namespace Tiles
         }
     }
 
-    /// Dispatches an event from the window to the app and its layers.
+    // Dispatches an event from the window to the app and its layers.
     void Application::OnEvent(Event& event)
     {
         EventDispatcher dispatcher(event);
@@ -250,6 +253,14 @@ namespace Tiles
             m_Running = false;
             return true;
         });
+
+        // Feed the input state before layers run, and without consuming the event,
+        // so held-state stays correct even if a layer marks the event handled.
+        dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) { m_InputState.OnKeyPressed(e.GetKey(), e.IsRepeat()); return false; });
+        dispatcher.Dispatch<KeyReleasedEvent>([this](KeyReleasedEvent& e) { m_InputState.OnKeyReleased(e.GetKey()); return false; });
+        dispatcher.Dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent& e) { m_InputState.OnMouseButtonPressed(e.GetButton()); return false; });
+        dispatcher.Dispatch<MouseButtonReleasedEvent>([this](MouseButtonReleasedEvent& e) { m_InputState.OnMouseButtonReleased(e.GetButton()); return false; });
+        dispatcher.Dispatch<WindowLostFocusEvent>([this](WindowLostFocusEvent&) { m_InputState.Reset(); return false; });
 
         // Deliver top-down; a layer that marks the event handled stops it from
         // reaching layers beneath.
@@ -261,16 +272,16 @@ namespace Tiles
         }
     }
 
-    /// Applies the current Fullscreen setting to the window.
+    // Applies the current Fullscreen setting to the window.
     void Application::SetWindowFullscreen()
     {
         if (m_Window)
             m_Window->SetFullscreen(m_Settings.Fullscreen);
     }
 
-    /// Saves the application settings
-    /// TODO: this should be moved to ApplicationSettingsSerializer
-    /// TODO: this should be called on shutdown
+    // Saves the application settings
+    // TODO: this should be moved to ApplicationSettingsSerializer
+    // TODO: this should be called on shutdown
     void Application::SaveSettings()
     {
         if (m_Window)
