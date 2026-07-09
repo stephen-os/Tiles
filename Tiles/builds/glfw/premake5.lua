@@ -3,7 +3,7 @@ project "GLFW"
     language "C"
     staticruntime "off"
 
-    flags { "MultiProcessorCompile" }
+    multiprocessorcompile "On"
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-int/" .. outputdir .. "/%{prj.name}")

@@ -4,7 +4,7 @@ project "TilesEditor"
    cppdialect "C++23"
    staticruntime "off"
 
-   flags { "MultiProcessorCompile" }
+   multiprocessorcompile "On"
 
    files { "src/**.h", "src/**.cpp" }
 
