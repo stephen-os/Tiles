@@ -14,9 +14,9 @@ group "Dependencies"
 group ""
 
 group "Engine"
-   include "Tiles/builds/tiles.lua"
+   include "Tiles"
 group ""
 
 group "Tools"
-   include "TilesEditor/builds/tileseditor.lua"
+   include "TilesEditor"
 group ""

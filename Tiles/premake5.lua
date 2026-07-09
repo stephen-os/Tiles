@@ -6,21 +6,21 @@ project "Tiles"
 
    flags { "MultiProcessorCompile" }
 
-   files { "../src/**.h", "../src/**.cpp", "../vendor/miniz/miniz.c", "../vendor/miniz/miniz.h" }
+   files { "src/**.h", "src/**.cpp", "vendor/miniz/miniz.c", "vendor/miniz/miniz.h" }
 
    includedirs
    {
-      "../src/Tiles",
+      "src/Tiles",
 
-      "../vendor/imgui",
-      "../vendor/glfw/include",
-      "../vendor/glm",
-      "../vendor/glad/include",
-      "../vendor/imguifd",
-      "../vendor/spdlog/include",
-      "../vendor/stb",
-      "../vendor/json",
-      "../vendor/miniz"
+      "vendor/imgui",
+      "vendor/glfw/include",
+      "vendor/glm",
+      "vendor/glad/include",
+      "vendor/imguifd",
+      "vendor/spdlog/include",
+      "vendor/stb",
+      "vendor/json",
+      "vendor/miniz"
    }
 
     links
