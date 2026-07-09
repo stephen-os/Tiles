@@ -12,19 +12,19 @@ project "ImGuiFD"
 
 	files
 	{
-		"../vendor/imguifd/ImGuiFileDialog.h",
-		"../vendor/imguifd/ImGuiFileDialog.cpp",
+		"../../vendor/imguifd/ImGuiFileDialog.h",
+		"../../vendor/imguifd/ImGuiFileDialog.cpp",
 
-		"../vendor/imguifd/ImGuiFileDialogConfig.h",
+		"../../vendor/imguifd/ImGuiFileDialogConfig.h",
 
-		"../vendor/imguifd/stb/stb_image.h",
-		"../vendor/imguifd/stb/stb_image_resize2.h"
+		"../../vendor/imguifd/stb/stb_image.h",
+		"../../vendor/imguifd/stb/stb_image_resize2.h"
 	}
 
 	includedirs
 	{
-		"../vendor/imgui",
-		"../vendor/imguifd"
+		"../../vendor/imgui",
+		"../../vendor/imguifd"
 	}
 
 	links { "ImGui" }

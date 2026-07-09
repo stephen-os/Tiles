@@ -11,14 +11,14 @@ project "GLAD"
 
     files
     {
-        "../vendor/glad/include/glad/gl.h",
-        "../vendor/glad/include/KHR/khrplatform.h",
-        "../vendor/glad/src/gl.c"
+        "../../vendor/glad/include/glad/gl.h",
+        "../../vendor/glad/include/KHR/khrplatform.h",
+        "../../vendor/glad/src/gl.c"
     }
 
     includedirs
     {
-        "../vendor/glad/include"
+        "../../vendor/glad/include"
     }
 
     -- Platform-specific settings
