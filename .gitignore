@@ -11,6 +11,7 @@ bin-int/
 
 # Runtime per-user window state
 TilesEditor/settings.json
+TilesEditor/imgui.ini
 
 # Exclude
 !Directories/premake
