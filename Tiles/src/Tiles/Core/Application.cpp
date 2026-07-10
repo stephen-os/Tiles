@@ -6,7 +6,6 @@
 #include <vector>
 
 #include <spdlog/spdlog.h>
-#include <stb/stb_image.h>
 
 #include "imgui.h"
 #include <backends/imgui_impl_glfw.h>
@@ -38,22 +37,16 @@ namespace Tiles
 		m_Settings = settings;
 
 		TILES_LOGGER_INIT();
-		TILES_ENGINE_INFO("Starting Tiles Application: {}", m_Settings.Name);
+		TILES_ENGINE_INFO("Starting Tiles Application: {}", m_Settings.Window.Title);
 
 		// Restore persisted window geometry over the code-provided defaults; a
 		// first run (no file yet) leaves the defaults in place.
 		ApplicationSettingsSerializer::Load(SETTINGS_FILE, m_Settings);
 
 		// The Window owns GLFW init, the OS window, its icon, and the OpenGL
-		// context the app renders into. It is created hidden and shown after setup.
-		WindowSettings windowSettings;
-		windowSettings.Title = m_Settings.Name;
-		windowSettings.Width = m_Settings.Width;
-		windowSettings.Height = m_Settings.Height;
-		windowSettings.IconPath = m_Settings.Icon;
-		windowSettings.VSync = true;
-
-		m_Window = std::make_unique<Window>(windowSettings);
+		// context the app renders into. It is created hidden — applying the
+		// persisted geometry and maximize/fullscreen state — and shown after setup.
+		m_Window = std::make_unique<Window>(m_Settings.Window);
 		if (!m_Window->GetNativeWindow())
 		{
 			TILES_ENGINE_ERROR("Failed to create the application window.");
@@ -92,16 +85,6 @@ namespace Tiles
 
 		// Route OS window/input events through the application to the layers.
 		m_Window->SetEventCallback([this](Event& e) { OnEvent(e); });
-
-		// Restore the windowed position before maximizing/fullscreening, so the
-		// window returns here when the user later un-maximizes.
-		m_Window->SetPosition(m_Settings.PositionX, m_Settings.PositionY);
-
-		if (m_Settings.Maximized)
-			m_Window->Maximize();
-
-		if (m_Settings.Fullscreen)
-			m_Window->SetFullscreen(true);
 
 		// Created hidden; reveal it now that GL and ImGui are initialized.
 		m_Window->Show();
@@ -266,7 +249,7 @@ namespace Tiles
 	void Application::SetWindowFullscreen()
 	{
 		if (m_Window)
-			m_Window->SetFullscreen(m_Settings.Fullscreen);
+			m_Window->SetFullscreen(m_Settings.Window.Fullscreen);
 	}
 
 	// Saves the application settings
@@ -275,15 +258,15 @@ namespace Tiles
 	{
 		if (m_Window)
 		{
-			m_Settings.Maximized = m_Window->IsMaximized();
+			m_Settings.Window.Maximized = m_Window->IsMaximized();
 
 			// Persist the floating geometry, not the maximized/fullscreen size, so
 			// the window restores to where it last was in windowed mode.
-			if (!m_Settings.Maximized && !m_Settings.Fullscreen)
+			if (!m_Settings.Window.Maximized && !m_Settings.Window.Fullscreen)
 			{
-				m_Window->GetPosition(m_Settings.PositionX, m_Settings.PositionY);
-				m_Settings.Width = m_Window->GetWidth();
-				m_Settings.Height = m_Window->GetHeight();
+				m_Window->GetPosition(m_Settings.Window.PositionX, m_Settings.Window.PositionY);
+				m_Settings.Window.Width = m_Window->GetWidth();
+				m_Settings.Window.Height = m_Window->GetHeight();
 			}
 		}
 

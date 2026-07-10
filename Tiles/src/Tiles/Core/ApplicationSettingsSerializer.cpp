@@ -20,12 +20,12 @@ namespace Tiles
 			file >> json;
 
 			const auto& window = json.at("window");
-			settings.Width = window.value("width", settings.Width);
-			settings.Height = window.value("height", settings.Height);
-			settings.PositionX = window.value("x", settings.PositionX);
-			settings.PositionY = window.value("y", settings.PositionY);
-			settings.Maximized = window.value("maximized", settings.Maximized);
-			settings.Fullscreen = window.value("fullscreen", settings.Fullscreen);
+			settings.Window.Width = window.value("width", settings.Window.Width);
+			settings.Window.Height = window.value("height", settings.Window.Height);
+			settings.Window.PositionX = window.value("x", settings.Window.PositionX);
+			settings.Window.PositionY = window.value("y", settings.Window.PositionY);
+			settings.Window.Maximized = window.value("maximized", settings.Window.Maximized);
+			settings.Window.Fullscreen = window.value("fullscreen", settings.Window.Fullscreen);
 
 			TILES_ENGINE_INFO("ApplicationSettings: Loaded window state from '{}'", path.string());
 		}
@@ -40,12 +40,12 @@ namespace Tiles
 		try
 		{
 			nlohmann::json window;
-			window["width"] = settings.Width;
-			window["height"] = settings.Height;
-			window["x"] = settings.PositionX;
-			window["y"] = settings.PositionY;
-			window["maximized"] = settings.Maximized;
-			window["fullscreen"] = settings.Fullscreen;
+			window["width"] = settings.Window.Width;
+			window["height"] = settings.Window.Height;
+			window["x"] = settings.Window.PositionX;
+			window["y"] = settings.Window.PositionY;
+			window["maximized"] = settings.Window.Maximized;
+			window["fullscreen"] = settings.Window.Fullscreen;
 
 			nlohmann::json json;
 			json["window"] = window;

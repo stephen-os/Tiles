@@ -15,6 +15,8 @@ namespace Tiles
 		std::string IconPath;
 		uint32_t Width = 1600;
 		uint32_t Height = 900;
+		int32_t PositionX = 100;
+		int32_t PositionY = 100;
 		bool Fullscreen = false;
 		bool Maximized = false;
 		bool Centered = false;

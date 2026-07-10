@@ -83,7 +83,13 @@ namespace Tiles
 
 		SetupCallbacks();
 
-		// Apply initial window state
+		// Apply the saved windowed position first, then any maximize/fullscreen
+		// state, so the window restores to this position when the user later
+		// leaves maximize/fullscreen.
+		SetPosition(settings.PositionX, settings.PositionY);
+		m_WindowedX = settings.PositionX;
+		m_WindowedY = settings.PositionY;
+
 		if (settings.Fullscreen)
 			SetFullscreen(true);
 		else if (settings.Maximized)

@@ -226,12 +226,12 @@ public:
 Tiles::Application* Tiles::CreateApplication(int argc, char** argv)
 {
 	Tiles::ApplicationSettings spec;
-	spec.Name = "Tiles";
-	spec.Icon = "res/assets/bucket.png";
-	spec.Width = 1920;
-	spec.Height = 1080;
+	spec.Window.Title = "Tiles";
+	spec.Window.IconPath = "res/assets/bucket.png";
+	spec.Window.Width = 1920;
+	spec.Window.Height = 1080;
 	spec.Use2DRenderer = true;
-	spec.Maximized = true;
+	spec.Window.Maximized = true;
 
 	Tiles::Application* app = new TilesEditor(spec);
 
