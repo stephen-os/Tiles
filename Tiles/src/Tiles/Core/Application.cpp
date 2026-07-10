@@ -3,17 +3,12 @@
 
 #include "Application.h"
 
-#include <iostream>
 #include <vector>
 
 #include <spdlog/spdlog.h>
-
 #include <stb/stb_image.h>
 
-#include <fstream>
-#include <filesystem>
-#include <stdlib.h>
-
+#include "imgui.h"
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
@@ -25,280 +20,274 @@
 
 namespace Tiles
 {
-    // Static singleton
-    static Tiles::Application* s_Instance = nullptr;
-    
-    // Window state is persisted here, in the working directory alongside imgui.ini.
-    // TODO: This filename should be in the ApplicationSettings file
-    static constexpr const char* SETTINGS_FILE = "settings.json";
+	// Static singleton
+	static Tiles::Application* s_Instance = nullptr;
 
-    // Static accessor
-    Application& Application::GetInstance() { return *s_Instance; }
+	// Window state is persisted here, in the working directory alongside imgui.ini.
+	// TODO: This filename should be in the ApplicationSettings file
+	static constexpr const char* SETTINGS_FILE = "settings.json";
 
-    // Constructor
-    Application::Application(const ApplicationSettings& settings)
-    {
+	// Static accessor
+	Application& Application::GetInstance() { return *s_Instance; }
+
+	// Builds the window, loads GL, initializes the ImGui backends, and restores
+	// persisted window geometry over the code-provided defaults.
+	Application::Application(const ApplicationSettings& settings)
+	{
 		s_Instance = this;
-        m_Settings = settings;
+		m_Settings = settings;
 
-        TILES_LOGGER_INIT();
-        TILES_ENGINE_INFO("Starting Tiles Application: {}", m_Settings.Name);
+		TILES_LOGGER_INIT();
+		TILES_ENGINE_INFO("Starting Tiles Application: {}", m_Settings.Name);
 
-        // Restore persisted window geometry over the code-provided defaults; a
-        // first run (no file yet) leaves the defaults in place.
-        ApplicationSettingsSerializer::Load(SETTINGS_FILE, m_Settings);
+		// Restore persisted window geometry over the code-provided defaults; a
+		// first run (no file yet) leaves the defaults in place.
+		ApplicationSettingsSerializer::Load(SETTINGS_FILE, m_Settings);
 
-        // The Window owns GLFW init, the OS window, its icon, and the OpenGL
-        // context the app renders into. It is created hidden and shown after setup.
-        WindowSettings windowSettings;
-        windowSettings.Title = m_Settings.Name;
-        windowSettings.Width = m_Settings.Width;
-        windowSettings.Height = m_Settings.Height;
-        windowSettings.IconPath = m_Settings.Icon;
-        windowSettings.VSync = true;
+		// The Window owns GLFW init, the OS window, its icon, and the OpenGL
+		// context the app renders into. It is created hidden and shown after setup.
+		WindowSettings windowSettings;
+		windowSettings.Title = m_Settings.Name;
+		windowSettings.Width = m_Settings.Width;
+		windowSettings.Height = m_Settings.Height;
+		windowSettings.IconPath = m_Settings.Icon;
+		windowSettings.VSync = true;
 
-        m_Window = std::make_unique<Window>(windowSettings);
-        if (!m_Window->GetNativeWindow())
-        {
-            TILES_ENGINE_ERROR("Failed to create the application window.");
-            return;
-        }
+		m_Window = std::make_unique<Window>(windowSettings);
+		if (!m_Window->GetNativeWindow())
+		{
+			TILES_ENGINE_ERROR("Failed to create the application window.");
+			return;
+		}
 
-        int status = gladLoadGL((GLADloadfunc)glfwGetProcAddress);
-        TILES_ASSERT(status, "[OpenGL Context] Failed to initialize GLAD.");
+		int status = gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress));
+		TILES_ASSERT(status, "[OpenGL Context] Failed to initialize GLAD.");
 
-        const char* version = (const char*)glGetString(GL_VERSION);
-        TILES_ASSERT(version, "[OpenGL Context] Failed to retrieve OpenGL version.");
-        TILES_ENGINE_INFO("OpenGL Version: {}", version);
+		const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
+		TILES_ASSERT(version, "[OpenGL Context] Failed to retrieve OpenGL version.");
+		TILES_ENGINE_INFO("OpenGL Version: {}", version);
 
-        if (m_Settings.Use2DRenderer)
-            Renderer2D::Init();
+		if (m_Settings.Use2DRenderer)
+			Renderer2D::Init();
 
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
 
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
-        ImGuiStyle& style = ImGui::GetStyle();
-        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            style.WindowRounding = 0.0f;
-            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-        }
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
 
-        ImGui_ImplGlfw_InitForOpenGL(m_Window->GetNativeWindow(), true);
-        const char* glsl_version = "#version 130";
-        ImGui_ImplOpenGL3_Init(glsl_version);
+		ImGui_ImplGlfw_InitForOpenGL(m_Window->GetNativeWindow(), true);
+		const char* glslVersion = "#version 130";
+		ImGui_ImplOpenGL3_Init(glslVersion);
 
-        // Route OS window/input events through the application to the layers.
-        m_Window->SetEventCallback([this](Event& e) { OnEvent(e); });
+		// Route OS window/input events through the application to the layers.
+		m_Window->SetEventCallback([this](Event& e) { OnEvent(e); });
 
-        // Restore the windowed position before maximizing/fullscreening, so the
-        // window returns here when the user later un-maximizes.
-        m_Window->SetPosition(m_Settings.PositionX, m_Settings.PositionY);
+		// Restore the windowed position before maximizing/fullscreening, so the
+		// window returns here when the user later un-maximizes.
+		m_Window->SetPosition(m_Settings.PositionX, m_Settings.PositionY);
 
-        if (m_Settings.Maximized)
-            m_Window->Maximize();
+		if (m_Settings.Maximized)
+			m_Window->Maximize();
 
-        if (m_Settings.Fullscreen)
-            m_Window->SetFullscreen(true);
+		if (m_Settings.Fullscreen)
+			m_Window->SetFullscreen(true);
 
-        // Created hidden; reveal it now that GL and ImGui are initialized.
-        m_Window->Show();
-    }
+		// Created hidden; reveal it now that GL and ImGui are initialized.
+		m_Window->Show();
+	}
 
-    // Application destructor
-    Application::~Application()
-    {
+	// Persists window geometry, then tears down the ImGui/GL backends and window.
+	Application::~Application()
+	{
 		s_Instance = nullptr;
 
-        // A null window means construction bailed out before the graphics and
-        // ImGui backends were initialized, so their teardown must be skipped.
-        if (m_Window)
-        {
-            SaveSettings();
+		// A null window means construction bailed out before the graphics and
+		// ImGui backends were initialized, so their teardown must be skipped.
+		if (m_Window)
+		{
+			SaveSettings();
 
-            if (m_Settings.Use2DRenderer)
-                Renderer2D::Shutdown();
+			if (m_Settings.Use2DRenderer)
+				Renderer2D::Shutdown();
 
-            ImGui_ImplOpenGL3_Shutdown();
-            ImGui_ImplGlfw_Shutdown();
-            ImGui::DestroyContext();
+			ImGui_ImplOpenGL3_Shutdown();
+			ImGui_ImplGlfw_Shutdown();
+			ImGui::DestroyContext();
 
-            m_Window.reset();
-        }
+			m_Window.reset();
+		}
 
-        Window::TerminateGLFW();
+		Window::TerminateGLFW();
 
-        TILES_LOGGER_SHUTDOWN();
-    }
+		TILES_LOGGER_SHUTDOWN();
+	}
 
-    // Application entry point
-    void Application::Create()
-    {
-        OnCreate();
-    }
-    
-    // Application exit point
-    void Application::Destroy()
-    {
-        for (auto& layer : m_LayerStack)
-            layer->OnDetach();
+	// Runs client setup (OnCreate) once before the run loop.
+	void Application::Create()
+	{
+		OnCreate();
+	}
 
-        m_LayerStack.clear();
+	// Detaches all layers, then runs client teardown (OnDestroy).
+	void Application::Destroy()
+	{
+		for (auto& layer : m_LayerStack)
+			layer->OnDetach();
 
-        OnDestroy();
-    }
+		m_LayerStack.clear();
 
-    // Application run loop
-    void Application::Run()
-    {
-        if (!m_Window || !m_Window->GetNativeWindow())
-        {
-            TILES_ENGINE_ERROR("Application::Run: Window was not created; aborting run loop.");
-            return;
-        }
+		OnDestroy();
+	}
 
-        while (!m_Window->ShouldClose() && m_Running)
-        {
-            m_TimeStep = m_FrameTimer.Elapsed();
-            m_FrameTimer.Reset();
+	// Application run loop
+	void Application::Run()
+	{
+		if (!m_Window || !m_Window->GetNativeWindow())
+		{
+			TILES_ENGINE_ERROR("Application::Run: Window was not created; aborting run loop.");
+			return;
+		}
 
-            for (auto& layer : m_LayerStack)
-                layer->OnUpdate(m_TimeStep);
+		while (!m_Window->ShouldClose() && m_Running)
+		{
+			m_TimeStep = m_FrameTimer.Elapsed();
+			m_FrameTimer.Reset();
 
-            // Advance last frame's press/release edges to steady state before the
-            // window pumps this frame's events into the input state (in OnEvent).
-            m_InputState.NewFrame();
-            m_Window->Update();
+			for (auto& layer : m_LayerStack)
+				layer->OnUpdate(m_TimeStep);
 
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+			// Advance last frame's press/release edges to steady state before the
+			// window pumps this frame's events into the input state (in OnEvent).
+			m_InputState.NewFrame();
+			m_Window->Update();
 
-            ImGuiViewport* viewport = ImGui::GetMainViewport();
-            ImGui::SetNextWindowPos(viewport->WorkPos);
-            ImGui::SetNextWindowSize(viewport->WorkSize);
-            ImGui::SetNextWindowViewport(viewport->ID);
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
 
-            ImGuiWindowFlags dockspace_flags =
-                ImGuiWindowFlags_NoTitleBar |
-                ImGuiWindowFlags_NoCollapse |
-                ImGuiWindowFlags_NoResize |
-                ImGuiWindowFlags_NoMove |
-                ImGuiWindowFlags_NoBringToFrontOnFocus |
-                ImGuiWindowFlags_NoNavFocus |
-                ImGuiWindowFlags_NoBackground;
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->WorkPos);
+			ImGui::SetNextWindowSize(viewport->WorkSize);
+			ImGui::SetNextWindowViewport(viewport->ID);
 
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			ImGuiWindowFlags dockspaceFlags =
+				ImGuiWindowFlags_NoTitleBar |
+				ImGuiWindowFlags_NoCollapse |
+				ImGuiWindowFlags_NoResize |
+				ImGuiWindowFlags_NoMove |
+				ImGuiWindowFlags_NoBringToFrontOnFocus |
+				ImGuiWindowFlags_NoNavFocus |
+				ImGuiWindowFlags_NoBackground;
 
-            ImGui::Begin("DockSpace", nullptr, dockspace_flags);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-            // Create the dockspace
-            ImGuiID dockspace_id = ImGui::GetID("MainDockSpace");
-			static bool flag = true;
-            if (flag)
-            {
-			    TILES_ENGINE_INFO("Application: Dockspace ID: {}", dockspace_id);
-                flag = false;
-            }
-            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
+			ImGui::Begin("DockSpace", nullptr, dockspaceFlags);
 
-            ImGui::End();
-            ImGui::PopStyleVar(3);
+			// Create the dockspace
+			ImGuiID dockspaceId = ImGui::GetID("MainDockSpace");
+			ImGui::DockSpace(dockspaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 
-            // Layer from TilesApp
-            for (auto& layer : m_LayerStack)
-                layer->OnUIRender();
+			ImGui::End();
+			ImGui::PopStyleVar(3);
 
-            // Render ImGui
-            ImGui::Render();
+			// Let each layer emit its UI into the dockspace.
+			for (auto& layer : m_LayerStack)
+				layer->OnUIRender();
 
-            ImDrawData* main_draw_data = ImGui::GetDrawData();
-            const bool main_is_minimized = (main_draw_data->DisplaySize.x <= 0.0f || main_draw_data->DisplaySize.y <= 0.0f);
+			// Render ImGui
+			ImGui::Render();
 
-            if (!main_is_minimized)
-            {
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-            }
+			ImDrawData* mainDrawData = ImGui::GetDrawData();
+			const bool mainIsMinimized = (mainDrawData->DisplaySize.x <= 0.0f || mainDrawData->DisplaySize.y <= 0.0f);
 
-            // Handle ImGui viewport if enabled
-            ImGuiIO& io = ImGui::GetIO();
-            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-            {
-                GLFWwindow* backup_current_context = glfwGetCurrentContext();
-                ImGui::UpdatePlatformWindows();
-                ImGui::RenderPlatformWindowsDefault();
-                glfwMakeContextCurrent(backup_current_context);
-            }
+			if (!mainIsMinimized)
+			{
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+			}
 
-            if (!main_is_minimized)
-                m_Window->SwapBuffers();
-        }
-    }
+			// Handle ImGui viewport if enabled
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				GLFWwindow* backupCurrentContext = glfwGetCurrentContext();
+				ImGui::UpdatePlatformWindows();
+				ImGui::RenderPlatformWindowsDefault();
+				glfwMakeContextCurrent(backupCurrentContext);
+			}
 
-    // Dispatches an event from the window to the app and its layers.
-    void Application::OnEvent(Event& event)
-    {
-        EventDispatcher dispatcher(event);
-        dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent&)
-        {
-            m_Running = false;
-            return true;
-        });
+			if (!mainIsMinimized)
+				m_Window->SwapBuffers();
+		}
+	}
 
-        // Feed the input state before layers run, and without consuming the event,
-        // so held-state stays correct even if a layer marks the event handled.
-        dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) { m_InputState.OnKeyPressed(e.GetKey(), e.IsRepeat()); return false; });
-        dispatcher.Dispatch<KeyReleasedEvent>([this](KeyReleasedEvent& e) { m_InputState.OnKeyReleased(e.GetKey()); return false; });
-        dispatcher.Dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent& e) { m_InputState.OnMouseButtonPressed(e.GetButton()); return false; });
-        dispatcher.Dispatch<MouseButtonReleasedEvent>([this](MouseButtonReleasedEvent& e) { m_InputState.OnMouseButtonReleased(e.GetButton()); return false; });
-        dispatcher.Dispatch<WindowLostFocusEvent>([this](WindowLostFocusEvent&) { m_InputState.Reset(); return false; });
+	// Dispatches an event from the window to the app and its layers.
+	void Application::OnEvent(Event& event)
+	{
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent&)
+		{
+			m_Running = false;
+			return true;
+		});
 
-        // Deliver top-down; a layer that marks the event handled stops it from
-        // reaching layers beneath.
-        for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
-        {
-            if (event.IsHandled())
-                break;
-            (*it)->OnEvent(event);
-        }
-    }
+		// Feed the input state before layers run, and without consuming the event,
+		// so held-state stays correct even if a layer marks the event handled.
+		dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) { m_InputState.OnKeyPressed(e.GetKey(), e.IsRepeat()); return false; });
+		dispatcher.Dispatch<KeyReleasedEvent>([this](KeyReleasedEvent& e) { m_InputState.OnKeyReleased(e.GetKey()); return false; });
+		dispatcher.Dispatch<MouseButtonPressedEvent>([this](MouseButtonPressedEvent& e) { m_InputState.OnMouseButtonPressed(e.GetButton()); return false; });
+		dispatcher.Dispatch<MouseButtonReleasedEvent>([this](MouseButtonReleasedEvent& e) { m_InputState.OnMouseButtonReleased(e.GetButton()); return false; });
+		dispatcher.Dispatch<WindowLostFocusEvent>([this](WindowLostFocusEvent&) { m_InputState.Reset(); return false; });
 
-    // Applies the current Fullscreen setting to the window.
-    void Application::SetWindowFullscreen()
-    {
-        if (m_Window)
-            m_Window->SetFullscreen(m_Settings.Fullscreen);
-    }
+		// Deliver top-down; a layer that marks the event handled stops it from
+		// reaching layers beneath.
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		{
+			if (event.IsHandled())
+				break;
+			(*it)->OnEvent(event);
+		}
+	}
 
-    // Saves the application settings
-    // TODO: this should be moved to ApplicationSettingsSerializer
-    // TODO: this should be called on shutdown
-    void Application::SaveSettings()
-    {
-        if (m_Window)
-        {
-            m_Settings.Maximized = m_Window->IsMaximized();
+	// Applies the current Fullscreen setting to the window.
+	void Application::SetWindowFullscreen()
+	{
+		if (m_Window)
+			m_Window->SetFullscreen(m_Settings.Fullscreen);
+	}
 
-            // Persist the floating geometry, not the maximized/fullscreen size, so
-            // the window restores to where it last was in windowed mode.
-            if (!m_Settings.Maximized && !m_Settings.Fullscreen)
-            {
-                m_Window->GetPosition(m_Settings.PositionX, m_Settings.PositionY);
-                m_Settings.Width = m_Window->GetWidth();
-                m_Settings.Height = m_Window->GetHeight();
-            }
-        }
+	// Saves the application settings
+	// TODO: this should be moved to ApplicationSettingsSerializer
+	void Application::SaveSettings()
+	{
+		if (m_Window)
+		{
+			m_Settings.Maximized = m_Window->IsMaximized();
 
-        ApplicationSettingsSerializer::Save(SETTINGS_FILE, m_Settings);
-    }
+			// Persist the floating geometry, not the maximized/fullscreen size, so
+			// the window restores to where it last was in windowed mode.
+			if (!m_Settings.Maximized && !m_Settings.Fullscreen)
+			{
+				m_Window->GetPosition(m_Settings.PositionX, m_Settings.PositionY);
+				m_Settings.Width = m_Window->GetWidth();
+				m_Settings.Height = m_Window->GetHeight();
+			}
+		}
+
+		ApplicationSettingsSerializer::Save(SETTINGS_FILE, m_Settings);
+	}
 
 }

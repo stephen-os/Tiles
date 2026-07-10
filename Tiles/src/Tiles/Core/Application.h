@@ -1,12 +1,10 @@
 #pragma once
 
-#include "imgui.h"
-
 #include "Window.h"
-#include "Input/InputState.h"
-
 #include "Layer.h"
 #include "ApplicationSettings.h"
+
+#include "Input/InputState.h"
 #include "../Utils/Timer.h"
 
 #include <string>
@@ -18,10 +16,10 @@ namespace Tiles
 	class Application
 	{
 	public:
-		// Application constructor
+		// Builds the window, loads GL, and initializes the ImGui backends.
 		Application(const ApplicationSettings& settings = ApplicationSettings());
 		
-		// Application destructor
+		// Tears down the ImGui/GL backends and window; persists window geometry.
 		virtual ~Application();
 
 		// Runs client setup (OnCreate); call once before Run.
@@ -39,13 +37,13 @@ namespace Tiles
 		void SetWindowFullscreen();
 
 		// Requests the run loop to exit at the end of the current frame.
-		void Shutdown() { m_Running = false; };
+		void Shutdown() { m_Running = false; }
 
 		// Gets the instance of this application
-		static Application& GetInstance();
+		[[nodiscard]] static Application& GetInstance();
 
 		// Gets the native window handle of this application
-		GLFWwindow* GetWindowHandle() const { return m_Window ? m_Window->GetNativeWindow() : nullptr; };
+		[[nodiscard]] GLFWwindow* GetWindowHandle() const { return m_Window ? m_Window->GetNativeWindow() : nullptr; }
 
 		// The owned window. Valid for the lifetime of the running application.
 		[[nodiscard]] Window& GetWindow() const { return *m_Window; }
@@ -61,8 +59,6 @@ namespace Tiles
 		virtual void OnDestroy() = 0;
 
 		// Constructs a layer of type T in place, takes ownership, and attaches it.
-		// @tparam T Layer subclass to instantiate.
-		// @param args Arguments forwarded to T's constructor.
 		template<typename T, typename... Args>
 		void PushLayer(Args&&... args)
 		{
@@ -83,7 +79,7 @@ namespace Tiles
 		std::unique_ptr<Window> m_Window;
 		Input::InputState m_InputState;
 		bool m_Running = true;
-		std::vector<std::shared_ptr<Layer>> m_LayerStack;
+		std::vector<std::unique_ptr<Layer>> m_LayerStack;
 		ApplicationSettings m_Settings;
 		float m_TimeStep = 0.0f;
 		Timer m_FrameTimer;
