@@ -342,6 +342,21 @@ namespace Tiles
 		y = py;
 	}
 
+	// Captures the persist-worthy window geometry into settings.
+	void Window::CaptureState(WindowSettings& settings) const
+	{
+		settings.Maximized = IsMaximized();
+
+		// Persist the floating geometry, not the maximized/fullscreen size, so the
+		// window restores to where it last was in windowed mode.
+		if (!settings.Maximized && !settings.Fullscreen)
+		{
+			GetPosition(settings.PositionX, settings.PositionY);
+			settings.Width = GetWidth();
+			settings.Height = GetHeight();
+		}
+	}
+
 	// Maximizes the window.
 	void Window::Maximize()
 	{

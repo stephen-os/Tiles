@@ -22,10 +22,6 @@ namespace Tiles
 	// Static singleton
 	static Tiles::Application* s_Instance = nullptr;
 
-	// Window state is persisted here, in the working directory alongside imgui.ini.
-	// TODO: This filename should be in the ApplicationSettings file
-	static constexpr const char* SETTINGS_FILE = "settings.json";
-
 	// Static accessor
 	Application& Application::GetInstance() { return *s_Instance; }
 
@@ -41,7 +37,7 @@ namespace Tiles
 
 		// Restore persisted window geometry over the code-provided defaults; a
 		// first run (no file yet) leaves the defaults in place.
-		ApplicationSettingsSerializer::Load(SETTINGS_FILE, m_Settings);
+		ApplicationSettingsSerializer::Load(m_Settings.SettingsFile, m_Settings);
 
 		// The Window owns GLFW init, the OS window, its icon, and the OpenGL
 		// context the app renders into. It is created hidden — applying the
@@ -252,25 +248,13 @@ namespace Tiles
 			m_Window->SetFullscreen(m_Settings.Window.Fullscreen);
 	}
 
-	// Saves the application settings
-	// TODO: this should be moved to ApplicationSettingsSerializer
+	// Captures the live window geometry into the settings, then writes them to disk.
 	void Application::SaveSettings()
 	{
 		if (m_Window)
-		{
-			m_Settings.Window.Maximized = m_Window->IsMaximized();
+			m_Window->CaptureState(m_Settings.Window);
 
-			// Persist the floating geometry, not the maximized/fullscreen size, so
-			// the window restores to where it last was in windowed mode.
-			if (!m_Settings.Window.Maximized && !m_Settings.Window.Fullscreen)
-			{
-				m_Window->GetPosition(m_Settings.Window.PositionX, m_Settings.Window.PositionY);
-				m_Settings.Window.Width = m_Window->GetWidth();
-				m_Settings.Window.Height = m_Window->GetHeight();
-			}
-		}
-
-		ApplicationSettingsSerializer::Save(SETTINGS_FILE, m_Settings);
+		ApplicationSettingsSerializer::Save(m_Settings.SettingsFile, m_Settings);
 	}
 
 }

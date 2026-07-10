@@ -95,6 +95,11 @@ namespace Tiles
 		// Writes the window's top-left screen position into x, y.
 		void GetPosition(int32_t& x, int32_t& y) const;
 
+		// Captures the persist-worthy window geometry into settings: the maximized
+		// flag always, and the floating position/size only while in windowed mode,
+		// so a maximized/fullscreen size is never persisted as the restore size.
+		void CaptureState(WindowSettings& settings) const;
+
 		// Whether vertical sync is currently enabled.
 		[[nodiscard]] bool IsVSync() const { return m_VSync; }
 

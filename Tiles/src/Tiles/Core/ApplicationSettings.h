@@ -2,6 +2,8 @@
 
 #include "Window.h"
 
+#include <string>
+
 namespace Tiles
 {
 	// Startup configuration for the Application: the full window spec plus the
@@ -13,5 +15,8 @@ namespace Tiles
 		WindowSettings Window;
 
 		bool Use2DRenderer = false;
+
+		// Working-directory-relative path of the persisted window-state file.
+		std::string SettingsFile = "settings.json";
 	};
 }
