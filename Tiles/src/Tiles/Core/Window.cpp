@@ -26,11 +26,14 @@ namespace Tiles
 {
 	static bool s_GLFWInitialized = false;
 
+	// Routes GLFW errors into the engine log.
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		TILES_ENGINE_ERROR("[GLFW] Error {}: {}", error, description);
 	}
 
+	// Lazily initializes GLFW, creates the hidden window and its GL context, and
+	// applies the requested initial window state.
 	Window::Window(const WindowSettings& settings)
 		: m_Width(settings.Width)
 		, m_Height(settings.Height)
@@ -91,6 +94,7 @@ namespace Tiles
 		TILES_ENGINE_INFO("Window created: {}x{}", m_Width, m_Height);
 	}
 
+	// Destroys the GLFW window (GLFW itself is terminated separately).
 	Window::~Window()
 	{
 		if (m_Window)
@@ -100,6 +104,7 @@ namespace Tiles
 		}
 	}
 
+	// Terminates GLFW once, after the last window has been destroyed.
 	void Window::TerminateGLFW()
 	{
 		if (s_GLFWInitialized)
@@ -109,6 +114,8 @@ namespace Tiles
 		}
 	}
 
+	// Installs the GLFW callbacks that translate window/input events into Events
+	// and keep the cached window size in sync.
 	void Window::SetupCallbacks()
 	{
 		glfwSetWindowUserPointer(m_Window, this);
@@ -253,27 +260,33 @@ namespace Tiles
 		});
 	}
 
+	// Pumps the OS event queue.
 	void Window::Update()
 	{
 		glfwPollEvents();
 	}
 
+	// Presents the frame by swapping the front and back buffers.
 	void Window::SwapBuffers()
 	{
 		glfwSwapBuffers(m_Window);
 	}
 
+	// True once the OS has requested the window be closed.
 	bool Window::ShouldClose() const
 	{
 		return glfwWindowShouldClose(m_Window);
 	}
 
+	// Enables or disables vertical sync.
 	void Window::SetVSync(bool enabled)
 	{
 		m_VSync = enabled;
 		glfwSwapInterval(enabled ? 1 : 0);
 	}
 
+	// Toggles borderless-fullscreen on the primary monitor, restoring the stored
+	// windowed geometry when leaving fullscreen.
 	void Window::SetFullscreen(bool fullscreen)
 	{
 		if (m_Fullscreen == fullscreen)
@@ -282,7 +295,7 @@ namespace Tiles
 		if (fullscreen)
 		{
 			// Store windowed position and size before going fullscreen
-			int x, y;
+			int x = 0, y = 0;
 			glfwGetWindowPos(m_Window, &x, &y);
 			m_WindowedX = x;
 			m_WindowedY = y;
@@ -308,11 +321,13 @@ namespace Tiles
 		m_Fullscreen = fullscreen;
 	}
 
+	// Moves the window's top-left to (x, y) in screen coordinates.
 	void Window::SetPosition(int32_t x, int32_t y)
 	{
 		glfwSetWindowPos(m_Window, x, y);
 	}
 
+	// Writes the window's top-left screen position into x, y.
 	void Window::GetPosition(int32_t& x, int32_t& y) const
 	{
 		int px = 0, py = 0;
@@ -321,26 +336,31 @@ namespace Tiles
 		y = py;
 	}
 
+	// Maximizes the window.
 	void Window::Maximize()
 	{
 		glfwMaximizeWindow(m_Window);
 	}
 
+	// Minimizes (iconifies) the window.
 	void Window::Minimize()
 	{
 		glfwIconifyWindow(m_Window);
 	}
 
+	// Restores the window from a maximized/minimized state.
 	void Window::Restore()
 	{
 		glfwRestoreWindow(m_Window);
 	}
 
+	// Makes the (initially hidden) window visible.
 	void Window::Show()
 	{
 		glfwShowWindow(m_Window);
 	}
 
+	// Centers the window on the primary monitor.
 	void Window::CenterOnMonitor()
 	{
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -371,16 +391,19 @@ namespace Tiles
 		m_WindowedY = centerY;
 	}
 
+	// Whether the window is currently maximized.
 	bool Window::IsMaximized() const
 	{
 		return glfwGetWindowAttrib(m_Window, GLFW_MAXIMIZED) == GLFW_TRUE;
 	}
 
+	// Whether the window is currently minimized (iconified).
 	bool Window::IsMinimized() const
 	{
 		return glfwGetWindowAttrib(m_Window, GLFW_ICONIFIED) == GLFW_TRUE;
 	}
 
+	// Loads an image file and applies it as the window icon.
 	void Window::SetIcon(const std::string& iconPath)
 	{
 		int width, height, channels;
@@ -403,7 +426,8 @@ namespace Tiles
 		TILES_ENGINE_INFO("Window icon set: {} ({}x{})", iconPath, width, height);
 	}
 
-	void Window::SetTitlebarColor(uint8_t r, uint8_t g, uint8_t b)
+	// Sets the titlebar background color (Windows 11+ only; no-op elsewhere).
+	void Window::SetTitlebarColor([[maybe_unused]] uint8_t r, [[maybe_unused]] uint8_t g, [[maybe_unused]] uint8_t b)
 	{
 #ifdef TILES_PLATFORM_WINDOWS
 		HWND hwnd = glfwGetWin32Window(m_Window);
@@ -415,11 +439,11 @@ namespace Tiles
 		}
 #else
 		TILES_ENGINE_WARN("Titlebar color customization is only supported on Windows");
-		(void)r; (void)g; (void)b;
 #endif
 	}
 
-	void Window::SetTitlebarTextColor(uint8_t r, uint8_t g, uint8_t b)
+	// Sets the titlebar text color (Windows 11+ only; no-op elsewhere).
+	void Window::SetTitlebarTextColor([[maybe_unused]] uint8_t r, [[maybe_unused]] uint8_t g, [[maybe_unused]] uint8_t b)
 	{
 #ifdef TILES_PLATFORM_WINDOWS
 		HWND hwnd = glfwGetWin32Window(m_Window);
@@ -431,7 +455,6 @@ namespace Tiles
 		}
 #else
 		TILES_ENGINE_WARN("Titlebar text color customization is only supported on Windows");
-		(void)r; (void)g; (void)b;
 #endif
 	}
 }
