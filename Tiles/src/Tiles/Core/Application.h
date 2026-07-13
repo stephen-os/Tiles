@@ -2,7 +2,6 @@
 
 #include "Window.h"
 #include "Layer.h"
-#include "ApplicationSettings.h"
 
 #include "Input/InputState.h"
 #include "../Utils/Timer.h"
@@ -13,6 +12,17 @@
 
 namespace Tiles
 {
+	// Startup configuration for the Application
+	struct ApplicationSettings
+	{
+		WindowSettings Window;
+
+		bool Use2DRenderer = false;
+
+		// Working-directory-relative path of the persisted window-state file.
+		std::string SettingsFile = "settings.json";
+	};
+
 	class Application
 	{
 	public:
@@ -74,6 +84,10 @@ namespace Tiles
 		// Captures the current window geometry (size/position/maximized/
 		// fullscreen) and writes it to the settings file for the next run.
 		void SaveSettings();
+
+		// Loads the settings file and applies the window geometry (size/position/
+		// maximized/fullscreen) to the window.
+		void LoadSettings();
 
 	private:
 		std::unique_ptr<Window> m_Window;

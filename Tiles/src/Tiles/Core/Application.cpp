@@ -4,6 +4,8 @@
 #include "Application.h"
 
 #include <vector>
+#include <fstream>
+#include <filesystem>
 
 #include <spdlog/spdlog.h>
 
@@ -13,7 +15,8 @@
 
 #include "Log.h"
 #include "Assert.h"
-#include "ApplicationSettingsSerializer.h"
+
+#include "json.hpp"
 
 #include "../Graphics/Renderer2D.h"
 
@@ -37,7 +40,7 @@ namespace Tiles
 
 		// Restore persisted window geometry over the code-provided defaults; a
 		// first run (no file yet) leaves the defaults in place.
-		ApplicationSettingsSerializer::Load(m_Settings.SettingsFile, m_Settings);
+		LoadSettings();
 
 		// The Window owns GLFW init, the OS window, its icon, and the OpenGL
 		// context the app renders into. It is created hidden — applying the
@@ -254,7 +257,54 @@ namespace Tiles
 		if (m_Window)
 			m_Window->CaptureState(m_Settings.Window);
 
-		ApplicationSettingsSerializer::Save(m_Settings.SettingsFile, m_Settings);
+		try
+		{
+			nlohmann::json window;
+			window["width"] = m_Settings.Window.Width;
+			window["height"] = m_Settings.Window.Height;
+			window["x"] = m_Settings.Window.PositionX;
+			window["y"] = m_Settings.Window.PositionY;
+			window["maximized"] = m_Settings.Window.Maximized;
+			window["fullscreen"] = m_Settings.Window.Fullscreen;
+
+			nlohmann::json json;
+			json["window"] = window;
+
+			std::ofstream file(m_Settings.SettingsFile);
+			file << json.dump(4);
+		}
+		catch (const std::exception& e)
+		{
+			TILES_ENGINE_WARN("ApplicationSettings: Failed to save '{}': {}", m_Settings.SettingsFile, e.what());
+		}
+	}
+
+	// Loads the settings file and applies the window geometry to the window.
+	void Application::LoadSettings()
+	{
+		if (!std::filesystem::exists(m_Settings.SettingsFile))
+			return;
+
+		try
+		{
+			std::ifstream file(m_Settings.SettingsFile);
+			nlohmann::json json;
+			file >> json;
+
+			const auto& window = json.at("window");
+			m_Settings.Window.Width = window.value("width", m_Settings.Window.Width);
+			m_Settings.Window.Height = window.value("height", m_Settings.Window.Height);
+			m_Settings.Window.PositionX = window.value("x", m_Settings.Window.PositionX);
+			m_Settings.Window.PositionY = window.value("y", m_Settings.Window.PositionY);
+			m_Settings.Window.Maximized = window.value("maximized", m_Settings.Window.Maximized);
+			m_Settings.Window.Fullscreen = window.value("fullscreen", m_Settings.Window.Fullscreen);
+
+			TILES_ENGINE_INFO("ApplicationSettings: Loaded window state from '{}'", m_Settings.SettingsFile);
+		}
+		catch (const std::exception& e)
+		{
+			TILES_ENGINE_WARN("ApplicationSettings: Failed to load '{}': {}; using defaults", m_Settings.SettingsFile, e.what());
+		}
 	}
 
 }
