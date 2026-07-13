@@ -2,5 +2,6 @@
 
 namespace Tiles
 {
-	Layer::Layer(const std::string& name) : m_name(name) {}
+	// Constructs a layer with the given name.
+	Layer::Layer(const std::string& name) : m_Name(name) {}
 }
