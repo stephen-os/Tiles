@@ -17,12 +17,4 @@ namespace Tiles::Input
 		Right = Button1,
 		Middle = Button2
 	};
-
-	// Cursor mode for the mouse. Mirrors GLFW's cursor modes.
-	enum class CursorMode : uint8_t
-	{
-		Normal = 0,
-		Hidden = 1,
-		Disabled = 2
-	};
 }

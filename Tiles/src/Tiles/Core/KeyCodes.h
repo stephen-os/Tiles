@@ -83,7 +83,7 @@ namespace Tiles::Input
 
 		Menu = 348
 	};
-	
+
 	// Key state for a key event.
 	enum class KeyState : uint8_t
 	{
@@ -96,11 +96,11 @@ namespace Tiles::Input
 	// Bitmask for modifier keys.
 	enum class KeyMods : uint8_t
 	{
-		None	 = 0, 
-		Shift	 = 1 << 0,
-		Control  = 1 << 1,
-		Alt      = 1 << 2,
-		Super    = 1 << 3,
+		None    = 0,
+		Shift   = 1 << 0,
+		Control = 1 << 1,
+		Alt     = 1 << 2,
+		Super   = 1 << 3,
 	};
 
 	// Bitwise or operator for KeyMods.
@@ -121,7 +121,7 @@ namespace Tiles::Input
 		return (set & flag) == flag;
 	}
 
-	// Represents a keyboard shortcut, which is a combination of a key and optional modifier keys.
+	// A keyboard shortcut: a key plus optional modifiers.
 	struct Shortcut
 	{
 		KeyCode Key = KeyCode::Unknown;
@@ -130,8 +130,7 @@ namespace Tiles::Input
 		// Returns true if the shortcut has a valid key assigned (not Unknown).
 		constexpr bool IsBound() const { return Key != KeyCode::Unknown; }
 
-		// Operator to compare two shortcuts for equality. 
-		// Two shortcuts are equal if they have the same key and the same modifiers.
+		// Two shortcuts are equal when their key and modifiers both match.
 		constexpr bool operator==(const Shortcut& other) const
 		{
 			return Key == other.Key && Mods == other.Mods;
