@@ -238,8 +238,5 @@ namespace Tiles
     namespace File
     {
         constexpr const char* ProjectExtension = ".tiles";
-        constexpr const char* ProjectFilesFilter = "*.tiles";
-        constexpr const char* AllFilesFilter = "*.*";
-        constexpr const char* TextureFilesFilter = "*.png;*.jpg;*.jpeg";
     }
 }
