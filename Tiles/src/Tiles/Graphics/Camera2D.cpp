@@ -1,5 +1,7 @@
 #include "Camera2D.h"
 
+#include <algorithm>
+
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Tiles
@@ -32,5 +34,48 @@ namespace Tiles
 		float ndcY = 1.0f - 2.0f * pixel.y / viewportSize.y;
 
 		return { Center.x + ndcX * halfWidth, Center.y - ndcY * halfHeight };
+	}
+
+	// Returns the camera to the world origin at default zoom.
+	void Camera2D::Reset()
+	{
+		Center = { 0.0f, 0.0f };
+		Zoom = 1.0f;
+	}
+
+	// Frames the content's tile bounds within a nominal viewport, or sits at the
+	// origin when there is nothing to frame.
+	void Camera2D::Fit(const std::optional<glm::ivec4>& bounds, float tileSize, float minZoom, float maxZoom)
+	{
+		// With nothing painted there is no content to frame; sit at the origin.
+		if (!bounds)
+		{
+			Reset();
+			return;
+		}
+
+		const float minX = bounds->x, minY = bounds->y;
+		const float maxX = bounds->z, maxY = bounds->w;
+
+		// A tile at coord (cx, cy) fills the cell [cx, cx+1], so the content spans
+		// [minX, maxX+1] in tiles; center on the midpoint in world units.
+		Center = {
+			(minX + maxX + 1.0f) * 0.5f * tileSize,
+			(minY + maxY + 1.0f) * 0.5f * tileSize
+		};
+
+		const float contentWidth = (maxX - minX + 1.0f) * tileSize;
+		const float contentHeight = (maxY - minY + 1.0f) * tileSize;
+
+		// Assumes a nominal viewport size; the 0.9 factor leaves a margin so the
+		// content does not sit flush against the edges.
+		const float viewportWidth = 800.0f;
+		const float viewportHeight = 600.0f;
+
+		const float zoomX = viewportWidth / contentWidth;
+		const float zoomY = viewportHeight / contentHeight;
+		const float fitZoom = std::min(zoomX, zoomY) * 0.9f;
+
+		Zoom = std::clamp(fitZoom, minZoom, maxZoom);
 	}
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <glm/glm.hpp>
 
 namespace Tiles
@@ -21,5 +23,13 @@ namespace Tiles
 		// Maps a screen pixel (top-left origin) within @p viewportSize to a
 		// world-space point.
 		glm::vec2 ScreenToWorld(const glm::vec2& pixel, const glm::vec2& viewportSize) const;
+
+		// Returns the camera to the world origin at default zoom.
+		void Reset();
+
+		// Centers and zooms so the content's inclusive tile @p bounds fit a nominal
+		// viewport, clamped to [minZoom, maxZoom]; resets to the origin when @p
+		// bounds is empty. @p tileSize is the world size of one tile.
+		void Fit(const std::optional<glm::ivec4>& bounds, float tileSize, float minZoom, float maxZoom);
 	};
 }

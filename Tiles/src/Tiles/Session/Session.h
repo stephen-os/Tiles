@@ -11,8 +11,8 @@
 #include "Domain/Project.h"
 #include "Domain/ProjectHistory.h"
 #include "Domain/ProjectSerializer.h"
+#include "Graphics/Camera2D.h"
 #include "Session/CommandDispatcher.h"
-#include "Session/ViewportCameraController.h"
 #include "Session/EditingState.h"
 
 namespace Tiles
@@ -35,18 +35,10 @@ namespace Tiles
 
 		// --- Viewport camera ---
 
-		// The viewport camera.
-		[[nodiscard]] Camera2D& GetViewportCamera() { return m_CameraController.GetCamera(); }
-		[[nodiscard]] const Camera2D& GetViewportCamera() const { return m_CameraController.GetCamera(); }
-
-		// Recenters the camera on the world origin at default zoom.
-		void ResetViewportCamera();
-
-		// Centers and zooms the camera so the whole project fits in view.
-		void FitViewportCameraToProject();
-
-		// Centers the camera on the world origin, keeping the current zoom.
-		void CenterViewportCameraOnProject();
+		// The viewport camera. Its framing/reset tools live on Camera2D and are
+		// driven by the editor (see PanelViewport).
+		[[nodiscard]] Camera2D& GetViewportCamera() { return m_Camera; }
+		[[nodiscard]] const Camera2D& GetViewportCamera() const { return m_Camera; }
 
 		// --- Editing selection ---
 
@@ -164,7 +156,7 @@ namespace Tiles
 		std::shared_ptr<Project> m_Project;
 		ProjectHistory m_History;
 		CommandDispatcher m_CommandDispatcher;
-		ViewportCameraController m_CameraController;
+		Camera2D m_Camera;
 		EditingState m_EditingState;
 	};
 }

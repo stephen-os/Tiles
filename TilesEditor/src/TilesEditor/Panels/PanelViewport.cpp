@@ -218,7 +218,8 @@ namespace Tiles::Editor
             camera.Center = { 0.0f, 0.0f };
         ImGui::SameLine();
         if (ImGui::Button("Fit"))
-            Ctx().FitViewportCameraToProject();
+            camera.Fit(Ctx().GetProject()->GetLayerStack().GetBounds(),
+                Viewport::Render::DefaultTileSize, Viewport::Render::MinZoom, Viewport::Render::MaxZoom);
 
         if (ImGui::IsWindowHovered())
         {

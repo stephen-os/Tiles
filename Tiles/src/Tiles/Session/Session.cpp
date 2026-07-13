@@ -18,25 +18,7 @@ namespace Tiles
 				ValidateWorkingLayer();
 			});
 
-		m_CameraController.Initialize();
-	}
-
-	// Recenters the camera on the world origin at default zoom.
-	void Session::ResetViewportCamera()
-	{
-		m_CameraController.Initialize();
-	}
-
-	// Centers and zooms the camera so the whole project fits in view.
-	void Session::FitViewportCameraToProject()
-	{
-		m_CameraController.Fit(m_Project->GetLayerStack().GetBounds());
-	}
-
-	// Centers the camera on the world origin, keeping the current zoom.
-	void Session::CenterViewportCameraOnProject()
-	{
-		m_CameraController.Center();
+		m_Camera.Reset();
 	}
 
 	// Selects the active layer for painting; ignored if index is out of range.
@@ -136,7 +118,7 @@ namespace Tiles
 		m_Project->UpdateLastAccessed();
 
 		m_EditingState.Reset();
-		m_CameraController.Initialize();
+		m_Camera.Reset();
 	}
 
 	// Serializes the project to its existing file path; fails if it has none yet.
@@ -206,7 +188,7 @@ namespace Tiles
 		m_CommandDispatcher.Clear();
 		m_EditingState.Reset();
 		ValidateWorkingLayer();
-		m_CameraController.Initialize();
+		m_Camera.Reset();
 
 		TILES_ENGINE_INFO("Session::LoadProject: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
 		return {};
