@@ -33,7 +33,7 @@
 using namespace Tiles;
 using namespace Tiles::Editor;
 
-// The editor's single application layer. It owns the shared Context, the panel/
+// The editor's single application layer. It owns the shared Session, the panel/
 // popup registry, and the action map, and implements EditorHost so any panel or
 // popup can reach the document, open another view, or fire an action through the
 // same facade. Global keyboard shortcuts arrive via OnEvent and are resolved
@@ -45,10 +45,10 @@ public:
 
 	void OnAttach() override
 	{
-		// The layer solely owns one Context; every panel and popup borrows it
+		// The layer solely owns one Session; every panel and popup borrows it
 		// through EditorHost::Doc(), so they all read and mutate the same project,
 		// brush, working layer, and command history.
-		m_Context = std::make_unique<Context>();
+		m_Session = std::make_unique<Session>();
 
 		m_Panels.SetHost(*this);
 		RegisterPanels();
@@ -79,7 +79,7 @@ public:
 
 	// --- EditorHost ---------------------------------------------------------
 
-	Context& Doc() override { return *m_Context; }
+	Session& Doc() override { return *m_Session; }
 
 	void OpenPopup(PopupId id) override { m_Panels.OpenPopup(id); }
 	void ClosePopup(PopupId id) override { m_Panels.ClosePopup(id); }
@@ -161,46 +161,46 @@ private:
 			{ KeyCode::S, KeyMods::Control });
 
 		m_Actions.Register(ActionId::SaveAs,
-			[this] { if (m_Context->HasProject()) OpenPopup(PopupId::SaveAs); },
+			[this] { if (m_Session->HasProject()) OpenPopup(PopupId::SaveAs); },
 			{ KeyCode::S, KeyMods::Control | KeyMods::Shift });
 
 		m_Actions.Register(ActionId::Export,
-			[this] { if (m_Context->HasProject()) OpenPopup(PopupId::Export); },
+			[this] { if (m_Session->HasProject()) OpenPopup(PopupId::Export); },
 			{ KeyCode::E, KeyMods::Control });
 
 		m_Actions.Register(ActionId::Undo,
-			[this] { if (m_Context->CanUndo()) m_Context->Undo(); },
+			[this] { if (m_Session->CanUndo()) m_Session->Undo(); },
 			{ KeyCode::Z, KeyMods::Control });
 
 		m_Actions.Register(ActionId::Redo,
-			[this] { if (m_Context->CanRedo()) m_Context->Redo(); },
+			[this] { if (m_Session->CanRedo()) m_Session->Redo(); },
 			{ KeyCode::Y, KeyMods::Control });
 
 		m_Actions.Register(ActionId::ClearHistory,
-			[this] { if (m_Context->HasProject()) m_Context->ClearHistory(); });
+			[this] { if (m_Session->HasProject()) m_Session->ClearHistory(); });
 	}
 
 	// Saves in place, falling back to the Save-As dialog for a never-saved
 	// project; a failed save surfaces through the shared error popup.
 	void SaveProject()
 	{
-		if (!m_Context->HasProject())
+		if (!m_Session->HasProject())
 			return;
 
-		auto project = m_Context->GetProject();
+		auto project = m_Session->GetProject();
 		if (project->IsNew() && project->HasUnsavedChanges())
 		{
 			OpenPopup(PopupId::SaveAs);
 		}
 		else
 		{
-			auto result = m_Context->SaveProject();
+			auto result = m_Session->SaveProject();
 			if (!result)
 				Notify(result.error().message);
 		}
 	}
 
-	std::unique_ptr<Context> m_Context;
+	std::unique_ptr<Session> m_Session;
 	PanelManager m_Panels;
 	ActionRegistry m_Actions;
 };

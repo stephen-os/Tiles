@@ -34,7 +34,7 @@ namespace Tiles
 			return std::make_unique<TilePaintCommand>(x, y, layerIndex, tile);
 		case PaintingMode::Eraser:
 			return std::make_unique<TileEraseCommand>(x, y, layerIndex);
-		// Fill needs the visible-view bound, so it goes through Context::FillLayer
+		// Fill needs the visible-view bound, so it goes through Session::FillLayer
 		// / BuildFillCommand rather than this per-cell dispatch.
 		default:
 			return nullptr;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Session/Context.h"
+#include "Session/Session.h"
 
 #include "Tiles.h"
 
@@ -32,7 +32,7 @@ namespace Tiles::Editor
     protected:
         EditorHost& Host() const { return m_Host; }
         // Shorthand for the shared document/session state.
-        Context& Ctx() const { return m_Host.Doc(); }
+        Session& Ctx() const { return m_Host.Doc(); }
 
         EditorHost& m_Host;
         bool m_Open = true;

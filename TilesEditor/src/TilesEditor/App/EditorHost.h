@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-namespace Tiles { class Context; }
+namespace Tiles { class Session; }
 
 namespace Tiles::Editor
 {
@@ -20,7 +20,7 @@ namespace Tiles::Editor
         virtual ~EditorHost() = default;
 
         // The shared document/session state (project, brush, command history).
-        virtual Context& Doc() = 0;
+        virtual Session& Doc() = 0;
 
         virtual void OpenPopup(PopupId id) = 0;
         virtual void ClosePopup(PopupId id) = 0;

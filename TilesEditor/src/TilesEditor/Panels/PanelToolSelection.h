@@ -13,7 +13,7 @@
 namespace Tiles::Editor
 {
     // Tool palette for the three painting modes (Brush/Eraser/Fill). The active
-    // tool is stored on the Context as its PaintingMode. Also draws a texture as
+    // tool is stored on the Session as its PaintingMode. Also draws a texture as
     // a custom mouse cursor while a tool is active.
     class PanelToolSelection : public Panel
     {

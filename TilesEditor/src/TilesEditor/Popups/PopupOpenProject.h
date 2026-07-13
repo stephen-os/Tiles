@@ -6,7 +6,7 @@
 namespace Tiles::Editor
 {
     // Open-Project dialog: browse to or type a .tiles file, validate that it
-    // exists and has the right extension, then load it via Context::LoadProject.
+    // exists and has the right extension, then load it via Session::LoadProject.
     // Shows an inline status message and auto-closes shortly after a successful open.
     class PopupOpenProject : public Popup
     {

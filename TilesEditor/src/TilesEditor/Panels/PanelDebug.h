@@ -6,7 +6,7 @@
 namespace Tiles::Editor
 {
     // Debug-only inspector (registered only in TILES_DEBUG builds) exposing live
-    // Context, project, layer-stack, brush, command-history, atlas, and timing
+    // Session, project, layer-stack, brush, command-history, atlas, and timing
     // state in collapsible sections. Read-only apart from a Clear History button.
     class PanelDebug : public Panel
     {

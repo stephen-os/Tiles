@@ -5,7 +5,7 @@
 namespace Tiles::Editor
 {
     // New-Project dialog: enter a name and create a fresh project via
-    // Context::CreateProject, replacing the current one.
+    // Session::CreateProject, replacing the current one.
     class PopupNewProject : public Popup
     {
     public:

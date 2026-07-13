@@ -53,6 +53,6 @@ namespace Tiles
         std::vector<ProjectHistoryEntry> m_History;
         bool m_HasChanges = false;
 
-        friend class ProjectSession;
+        friend class Session;
     };
 }

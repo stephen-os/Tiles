@@ -29,7 +29,7 @@ namespace Tiles::Editor
         }
 
         // Render all debug sections
-        if (ImGui::CollapsingHeader("Context Information", ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader("Session Information", ImGuiTreeNodeFlags_DefaultOpen))
         {
             RenderContextInfo();
         }
@@ -79,7 +79,7 @@ namespace Tiles::Editor
 
     void PanelDebug::RenderContextInfo()
     {
-        ImGui::Text("Context Address: %p", (void*)&Ctx());
+        ImGui::Text("Session Address: %p", (void*)&Ctx());
         ImGui::Text("Is Dirty: %s", Ctx().IsDirty() ? "Yes" : "No");
     }
 

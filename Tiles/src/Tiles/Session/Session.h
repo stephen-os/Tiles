@@ -8,28 +8,30 @@
 
 #include "Core/Error.h"
 #include "Domain/Tile.h"
+#include "Domain/Project.h"
+#include "Domain/ProjectHistory.h"
+#include "Domain/ProjectSerializer.h"
 #include "Session/CommandDispatcher.h"
-#include "Session/ProjectSession.h"
 #include "Session/ViewportCameraController.h"
 #include "Session/EditingState.h"
 
 namespace Tiles
 {
-	// Owns the active project, the editing selection (working layer, brush,
-	// painting mode), the undo/redo history, and the viewport camera, mediating
-	// every edit through the command history. This is the single document seam
-	// the editor drives via EditorHost::Doc().
-	class Context
+	// The editing session for one project: owns the project and its persistence,
+	// the editing selection (working layer, brush, painting mode), the undo/redo
+	// history, and the viewport camera. A session always has a project. This is
+	// the single seam the editor drives via EditorHost::Doc().
+	class Session
 	{
 	public:
-		Context();
-		~Context() = default;
+		Session();
+		~Session() = default;
 
 		// Installs a this-capturing mutation hook, so it must not be copied or moved.
-		Context(const Context&) = delete;
-		Context& operator=(const Context&) = delete;
-		Context(Context&&) = delete;
-		Context& operator=(Context&&) = delete;
+		Session(const Session&) = delete;
+		Session& operator=(const Session&) = delete;
+		Session(Session&&) = delete;
+		Session& operator=(Session&&) = delete;
 
 		// --- Viewport camera ---
 
@@ -92,7 +94,7 @@ namespace Tiles
 		// --- Undo / redo ---
 
 		// Runs a command through the history (recording it for undo) and marks
-		// the project modified. Null commands and a missing project are ignored.
+		// the project modified. Null commands are ignored.
 		void ExecuteCommand(std::unique_ptr<Command> command);
 
 		// True when there is a command to undo.
@@ -108,54 +110,50 @@ namespace Tiles
 		void Redo();
 
 		// True while the project has unsaved changes.
-		[[nodiscard]] bool IsDirty() const { return m_ProjectSession.IsDirty(); }
+		[[nodiscard]] bool IsDirty() const { return m_Project->HasUnsavedChanges(); }
 
 		// Drops the entire undo/redo history.
 		void ClearHistory() { m_CommandDispatcher.Clear(); }
 
-		// --- Project management ---
+		// --- Project ---
 
-		// Replaces the current project with a fresh one, resetting brush,
-		// painting mode, working layer, and command history.
+		// Replaces the project with a fresh one, resetting brush, painting mode,
+		// working layer, and command history.
 		void CreateProject(const std::string& name);
 
-		// Closes the active project, leaving the session empty and resetting the
-		// editing selection, command history, and camera.
-		void CloseProject();
-
 		// Serializes the project to its existing file path.
-		// @return Failure if there is no project or no path yet (use SaveProjectAs).
+		// @return NoFilePath if the project has no path yet (use SaveProjectAs).
 		[[nodiscard]] std::expected<void, Error> SaveProject();
 
 		// Serializes the project to path and adopts it as the project's file path.
 		[[nodiscard]] std::expected<void, Error> SaveProjectAs(const std::filesystem::path& path);
 
-		// Loads a project from path, replacing the current one and resetting
+		// Loads a project from path, replacing the current one and resetting the
 		// editing state. A missing file is dropped from recent projects.
 		[[nodiscard]] std::expected<void, Error> LoadProject(const std::filesystem::path& path);
 
-		// True while a project is loaded.
-		[[nodiscard]] bool HasProject() const { return m_ProjectSession.HasProject(); }
+		// True while a project is loaded (always, in the single-project model).
+		[[nodiscard]] bool HasProject() const { return m_Project != nullptr; }
 
 		// Project name, suffixed with "(Unsaved)" while it has no file path.
-		[[nodiscard]] std::string GetProjectDisplayName() const { return m_ProjectSession.GetDisplayName(); }
+		[[nodiscard]] std::string GetProjectDisplayName() const;
 
 		// The active project.
-		[[nodiscard]] std::shared_ptr<Project> GetProject() const { return m_ProjectSession.GetProject(); }
+		[[nodiscard]] std::shared_ptr<Project> GetProject() const { return m_Project; }
 
 		// --- Recent projects ---
 
 		// The number of tracked recent projects.
-		[[nodiscard]] size_t GetRecentProjectCount() const { return m_ProjectSession.GetRecentCount(); }
+		[[nodiscard]] size_t GetRecentProjectCount() const { return m_History.GetCount(); }
 
 		// True while the recent-projects list is non-empty.
-		[[nodiscard]] bool HasRecentProjects() const { return m_ProjectSession.HasRecent(); }
+		[[nodiscard]] bool HasRecentProjects() const { return !m_History.IsEmpty(); }
 
 		// The recent-projects entry at index.
-		[[nodiscard]] const ProjectHistoryEntry& GetRecentProject(size_t index) const { return m_ProjectSession.GetRecent(index); }
+		[[nodiscard]] const ProjectHistoryEntry& GetRecentProject(size_t index) const { return m_History.GetEntry(index); }
 
 		// Clears the recent-projects list.
-		void ClearRecentProjects() { m_ProjectSession.ClearRecent(); }
+		void ClearRecentProjects() { m_History.Clear(); }
 
 	private:
 		// Clamps the working-layer index back into range after the layer count
@@ -163,7 +161,8 @@ namespace Tiles
 		void ValidateWorkingLayer();
 
 	private:
-		ProjectSession m_ProjectSession;
+		std::shared_ptr<Project> m_Project;
+		ProjectHistory m_History;
 		CommandDispatcher m_CommandDispatcher;
 		ViewportCameraController m_CameraController;
 		EditingState m_EditingState;

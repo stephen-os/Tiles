@@ -8,7 +8,7 @@
 namespace Tiles::Editor
 {
     // Editor for the current brush's rotation, size, and tint. Controls read and
-    // write the Context's brush directly, with drag fields, preset buttons, and a
+    // write the Session's brush directly, with drag fields, preset buttons, and a
     // colour picker; changes take effect immediately (no undo step).
     class PanelBrushAttributes : public Panel
     {
