@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-#include "../../Graphics/Camera2D.h"
+#include "Graphics/Camera2D.h"
 
 namespace Tiles
 {
