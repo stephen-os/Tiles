@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Log.h"
+#include "Logger.h"
 #include <cstdlib>
 
 #define TILES_STRINGIFY2(x) #x
@@ -13,7 +13,7 @@
 #define TILES_ASSERT(condition, ...) \
 	do { \
 		if (!(condition)) { \
-			::Tiles::Logger::Get().PrintAssertMessage(::Tiles::Logger::Type::Core, \
+			::Tiles::Logger::Get().PrintAssertMessage(::Tiles::Logger::Type::Engine, \
 				"Assertion (" #condition ") failed at " __FILE__ ":" TILES_STRINGIFY(__LINE__), __VA_ARGS__); \
 			std::abort(); \
 		} \

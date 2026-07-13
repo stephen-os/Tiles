@@ -1,5 +1,5 @@
 #include "Window.h"
-#include "Log.h"
+#include "Logger.h"
 #include "Assert.h"
 
 #include <GLFW/glfw3.h>

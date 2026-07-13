@@ -13,7 +13,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
-#include "Log.h"
+#include "Logger.h"
 #include "Assert.h"
 
 #include "json.hpp"
