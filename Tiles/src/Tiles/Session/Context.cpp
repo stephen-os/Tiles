@@ -127,22 +127,22 @@ namespace Tiles
 	}
 
 	// Serializes the project to its existing file path.
-	ProjectResult Context::SaveProject()
+	std::expected<void, Error> Context::SaveProject()
 	{
 		return m_ProjectSession.Save();
 	}
 
 	// Serializes the project to path and adopts it as the project's file path.
-	ProjectResult Context::SaveProjectAs(const std::filesystem::path& path)
+	std::expected<void, Error> Context::SaveProjectAs(const std::filesystem::path& path)
 	{
 		return m_ProjectSession.SaveAs(path);
 	}
 
 	// Loads a project from path, resetting editing/undo/camera around it.
-	ProjectResult Context::LoadProject(const std::filesystem::path& path)
+	std::expected<void, Error> Context::LoadProject(const std::filesystem::path& path)
 	{
-		ProjectResult result = m_ProjectSession.Load(path);
-		if (!result.Success)
+		auto result = m_ProjectSession.Load(path);
+		if (!result)
 			return result;
 
 		// A new project is in place; reset the editing/undo/camera state around it.
@@ -152,6 +152,6 @@ namespace Tiles
 
 		m_CameraController.Initialize();
 
-		return result;
+		return {};
 	}
 }

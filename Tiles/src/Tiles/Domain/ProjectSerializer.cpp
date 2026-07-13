@@ -52,24 +52,24 @@ namespace Tiles
 
         // Loads the legacy path-referencing JSON format so pre-container projects
         // still open. Save always writes the self-contained container.
-        ProjectResult LoadLegacyJSON(const std::vector<uint8_t>& bytes, std::shared_ptr<Project>& outProject)
+        std::expected<std::shared_ptr<Project>, Error> LoadLegacyJSON(const std::vector<uint8_t>& bytes)
         {
             try
             {
                 nlohmann::json jsonProject = nlohmann::json::parse(bytes);
-                outProject = Project::FromJSON(jsonProject);
-                if (!outProject)
-                    return { false, "Invalid project file format." };
-                return { true, "Project loaded successfully." };
+                std::shared_ptr<Project> project = Project::FromJSON(jsonProject);
+                if (!project)
+                    return std::unexpected(Error{ ErrorCode::ReadFailure, "Invalid project file format." });
+                return project;
             }
             catch (const std::exception& e)
             {
-                return { false, std::string("Invalid project file format: ") + e.what() };
+                return std::unexpected(Error{ ErrorCode::ReadFailure, std::string("Invalid project file format: ") + e.what() });
             }
         }
     }
 
-    ProjectResult ProjectSerializer::Save(const Project& project, const std::filesystem::path& path)
+    std::expected<void, Error> ProjectSerializer::Save(const Project& project, const std::filesystem::path& path)
     {
         auto directory = path.parent_path();
         if (!directory.empty() && !std::filesystem::exists(directory))
@@ -78,7 +78,7 @@ namespace Tiles
         mz_zip_archive zip;
         std::memset(&zip, 0, sizeof(zip));
         if (!mz_zip_writer_init_heap(&zip, 0, 0))
-            return { false, "Failed to initialize the project archive." };
+            return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to initialize the project archive." });
 
         // Build the manifest as we embed atlas images. One entry per atlas keeps
         // atlas indices (referenced by tiles) stable; the image is embedded when
@@ -123,7 +123,7 @@ namespace Tiles
                 if (!png)
                 {
                     mz_zip_writer_end(&zip);
-                    return { false, "Failed to encode an atlas image." };
+                    return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to encode an atlas image." });
                 }
 
                 std::string imageName = "atlas" + std::to_string(i) + ".png";
@@ -132,7 +132,7 @@ namespace Tiles
                 if (!added)
                 {
                     mz_zip_writer_end(&zip);
-                    return { false, "Failed to add an atlas image to the archive." };
+                    return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to add an atlas image to the archive." });
                 }
 
                 jsonAtlas[JSON::Atlas::Image] = imageName;
@@ -146,7 +146,7 @@ namespace Tiles
         if (!mz_zip_writer_add_mem(&zip, ManifestEntry, manifestStr.data(), manifestStr.size(), MZ_DEFAULT_COMPRESSION))
         {
             mz_zip_writer_end(&zip);
-            return { false, "Failed to add the manifest to the archive." };
+            return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to add the manifest to the archive." });
         }
 
         void* archiveBuffer = nullptr;
@@ -154,7 +154,7 @@ namespace Tiles
         if (!mz_zip_writer_finalize_heap_archive(&zip, &archiveBuffer, &archiveSize))
         {
             mz_zip_writer_end(&zip);
-            return { false, "Failed to finalize the project archive." };
+            return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to finalize the project archive." });
         }
 
         bool wrote = WriteFileBytes(path, archiveBuffer, archiveSize);
@@ -162,34 +162,34 @@ namespace Tiles
         mz_zip_writer_end(&zip);
 
         if (!wrote)
-            return { false, "Failed to write the project file." };
+            return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to write the project file." });
 
-        return { true, "Project saved successfully." };
+        return {};
     }
 
-    ProjectResult ProjectSerializer::Load(const std::filesystem::path& path, std::shared_ptr<Project>& outProject)
+    std::expected<std::shared_ptr<Project>, Error> ProjectSerializer::Load(const std::filesystem::path& path)
     {
         std::vector<uint8_t> fileBytes;
         if (!ReadFileBytes(path, fileBytes))
-            return { false, "Failed to open file for reading." };
+            return std::unexpected(Error{ ErrorCode::ReadFailure, "Failed to open file for reading." });
 
         // A ZIP container starts with "PK"; anything else is treated as a legacy
         // JSON project.
         const bool isContainer = fileBytes.size() >= 2 && fileBytes[0] == 'P' && fileBytes[1] == 'K';
         if (!isContainer)
-            return LoadLegacyJSON(fileBytes, outProject);
+            return LoadLegacyJSON(fileBytes);
 
         mz_zip_archive zip;
         std::memset(&zip, 0, sizeof(zip));
         if (!mz_zip_reader_init_mem(&zip, fileBytes.data(), fileBytes.size(), 0))
-            return { false, "Failed to open the project archive." };
+            return std::unexpected(Error{ ErrorCode::ReadFailure, "Failed to open the project archive." });
 
         size_t manifestSize = 0;
         void* manifestData = mz_zip_reader_extract_file_to_heap(&zip, ManifestEntry, &manifestSize, 0);
         if (!manifestData)
         {
             mz_zip_reader_end(&zip);
-            return { false, "Project archive is missing its manifest." };
+            return std::unexpected(Error{ ErrorCode::ReadFailure, "Project archive is missing its manifest." });
         }
 
         std::shared_ptr<Project> project;
@@ -202,7 +202,7 @@ namespace Tiles
             if (!manifest.contains(JSON::Project::LayerStack))
             {
                 mz_zip_reader_end(&zip);
-                return { false, "Invalid project file format." };
+                return std::unexpected(Error{ ErrorCode::ReadFailure, "Invalid project file format." });
             }
 
             std::string name = manifest.value(JSON::Project::Name, "Untitled Project");
@@ -270,11 +270,10 @@ namespace Tiles
         catch (const std::exception& e)
         {
             mz_zip_reader_end(&zip);
-            return { false, std::string("Invalid project file format: ") + e.what() };
+            return std::unexpected(Error{ ErrorCode::ReadFailure, std::string("Invalid project file format: ") + e.what() });
         }
 
         mz_zip_reader_end(&zip);
-        outProject = project;
-        return { true, "Project loaded successfully." };
+        return project;
     }
 }

@@ -78,9 +78,9 @@ namespace Tiles::Editor
 
                         if (ImGui::MenuItem(menuText.c_str(), shortcut.empty() ? nullptr : shortcut.c_str()))
                         {
-                            ProjectResult result = Ctx().LoadProject(entry.filePath);
-                            if (!result.Success)
-                                Host().Notify(result.Message);
+                            auto result = Ctx().LoadProject(entry.filePath);
+                            if (!result)
+                                Host().Notify(result.error().message);
                         }
 
                         if (ImGui::IsItemHovered())

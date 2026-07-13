@@ -194,9 +194,9 @@ private:
 		}
 		else
 		{
-			ProjectResult result = m_Context->SaveProject();
-			if (!result.Success)
-				Notify(result.Message);
+			auto result = m_Context->SaveProject();
+			if (!result)
+				Notify(result.error().message);
 		}
 	}
 

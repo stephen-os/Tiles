@@ -205,12 +205,12 @@ namespace Tiles::Editor
 
         auto result = Ctx().LoadProject(GetFullFilePath());
 
-        m_Message = result.Message;
+        m_ProjectOpenedSuccessfully = result.has_value();
+        m_Message = result ? "Project loaded successfully." : result.error().message;
         m_ShowMessage = true;
         m_MessageTimer = 0.0f;
-        m_ProjectOpenedSuccessfully = result.Success;
 
-        if (result.Success)
+        if (result)
         {
             ImGui::SetWindowFocus(nullptr);
         }

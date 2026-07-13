@@ -188,12 +188,12 @@ namespace Tiles::Editor
             std::filesystem::path fullPath = GetFullFilePath();
             auto result = Ctx().SaveProjectAs(fullPath);
 
-            m_SaveMessage = result.Message;
+            m_ProjectSavedSuccessfully = result.has_value();
+            m_SaveMessage = result ? "Project saved successfully." : result.error().message;
             m_ShowMessage = true;
             m_MessageTimer = 0.0f;
-            m_ProjectSavedSuccessfully = result.Success;
 
-            if (result.Success)
+            if (result)
             {
                 ImGui::SetWindowFocus(nullptr);
             }

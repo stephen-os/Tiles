@@ -1,10 +1,12 @@
 #pragma once
 
 #include <cstddef>
+#include <expected>
 #include <filesystem>
 #include <memory>
 #include <string>
 
+#include "Core/Error.h"
 #include "Domain/Project.h"
 #include "Domain/ProjectHistory.h"
 #include "Domain/ProjectSerializer.h"
@@ -37,14 +39,14 @@ namespace Tiles
 		void Create(const std::string& name);
 
 		// Serializes to the project's existing file path.
-		[[nodiscard]] ProjectResult Save();
+		[[nodiscard]] std::expected<void, Error> Save();
 
 		// Serializes to path and adopts it as the project's file path.
-		[[nodiscard]] ProjectResult SaveAs(const std::filesystem::path& path);
+		[[nodiscard]] std::expected<void, Error> SaveAs(const std::filesystem::path& path);
 
 		// Loads path into the active project, recording it in the history.
 		// A missing file is dropped from the history and reported as a failure.
-		[[nodiscard]] ProjectResult Load(const std::filesystem::path& path);
+		[[nodiscard]] std::expected<void, Error> Load(const std::filesystem::path& path);
 
 		// The number of tracked recent projects.
 		[[nodiscard]] size_t GetRecentCount() const { return m_History.GetCount(); }

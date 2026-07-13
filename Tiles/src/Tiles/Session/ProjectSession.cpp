@@ -31,18 +31,18 @@ namespace Tiles
 	}
 
 	// Serializes to the project's existing file path; fails if it has none yet.
-	ProjectResult ProjectSession::Save()
+	std::expected<void, Error> ProjectSession::Save()
 	{
 		if (!m_Project)
-			return { false, "No project loaded." };
+			return std::unexpected(Error{ ErrorCode::NoProject, "No project loaded." });
 
 		if (m_Project->IsNew())
-			return { false, "Project has no file path. Use 'Save As' to specify a location." };
+			return std::unexpected(Error{ ErrorCode::NoFilePath, "Project has no file path. Use 'Save As' to specify a location." });
 
 		const auto path = m_Project->GetFilePath();
 
-		ProjectResult result = ProjectSerializer::Save(*m_Project, path);
-		if (!result.Success)
+		auto result = ProjectSerializer::Save(*m_Project, path);
+		if (!result)
 			return result;
 
 		m_Project->MarkAsSaved();
@@ -50,20 +50,20 @@ namespace Tiles
 		m_History.AddProject(path, m_Project->GetProjectName());
 
 		TILES_ENGINE_INFO("ProjectSession::Save: Successfully saved project '{}'", m_Project->GetProjectName());
-		return result;
+		return {};
 	}
 
 	// Serializes to path and adopts it as the project's file path.
-	ProjectResult ProjectSession::SaveAs(const std::filesystem::path& path)
+	std::expected<void, Error> ProjectSession::SaveAs(const std::filesystem::path& path)
 	{
 		if (!m_Project)
-			return { false, "No project loaded." };
+			return std::unexpected(Error{ ErrorCode::NoProject, "No project loaded." });
 
 		if (path.empty())
-			return { false, "Invalid file path." };
+			return std::unexpected(Error{ ErrorCode::InvalidPath, "Invalid file path." });
 
-		ProjectResult result = ProjectSerializer::Save(*m_Project, path);
-		if (!result.Success)
+		auto result = ProjectSerializer::Save(*m_Project, path);
+		if (!result)
 			return result;
 
 		m_Project->SetFilePath(path.string());
@@ -72,28 +72,28 @@ namespace Tiles
 		m_History.AddProject(path, m_Project->GetProjectName());
 
 		TILES_ENGINE_INFO("ProjectSession::SaveAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
-		return result;
+		return {};
 	}
 
 	// Loads path into the active project, recording it in the history; a missing
 	// file is dropped from the history and reported as a failure.
-	ProjectResult ProjectSession::Load(const std::filesystem::path& path)
+	std::expected<void, Error> ProjectSession::Load(const std::filesystem::path& path)
 	{
 		if (!std::filesystem::exists(path))
 		{
 			TILES_ENGINE_INFO("ProjectSession::Load: File does not exist: {}", path.string());
 			m_History.RemoveProject(path);
-			return { false, "File does not exist." };
+			return std::unexpected(Error{ ErrorCode::FileNotFound, "File does not exist." });
 		}
 
-		std::shared_ptr<Project> project;
-		ProjectResult result = ProjectSerializer::Load(path, project);
-		if (!result.Success)
+		auto result = ProjectSerializer::Load(path);
+		if (!result)
 		{
-			TILES_ENGINE_INFO("ProjectSession::Load: Load failed: {}", result.Message);
-			return result;
+			TILES_ENGINE_INFO("ProjectSession::Load: Load failed: {}", result.error().message);
+			return std::unexpected(result.error());
 		}
 
+		std::shared_ptr<Project> project = *result;
 		project->SetFilePath(path.string());
 		project->MarkAsSaved();
 		project->UpdateLastAccessed();
@@ -102,6 +102,6 @@ namespace Tiles
 		m_History.AddProject(path, m_Project->GetProjectName());
 
 		TILES_ENGINE_INFO("ProjectSession::Load: Successfully loaded project '{}' from '{}'", m_Project->GetProjectName(), path.string());
-		return result;
+		return {};
 	}
 }

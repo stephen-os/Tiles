@@ -1,10 +1,12 @@
 #pragma once
 
 #include <cstddef>
+#include <expected>
 #include <filesystem>
 #include <memory>
 #include <string>
 
+#include "Core/Error.h"
 #include "Domain/Tile.h"
 #include "Session/CommandDispatcher.h"
 #include "Session/ProjectSession.h"
@@ -119,14 +121,14 @@ namespace Tiles
 
 		// Serializes the project to its existing file path.
 		// @return Failure if there is no project or no path yet (use SaveProjectAs).
-		[[nodiscard]] ProjectResult SaveProject();
+		[[nodiscard]] std::expected<void, Error> SaveProject();
 
 		// Serializes the project to path and adopts it as the project's file path.
-		[[nodiscard]] ProjectResult SaveProjectAs(const std::filesystem::path& path);
+		[[nodiscard]] std::expected<void, Error> SaveProjectAs(const std::filesystem::path& path);
 
 		// Loads a project from path, replacing the current one and resetting
 		// editing state. A missing file is dropped from recent projects.
-		[[nodiscard]] ProjectResult LoadProject(const std::filesystem::path& path);
+		[[nodiscard]] std::expected<void, Error> LoadProject(const std::filesystem::path& path);
 
 		// True while a project is loaded.
 		[[nodiscard]] bool HasProject() const { return m_ProjectSession.HasProject(); }
