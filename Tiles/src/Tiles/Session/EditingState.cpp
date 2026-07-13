@@ -21,10 +21,6 @@ namespace Tiles
         {
             m_WorkingLayer = 0;
         }
-        else if (!layerStack.IsValidLayerIndex(m_WorkingLayer))
-        {
-            m_WorkingLayer = 0;
-        }
         else if (m_WorkingLayer >= layerStack.GetLayerCount())
         {
             m_WorkingLayer = layerStack.GetLayerCount() - 1;
