@@ -10,7 +10,7 @@
 #include <stb_image.h>
 
 #include "Domain/Project.h"
-#include "Core/Constants.h"
+#include "Domain/Constants.h"
 #include "Core/Logger.h"
 #include "Graphics/Texture.h"
 #include "Graphics/TextureAtlas.h"

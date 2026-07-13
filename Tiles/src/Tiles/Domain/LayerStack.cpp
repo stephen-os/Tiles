@@ -1,7 +1,7 @@
 #include "Domain/LayerStack.h"
 #include "Core/Assert.h"
 #include "Core/Logger.h"
-#include "Core/Constants.h"
+#include "Domain/Constants.h"
 
 #include <algorithm>
 

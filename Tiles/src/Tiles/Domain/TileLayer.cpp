@@ -1,6 +1,6 @@
 #include "Domain/TileLayer.h"
 
-#include "Core/Constants.h"
+#include "Domain/Constants.h"
 
 #include <climits>
 
