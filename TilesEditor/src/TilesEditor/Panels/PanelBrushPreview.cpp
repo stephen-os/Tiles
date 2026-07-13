@@ -2,7 +2,7 @@
 
 #include "../UIConstants.h"
 
-#include "Core/Log.h"
+#include "Core/Logger.h"
 
 namespace Tiles::Editor
 {

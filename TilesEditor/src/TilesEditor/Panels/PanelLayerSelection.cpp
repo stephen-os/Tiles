@@ -2,7 +2,7 @@
 
 #include "../UIConstants.h"
 
-#include "Core/Log.h"
+#include "Core/Logger.h"
 
 #include "Commands/LayerAddCommand.h"
 #include "Commands/LayerDeleteCommand.h"

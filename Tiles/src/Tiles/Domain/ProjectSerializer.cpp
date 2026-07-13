@@ -11,7 +11,7 @@
 
 #include "Domain/Project.h"
 #include "Core/Constants.h"
-#include "Core/Log.h"
+#include "Core/Logger.h"
 #include "Graphics/Texture.h"
 #include "Graphics/TextureAtlas.h"
 

@@ -1,7 +1,7 @@
 #include "Tiles.h"
 
 #include "Core/Event.h"
-#include "Core/Log.h"
+#include "Core/Logger.h"
 
 #include "EntryPoint.h"
 

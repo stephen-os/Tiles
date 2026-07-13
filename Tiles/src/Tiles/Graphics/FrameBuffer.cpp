@@ -4,7 +4,7 @@
 
 #include "RenderCommands.h"
 #include "../Core/Assert.h"
-#include "../Core/Log.h"
+#include "../Core/Logger.h"
 
 namespace Tiles
 {

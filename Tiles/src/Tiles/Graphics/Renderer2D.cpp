@@ -1,5 +1,5 @@
 #include "Renderer2D.h"
-#include "Core/Log.h"
+#include "Core/Logger.h"
 
 #include "Renderer2D/RendererState.h"
 

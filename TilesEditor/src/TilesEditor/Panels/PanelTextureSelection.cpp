@@ -1,7 +1,7 @@
 #include "PanelTextureSelection.h"
 #include "../UIConstants.h"
 #include "ImGuiFileDialog.h"
-#include "Core/Log.h"
+#include "Core/Logger.h"
 #include <filesystem>
 #include <algorithm>
 

@@ -4,7 +4,7 @@
 #include "Core/Application.h"
 #include "Core/Layer.h"
 #include "Core/Input.h"
-#include "Core/Log.h"
+#include "Core/Logger.h"
 #include "Core/Assert.h"
 
 // Graphics

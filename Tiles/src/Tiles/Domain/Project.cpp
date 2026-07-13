@@ -1,6 +1,6 @@
 #include "Domain/Project.h"
 
-#include "Core/Log.h"
+#include "Core/Logger.h"
 #include "Core/Assert.h"
 
 #include "Core/Constants.h"

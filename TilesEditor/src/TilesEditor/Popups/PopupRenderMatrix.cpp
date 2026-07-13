@@ -2,7 +2,7 @@
 #include "Core/Constants.h"
 #include "../UIConstants.h"
 #include "Tiles.h"
-#include "Core/Log.h"
+#include "Core/Logger.h"
 #include "../Rendering/TileSceneRenderer.h"
 #include "ImGuiFileDialog.h"
 #include <algorithm>

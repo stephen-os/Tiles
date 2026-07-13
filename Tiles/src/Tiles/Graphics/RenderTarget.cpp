@@ -1,5 +1,5 @@
 #include "RenderTarget.h"
-#include "Core/Log.h"
+#include "Core/Logger.h"
 
 #include <stb_image_write.h>
 
