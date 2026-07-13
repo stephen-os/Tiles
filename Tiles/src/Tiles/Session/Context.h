@@ -119,6 +119,10 @@ namespace Tiles
 		// painting mode, working layer, and command history.
 		void CreateProject(const std::string& name);
 
+		// Closes the active project, leaving the session empty and resetting the
+		// editing selection, command history, and camera.
+		void CloseProject();
+
 		// Serializes the project to its existing file path.
 		// @return Failure if there is no project or no path yet (use SaveProjectAs).
 		[[nodiscard]] std::expected<void, Error> SaveProject();

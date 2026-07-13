@@ -29,14 +29,17 @@ namespace Tiles
 		// True while a project is loaded.
 		[[nodiscard]] bool HasProject() const { return m_Project != nullptr; }
 
-		// True while the project has unsaved changes.
-		[[nodiscard]] bool IsDirty() const { return m_Project->HasUnsavedChanges(); }
+		// True while a project is loaded and has unsaved changes.
+		[[nodiscard]] bool IsDirty() const { return m_Project && m_Project->HasUnsavedChanges(); }
 
 		// Project name, suffixed with "(Unsaved)" while it has no file path.
 		[[nodiscard]] std::string GetDisplayName() const;
 
 		// Replaces the project with a fresh, empty one.
 		void Create(const std::string& name);
+
+		// Closes the active project, leaving the session with no project loaded.
+		void Close() { m_Project.reset(); }
 
 		// Serializes to the project's existing file path.
 		[[nodiscard]] std::expected<void, Error> Save();

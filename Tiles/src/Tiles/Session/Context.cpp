@@ -9,7 +9,8 @@ namespace Tiles
 		// layer in range (a layer delete can be undone/redone under us).
 		m_CommandDispatcher.SetOnMutated([this]()
 			{
-				m_ProjectSession.GetProject()->MarkAsModified();
+				if (m_ProjectSession.HasProject())
+					m_ProjectSession.GetProject()->MarkAsModified();
 				ValidateWorkingLayer();
 			});
 
@@ -25,6 +26,9 @@ namespace Tiles
 	// Centers and zooms the camera so the whole project fits in view.
 	void Context::FitViewportCameraToProject()
 	{
+		if (!m_ProjectSession.HasProject())
+			return;
+
 		const auto& layerStack = m_ProjectSession.GetProject()->GetLayerStack();
 		m_CameraController.Fit(layerStack.GetBounds());
 	}
@@ -38,14 +42,16 @@ namespace Tiles
 	// Selects the active layer for painting; ignored if index is out of range.
 	void Context::SetWorkingLayer(size_t index)
 	{
-		if (m_ProjectSession.GetProject()->GetLayerStack().IsValidLayerIndex(index))
+		if (m_ProjectSession.HasProject()
+			&& m_ProjectSession.GetProject()->GetLayerStack().IsValidLayerIndex(index))
 			m_EditingState.SetWorkingLayer(index);
 	}
 
 	// True when the working-layer index refers to an existing layer.
 	bool Context::HasWorkingLayer() const
 	{
-		return m_ProjectSession.GetProject()->GetLayerStack().IsValidLayerIndex(m_EditingState.GetWorkingLayer());
+		return m_ProjectSession.HasProject()
+			&& m_ProjectSession.GetProject()->GetLayerStack().IsValidLayerIndex(m_EditingState.GetWorkingLayer());
 	}
 
 	// The active layer. Requires HasWorkingLayer(); asserts otherwise.
@@ -69,7 +75,8 @@ namespace Tiles
 	// Issues the current painting mode's command against the given layer.
 	void Context::PaintTileOnLayer(size_t layerIndex, int x, int y, const Tile& tile)
 	{
-		if (!m_ProjectSession.GetProject()->GetLayerStack().IsValidLayerIndex(layerIndex))
+		if (!m_ProjectSession.HasProject()
+			|| !m_ProjectSession.GetProject()->GetLayerStack().IsValidLayerIndex(layerIndex))
 			return;
 
 		ExecuteCommand(m_EditingState.BuildModeCommand(layerIndex, x, y, tile));
@@ -113,6 +120,9 @@ namespace Tiles
 	// Clamps the working-layer index back into range against the active project.
 	void Context::ValidateWorkingLayer()
 	{
+		if (!m_ProjectSession.HasProject())
+			return;
+
 		m_EditingState.ValidateWorkingLayer(m_ProjectSession.GetProject()->GetLayerStack());
 	}
 
@@ -121,6 +131,16 @@ namespace Tiles
 	{
 		m_CommandDispatcher.Clear();
 		m_ProjectSession.Create(name);
+		m_EditingState.Reset();
+
+		m_CameraController.Initialize();
+	}
+
+	// Closes the active project, resetting editing/undo/camera to the empty state.
+	void Context::CloseProject()
+	{
+		m_CommandDispatcher.Clear();
+		m_ProjectSession.Close();
 		m_EditingState.Reset();
 
 		m_CameraController.Initialize();
