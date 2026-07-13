@@ -9,8 +9,6 @@
 #include "Session/CommandDispatcher.h"
 #include "Session/ProjectSession.h"
 
-#include "Constants.h"
-
 #include "Session/ViewportCameraController.h"
 #include "Session/EditingState.h"
 
