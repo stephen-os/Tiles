@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Input/KeyCodes.h"
-#include "Input/MouseCodes.h"
+#include "KeyCodes.h"
+#include "MouseCodes.h"
 
 namespace Tiles::Input
 {

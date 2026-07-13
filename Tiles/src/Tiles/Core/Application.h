@@ -3,7 +3,7 @@
 #include "Window.h"
 #include "Layer.h"
 
-#include "Input/InputState.h"
+#include "InputState.h"
 #include "../Utils/Timer.h"
 
 #include <string>

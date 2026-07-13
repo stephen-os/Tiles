@@ -1,7 +1,7 @@
 #include "Input.h"
 
 #include "Application.h"
-#include "Input/InputState.h"
+#include "InputState.h"
 
 namespace Tiles::Input
 {

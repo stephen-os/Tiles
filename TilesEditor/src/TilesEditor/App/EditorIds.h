@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Input/KeyCodes.h"
+#include "Core/KeyCodes.h"
 
 namespace Tiles::Editor
 {
