@@ -1,6 +1,5 @@
 #include "PanelViewport.h"
 
-#include "Core/Constants.h"
 #include "../UIConstants.h"
 
 #include "Core/Input.h"

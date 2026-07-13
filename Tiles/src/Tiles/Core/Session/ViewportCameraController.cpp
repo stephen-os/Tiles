@@ -2,10 +2,16 @@
 
 #include <algorithm>
 
-#include "../Constants.h"
-
 namespace Tiles
 {
+    namespace
+    {
+        // Camera framing limits used when fitting content to the viewport.
+        constexpr float DefaultTileSize = 64.0f;
+        constexpr float MinZoom = 0.5f;
+        constexpr float MaxZoom = 3.0f;
+    }
+
     ViewportCameraController::ViewportCameraController() {}
 
     void ViewportCameraController::Initialize()
@@ -28,7 +34,7 @@ namespace Tiles
             return;
         }
 
-        const float tileSize = Viewport::Render::DefaultTileSize;
+        const float tileSize = DefaultTileSize;
 
         // A tile at coord (cx, cy) fills the cell [cx, cx+1], centered at
         // (cx + 0.5) * tileSize, so the content spans [minX, maxX+1] in tiles.
@@ -52,6 +58,6 @@ namespace Tiles
         const float zoomY = viewportHeight / contentHeight;
         const float fitZoom = std::min(zoomX, zoomY) * 0.9f;
 
-        m_Camera.Zoom = std::clamp(fitZoom, Viewport::Render::MinZoom, Viewport::Render::MaxZoom);
+        m_Camera.Zoom = std::clamp(fitZoom, MinZoom, MaxZoom);
     }
 }
