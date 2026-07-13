@@ -30,6 +30,12 @@ namespace Tiles
 		// Tears down the ImGui/GL backends and window; persists window geometry.
 		virtual ~Application();
 
+		// A unique identity; not copyable or movable.
+		Application(const Application&) = delete;
+		Application& operator=(const Application&) = delete;
+		Application(Application&&) = delete;
+		Application& operator=(Application&&) = delete;
+
 		// Runs client setup (OnCreate); call once before Run.
 		void Create();
 
