@@ -59,8 +59,7 @@ namespace Tiles
 		TILES_ASSERT(version, "[OpenGL Context] Failed to retrieve OpenGL version.");
 		TILES_ENGINE_INFO("OpenGL Version: {}", version);
 
-		if (m_Settings.Use2DRenderer)
-			Renderer2D::Init();
+		Renderer2D::Init();
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -100,8 +99,7 @@ namespace Tiles
 		{
 			SaveSettings();
 
-			if (m_Settings.Use2DRenderer)
-				Renderer2D::Shutdown();
+			Renderer2D::Shutdown();
 
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui_ImplGlfw_Shutdown();

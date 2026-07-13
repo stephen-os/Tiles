@@ -230,7 +230,6 @@ Tiles::Application* Tiles::CreateApplication(int argc, char** argv)
 	spec.Window.IconPath = "res/assets/bucket.png";
 	spec.Window.Width = 1920;
 	spec.Window.Height = 1080;
-	spec.Use2DRenderer = true;
 	spec.Window.Maximized = true;
 
 	Tiles::Application* app = new TilesEditor(spec);

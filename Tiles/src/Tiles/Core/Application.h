@@ -17,8 +17,6 @@ namespace Tiles
 	{
 		WindowSettings Window;
 
-		bool Use2DRenderer = false;
-
 		// Working-directory-relative path of the persisted window-state file.
 		std::string SettingsFile = "settings.json";
 	};
