@@ -26,7 +26,7 @@ namespace Tiles::Editor
 
             glm::vec2 tileSizeMultiplier = tile.GetSize();
 
-            Tiles::QuadParams params;
+            Tiles::Square params;
             // Nudge each layer's depth so higher layers draw above lower ones.
             params.Position = { tileWorldPos.x, tileWorldPos.y, baseDepth + layerIndex * 0.01f };
             params.Rotation = tile.GetRotation();
@@ -44,7 +44,7 @@ namespace Tiles::Editor
                 }
             }
 
-            Tiles::Renderer2D::DrawQuad(params);
+            Tiles::Renderer2D::DrawSquare(params);
         }
     }
 }

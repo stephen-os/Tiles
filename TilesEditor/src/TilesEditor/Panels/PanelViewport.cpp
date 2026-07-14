@@ -148,7 +148,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderGrid()
     {
-        // Colors come from GridParams' defaults; the grid reconstructs world
+        // Colors come from the Grid struct's defaults; the grid reconstructs world
         // space from the frame's view-projection (set by BeginFrame). Grid lines
         // fall on integer tile boundaries (so they pass through the origin); a
         // tile at (cx, cy) fills the cell between them.
@@ -164,7 +164,7 @@ namespace Tiles::Editor
         float halfWidth = m_ViewportSize.x / camera.Zoom * 0.5f;
         float halfHeight = m_ViewportSize.y / camera.Zoom * 0.5f;
 
-        Tiles::LineParams line;
+        Tiles::Line line;
         line.Color = Viewport::Grid::BoundaryColor;   // red
         line.Thickness = 2.0f;
 
@@ -190,7 +190,7 @@ namespace Tiles::Editor
         float x1 = (region.Min.x + region.Size.x) * m_TileSize;
         float y1 = (region.Min.y + region.Size.y) * m_TileSize;
 
-        Tiles::LineParams line;
+        Tiles::Line line;
         line.Color = { 0.2f, 0.8f, 1.0f, 1.0f };   // cyan, distinct from the red origin axes
         line.Thickness = 2.0f;
 
@@ -293,7 +293,7 @@ namespace Tiles::Editor
     {
         glm::vec2 brushSize = brush.GetSize();
 
-        Tiles::QuadParams params;
+        Tiles::Square params;
         params.Position = m_MouseFollowQuadPosition;
         params.Rotation = brush.GetRotation();
         params.Tint = brush.GetTint();
@@ -310,12 +310,12 @@ namespace Tiles::Editor
             }
         }
 
-        Tiles::Renderer2D::DrawQuad(params);
+        Tiles::Renderer2D::DrawSquare(params);
     }
 
     void PanelViewport::RenderEraserPreview()
     {
-        Tiles::Renderer2D::DrawQuad({
+        Tiles::Renderer2D::DrawSquare({
             .Position = m_MouseFollowQuadPosition,
             .Size = { m_TileSize, m_TileSize },
             .Tint = { 1.0f, 0.0f, 0.0f, 0.3f },
@@ -324,7 +324,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderFillPreview()
     {
-        Tiles::Renderer2D::DrawQuad({
+        Tiles::Renderer2D::DrawSquare({
             .Position = m_MouseFollowQuadPosition,
             .Size = { m_TileSize, m_TileSize },
             .Tint = { 0.0f, 0.0f, 1.0f, 0.3f },
@@ -333,7 +333,7 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderBasicHover()
     {
-        Tiles::Renderer2D::DrawQuad({
+        Tiles::Renderer2D::DrawSquare({
             .Position = m_MouseFollowQuadPosition,
             .Size = m_MouseFollowQuadSize,
             .Tint = m_MouseFollowQuadColor,

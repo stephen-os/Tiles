@@ -75,7 +75,7 @@ namespace Tiles::Editor
         Tiles::Renderer2D::BeginFrame(camera.ViewProjection({ previewDimensions.x, previewDimensions.y }));
 
         // Render background
-        Tiles::Renderer2D::DrawQuad({
+        Tiles::Renderer2D::DrawSquare({
             .Position = { 0.0f, 0.0f, Render2D::Depth::Background },
             .Size = { Render2D::Grid::BackgroundSize, Render2D::Grid::BackgroundSize },
             .Tint = { m_BackgroundBrightness, m_BackgroundBrightness, m_BackgroundBrightness, 1.0f },
@@ -84,7 +84,7 @@ namespace Tiles::Editor
         // Render grid if enabled
         if (m_ShowGrid)
         {
-            Tiles::LineParams line;
+            Tiles::Line line;
             line.Color = Render2D::Grid::Color;
             line.Thickness = Render2D::Grid::LineThickness;
 
@@ -108,7 +108,7 @@ namespace Tiles::Editor
         // Render brush
         auto& brush = Ctx().GetBrush();
 
-        Tiles::QuadParams brushQuad;
+        Tiles::Square brushQuad;
         brushQuad.Position = { 0.0f, 0.0f, Render2D::Depth::Brush };
         brushQuad.Size = brush.GetSize();
         brushQuad.Rotation = brush.GetRotation();
@@ -120,12 +120,12 @@ namespace Tiles::Editor
             brushQuad.Texture = Ctx().GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
         }
 
-        Tiles::Renderer2D::DrawQuad(brushQuad);
+        Tiles::Renderer2D::DrawSquare(brushQuad);
 
         // Render bounds if enabled
         if (m_ShowBounds)
         {
-            Tiles::Renderer2D::DrawQuad({
+            Tiles::Renderer2D::DrawSquare({
                 .Position = { 0.0f, 0.0f, Render2D::Depth::Bounds },
                 .Size = { brush.GetSize().x + Render2D::Bounds::Offset, brush.GetSize().y + Render2D::Bounds::Offset },
                 .Tint = Render2D::Bounds::Color,
