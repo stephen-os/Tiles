@@ -1,201 +1,159 @@
 #pragma once
-#include <memory>
-#include <cstdint>
 
 #include "VertexArray.h"
 
-
-namespace Tiles::GL
-{
-    // Drains the OpenGL error queue after a call and logs any errors with the
-    // originating call, file, and line. Declared here, defined in the .cpp so
-    // this header stays free of the GL headers.
-    void CheckError(const char* call, const char* file, int line);
-}
-
-// Wraps an OpenGL call so GL errors are surfaced during development. In debug
-// builds the error queue is drained and logged after every call; release keeps
-// the call bare to avoid a glGetError round-trip per command.
-#ifdef TILES_DEBUG
-    #define GLCALL(x) do { x; ::Tiles::GL::CheckError(#x, __FILE__, __LINE__); } while (0)
-#else
-    #define GLCALL(x) x
-#endif
+#include <cstdint>
+#include <memory>
 
 namespace Tiles
 {
-    enum class PolygonMode
-    {
-        Fill = 0,
-        Line,
-        Point
-    };
+	enum class PolygonMode
+	{
+		Fill = 0,
+		Line,
+		Point
+	};
 
-    enum class BlendFactor
-    {
-        Zero = 0,
-        One,
-        SrcColor,
-        OneMinusSrcColor,
-        DstColor,
-        OneMinusDstColor,
-        SrcAlpha,
-        OneMinusSrcAlpha,
-        DstAlpha,
-        OneMinusDstAlpha,
-        ConstantColor,
-        OneMinusConstantColor,
-        ConstantAlpha,
-        OneMinusConstantAlpha
-    };
+	enum class BlendFactor
+	{
+		Zero = 0,
+		One,
+		SrcColor,
+		OneMinusSrcColor,
+		DstColor,
+		OneMinusDstColor,
+		SrcAlpha,
+		OneMinusSrcAlpha,
+		DstAlpha,
+		OneMinusDstAlpha,
+		ConstantColor,
+		OneMinusConstantColor,
+		ConstantAlpha,
+		OneMinusConstantAlpha
+	};
 
-    enum class BlendEquation
-    {
-        Add = 0,
-        Subtract,
-        ReverseSubtract,
-        Min,
-        Max
-    };
+	enum class BlendEquation
+	{
+		Add = 0,
+		Subtract,
+		ReverseSubtract,
+		Min,
+		Max
+	};
 
-    enum class DepthFunc
-    {
-        Never = 0,
-        Less,
-        Equal,
-        LessEqual,
-        Greater,
-        NotEqual,
-        GreaterEqual,
-        Always
-    };
+	enum class DepthFunc
+	{
+		Never = 0,
+		Less,
+		Equal,
+		LessEqual,
+		Greater,
+		NotEqual,
+		GreaterEqual,
+		Always
+	};
 
-    enum class CullFace
-    {
-        Front = 0,
-        Back,
-        FrontAndBack
-    };
+	enum class CullFace
+	{
+		Front = 0,
+		Back,
+		FrontAndBack
+	};
 
-    enum class FrontFace
-    {
-        Clockwise = 0,
-        CounterClockwise
-    };
+	enum class FrontFace
+	{
+		Clockwise = 0,
+		CounterClockwise
+	};
 
-    enum class PrimitiveType
-    {
-        Points = 0,
-        Lines,
-        LineStrip,
-        LineLoop,
-        Triangles,
-        TriangleStrip,
-        TriangleFan
-    };
+	enum class PrimitiveType
+	{
+		Points = 0,
+		Lines,
+		LineStrip,
+		LineLoop,
+		Triangles,
+		TriangleStrip,
+		TriangleFan
+	};
 
-    struct RenderState
-    {
-        bool depthTest = true;
-        bool depthWrite = true;
-        bool blending = false;
-        bool faceCulling = false;
-        bool scissorTest = false;
-        PolygonMode polygonMode = PolygonMode::Fill;
-        DepthFunc depthFunc = DepthFunc::Less;
-        CullFace cullFace = CullFace::Back;
-        FrontFace frontFace = FrontFace::CounterClockwise;
-        BlendFactor srcBlend = BlendFactor::SrcAlpha;
-        BlendFactor dstBlend = BlendFactor::OneMinusSrcAlpha;
-        BlendEquation blendEquation = BlendEquation::Add;
-        float lineWidth = 1.0f;
-        float pointSize = 1.0f;
-    };
+	// A thin, stateless facade over the OpenGL pipeline-state and draw calls,
+	// taking engine enums instead of raw GL constants. All methods are static;
+	// GL errors surface through the debug-message callback, not a return value.
+	class RenderCommands
+	{
+	public:
+		// Viewport and clearing
+		static void SetViewport(int x, int y, int width, int height);
+		static void SetClearColor(float r, float g, float b, float a = 1.0f);
+		static void Clear();
+		static void ClearColor();
+		static void ClearDepth();
+		static void ClearStencil();
 
-    class RenderCommands
-    {
-    public:
-        // Viewport and Clearing
-        static void SetViewport(int x, int y, int width, int height);
-        static void SetClearColor(float r, float g, float b, float a = 1.0f);
-        static void Clear();
-        static void ClearColor();
-        static void ClearDepth();
-        static void ClearStencil();
+		// Depth testing
+		static void EnableDepthTest();
+		static void DisableDepthTest();
+		static void SetDepthFunc(DepthFunc func);
+		static void SetDepthMask(bool writeEnabled);
 
-        // Depth Testing
-        static void EnableDepthTest();
-        static void DisableDepthTest();
-        static void SetDepthFunc(DepthFunc func);
-        static void SetDepthMask(bool writeEnabled);
+		// Blending
+		static void EnableBlending();
+		static void DisableBlending();
+		static void SetBlendFunc(BlendFactor sfactor, BlendFactor dfactor);
+		static void SetBlendEquation(BlendEquation mode);
 
-        // Blending
-        static void EnableBlending();
-        static void DisableBlending();
-        static void SetBlendFunc(BlendFactor sfactor, BlendFactor dfactor);
-        static void SetBlendEquation(BlendEquation mode);
+		// Face culling
+		static void EnableFaceCulling();
+		static void DisableFaceCulling();
+		static void SetCullFace(CullFace mode);
+		static void SetFrontFace(FrontFace mode);
 
-        // Face Culling
-        static void EnableFaceCulling();
-        static void DisableFaceCulling();
-        static void SetCullFace(CullFace mode);
-        static void SetFrontFace(FrontFace mode);
+		// Scissor testing
+		static void EnableScissorTest();
+		static void DisableScissorTest();
+		static void SetScissorBox(int x, int y, int width, int height);
 
-        // Scissor Testing
-        static void EnableScissorTest();
-        static void DisableScissorTest();
-        static void SetScissorBox(int x, int y, int width, int height);
+		// Polygon and line/point settings
+		static void SetPolygonMode(PolygonMode mode);
+		static void SetLineWidth(float width);
+		static void SetPointSize(float size);
+		static void EnableProgramPointSize();
+		static void DisableProgramPointSize();
 
-        // Polygon and Line/Point Settings
-        static void SetPolygonMode(PolygonMode mode);
-        static void SetLineWidth(float width);
-        static void SetPointSize(float size);
+		// Basic drawing
+		static void DrawArrays(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t offset = 0);
+		static void DrawElements(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive);
+		static void DrawElementsWithCount(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t indexCount);
 
-        // Point Size Program Control
-        static void EnableProgramPointSize();
-        static void DisableProgramPointSize();
+		// Instanced drawing
+		static void DrawArraysInstanced(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t instanceCount, uint32_t offset = 0);
+		static void DrawElementsInstanced(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t instanceCount);
 
-        // State Management
-        static void SetRenderState(const RenderState& state);
-        static RenderState GetRenderState();
+		// Multi-draw
+		static void MultiDrawArrays(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, const int* first, const int* count, int drawCount);
 
-        // Basic Drawing Commands
-        static void DrawArrays(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t offset = 0);
-        static void DrawElements(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive);
+		// Convenience wrappers by primitive type
+		static void DrawPoints(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+		static void DrawLines(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+		static void DrawLineStrips(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+		static void DrawTriangles(const std::shared_ptr<VertexArray>& vao, uint32_t count = 0, uint32_t offset = 0); // count = 0 uses the index buffer
+		static void DrawTriangleStrip(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
+		static void DrawTriangleFan(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
 
-        // Instanced Drawing
-        static void DrawArraysInstanced(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t count, uint32_t instanceCount, uint32_t offset = 0);
-        static void DrawElementsInstanced(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t instanceCount);
+		// Indexed convenience wrappers
+		static void DrawPointsIndexed(const std::shared_ptr<VertexArray>& vao);
+		static void DrawLinesIndexed(const std::shared_ptr<VertexArray>& vao);
+		static void DrawTrianglesIndexed(const std::shared_ptr<VertexArray>& vao);
 
-        // With Count
-        static void DrawElementsWithCount(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, uint32_t indexCount);
-
-        // Multi-draw Commands
-        static void MultiDrawArrays(const std::shared_ptr<VertexArray>& vao, PrimitiveType primitive, const int* first, const int* count, int drawCount);
-
-        // Convenience Drawing Methods (backwards compatibility and ease of use)
-        static void DrawPoints(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-        static void DrawLines(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-        static void DrawLineStrips(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-        static void DrawTriangles(const std::shared_ptr<VertexArray>& vao, uint32_t count = 0, uint32_t offset = 0); // count = 0 means use index buffer
-        static void DrawTriangleStrip(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-        static void DrawTriangleFan(const std::shared_ptr<VertexArray>& vao, uint32_t count, uint32_t offset = 0);
-
-        // Indexed versions
-        static void DrawPointsIndexed(const std::shared_ptr<VertexArray>& vao);
-        static void DrawLinesIndexed(const std::shared_ptr<VertexArray>& vao);
-        static void DrawTrianglesIndexed(const std::shared_ptr<VertexArray>& vao);
-
-    private:
-        static RenderState s_CurrentState;
-
-        // Internal helper functions for enum conversion
-        static unsigned int ToGLEnum(PolygonMode mode);
-        static unsigned int ToGLEnum(BlendFactor factor);
-        static unsigned int ToGLEnum(BlendEquation equation);
-        static unsigned int ToGLEnum(DepthFunc func);
-        static unsigned int ToGLEnum(CullFace face);
-        static unsigned int ToGLEnum(FrontFace face);
-        static unsigned int ToGLEnum(PrimitiveType primitive);
-    };
+	private:
+		// Engine enum -> GL constant conversions.
+		static unsigned int ToGLEnum(PolygonMode mode);
+		static unsigned int ToGLEnum(BlendFactor factor);
+		static unsigned int ToGLEnum(BlendEquation equation);
+		static unsigned int ToGLEnum(DepthFunc func);
+		static unsigned int ToGLEnum(CullFace face);
+		static unsigned int ToGLEnum(FrontFace face);
+		static unsigned int ToGLEnum(PrimitiveType primitive);
+	};
 }
