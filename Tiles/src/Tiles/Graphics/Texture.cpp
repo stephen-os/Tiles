@@ -102,6 +102,22 @@ namespace Tiles
 		return texture;
 	}
 
+	// Decodes an encoded image from memory (PNG/JPG/...) and uploads it.
+	std::shared_ptr<Texture> Texture::CreateFromEncodedImage(const void* data, size_t size)
+	{
+		int width = 0, height = 0, channels = 0;
+		stbi_uc* pixels = stbi_load_from_memory(static_cast<const stbi_uc*>(data), static_cast<int>(size), &width, &height, &channels, 4);
+		if (!pixels)
+		{
+			TILES_ENGINE_ERROR("Texture::CreateFromEncodedImage: failed to decode image ({})", stbi_failure_reason());
+			return nullptr;
+		}
+
+		auto texture = CreateFromData(pixels, static_cast<uint32_t>(width), static_cast<uint32_t>(height), 4);
+		stbi_image_free(pixels);
+		return texture;
+	}
+
 	// Creates a texture by decoding an image file.
 	Texture::Texture(const std::string& source)
 	{

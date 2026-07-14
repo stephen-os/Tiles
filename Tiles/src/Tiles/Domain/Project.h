@@ -13,7 +13,7 @@
 #include "Domain/TileLayer.h"
 #include "Domain/LayerStack.h"
 
-#include "../Graphics/TextureAtlas.h"
+#include "Domain/TextureAtlas.h"
 
 namespace Tiles
 {
@@ -32,8 +32,7 @@ namespace Tiles
     class Project
     {
     public:
-        nlohmann::json ToJSON() const;
-        // Reconstructs a project from JSON.
+        // Reconstructs a project from the legacy path-referencing JSON format.
         // @return Null if the required layer-stack field is missing.
         static std::shared_ptr<Project> FromJSON(const nlohmann::json& json);
 

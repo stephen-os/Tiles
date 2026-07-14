@@ -10,9 +10,11 @@
 // Graphics
 #include "Graphics/Renderer2D.h"
 #include "Graphics/Texture.h"
-#include "Graphics/TextureAtlas.h"
 #include "Graphics/RenderTarget.h"
 #include "Graphics/Camera2D.h"
+
+// Domain
+#include "Domain/TextureAtlas.h"
 
 // Utils
 #include "Utils/Timer.h"

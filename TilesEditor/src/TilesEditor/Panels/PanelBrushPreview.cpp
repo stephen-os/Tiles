@@ -117,7 +117,8 @@ namespace Tiles::Editor
 
         if (brush.IsTextured() && brush.HasValidAtlas())
         {
-            brushQuad.Texture = Ctx().GetProject()->GetTextureAtlas(brush.GetAtlasIndex())->GetTexture();
+            auto atlas = Ctx().GetProject()->GetTextureAtlas(brush.GetAtlasIndex());
+            brushQuad.Texture = Host().GetAtlasTexture(*atlas);
         }
 
         Tiles::Renderer2D::DrawSquare(brushQuad);

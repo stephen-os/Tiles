@@ -7,13 +7,11 @@
 
 #include "json.hpp"
 #include <miniz.h>
-#include <stb_image.h>
 
 #include "Domain/Project.h"
+#include "Domain/TextureAtlas.h"
 #include "Domain/Constants.h"
 #include "Core/Logger.h"
-#include "Graphics/Texture.h"
-#include "Graphics/TextureAtlas.h"
 
 namespace Tiles
 {
@@ -108,28 +106,14 @@ namespace Tiles
             jsonAtlas[JSON::Atlas::Width] = atlas->GetWidth();
             jsonAtlas[JSON::Atlas::Height] = atlas->GetHeight();
 
-            if (auto texture = atlas->GetTexture())
+            if (atlas->HasImage())
             {
-                // Read the atlas back from the GPU and encode it to a PNG embedded
-                // in the archive, so the saved file never depends on the original
+                // Embed the atlas's source image bytes directly -- no GPU readback
+                // or re-encoding -- so the saved file never depends on the original
                 // image's path.
-                std::vector<uint8_t> pixels = texture->ReadPixels();
-                size_t pngSize = 0;
-                void* png = tdefl_write_image_to_png_file_in_memory(
-                    pixels.data(),
-                    static_cast<int>(texture->GetWidth()),
-                    static_cast<int>(texture->GetHeight()),
-                    4, &pngSize);
-                if (!png)
-                {
-                    mz_zip_writer_end(&zip);
-                    return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to encode an atlas image." });
-                }
-
-                std::string imageName = "atlas" + std::to_string(i) + ".png";
-                mz_bool added = mz_zip_writer_add_mem(&zip, imageName.c_str(), png, pngSize, MZ_NO_COMPRESSION);
-                mz_free(png);
-                if (!added)
+                const std::vector<uint8_t>& imageBytes = atlas->GetImageBytes();
+                std::string imageName = "atlas" + std::to_string(i) + ".img";
+                if (!mz_zip_writer_add_mem(&zip, imageName.c_str(), imageBytes.data(), imageBytes.size(), MZ_NO_COMPRESSION))
                 {
                     mz_zip_writer_end(&zip);
                     return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to add an atlas image to the archive." });
@@ -230,7 +214,7 @@ namespace Tiles
                     std::string imageName = jsonAtlas.value(JSON::Atlas::Image, "");
                     if (imageName.empty())
                     {
-                        // Textureless atlas: preserve the slot so indices line up.
+                        // Imageless atlas: preserve the slot so indices line up.
                         project->AddTextureAtlas(TextureAtlas::Create(gridWidth, gridHeight));
                         continue;
                     }
@@ -244,26 +228,12 @@ namespace Tiles
                         continue;
                     }
 
-                    int width = 0, height = 0, channels = 0;
-                    stbi_uc* pixels = stbi_load_from_memory(
-                        reinterpret_cast<stbi_uc*>(imageData), static_cast<int>(imageSize),
-                        &width, &height, &channels, 4);
+                    std::vector<uint8_t> imageBytes(
+                        reinterpret_cast<uint8_t*>(imageData),
+                        reinterpret_cast<uint8_t*>(imageData) + imageSize);
                     mz_free(imageData);
 
-                    if (!pixels)
-                    {
-                        TILES_ENGINE_WARN("ProjectSerializer::Load: Failed to decode atlas image '{}'", imageName);
-                        project->AddTextureAtlas(TextureAtlas::Create(gridWidth, gridHeight));
-                        continue;
-                    }
-
-                    auto texture = Texture::CreateFromData(pixels, static_cast<uint32_t>(width), static_cast<uint32_t>(height), 4);
-                    stbi_image_free(pixels);
-
-                    if (texture)
-                        project->AddTextureAtlas(TextureAtlas::Create(texture, gridWidth, gridHeight));
-                    else
-                        project->AddTextureAtlas(TextureAtlas::Create(gridWidth, gridHeight));
+                    project->AddTextureAtlas(TextureAtlas::Create(std::move(imageBytes), gridWidth, gridHeight));
                 }
             }
         }

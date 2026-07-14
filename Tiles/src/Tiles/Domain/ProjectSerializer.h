@@ -19,8 +19,8 @@ namespace Tiles
     {
     public:
         // Writes project to path as a container, creating any missing parent
-        // directories. Requires a current GL context (atlases are read back from
-        // the GPU to embed).
+        // directories. Embeds each atlas's source image bytes directly, so no GL
+        // context or GPU readback is involved.
         // @return A WriteFailure error if encoding or writing fails.
         [[nodiscard]] static std::expected<void, Error> Save(const Project& project, const std::filesystem::path& path);
 

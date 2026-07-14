@@ -8,6 +8,8 @@
 #include "App/EditorHost.h"
 #include "App/ActionRegistry.h"
 
+#include "Rendering/AtlasTextureCache.h"
+
 #include "Panels/PanelManager.h"
 #include "Panels/PanelLayerSelection.h"
 #include "Panels/PanelToolSelection.h"
@@ -63,6 +65,15 @@ public:
 
 	void OnUpdate(float timestep) override
 	{
+		// The atlas texture cache keys on atlas pointers; drop it when the active
+		// project changes so an entry never outlives the atlas it was built from.
+		const Project* project = m_Session->HasProject() ? m_Session->GetProject().get() : nullptr;
+		if (project != m_LastProject)
+		{
+			m_AtlasTextures.Clear();
+			m_LastProject = project;
+		}
+
 		m_Panels.Update();
 	}
 
@@ -80,6 +91,8 @@ public:
 	// --- EditorHost ---------------------------------------------------------
 
 	Session& Doc() override { return *m_Session; }
+
+	std::shared_ptr<Tiles::Texture> GetAtlasTexture(const Tiles::TextureAtlas& atlas) override { return m_AtlasTextures.Get(atlas); }
 
 	void OpenPopup(PopupId id) override { m_Panels.OpenPopup(id); }
 	void ClosePopup(PopupId id) override { m_Panels.ClosePopup(id); }
@@ -203,6 +216,11 @@ private:
 	std::unique_ptr<Session> m_Session;
 	PanelManager m_Panels;
 	ActionRegistry m_Actions;
+
+	// GPU textures for the active project's atlases; observing pointer used to
+	// detect a project change and clear the cache.
+	AtlasTextureCache m_AtlasTextures;
+	const Project* m_LastProject = nullptr;
 };
 
 class TilesEditor : public Application

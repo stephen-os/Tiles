@@ -109,7 +109,7 @@ namespace Tiles::Editor
         ImGui::Text("Atlas:");
         ImGui::SameLine();
 
-        if (!atlas->HasTexture())
+        if (!atlas->HasImage())
         {
             ImGui::AlignTextToFramePadding();
             ImGui::TextWrapped("[ No file selected ]");
@@ -122,13 +122,13 @@ namespace Tiles::Editor
         }
         else
         {
-            std::string path = atlas->GetTexture()->GetPath();
+            std::string path = atlas->GetSourcePath();
             RenderComponentFilePathDisplay("AtlasPath", path);
             ImGui::SameLine();
 
             if (ImGui::Button("Remove"))
             {
-                atlas->RemoveTexture();
+                atlas->RemoveImage();
                 Ctx().GetProject()->MarkAsModified();
             }
         }
@@ -225,12 +225,13 @@ namespace Tiles::Editor
         ImVec2 buttonSize(tileSize, tileSize);
 
         // Render texture or transparent empty button
-        if (atlas->HasTexture())
+        auto texture = Host().GetAtlasTexture(*atlas);
+        if (texture)
         {
             glm::vec4 texCoords = atlas->GetTextureCoords(index);
             ImVec2 uvMin(texCoords.x, texCoords.y);
             ImVec2 uvMax(texCoords.z, texCoords.w);
-            auto textureID = reinterpret_cast<void*>(static_cast<uintptr_t>(atlas->GetTexture()->GetID()));
+            auto textureID = reinterpret_cast<void*>(static_cast<uintptr_t>(texture->GetID()));
 
             ImGui::Image(textureID, buttonSize, uvMin, uvMax, ImVec4(1, 1, 1, 1), ImVec4(0, 0, 0, 0));
         }
@@ -330,7 +331,7 @@ namespace Tiles::Editor
             if (atlas)
             {
                 std::filesystem::path relativePath = std::filesystem::relative(newPath, std::filesystem::current_path());
-                atlas->SetTexture(relativePath.string());
+                atlas->SetImage(relativePath.string());
                 Ctx().GetProject()->MarkAsModified();
             }
         }

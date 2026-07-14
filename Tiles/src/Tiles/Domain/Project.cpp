@@ -76,34 +76,6 @@ namespace Tiles
         MarkAsModified();
     }
 
-    nlohmann::json Project::ToJSON() const
-    {
-        TILES_ENGINE_INFO("Project::ToJSON: Serializing project '{}' to JSON", m_ProjectName);
-
-        nlohmann::json jsonProject;
-
-        jsonProject[JSON::Project::Name] = GetProjectName();
-        jsonProject[JSON::Project::LayerStack] = GetLayerStack().ToJSON();
-
-        nlohmann::json atlasArray = nlohmann::json::array();
-        for (const auto& atlas : GetTextureAtlases())
-        {
-            if (atlas && atlas->GetTexture())
-            {
-                nlohmann::json jsonAtlas;
-                jsonAtlas[JSON::Atlas::Path] = atlas->GetTexture()->GetPath();
-                jsonAtlas[JSON::Atlas::Width] = atlas->GetWidth();
-                jsonAtlas[JSON::Atlas::Height] = atlas->GetHeight();
-                atlasArray.push_back(jsonAtlas);
-            }
-        }
-        jsonProject[JSON::Atlas::Array] = atlasArray;
-
-        TILES_ENGINE_INFO("Project::ToJSON: Serialized project with {} texture atlases", GetTextureAtlases().size());
-
-        return jsonProject;
-    }
-
     std::shared_ptr<Project> Project::FromJSON(const nlohmann::json& json)
     {
         TILES_ENGINE_INFO("Project::FromJSON: Loading project from JSON");

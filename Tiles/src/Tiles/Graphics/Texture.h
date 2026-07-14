@@ -83,6 +83,9 @@ namespace Tiles
 		[[nodiscard]] static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, int components);
 		[[nodiscard]] static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format);
 
+		// Decodes an encoded image (PNG/JPG/...) from memory and uploads it.
+		[[nodiscard]] static std::shared_ptr<Texture> CreateFromEncodedImage(const void* data, size_t size);
+
 		Texture(const std::string& source);
 		Texture(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
 		~Texture();

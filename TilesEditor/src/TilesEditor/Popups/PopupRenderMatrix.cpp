@@ -593,7 +593,7 @@ namespace Tiles::Editor
                 continue;
 
             const auto& layer = layerStack.GetLayer(layerIdx);
-            DrawTileLayer(layer, layerIdx, tileSize, textureAtlases, 0.0f);
+            DrawTileLayer(layer, layerIdx, tileSize, textureAtlases, 0.0f, Host());
         }
 
         Tiles::Renderer2D::EndFrame();

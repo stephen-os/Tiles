@@ -249,7 +249,7 @@ namespace Tiles::Editor
     void PanelViewport::RenderLayer(const TileLayer& layer, size_t layerIndex)
     {
         const auto& textureAtlases = Ctx().GetProject()->GetTextureAtlases();
-        DrawTileLayer(layer, layerIndex, m_TileSize, textureAtlases, Viewport::Depth::Tile);
+        DrawTileLayer(layer, layerIndex, m_TileSize, textureAtlases, Viewport::Depth::Tile, Host());
     }
 
     void PanelViewport::RenderHoverTile()
@@ -303,9 +303,9 @@ namespace Tiles::Editor
         if (brush.IsTextured() && brush.HasValidAtlas() && brush.GetAtlasIndex() < textureAtlases.size())
         {
             auto atlas = textureAtlases[brush.GetAtlasIndex()];
-            if (atlas && atlas->HasTexture())
+            if (atlas && atlas->HasImage())
             {
-                params.Texture = atlas->GetTexture();
+                params.Texture = Host().GetAtlasTexture(*atlas);
                 params.TexCoords = brush.GetTextureCoords();
             }
         }

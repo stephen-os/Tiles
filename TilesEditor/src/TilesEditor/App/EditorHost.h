@@ -2,11 +2,12 @@
 
 #include "EditorIds.h"
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
-namespace Tiles { class Session; }
+namespace Tiles { class Session; class Texture; class TextureAtlas; }
 
 namespace Tiles::Editor
 {
@@ -21,6 +22,11 @@ namespace Tiles::Editor
 
         // The shared document/session state (project, brush, command history).
         virtual Session& Doc() = 0;
+
+        // The GL texture backing a document atlas, built and cached on demand;
+        // null if the atlas has no image. Lets views render atlases without the
+        // document (or the atlas) depending on the graphics layer.
+        virtual std::shared_ptr<Tiles::Texture> GetAtlasTexture(const Tiles::TextureAtlas& atlas) = 0;
 
         virtual void OpenPopup(PopupId id) = 0;
         virtual void ClosePopup(PopupId id) = 0;

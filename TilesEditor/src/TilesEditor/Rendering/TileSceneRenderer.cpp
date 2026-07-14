@@ -2,8 +2,10 @@
 
 #include "Domain/Tile.h"
 #include "Domain/TileLayer.h"
+#include "Domain/TextureAtlas.h"
 #include "Graphics/Renderer2D.h"
-#include "Graphics/TextureAtlas.h"
+
+#include "../App/EditorHost.h"
 
 namespace Tiles::Editor
 {
@@ -12,7 +14,8 @@ namespace Tiles::Editor
         size_t layerIndex,
         float tileSize,
         const std::vector<std::shared_ptr<Tiles::TextureAtlas>>& textureAtlases,
-        float baseDepth)
+        float baseDepth,
+        EditorHost& host)
     {
         // The map holds only painted cells, so every entry is drawn. A tile at
         // signed coord (cx, cy) fills the cell [cx, cx+1] x [cy, cy+1], i.e. it is
@@ -37,9 +40,9 @@ namespace Tiles::Editor
             if (tile.IsTextured() && tile.GetAtlasIndex() < textureAtlases.size())
             {
                 auto atlas = textureAtlases[tile.GetAtlasIndex()];
-                if (atlas && atlas->HasTexture())
+                if (atlas && atlas->HasImage())
                 {
-                    params.Texture = atlas->GetTexture();
+                    params.Texture = host.GetAtlasTexture(*atlas);
                     params.TexCoords = tile.GetTextureCoords();
                 }
             }
