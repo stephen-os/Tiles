@@ -1,24 +1,27 @@
 #include "Texture.h"
-#include "Core/Assert.h"
 
-#include "RenderCommands.h"
+#include "Core/Assert.h"
 
 #include <glad/gl.h>
 #include <stb_image.h>
+
 #include <utility>
 
 namespace Tiles
 {
+	// Loads a texture from an image file on disk.
 	std::shared_ptr<Texture> Texture::Create(const std::string& source)
 	{
 		return std::make_shared<Texture>(source);
 	}
 
+	// Allocates an empty texture of the given size and format.
 	std::shared_ptr<Texture> Texture::Create(uint32_t width, uint32_t height, TextureFormat format)
 	{
 		return std::make_shared<Texture>(width, height, format);
 	}
 
+	// Creates a texture and uploads data, deriving the format from the channel count.
 	std::shared_ptr<Texture> Texture::CreateFromData(const void* data, uint32_t width, uint32_t height, int components)
 	{
 		TextureFormat format = TextureFormats::FromComponentCount(components);
@@ -30,168 +33,77 @@ namespace Tiles
 
 		auto texture = Texture::Create(width, height, format);
 		if (data)
-		{
 			texture->SetData(data, width, height, format);
-		}
+
 		return texture;
 	}
 
+	// Creates a texture and uploads data in the given format.
 	std::shared_ptr<Texture> Texture::CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format)
 	{
 		auto texture = Texture::Create(width, height, format);
 		if (data)
-		{
 			texture->SetData(data, width, height, format);
-		}
-		return texture;
-	}
-
-	std::vector<uint8_t> Texture::ReadPixels() const
-	{
-		std::vector<uint8_t> pixels(static_cast<size_t>(m_Width) * m_Height * 4);
-		GLCALL(glGetTextureImage(m_BufferID, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-			static_cast<GLsizei>(pixels.size()), pixels.data()));
-		return pixels;
-	}
-
-	std::shared_ptr<Texture> Texture::CreateCubemap(const std::vector<std::string>& faces)
-	{
-		if (faces.size() != 6)
-		{
-			TILES_ENGINE_ERROR("Cubemap requires exactly 6 face textures, got {0}", faces.size());
-			return nullptr;
-		}
-
-		auto texture = Texture::Create(1, 1, TextureFormat::RGBA8);
-		texture->m_IsCubemap = true;
-
-		GLCALL(glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &texture->m_BufferID));
-
-		int width = 0, height = 0;
-		for (int i = 0; i < 6; ++i)
-		{
-			int channels;
-			int faceWidth, faceHeight;
-			unsigned char* data = stbi_load(faces[i].c_str(), &faceWidth, &faceHeight, &channels, 0);
-
-			if (!data)
-			{
-				TILES_ENGINE_ERROR("Failed to load cubemap face: {0}", faces[i]);
-
-				GLCALL(glDeleteTextures(1, &texture->m_BufferID));
-				texture->m_BufferID = 0;
-
-				return nullptr;
-			}
-
-			// The first face fixes the cubemap dimensions/format and allocates
-			// immutable storage; every later face must match those dimensions.
-			if (i == 0)
-			{
-				width = faceWidth;
-				height = faceHeight;
-				texture->m_Width = width;
-				texture->m_Height = height;
-
-				texture->m_Format = TextureFormats::FromComponentCount(channels);
-				auto formatInfo = TextureFormats::GetInfo(texture->m_Format);
-
-				GLCALL(glTextureStorage2D(texture->m_BufferID, 1, formatInfo.InternalFormat, width, height));
-			}
-			else if (faceWidth != width || faceHeight != height)
-			{
-				TILES_ENGINE_ERROR("All cubemap faces must have the same dimensions");
-
-				stbi_image_free(data);
-				GLCALL(glDeleteTextures(1, &texture->m_BufferID));
-				texture->m_BufferID = 0;
-
-				return nullptr;
-			}
-
-			TextureFormat faceFormat = TextureFormats::FromComponentCount(channels);
-			auto formatInfo = TextureFormats::GetInfo(faceFormat);
-
-			GLCALL(glTextureSubImage3D(texture->m_BufferID, 0, 0, 0, i, width, height, 1, formatInfo.DataFormat, formatInfo.DataType, data));
-
-			stbi_image_free(data);
-		}
-
-		// Set cubemap parameters
-		GLCALL(glTextureParameteri(texture->m_BufferID, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-		GLCALL(glTextureParameteri(texture->m_BufferID, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-		GLCALL(glTextureParameteri(texture->m_BufferID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-		GLCALL(glTextureParameteri(texture->m_BufferID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-		GLCALL(glTextureParameteri(texture->m_BufferID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 
 		return texture;
 	}
 
-	std::shared_ptr<Texture> Texture::CreateCubemap(uint32_t width, uint32_t height, const void* data)
-	{
-		auto texture = Texture::Create(width, height, TextureFormat::RGBA8);
-		texture->CreateCubemapTexture(width, height, data);
-		return texture;
-	}
-
-	// Constructors
+	// Creates a texture by decoding an image file.
 	Texture::Texture(const std::string& source)
 	{
 		LoadFromFile(source);
 	}
 
+	// Creates an empty texture with immutable storage at the given size/format.
 	Texture::Texture(uint32_t width, uint32_t height, TextureFormat format)
 		: m_Width(width), m_Height(height), m_Format(format)
 	{
 		CreateTexture(width, height, format);
 	}
 
+	// Deletes the GL texture (a no-op for a moved-from id of 0).
 	Texture::~Texture()
 	{
-		GLCALL(glDeleteTextures(1, &m_BufferID));
+		glDeleteTextures(1, &m_BufferID);
 	}
 
+	// Steals other's handle, leaving it id 0.
 	Texture::Texture(Texture&& other) noexcept
 		: m_Path(std::move(other.m_Path)), m_Width(other.m_Width), m_Height(other.m_Height),
-		  m_BufferID(other.m_BufferID), m_Format(other.m_Format), m_IsCubemap(other.m_IsCubemap)
+		  m_BufferID(other.m_BufferID), m_Format(other.m_Format)
 	{
 		other.m_BufferID = 0;
 	}
 
+	// Frees this handle, then steals other's.
 	Texture& Texture::operator=(Texture&& other) noexcept
 	{
 		if (this != &other)
 		{
-			GLCALL(glDeleteTextures(1, &m_BufferID));
+			glDeleteTextures(1, &m_BufferID);
 			m_Path = std::move(other.m_Path);
 			m_Width = other.m_Width;
 			m_Height = other.m_Height;
 			m_BufferID = other.m_BufferID;
 			m_Format = other.m_Format;
-			m_IsCubemap = other.m_IsCubemap;
 			other.m_BufferID = 0;
 		}
 		return *this;
 	}
 
+	// Binds the texture to texture unit slot.
 	void Texture::Bind(uint32_t slot) const
 	{
-		GLCALL(glActiveTexture(GL_TEXTURE0 + slot));
-		if (m_IsCubemap)
-		{
-			GLCALL(glBindTexture(GL_TEXTURE_CUBE_MAP, m_BufferID));
-		}
-		else
-		{
-			GLCALL(glBindTexture(GL_TEXTURE_2D, m_BufferID));
-		}
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, m_BufferID);
 	}
 
+	// With DSA, explicit unbinding is unnecessary; kept for call-site symmetry.
 	void Texture::Unbind() const
 	{
-		// With DSA, explicit unbinding is less necessary
 	}
 
+	// Recreates the texture at a new size, keeping the current format.
 	bool Texture::SetResolution(uint32_t width, uint32_t height)
 	{
 		TILES_ASSERT(width > 0 && height > 0, "Invalid resolution: {0}, {1}", width, height);
@@ -199,12 +111,14 @@ namespace Tiles
 		m_Width = width;
 		m_Height = height;
 
-		GLCALL(glDeleteTextures(1, &m_BufferID));
+		glDeleteTextures(1, &m_BufferID);
 		CreateTexture(width, height, m_Format);
 
 		return true;
 	}
 
+	// Uploads size bytes into the existing storage; size must match the current
+	// dimensions and format exactly.
 	void Texture::SetData(const void* data, uint32_t size)
 	{
 		TILES_ASSERT(data != nullptr, "SetData called with null data pointer");
@@ -213,15 +127,17 @@ namespace Tiles
 		TILES_ASSERT(size == expectedSize, "Texture::SetData - Data size mismatch. Expected: {0}, got: {1}", expectedSize, size);
 
 		auto formatInfo = TextureFormats::GetInfo(m_Format);
-		GLCALL(glTextureSubImage2D(m_BufferID, 0, 0, 0, m_Width, m_Height, formatInfo.DataFormat, formatInfo.DataType, data));
+		glTextureSubImage2D(m_BufferID, 0, 0, 0, m_Width, m_Height, formatInfo.DataFormat, formatInfo.DataType, data);
 	}
 
+	// Recreates the texture at the given size and channel count, then uploads data.
 	void Texture::SetData(const void* data, uint32_t width, uint32_t height, int components)
 	{
 		TextureFormat format = TextureFormats::FromComponentCount(components);
 		SetData(data, width, height, format);
 	}
 
+	// Recreates the texture at the given size/format and uploads data.
 	void Texture::SetData(const void* data, uint32_t width, uint32_t height, TextureFormat format)
 	{
 		if (!data)
@@ -238,28 +154,38 @@ namespace Tiles
 
 		// Immutable storage cannot be resized or reformatted in place, so a new
 		// size/format requires deleting and recreating the texture object.
-		GLCALL(glDeleteTextures(1, &m_BufferID));
-		GLCALL(glCreateTextures(GL_TEXTURE_2D, 1, &m_BufferID));
-		GLCALL(glTextureStorage2D(m_BufferID, 1, formatInfo.InternalFormat, width, height));
-		GLCALL(glTextureSubImage2D(m_BufferID, 0, 0, 0, width, height, formatInfo.DataFormat, formatInfo.DataType, data));
+		glDeleteTextures(1, &m_BufferID);
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_BufferID);
+		glTextureStorage2D(m_BufferID, 1, formatInfo.InternalFormat, width, height);
+		glTextureSubImage2D(m_BufferID, 0, 0, 0, width, height, formatInfo.DataFormat, formatInfo.DataType, data);
 
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_S, GL_REPEAT));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_T, GL_REPEAT));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+		glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		GLCALL(glGenerateTextureMipmap(m_BufferID));
+		glGenerateTextureMipmap(m_BufferID);
 	}
 
+	// The number of channels in the current format.
 	int Texture::GetComponentCount() const
 	{
 		return TextureFormats::GetComponentCount(m_Format);
 	}
 
+	// Reads the texture back from the GPU as tightly-packed RGBA8 pixels.
+	std::vector<uint8_t> Texture::ReadPixels() const
+	{
+		std::vector<uint8_t> pixels(static_cast<size_t>(m_Width) * m_Height * 4);
+		glGetTextureImage(m_BufferID, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+			static_cast<GLsizei>(pixels.size()), pixels.data());
+		return pixels;
+	}
+
+	// Decodes an image file with stb_image and uploads it into a fresh texture.
 	void Texture::LoadFromFile(const std::string& path)
 	{
-		GLCALL(glCreateTextures(GL_TEXTURE_2D, 1, &m_BufferID));
-
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_BufferID);
 
 		int channels;
 		int width, height;
@@ -274,66 +200,36 @@ namespace Tiles
 
 		auto formatInfo = TextureFormats::GetInfo(m_Format);
 
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_S, GL_REPEAT));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_T, GL_REPEAT));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+		glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		GLCALL(glTextureStorage2D(m_BufferID, 1, formatInfo.InternalFormat, m_Width, m_Height));
-		GLCALL(glTextureSubImage2D(m_BufferID, 0, 0, 0, m_Width, m_Height, formatInfo.DataFormat, GL_UNSIGNED_BYTE, data));
+		glTextureStorage2D(m_BufferID, 1, formatInfo.InternalFormat, m_Width, m_Height);
+		glTextureSubImage2D(m_BufferID, 0, 0, 0, m_Width, m_Height, formatInfo.DataFormat, GL_UNSIGNED_BYTE, data);
 
-		GLCALL(glGenerateTextureMipmap(m_BufferID));
+		glGenerateTextureMipmap(m_BufferID);
 
 		stbi_image_free(data);
 	}
 
+	// Allocates immutable GL storage and, if given, uploads initial pixels.
 	void Texture::CreateTexture(uint32_t width, uint32_t height, TextureFormat format, const void* data)
 	{
 		TILES_ASSERT(width > 0 && height > 0, "Texture dimensions must be greater than zero");
 
-		GLCALL(glCreateTextures(GL_TEXTURE_2D, 1, &m_BufferID));
+		glCreateTextures(GL_TEXTURE_2D, 1, &m_BufferID);
 
 		auto formatInfo = TextureFormats::GetInfo(format);
 
-		GLCALL(glTextureStorage2D(m_BufferID, 1, formatInfo.InternalFormat, width, height));
+		glTextureStorage2D(m_BufferID, 1, formatInfo.InternalFormat, width, height);
 
 		if (data)
-		{
-			GLCALL(glTextureSubImage2D(m_BufferID, 0, 0, 0, width, height, formatInfo.DataFormat, formatInfo.DataType, data));
-		}
+			glTextureSubImage2D(m_BufferID, 0, 0, 0, width, height, formatInfo.DataFormat, formatInfo.DataType, data);
 
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_S, GL_REPEAT));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_T, GL_REPEAT));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-	}
-
-	void Texture::CreateCubemapTexture(uint32_t width, uint32_t height, const void* data)
-	{
-		m_IsCubemap = true;
-
-		GLCALL(glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_BufferID));
-
-		auto formatInfo = TextureFormats::GetInfo(m_Format);
-
-		GLCALL(glTextureStorage2D(m_BufferID, 1, formatInfo.InternalFormat, width, height));
-
-		if (data)
-		{
-			const uint8_t* faceData = static_cast<const uint8_t*>(data);
-			uint32_t faceSize = width * height * TextureFormats::GetBytesPerPixel(m_Format);
-
-			for (uint32_t i = 0; i < 6; ++i)
-			{
-				const void* currentFaceData = faceData + i * faceSize;
-				GLCALL(glTextureSubImage3D(m_BufferID, 0, 0, 0, i, width, height, 1, formatInfo.DataFormat, formatInfo.DataType, currentFaceData));
-			}
-		}
-
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-		GLCALL(glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
+		glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(m_BufferID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	}
 }

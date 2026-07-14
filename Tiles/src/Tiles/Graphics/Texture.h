@@ -1,33 +1,27 @@
 #pragma once
-#include <memory>
-#include <cstdint>
-
-#include <string>
-#include <vector>
-
 
 #include "Formats/TextureFormat.h"
 
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace Tiles
 {
-	// 2D texture or cubemap; RAII wrapper owning a single GL texture object.
-	// Created with immutable storage via direct state access (DSA).
+	// A 2D texture; RAII wrapper owning a single GL texture object, allocated
+	// with immutable storage via direct state access (DSA).
 	class Texture
 	{
 	public:
 		// Loads a texture from an image file on disk.
-		static std::shared_ptr<Texture> Create(const std::string& source);
+		[[nodiscard]] static std::shared_ptr<Texture> Create(const std::string& source);
 		// Allocates an empty texture of the given size and format.
-		static std::shared_ptr<Texture> Create(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
+		[[nodiscard]] static std::shared_ptr<Texture> Create(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
 
 		// Uploads pixel data, deriving the format from the channel count.
-		static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, int components);
-		static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format);
-
-		// Builds a cubemap from six face image files (order: +X,-X,+Y,-Y,+Z,-Z).
-		static std::shared_ptr<Texture> CreateCubemap(const std::vector<std::string>& faces);
-		// Builds a cubemap from six contiguous faces of raw RGBA8 pixel data.
-		static std::shared_ptr<Texture> CreateCubemap(uint32_t width, uint32_t height, const void* data);
+		[[nodiscard]] static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, int components);
+		[[nodiscard]] static std::shared_ptr<Texture> CreateFromData(const void* data, uint32_t width, uint32_t height, TextureFormat format);
 
 		Texture(const std::string& source);
 		Texture(uint32_t width, uint32_t height, TextureFormat format = TextureFormat::RGBA8);
@@ -40,10 +34,13 @@ namespace Tiles
 		Texture(Texture&& other) noexcept;
 		Texture& operator=(Texture&& other) noexcept;
 
+		// Binds the texture to texture unit @p slot.
 		void Bind(uint32_t slot = 0) const;
 		void Unbind() const;
 
+		// Recreates the texture at a new size, keeping the current format.
 		bool SetResolution(uint32_t width, uint32_t height);
+
 		// Uploads @p size bytes into the existing storage; @p size must match the
 		// current dimensions and format exactly.
 		void SetData(const void* data, uint32_t size);
@@ -51,30 +48,28 @@ namespace Tiles
 		void SetData(const void* data, uint32_t width, uint32_t height, int components);
 		void SetData(const void* data, uint32_t width, uint32_t height, TextureFormat format);
 
-		uint32_t GetID() const { return m_BufferID; }
-		uint32_t GetWidth() const { return m_Width; }
-		uint32_t GetHeight() const { return m_Height; }
-		TextureFormat GetFormat() const { return m_Format; }
-		int GetComponentCount() const;
-		const std::string& GetPath() const { return m_Path; }
+		[[nodiscard]] uint32_t GetID() const { return m_BufferID; }
+		[[nodiscard]] uint32_t GetWidth() const { return m_Width; }
+		[[nodiscard]] uint32_t GetHeight() const { return m_Height; }
+		[[nodiscard]] TextureFormat GetFormat() const { return m_Format; }
+		[[nodiscard]] int GetComponentCount() const;
+		[[nodiscard]] const std::string& GetPath() const { return m_Path; }
 
 		// Reads the texture back from the GPU as tightly-packed RGBA8 pixels
 		// (width*height*4 bytes), so an atlas can be embedded in a saved project.
-		std::vector<uint8_t> ReadPixels() const;
-
-		bool IsCubemap() const { return m_IsCubemap; }
+		[[nodiscard]] std::vector<uint8_t> ReadPixels() const;
 
 	private:
+		// Decodes an image file and uploads it into a fresh GL texture.
 		void LoadFromFile(const std::string& path);
+		// Allocates immutable GL storage and, if given, uploads initial pixels.
 		void CreateTexture(uint32_t width, uint32_t height, TextureFormat format, const void* data = nullptr);
-		void CreateCubemapTexture(uint32_t width, uint32_t height, const void* data = nullptr);
 
 	private:
-		std::string m_Path = "";
+		std::string m_Path;
 		uint32_t m_Width = 0;
 		uint32_t m_Height = 0;
 		uint32_t m_BufferID = 0;
 		TextureFormat m_Format = TextureFormat::RGBA8;
-		bool m_IsCubemap = false;
 	};
 }

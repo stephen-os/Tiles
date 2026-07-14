@@ -1,35 +1,41 @@
 #include "TextureAtlas.h"
 
-#include <spdlog/spdlog.h>
+#include "Core/Logger.h"
 
 namespace Tiles
 {
-	std::shared_ptr<TextureAtlas> TextureAtlas::Create(std::string& source, int width, int height)
+	// Builds an atlas that loads its texture from a file.
+	std::shared_ptr<TextureAtlas> TextureAtlas::Create(const std::string& source, int width, int height)
 	{
 		return std::make_shared<TextureAtlas>(source, width, height);
 	}
 
+	// Builds a textureless atlas with the given grid dimensions.
 	std::shared_ptr<TextureAtlas> TextureAtlas::Create(int width, int height)
 	{
 		return std::make_shared<TextureAtlas>(width, height);
 	}
 
+	// Builds an atlas over an already-created texture.
 	std::shared_ptr<TextureAtlas> TextureAtlas::Create(std::shared_ptr<Texture> texture, int width, int height)
 	{
 		return std::make_shared<TextureAtlas>(std::move(texture), width, height);
 	}
 
+	// Creates a textureless atlas sized to the grid.
 	TextureAtlas::TextureAtlas(int width, int height)
 	{
 		Resize(width, height);
 	}
 
-	TextureAtlas::TextureAtlas(std::string& source, int width, int height)
+	// Creates an atlas, loading its texture from a file.
+	TextureAtlas::TextureAtlas(const std::string& source, int width, int height)
 	{
 		SetTexture(source);
 		Resize(width, height);
 	}
 
+	// Creates an atlas over an existing texture.
 	TextureAtlas::TextureAtlas(std::shared_ptr<Texture> texture, int width, int height)
 	{
 		SetTexture(std::move(texture));
@@ -63,36 +69,40 @@ namespace Tiles
 		}
 	}
 
+	// Loads the backing texture from a file.
 	void TextureAtlas::SetTexture(const std::string& source)
 	{
 		m_Texture = Texture::Create(source);
-
 		m_HasTexture = true;
 	}
 
+	// Replaces the backing texture with an existing one.
 	void TextureAtlas::SetTexture(std::shared_ptr<Texture> texture)
 	{
 		m_Texture = std::move(texture);
 		m_HasTexture = (m_Texture != nullptr);
 	}
 
+	// Drops the backing texture, keeping the grid dimensions.
 	void TextureAtlas::RemoveTexture()
 	{
 		m_Texture.reset();
 		m_HasTexture = false;
 	}
 
+	// UV rectangle of a cell, or a zero vector if the index is out of range.
 	glm::vec4 TextureAtlas::GetTextureCoords(int index) const
 	{
 		if (index < 0 || index >= static_cast<int>(m_TexCoords.size()))
 		{
-			spdlog::error("[Texture Atlas] Invalid texture index: {}", index);
+			TILES_ENGINE_ERROR("[Texture Atlas] Invalid texture index: {}", index);
 			return glm::vec4(0.0f);
 		}
 
 		return m_TexCoords[index];
 	}
 
+	// UV-space offset of a cell's lower-left corner.
 	glm::vec2 TextureAtlas::GetOffset(int index) const
 	{
 		int row = index / m_GridWidth;
@@ -104,6 +114,7 @@ namespace Tiles
 		return glm::vec2(xOffset, yOffset);
 	}
 
+	// Grid (column, row) coordinates of a cell, or zero if out of range.
 	glm::vec2 TextureAtlas::GetPosition(int index) const
 	{
 		if (index < 0 || index >= m_GridWidth * m_GridHeight)

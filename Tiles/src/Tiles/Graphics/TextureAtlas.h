@@ -2,57 +2,62 @@
 
 #include "Texture.h"
 
-#include <string>
-#include <vector>
-#include <memory>
-
 #include <glm/glm.hpp>
 
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace Tiles
 {
+	// A uniform grid over a single texture: maps cell indices to UV rectangles
+	// so tiles can reference sub-images by index. Cell UVs are precomputed on
+	// resize, making per-frame lookups a plain array index.
 	class TextureAtlas
 	{
 	public:
-		static std::shared_ptr<TextureAtlas> Create(std::string& source, int width, int height);
-		static std::shared_ptr<TextureAtlas> Create(int width, int height);
+		[[nodiscard]] static std::shared_ptr<TextureAtlas> Create(const std::string& source, int width, int height);
+		[[nodiscard]] static std::shared_ptr<TextureAtlas> Create(int width, int height);
 		// Builds an atlas over an already-created texture (e.g. one decoded from
 		// an embedded image on load).
-		static std::shared_ptr<TextureAtlas> Create(std::shared_ptr<Texture> texture, int width, int height);
-
+		[[nodiscard]] static std::shared_ptr<TextureAtlas> Create(std::shared_ptr<Texture> texture, int width, int height);
 
 		TextureAtlas(int width, int height);
-		TextureAtlas(std::string& source, int width, int height);
+		TextureAtlas(const std::string& source, int width, int height);
 		TextureAtlas(std::shared_ptr<Texture> texture, int width, int height);
 		~TextureAtlas() = default;
 
+		// Sets the grid dimensions and recomputes every cell's UV rectangle.
 		void Resize(int width, int height);
+
+		// Loads (or replaces) the backing texture from a file.
 		void SetTexture(const std::string& source);
+		// Replaces the backing texture with an existing one.
 		void SetTexture(std::shared_ptr<Texture> texture);
-
-		int GetWidth() const { return m_GridWidth; }
-		int GetHeight() const { return m_GridHeight; }
-
-		bool HasTexture() const { return m_HasTexture; }
+		// Drops the backing texture, keeping the grid dimensions.
 		void RemoveTexture();
 
-		const std::shared_ptr<Texture> GetTexture() const { return m_Texture; }
+		[[nodiscard]] int GetWidth() const { return m_GridWidth; }
+		[[nodiscard]] int GetHeight() const { return m_GridHeight; }
+
+		[[nodiscard]] bool HasTexture() const { return m_HasTexture; }
+		[[nodiscard]] const std::shared_ptr<Texture>& GetTexture() const { return m_Texture; }
 
 		// UV rectangle of cell @p index, packed as (uMin, vMin, uMax, vMax).
-		// Returns a zero vector on out-of-range index.
-		glm::vec4 GetTextureCoords(int index) const;
+		// Returns a zero vector on an out-of-range index.
+		[[nodiscard]] glm::vec4 GetTextureCoords(int index) const;
 		// UV-space offset of cell @p index's lower-left corner.
-		glm::vec2 GetOffset(int index) const;
+		[[nodiscard]] glm::vec2 GetOffset(int index) const;
 		// Grid (column, row) coordinates of cell @p index.
-		glm::vec2 GetPosition(int index) const;
+		[[nodiscard]] glm::vec2 GetPosition(int index) const;
 
 	private:
-		std::shared_ptr<Texture> m_Texture = nullptr;		// std::shared_ptr pointer to Texture
-		int m_GridWidth = 1;					// Number of textures along the width
-		int m_GridHeight = 1;					// Number of textures along the height
-		float m_TexWidth = 1.0f;				// Width of a single texture in UV space
-		float m_TexHeight = 1.0f;				// Height of a single texture in UV space
-		bool m_HasTexture = false;				// Flag to keep track when atlas has texture or not
-		std::vector<glm::vec4> m_TexCoords;		// Precomputed texture coordinates
+		std::shared_ptr<Texture> m_Texture;
+		int m_GridWidth = 1;                    // cells across
+		int m_GridHeight = 1;                   // cells down
+		float m_TexWidth = 1.0f;                // one cell's width in UV space
+		float m_TexHeight = 1.0f;               // one cell's height in UV space
+		bool m_HasTexture = false;
+		std::vector<glm::vec4> m_TexCoords;     // per-cell UV rects, filled by Resize
 	};
 }
