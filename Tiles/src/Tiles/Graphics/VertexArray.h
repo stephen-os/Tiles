@@ -23,16 +23,26 @@ namespace Tiles
 		VertexArray(VertexArray&&) = delete;
 		VertexArray& operator=(VertexArray&&) = delete;
 
+		// Binds this vertex array.
 		void Bind() const;
+
+		// Unbinds any vertex array.
 		void Unbind() const;
 
+		// Attaches a vertex buffer and wires its layout to attribute slots.
 		void SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer);
+
+		// Attaches the index buffer used for indexed draws.
 		void SetIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer);
 
-		std::shared_ptr<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
-		std::shared_ptr<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
+		// The attached vertex buffer, if any.
+		[[nodiscard]] const std::shared_ptr<VertexBuffer>& GetVertexBuffer() const { return m_VertexBuffer; }
 
-		static std::shared_ptr<VertexArray> Create();
+		// The attached index buffer, if any.
+		[[nodiscard]] const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return m_IndexBuffer; }
+
+		// Allocates a vertex array.
+		[[nodiscard]] static std::shared_ptr<VertexArray> Create();
 
 	private:
 		uint32_t m_RendererID = 0;

@@ -4,26 +4,31 @@
 
 namespace Tiles
 {
+	// Allocates a vertex array.
 	std::shared_ptr<VertexArray> VertexArray::Create()
 	{
 		return std::make_shared<VertexArray>();
 	}
 
+	// Creates the GL vertex-array handle.
 	VertexArray::VertexArray()
 	{
 		glGenVertexArrays(1, &m_RendererID);
 	}
 
+	// Deletes the GL vertex-array handle.
 	VertexArray::~VertexArray()
 	{
 		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
+	// Binds this vertex array.
 	void VertexArray::Bind() const
 	{
 		glBindVertexArray(m_RendererID);
 	}
 
+	// Unbinds any vertex array.
 	void VertexArray::Unbind() const
 	{
 		glBindVertexArray(0);
@@ -31,7 +36,8 @@ namespace Tiles
 
 	// Attaches a vertex buffer and wires each of its layout elements to the next
 	// attribute index. Padding elements advance the stride but get no attribute,
-	// and integer types use glVertexAttribIPointer to avoid float conversion.
+	// integer types use glVertexAttribIPointer to avoid float conversion, and
+	// matrix types occupy one attribute slot per column.
 	void VertexArray::SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer)
 	{
 		glBindVertexArray(m_RendererID);
@@ -56,7 +62,7 @@ namespace Tiles
 						GL_FLOAT,
 						element.Normalized ? GL_TRUE : GL_FALSE,
 						layout.GetStride(),
-						(const void*)element.Offset);
+						reinterpret_cast<const void*>(element.Offset));
 					m_VertexBufferIndex++;
 					break;
 				}
@@ -71,8 +77,27 @@ namespace Tiles
 						element.GetComponentCount(),
 						GL_INT,
 						layout.GetStride(),
-						(const void*)element.Offset);
+						reinterpret_cast<const void*>(element.Offset));
 					m_VertexBufferIndex++;
+					break;
+				}
+				case BufferDataType::Mat3:
+				case BufferDataType::Mat4:
+				{
+					// A matrix attribute takes one slot per column (mat3 = 3 x vec3,
+					// mat4 = 4 x vec4), each advanced by a column's worth of floats.
+					const uint32_t columns = element.GetComponentCount();
+					for (uint32_t col = 0; col < columns; ++col)
+					{
+						glEnableVertexAttribArray(m_VertexBufferIndex);
+						glVertexAttribPointer(m_VertexBufferIndex,
+							columns,
+							GL_FLOAT,
+							element.Normalized ? GL_TRUE : GL_FALSE,
+							layout.GetStride(),
+							reinterpret_cast<const void*>(element.Offset + col * columns * sizeof(float)));
+						m_VertexBufferIndex++;
+					}
 					break;
 				}
 			}
@@ -81,6 +106,7 @@ namespace Tiles
 		m_VertexBuffer = vertexBuffer;
 	}
 
+	// Attaches the index buffer used for indexed draws.
 	void VertexArray::SetIndexBuffer(std::shared_ptr<IndexBuffer> indexBuffer)
 	{
 		glBindVertexArray(m_RendererID);

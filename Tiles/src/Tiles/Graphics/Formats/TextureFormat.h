@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 namespace Tiles
@@ -28,22 +29,38 @@ namespace Tiles
 	class TextureFormats
 	{
 	public:
-		// Returns the info record for @p format, or the None record if the value
-		// is out of range.
-		static const TextureFormatInfo& GetInfo(TextureFormat format);
+		// The info record for format, or the None record if out of range.
+		[[nodiscard]] static const TextureFormatInfo& GetInfo(TextureFormat format);
 
-		static uint32_t GetInternalFormat(TextureFormat format) { return GetInfo(format).InternalFormat; }
-		static uint32_t GetDataFormat(TextureFormat format) { return GetInfo(format).DataFormat; }
-		static uint32_t GetDataType(TextureFormat format) { return GetInfo(format).DataType; }
-		static uint8_t GetComponentCount(TextureFormat format) { return GetInfo(format).ComponentCount; }
-		static uint8_t GetBytesPerPixel(TextureFormat format) { return GetInfo(format).BytesPerPixel; }
-		static const char* GetName(TextureFormat format) { return GetInfo(format).Name; }
-		static bool IsFloat(TextureFormat format) { return GetInfo(format).IsFloat; }
+		// The GL sized internal format.
+		[[nodiscard]] static uint32_t GetInternalFormat(TextureFormat format) { return GetInfo(format).InternalFormat; }
+
+		// The GL pixel data format (GL_RED/GL_RG/...).
+		[[nodiscard]] static uint32_t GetDataFormat(TextureFormat format) { return GetInfo(format).DataFormat; }
+
+		// The GL pixel data type (GL_UNSIGNED_BYTE/GL_FLOAT).
+		[[nodiscard]] static uint32_t GetDataType(TextureFormat format) { return GetInfo(format).DataType; }
+
+		// The number of channels.
+		[[nodiscard]] static uint8_t GetComponentCount(TextureFormat format) { return GetInfo(format).ComponentCount; }
+
+		// The bytes occupied by one pixel.
+		[[nodiscard]] static uint8_t GetBytesPerPixel(TextureFormat format) { return GetInfo(format).BytesPerPixel; }
+
+		// The format's display name.
+		[[nodiscard]] static const char* GetName(TextureFormat format) { return GetInfo(format).Name; }
+
+		// True for floating-point formats.
+		[[nodiscard]] static bool IsFloat(TextureFormat format) { return GetInfo(format).IsFloat; }
 
 		// Maps a channel count (1-4) to the matching 8-bit format, None otherwise.
-		static TextureFormat FromComponentCount(int components);
-		static bool IsValidFormat(TextureFormat format);
-		static size_t CalculateImageSize(TextureFormat format, uint32_t width, uint32_t height);
+		[[nodiscard]] static TextureFormat FromComponentCount(int components);
+
+		// True for a real (non-None, in-range) format.
+		[[nodiscard]] static bool IsValidFormat(TextureFormat format);
+
+		// The byte size of a width x height image in the given format.
+		[[nodiscard]] static size_t CalculateImageSize(TextureFormat format, uint32_t width, uint32_t height);
 
 	private:
 		static const TextureFormatInfo s_FormatTable[];

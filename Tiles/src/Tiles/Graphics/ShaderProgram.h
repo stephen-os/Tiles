@@ -1,61 +1,62 @@
 #pragma once
-#include <memory>
-#include <cstdint>
-
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <unordered_map>
 
 #include <glm/glm.hpp>
 
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <unordered_map>
 
 namespace Tiles
 {
-    // Linked vertex+fragment GL program; RAII wrapper owning the program and
-    // its two shader objects. Active uniform locations are cached at link time.
-    class ShaderProgram
-    {
-    public:
-        static std::shared_ptr<ShaderProgram> Create(const std::string& vertexSource, const std::string& fragmentSource);
+	// Linked vertex+fragment GL program; RAII wrapper owning the program and
+	// its two shader objects. Active uniform locations are cached at link time.
+	class ShaderProgram
+	{
+	public:
+		// Compiles, links, and caches uniforms for a vertex+fragment program.
+		[[nodiscard]] static std::shared_ptr<ShaderProgram> Create(const std::string& vertexSource, const std::string& fragmentSource);
 
-        // Compiles both stages from GLSL source, links them, and caches the
-        // locations of all active uniforms.
-        ShaderProgram(const std::string& vertexSource, const std::string& fragmentSource);
-        ~ShaderProgram();
+		// Compiles both stages from GLSL source, links them, and caches the
+		// locations of all active uniforms.
+		ShaderProgram(const std::string& vertexSource, const std::string& fragmentSource);
+		~ShaderProgram();
 
-        void Bind() const ;
-        void Unbind() const ;
+		// Makes this program the active GL program.
+		void Bind() const;
 
-        int GetAttributeLocation(const std::string& name);
+		// Unbinds any program.
+		void Unbind() const;
 
-        void SetUniformInt(const std::string& name, int value);
-        void SetUniformFloat(const std::string& name, float value);
+		// The GL location of a vertex attribute by name, or -1 (with a log) if absent.
+		[[nodiscard]] int GetAttributeLocation(const std::string& name) const;
 
-        void SetUniformVec2(const std::string& name, float a, float b);
-        void SetUniformVec2(const std::string& name, const glm::vec2& value);
+		// Sets a scalar/vector/matrix uniform by name; a no-op for an unknown name.
+		void SetUniformInt(const std::string& name, int value);
+		void SetUniformFloat(const std::string& name, float value);
+		void SetUniformVec2(const std::string& name, float a, float b);
+		void SetUniformVec2(const std::string& name, const glm::vec2& value);
+		void SetUniformVec3(const std::string& name, float a, float b, float c);
+		void SetUniformVec3(const std::string& name, const glm::vec3& value);
+		void SetUniformVec4(const std::string& name, float a, float b, float c, float d);
+		void SetUniformVec4(const std::string& name, const glm::vec4& value);
+		void SetUniformMat4(const std::string& name, const glm::mat4& value);
 
-        void SetUniformVec3(const std::string& name, float a, float b, float c);
-        void SetUniformVec3(const std::string& name, const glm::vec3& value);
+		// The GL program handle.
+		[[nodiscard]] uint32_t GetID() const { return m_ShaderProgramID; }
 
-        void SetUniformVec4(const std::string& name, float a, float b, float c, float d);
-        void SetUniformVec4(const std::string& name, const glm::vec4& value);
+	private:
+		// Compiles one shader stage (@p type is GL_VERTEX_SHADER/GL_FRAGMENT_SHADER)
+		// from source, logging and returning 0 on failure.
+		[[nodiscard]] uint32_t CompileSource(uint32_t type, const std::string& source);
 
-        void SetUniformMat4(const std::string& name, const glm::mat4& value);
+		// The cached location of @p name, or -1 (with a log) if it is not an active uniform.
+		[[nodiscard]] int UniformLocation(const std::string& name) const;
 
-        // Compiles one shader stage (@p type is GL_VERTEX_SHADER/GL_FRAGMENT_SHADER)
-        // from source, logging and returning 0 on failure.
-        unsigned int CompileSource(unsigned int type, const std::string& source);
-        // Logs an error if @p name is not a known uniform; used to guard the
-        // SetUniform* helpers in development.
-        void AssertUniform(const std::string& name);
+		uint32_t m_VertexShaderID = 0;
+		uint32_t m_FragmentShaderID = 0;
+		uint32_t m_ShaderProgramID = 0;
 
-		uint32_t GetID() const { return m_ShaderProgramID; }
-    private:
-        unsigned int m_VertexShaderID = 0;
-        unsigned int m_FragmentShaderID = 0;
-        unsigned int m_ShaderProgramID = 0;
-
-        std::unordered_map<std::string, int> m_Uniforms;
-    };
+		std::unordered_map<std::string, int> m_Uniforms;
+	};
 }

@@ -1,289 +1,311 @@
 #include "Buffer.h"
 
-#include <glad/gl.h>
-#include <utility>
+#include "Core/Assert.h"
 
-#include "RenderCommands.h"
-#include "../Core/Assert.h"
+#include <glad/gl.h>
+
+#include <utility>
 
 namespace Tiles
 {
-    // Vertex Buffer
+	namespace
+	{
+		// Maps a BufferUsage to its GL_*_DRAW enum.
+		uint32_t UsageToEnum(BufferUsage usage)
+		{
+			switch (usage)
+			{
+			case BufferUsage::Static:   return GL_STATIC_DRAW;
+			case BufferUsage::Dynamic:  return GL_DYNAMIC_DRAW;
+			case BufferUsage::Stream:   return GL_STREAM_DRAW;
+			}
 
-    namespace Utils
-    {
-        static uint32_t UsageToEnum(BufferUsage usage)
-        {
-            switch (usage)
-            {
-            case BufferUsage::Static:   return GL_STATIC_DRAW;
-            case BufferUsage::Dynamic:  return GL_DYNAMIC_DRAW;
-            case BufferUsage::Stream:   return GL_STREAM_DRAW;
-            default: TILES_ASSERT(false, "Unknown BufferUsage enum value!");
-            }
-        }
-    }
+			TILES_ASSERT(false, "Unknown BufferUsage enum value!");
+			return GL_STATIC_DRAW;
+		}
+	}
 
-     std::shared_ptr<VertexBuffer> VertexBuffer::Create(uint32_t size, BufferUsage usage)
-    {
-        return std::make_shared<VertexBuffer>(size, usage);
-    }
+	// --- Vertex buffer ------------------------------------------------------
 
-    std::shared_ptr<VertexBuffer> VertexBuffer::Create(const void* data, uint32_t size, BufferUsage usage)
-    {
-        return std::make_shared<VertexBuffer>(data, size, usage);
-    }
+	// Allocates an uninitialized vertex buffer of size bytes.
+	std::shared_ptr<VertexBuffer> VertexBuffer::Create(uint32_t size, BufferUsage usage)
+	{
+		return std::make_shared<VertexBuffer>(size, usage);
+	}
 
-    VertexBuffer::VertexBuffer(uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
-    {
-        GLCALL(glCreateBuffers(1, &m_BufferID));
-        TILES_ASSERT(m_BufferID != 0, "Failed to create vertex buffer!");
+	// Allocates a vertex buffer initialized with size bytes from data.
+	std::shared_ptr<VertexBuffer> VertexBuffer::Create(const void* data, uint32_t size, BufferUsage usage)
+	{
+		return std::make_shared<VertexBuffer>(data, size, usage);
+	}
 
-        GLCALL(glBindBuffer(GL_ARRAY_BUFFER, m_BufferID));
-        GLCALL(glBufferData(GL_ARRAY_BUFFER, size, nullptr, Utils::UsageToEnum(m_Usage)));
-    }
+	// Creates the GL buffer and allocates empty storage.
+	VertexBuffer::VertexBuffer(uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
+	{
+		glCreateBuffers(1, &m_BufferID);
+		TILES_ASSERT(m_BufferID != 0, "Failed to create vertex buffer!");
 
-    VertexBuffer::VertexBuffer(const void* vertices, uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
-    {
-        GLCALL(glCreateBuffers(1, &m_BufferID));
-        TILES_ASSERT(m_BufferID != 0, "Failed to create vertex buffer!");
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+		glBufferData(GL_ARRAY_BUFFER, size, nullptr, UsageToEnum(m_Usage));
+	}
 
-        GLCALL(glBindBuffer(GL_ARRAY_BUFFER, m_BufferID));
-        GLCALL(glBufferData(GL_ARRAY_BUFFER, size, vertices, Utils::UsageToEnum(m_Usage)));
-    }
+	// Creates the GL buffer and uploads the initial vertices.
+	VertexBuffer::VertexBuffer(const void* vertices, uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
+	{
+		glCreateBuffers(1, &m_BufferID);
+		TILES_ASSERT(m_BufferID != 0, "Failed to create vertex buffer!");
 
-    VertexBuffer::~VertexBuffer()
-    {
-        GLCALL(glDeleteBuffers(1, &m_BufferID));
-    }
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+		glBufferData(GL_ARRAY_BUFFER, size, vertices, UsageToEnum(m_Usage));
+	}
 
-    VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept
-        : m_BufferID(other.m_BufferID), m_Size(other.m_Size), m_Usage(other.m_Usage), m_Layout(std::move(other.m_Layout))
-    {
-        other.m_BufferID = 0;
-    }
+	// Deletes the GL buffer (a no-op for a moved-from id of 0).
+	VertexBuffer::~VertexBuffer()
+	{
+		glDeleteBuffers(1, &m_BufferID);
+	}
 
-    VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) noexcept
-    {
-        if (this != &other)
-        {
-            GLCALL(glDeleteBuffers(1, &m_BufferID));
-            m_BufferID = other.m_BufferID;
-            m_Size = other.m_Size;
-            m_Usage = other.m_Usage;
-            m_Layout = std::move(other.m_Layout);
-            other.m_BufferID = 0;
-        }
-        return *this;
-    }
+	// Steals other's handle, leaving it id 0.
+	VertexBuffer::VertexBuffer(VertexBuffer&& other) noexcept
+		: m_BufferID(other.m_BufferID), m_Size(other.m_Size), m_Usage(other.m_Usage), m_Layout(std::move(other.m_Layout))
+	{
+		other.m_BufferID = 0;
+	}
 
-    void VertexBuffer::Bind() const
-    {
-        TILES_ASSERT(m_BufferID != 0, "Trying to bind an invalid vertex buffer!");
-        GLCALL(glBindBuffer(GL_ARRAY_BUFFER, m_BufferID));
-    }
+	// Frees this handle, then steals other's.
+	VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) noexcept
+	{
+		if (this != &other)
+		{
+			glDeleteBuffers(1, &m_BufferID);
+			m_BufferID = other.m_BufferID;
+			m_Size = other.m_Size;
+			m_Usage = other.m_Usage;
+			m_Layout = std::move(other.m_Layout);
+			other.m_BufferID = 0;
+		}
+		return *this;
+	}
 
-    void VertexBuffer::Unbind() const
-    {
-        GLCALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
-    }
+	// Binds this buffer to GL_ARRAY_BUFFER.
+	void VertexBuffer::Bind() const
+	{
+		TILES_ASSERT(m_BufferID != 0, "Trying to bind an invalid vertex buffer!");
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
+	}
 
-    void VertexBuffer::SetData(const void* data, uint32_t size)
-    {
-        TILES_ASSERT(data != nullptr, "VertexBuffer::SetData called with null data!");
-        TILES_ASSERT(size > 0, "VertexBuffer::SetData called with zero size!");
+	// Unbinds any array buffer.
+	void VertexBuffer::Unbind() const
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 
-        GLCALL(glBindBuffer(GL_ARRAY_BUFFER, m_BufferID));
+	// Replaces the buffer contents, reusing storage when the update fits.
+	void VertexBuffer::SetData(const void* data, uint32_t size)
+	{
+		TILES_ASSERT(data != nullptr, "VertexBuffer::SetData called with null data!");
+		TILES_ASSERT(size > 0, "VertexBuffer::SetData called with zero size!");
+
+		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 
 		// Reuse existing storage when the update fits; only reallocate to grow.
 		if (size <= m_Size)
-		{
-			GLCALL(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
-		}
-        else
-        {
-            GLCALL(glBufferData(GL_ARRAY_BUFFER, size, data, Utils::UsageToEnum(m_Usage)));
-        }
+			glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+		else
+			glBufferData(GL_ARRAY_BUFFER, size, data, UsageToEnum(m_Usage));
 
-        m_Size = size;
-    }
+		m_Size = size;
+	}
 
-    // Index Buffer
+	// --- Index buffer -------------------------------------------------------
 
-    std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t * data, uint32_t count, BufferUsage usage)
-    {
-        return std::make_shared<IndexBuffer>(data, count, usage);
-    }
+	// Allocates an index buffer initialized with count 32-bit indices.
+	std::shared_ptr<IndexBuffer> IndexBuffer::Create(uint32_t* data, uint32_t count, BufferUsage usage)
+	{
+		return std::make_shared<IndexBuffer>(data, count, usage);
+	}
 
+	// Creates the GL buffer and uploads the initial indices.
 	IndexBuffer::IndexBuffer(uint32_t* data, uint32_t count, BufferUsage usage) : m_Count(count), m_Usage(usage)
-    {
-        TILES_ASSERT(data != nullptr, "Null index data passed to IndexBuffer!");
-        TILES_ASSERT(count > 0, "Index buffer count is zero!");
+	{
+		TILES_ASSERT(data != nullptr, "Null index data passed to IndexBuffer!");
+		TILES_ASSERT(count > 0, "Index buffer count is zero!");
 
-        GLCALL(glCreateBuffers(1, &m_BufferID));
-        TILES_ASSERT(m_BufferID != 0, "Failed to create index buffer!");
+		glCreateBuffers(1, &m_BufferID);
+		TILES_ASSERT(m_BufferID != 0, "Failed to create index buffer!");
 
-        GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID));
-        GLCALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), data, Utils::UsageToEnum(m_Usage)));
-    }
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), data, UsageToEnum(m_Usage));
+	}
 
-    IndexBuffer::~IndexBuffer()
-    {
-        GLCALL(glDeleteBuffers(1, &m_BufferID));
-    }
+	// Deletes the GL buffer (a no-op for a moved-from id of 0).
+	IndexBuffer::~IndexBuffer()
+	{
+		glDeleteBuffers(1, &m_BufferID);
+	}
 
-    IndexBuffer::IndexBuffer(IndexBuffer&& other) noexcept
-        : m_BufferID(other.m_BufferID), m_Count(other.m_Count), m_Usage(other.m_Usage)
-    {
-        other.m_BufferID = 0;
-    }
+	// Steals other's handle, leaving it id 0.
+	IndexBuffer::IndexBuffer(IndexBuffer&& other) noexcept
+		: m_BufferID(other.m_BufferID), m_Count(other.m_Count), m_Usage(other.m_Usage)
+	{
+		other.m_BufferID = 0;
+	}
 
-    IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) noexcept
-    {
-        if (this != &other)
-        {
-            GLCALL(glDeleteBuffers(1, &m_BufferID));
-            m_BufferID = other.m_BufferID;
-            m_Count = other.m_Count;
-            m_Usage = other.m_Usage;
-            other.m_BufferID = 0;
-        }
-        return *this;
-    }
+	// Frees this handle, then steals other's.
+	IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) noexcept
+	{
+		if (this != &other)
+		{
+			glDeleteBuffers(1, &m_BufferID);
+			m_BufferID = other.m_BufferID;
+			m_Count = other.m_Count;
+			m_Usage = other.m_Usage;
+			other.m_BufferID = 0;
+		}
+		return *this;
+	}
 
-    void IndexBuffer::Bind() const
-    {
-        TILES_ASSERT(m_BufferID != 0, "Trying to bind an invalid index buffer!");
-        GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID));
-    }
+	// Binds this buffer to GL_ELEMENT_ARRAY_BUFFER.
+	void IndexBuffer::Bind() const
+	{
+		TILES_ASSERT(m_BufferID != 0, "Trying to bind an invalid index buffer!");
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
+	}
 
-    void IndexBuffer::Unbind() const
-    {
-        GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-    }
+	// Unbinds any element array buffer.
+	void IndexBuffer::Unbind() const
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
 
+	// Replaces the index contents, reusing storage when the update fits.
 	void IndexBuffer::SetData(uint32_t* data, uint32_t count)
 	{
 		TILES_ASSERT(data != nullptr, "IndexBuffer::SetData called with null data!");
 		TILES_ASSERT(count > 0, "IndexBuffer::SetData called with zero count!");
 
-		uint32_t newSize = count * sizeof(uint32_t);
-		uint32_t currentSize = m_Count * sizeof(uint32_t);
+		size_t newSize = static_cast<size_t>(count) * sizeof(uint32_t);
+		size_t currentSize = static_cast<size_t>(m_Count) * sizeof(uint32_t);
 
-        m_Count = count;
+		m_Count = count;
 
-        GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID));
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
 
-        // Reuse existing storage when the update fits; only reallocate to grow.
-        if (newSize <= currentSize)
-        {
-            GLCALL(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, newSize, data));
-            return;
-        }
-
-        GLCALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, newSize, data, Utils::UsageToEnum(m_Usage)));
+		// Reuse existing storage when the update fits; only reallocate to grow.
+		if (newSize <= currentSize)
+			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, newSize, data);
+		else
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, newSize, data, UsageToEnum(m_Usage));
 	}
 
-	// Uniform Buffer
-    std::shared_ptr<UniformBuffer> UniformBuffer::Create(uint32_t size, BufferUsage usage)
-    {
-        return std::make_shared<UniformBuffer>(size, usage);
-    }
+	// --- Uniform buffer -----------------------------------------------------
 
-    std::shared_ptr<UniformBuffer> UniformBuffer::Create(const void* data, uint32_t size, BufferUsage usage)
-    {
-        return std::make_shared<UniformBuffer>(data, size, usage);
-    }
+	// Allocates an uninitialized uniform buffer of size bytes.
+	std::shared_ptr<UniformBuffer> UniformBuffer::Create(uint32_t size, BufferUsage usage)
+	{
+		return std::make_shared<UniformBuffer>(size, usage);
+	}
 
-    UniformBuffer::UniformBuffer(uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
-    {
-        GLCALL(glCreateBuffers(1, &m_BufferID));
-        TILES_ASSERT(m_BufferID != 0, "Failed to create uniform buffer!");
+	// Allocates a uniform buffer initialized with size bytes from data.
+	std::shared_ptr<UniformBuffer> UniformBuffer::Create(const void* data, uint32_t size, BufferUsage usage)
+	{
+		return std::make_shared<UniformBuffer>(data, size, usage);
+	}
 
-        GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID));
-        GLCALL(glBufferData(GL_UNIFORM_BUFFER, size, nullptr, Utils::UsageToEnum(m_Usage)));
-        GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
-    }
+	// Creates the GL buffer and allocates empty storage.
+	UniformBuffer::UniformBuffer(uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
+	{
+		glCreateBuffers(1, &m_BufferID);
+		TILES_ASSERT(m_BufferID != 0, "Failed to create uniform buffer!");
 
-    UniformBuffer::UniformBuffer(const void* data, uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
-    {
-        TILES_ASSERT(data != nullptr, "Null data passed to UniformBuffer constructor!");
-        TILES_ASSERT(size > 0, "Uniform buffer size is zero!");
+		glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID);
+		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, UsageToEnum(m_Usage));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
 
-        GLCALL(glCreateBuffers(1, &m_BufferID));
-        TILES_ASSERT(m_BufferID != 0, "Failed to create uniform buffer!");
+	// Creates the GL buffer and uploads the initial block.
+	UniformBuffer::UniformBuffer(const void* data, uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
+	{
+		TILES_ASSERT(data != nullptr, "Null data passed to UniformBuffer constructor!");
+		TILES_ASSERT(size > 0, "Uniform buffer size is zero!");
 
-        GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID));
-        GLCALL(glBufferData(GL_UNIFORM_BUFFER, size, data, Utils::UsageToEnum(m_Usage)));
-        GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
-    }
+		glCreateBuffers(1, &m_BufferID);
+		TILES_ASSERT(m_BufferID != 0, "Failed to create uniform buffer!");
 
-    UniformBuffer::~UniformBuffer()
-    {
-        GLCALL(glDeleteBuffers(1, &m_BufferID));
-    }
+		glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID);
+		glBufferData(GL_UNIFORM_BUFFER, size, data, UsageToEnum(m_Usage));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
 
-    UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept
-        : m_BufferID(other.m_BufferID), m_Size(other.m_Size), m_Usage(other.m_Usage), m_CurrentBindingPoint(other.m_CurrentBindingPoint)
-    {
-        other.m_BufferID = 0;
-    }
+	// Deletes the GL buffer (a no-op for a moved-from id of 0).
+	UniformBuffer::~UniformBuffer()
+	{
+		glDeleteBuffers(1, &m_BufferID);
+	}
 
-    UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept
-    {
-        if (this != &other)
-        {
-            GLCALL(glDeleteBuffers(1, &m_BufferID));
-            m_BufferID = other.m_BufferID;
-            m_Size = other.m_Size;
-            m_Usage = other.m_Usage;
-            m_CurrentBindingPoint = other.m_CurrentBindingPoint;
-            other.m_BufferID = 0;
-        }
-        return *this;
-    }
+	// Steals other's handle, leaving it id 0.
+	UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept
+		: m_BufferID(other.m_BufferID), m_Size(other.m_Size), m_Usage(other.m_Usage), m_CurrentBindingPoint(other.m_CurrentBindingPoint)
+	{
+		other.m_BufferID = 0;
+	}
 
-    void UniformBuffer::Bind(uint32_t bindingPoint) const
-    {
-        TILES_ASSERT(m_BufferID != 0, "Trying to bind an invalid uniform buffer!");
-        GLCALL(glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, m_BufferID));
-        m_CurrentBindingPoint = bindingPoint;
-    }
+	// Frees this handle, then steals other's.
+	UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept
+	{
+		if (this != &other)
+		{
+			glDeleteBuffers(1, &m_BufferID);
+			m_BufferID = other.m_BufferID;
+			m_Size = other.m_Size;
+			m_Usage = other.m_Usage;
+			m_CurrentBindingPoint = other.m_CurrentBindingPoint;
+			other.m_BufferID = 0;
+		}
+		return *this;
+	}
 
-    void UniformBuffer::Unbind() const
-    {
-        GLCALL(glBindBufferBase(GL_UNIFORM_BUFFER, m_CurrentBindingPoint, 0));
-    }
+	// Binds the buffer to an indexed uniform binding point and remembers it.
+	void UniformBuffer::Bind(uint32_t bindingPoint) const
+	{
+		TILES_ASSERT(m_BufferID != 0, "Trying to bind an invalid uniform buffer!");
+		glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, m_BufferID);
+		m_CurrentBindingPoint = bindingPoint;
+	}
 
-    void UniformBuffer::SetData(const void* data, uint32_t size)
-    {
-        TILES_ASSERT(data != nullptr, "UniformBuffer::SetData called with null data!");
-        TILES_ASSERT(size > 0, "UniformBuffer::SetData called with zero size!");
+	// Releases the binding point the buffer was last bound to.
+	void UniformBuffer::Unbind() const
+	{
+		glBindBufferBase(GL_UNIFORM_BUFFER, m_CurrentBindingPoint, 0);
+	}
 
-        GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID));
+	// Replaces the buffer contents, reusing storage when the update fits.
+	void UniformBuffer::SetData(const void* data, uint32_t size)
+	{
+		TILES_ASSERT(data != nullptr, "UniformBuffer::SetData called with null data!");
+		TILES_ASSERT(size > 0, "UniformBuffer::SetData called with zero size!");
 
-        // Reuse existing storage when the update fits; only reallocate to grow.
-        if (size <= m_Size)
-        {
-            GLCALL(glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data));
-        }
-        else
-        {
-            GLCALL(glBufferData(GL_UNIFORM_BUFFER, size, data, Utils::UsageToEnum(m_Usage)));
-            m_Size = size;
-        }
+		glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID);
 
-        GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
-    }
+		// Reuse existing storage when the update fits; only reallocate to grow.
+		if (size <= m_Size)
+			glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
+		else
+			glBufferData(GL_UNIFORM_BUFFER, size, data, UsageToEnum(m_Usage));
 
-    void UniformBuffer::SetSubData(const void* data, uint32_t size, uint32_t offset)
-    {
-        TILES_ASSERT(data != nullptr, "UniformBuffer::SetSubData called with null data!");
-        TILES_ASSERT(size > 0, "UniformBuffer::SetSubData called with zero size!");
-        TILES_ASSERT(offset + size <= m_Size, "UniformBuffer::SetSubData: offset + size exceeds buffer size!");
+		m_Size = size;
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
 
-        GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID));
-        GLCALL(glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data));
-        GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
-    }
+	// Updates size bytes at offset without reallocating.
+	void UniformBuffer::SetSubData(const void* data, uint32_t size, uint32_t offset)
+	{
+		TILES_ASSERT(data != nullptr, "UniformBuffer::SetSubData called with null data!");
+		TILES_ASSERT(size > 0, "UniformBuffer::SetSubData called with zero size!");
+		TILES_ASSERT(offset + size <= m_Size, "UniformBuffer::SetSubData: offset + size exceeds buffer size!");
+
+		glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID);
+		glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
 }

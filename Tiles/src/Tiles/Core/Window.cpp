@@ -60,6 +60,12 @@ namespace Tiles
 		glfwWindowHint(GLFW_RESIZABLE, settings.Resizable ? GLFW_TRUE : GLFW_FALSE);
 		glfwWindowHint(GLFW_DECORATED, settings.Decorated ? GLFW_TRUE : GLFW_FALSE);
 
+		// Ask for a debug context so glDebugMessageCallback reports errors; not
+		// requested in Dist, which runs without the GL debug machinery.
+#ifndef TILES_DIST
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
+
 		m_Window = glfwCreateWindow(
 			static_cast<int>(settings.Width),
 			static_cast<int>(settings.Height),

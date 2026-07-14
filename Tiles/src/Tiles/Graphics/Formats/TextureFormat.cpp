@@ -22,6 +22,7 @@ namespace Tiles
 		{ GL_RGBA32F,   GL_RGBA,    GL_FLOAT,           4,          16,     "RGBA32F",  true  },  // RGBA32F
 	};
 
+	// The info record for format, or the None record if out of range.
 	const TextureFormatInfo& TextureFormats::GetInfo(TextureFormat format)
 	{
 		uint8_t index = static_cast<uint8_t>(format);
@@ -32,6 +33,7 @@ namespace Tiles
 		return s_FormatTable[index];
 	}
 
+	// Maps a channel count (1-4) to the matching 8-bit format, None otherwise.
 	TextureFormat TextureFormats::FromComponentCount(int components)
 	{
 		switch (components)
@@ -44,11 +46,13 @@ namespace Tiles
 		}
 	}
 
+	// True for a real (non-None, in-range) format.
 	bool TextureFormats::IsValidFormat(TextureFormat format)
 	{
 		return format != TextureFormat::None && static_cast<uint8_t>(format) < (sizeof(s_FormatTable) / sizeof(s_FormatTable[0]));
 	}
 
+	// The byte size of a width x height image in the given format.
 	size_t TextureFormats::CalculateImageSize(TextureFormat format, uint32_t width, uint32_t height)
 	{
 		return static_cast<size_t>(width) * height * GetBytesPerPixel(format);

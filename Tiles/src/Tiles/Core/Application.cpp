@@ -22,6 +22,42 @@
 
 namespace Tiles
 {
+	// GL debug output is a development aid only; Dist requests no debug context,
+	// so none of this is compiled into the shipping build.
+#ifndef TILES_DIST
+	namespace
+	{
+		// Routes one driver debug message to the engine log, keyed by severity.
+		// Registered with glDebugMessageCallback; the unused parameters are part
+		// of the fixed GL callback signature.
+		void GLAD_API_PTR OnGLDebugMessage(GLenum /*source*/, GLenum /*type*/, GLuint /*id*/,
+			GLenum severity, GLsizei /*length*/, const GLchar* message, const void* /*userParam*/)
+		{
+			switch (severity)
+			{
+			case GL_DEBUG_SEVERITY_HIGH:    TILES_ENGINE_ERROR("[OpenGL] {}", message); break;
+			case GL_DEBUG_SEVERITY_MEDIUM:  TILES_ENGINE_WARN("[OpenGL] {}", message);  break;
+			case GL_DEBUG_SEVERITY_LOW:     TILES_ENGINE_INFO("[OpenGL] {}", message);  break;
+			default:                        TILES_ENGINE_TRACE("[OpenGL] {}", message); break;
+			}
+		}
+
+		// Turns on GL debug output and points it at OnGLDebugMessage, replacing
+		// per-call glGetError polling. In debug builds the callback fires
+		// synchronously on the offending call so the log line lands next to it;
+		// notification-level spam is filtered out.
+		void EnableGLDebugMessages()
+		{
+			glEnable(GL_DEBUG_OUTPUT);
+#ifdef TILES_DEBUG
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
+			glDebugMessageCallback(OnGLDebugMessage, nullptr);
+			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+		}
+	}
+#endif
+
 	// Static singleton
 	static Tiles::Application* s_Instance = nullptr;
 
@@ -58,6 +94,12 @@ namespace Tiles
 		const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
 		TILES_ASSERT(version, "[OpenGL Context] Failed to retrieve OpenGL version.");
 		TILES_ENGINE_INFO("OpenGL Version: {}", version);
+
+		// Route driver debug messages to the log instead of polling glGetError
+		// per call. Skipped in Dist, which requests no debug context.
+#ifndef TILES_DIST
+		EnableGLDebugMessages();
+#endif
 
 		Renderer2D::Init();
 
