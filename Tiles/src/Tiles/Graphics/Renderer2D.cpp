@@ -194,7 +194,7 @@ namespace Tiles
 	}
 
 	// Creates every batch's GPU objects and staging buffer and the white texture.
-	void Renderer2D::Init()
+	std::expected<void, Error> Renderer2D::Init()
 	{
 		TILES_ENGINE_INFO("Renderer2D: Initializing...");
 
@@ -294,6 +294,22 @@ namespace Tiles
 		s_Data->TextureSlots[0] = Texture::Create(1, 1);
 		s_Data->TextureSlots[0]->SetData(&whitePixel, sizeof(uint32_t));
 
+		// Every GL resource must have a non-zero handle; a zero means a buffer,
+		// shader, texture, or target failed to create (details are already logged,
+		// by the ctor and, in non-Dist builds, the GL debug callback).
+		const bool created =
+			s_Data->DefaultRenderTarget->GetTexture() != 0
+			&& s_Data->Square.VAO->GetID() && s_Data->Square.VBO->GetID() && s_Data->Square.IBO->GetID() && s_Data->Square.Shader->GetID()
+			&& s_Data->Circle.VAO->GetID() && s_Data->Circle.VBO->GetID() && s_Data->Circle.IBO->GetID() && s_Data->Circle.Shader->GetID()
+			&& s_Data->Line.VAO->GetID() && s_Data->Line.VBO->GetID() && s_Data->Line.Shader->GetID()
+			&& s_Data->Grid.VAO->GetID() && s_Data->Grid.VBO->GetID() && s_Data->Grid.Shader->GetID()
+			&& s_Data->TextureSlots[0]->GetID() != 0;
+		if (!created)
+		{
+			s_Data.reset();
+			return std::unexpected(Error{ ErrorCode::ResourceCreationFailure, "Renderer2D: one or more GL resources failed to initialize (see log)." });
+		}
+
 		s_Data->QuadPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data->QuadPositions[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
 		s_Data->QuadPositions[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
@@ -305,6 +321,7 @@ namespace Tiles
 		s_Data->CircleLocalPositions[3] = { -1.0f,  1.0f, 0.0f };
 
 		TILES_ENGINE_INFO("Renderer2D: Initialization complete");
+		return {};
 	}
 
 	// Destroys all renderer state (and with it every GL object, via RAII).

@@ -260,8 +260,11 @@ namespace Tiles
 		int channels;
 		int width, height;
 		unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
-
-		TILES_ASSERT(data, "Failed to load texture: {0}", path);
+		if (!data)
+		{
+			TILES_ENGINE_ERROR("Texture::LoadFromFile: failed to load image '{}' ({})", path, stbi_failure_reason());
+			return;
+		}
 
 		m_Width = width;
 		m_Height = height;

@@ -1,15 +1,17 @@
 #pragma once
 
-#include <memory>
-#include <cstdint>
-
 #include "VertexArray.h"
 #include "Texture.h"
 #include "ShaderProgram.h"
 #include "RenderCommands.h"
 #include "RenderTarget.h"
+#include "Core/Error.h"
 
 #include <glm/glm.hpp>
+
+#include <cstdint>
+#include <expected>
+#include <memory>
 
 namespace Tiles
 {
@@ -69,7 +71,9 @@ namespace Tiles
 	{
 	public:
 		// Initializes the renderer. Must be called before any other function.
-		static void Init();
+		// @return A ResourceCreationFailure error if any GL resource (buffer,
+		//         shader, texture, target) could not be created.
+		[[nodiscard]] static std::expected<void, Error> Init();
 
 		// Shuts down the renderer.
 		static void Shutdown();

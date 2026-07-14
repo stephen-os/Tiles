@@ -101,7 +101,11 @@ namespace Tiles
 		EnableGLDebugMessages();
 #endif
 
-		Renderer2D::Init();
+		if (auto result = Renderer2D::Init(); !result)
+		{
+			TILES_ENGINE_ERROR("Failed to initialize the renderer: {}", result.error().message);
+			return;
+		}
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();

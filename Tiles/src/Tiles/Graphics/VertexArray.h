@@ -41,6 +41,9 @@ namespace Tiles
 		// The attached index buffer, if any.
 		[[nodiscard]] const std::shared_ptr<IndexBuffer>& GetIndexBuffer() const { return m_IndexBuffer; }
 
+		// The GL vertex-array handle (0 if creation failed).
+		[[nodiscard]] uint32_t GetID() const { return m_RendererID; }
+
 		// Allocates a vertex array.
 		[[nodiscard]] static std::shared_ptr<VertexArray> Create();
 

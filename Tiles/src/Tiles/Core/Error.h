@@ -16,6 +16,7 @@ namespace Tiles
 		FileNotFound,  // the file does not exist
 		ReadFailure,   // the file could not be read or parsed
 		WriteFailure,  // the file could not be written or encoded
+		ResourceCreationFailure,  // a GPU resource (buffer, shader, texture, ...) could not be created
 	};
 
 	// The one project-wide error type carried on the failure side of a

@@ -43,7 +43,8 @@ namespace Tiles
 	VertexBuffer::VertexBuffer(uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
 	{
 		glCreateBuffers(1, &m_BufferID);
-		TILES_ASSERT(m_BufferID != 0, "Failed to create vertex buffer!");
+		if (m_BufferID == 0)
+			TILES_ENGINE_ERROR("VertexBuffer: failed to create the GL buffer.");
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ARRAY_BUFFER, size, nullptr, UsageToEnum(m_Usage));
@@ -53,7 +54,8 @@ namespace Tiles
 	VertexBuffer::VertexBuffer(const void* vertices, uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
 	{
 		glCreateBuffers(1, &m_BufferID);
-		TILES_ASSERT(m_BufferID != 0, "Failed to create vertex buffer!");
+		if (m_BufferID == 0)
+			TILES_ENGINE_ERROR("VertexBuffer: failed to create the GL buffer.");
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ARRAY_BUFFER, size, vertices, UsageToEnum(m_Usage));
@@ -132,7 +134,8 @@ namespace Tiles
 		TILES_ASSERT(count > 0, "Index buffer count is zero!");
 
 		glCreateBuffers(1, &m_BufferID);
-		TILES_ASSERT(m_BufferID != 0, "Failed to create index buffer!");
+		if (m_BufferID == 0)
+			TILES_ENGINE_ERROR("IndexBuffer: failed to create the GL buffer.");
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_BufferID);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), data, UsageToEnum(m_Usage));
@@ -216,7 +219,8 @@ namespace Tiles
 	UniformBuffer::UniformBuffer(uint32_t size, BufferUsage usage) : m_Size(size), m_Usage(usage)
 	{
 		glCreateBuffers(1, &m_BufferID);
-		TILES_ASSERT(m_BufferID != 0, "Failed to create uniform buffer!");
+		if (m_BufferID == 0)
+			TILES_ENGINE_ERROR("UniformBuffer: failed to create the GL buffer.");
 
 		glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID);
 		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, UsageToEnum(m_Usage));
@@ -230,7 +234,8 @@ namespace Tiles
 		TILES_ASSERT(size > 0, "Uniform buffer size is zero!");
 
 		glCreateBuffers(1, &m_BufferID);
-		TILES_ASSERT(m_BufferID != 0, "Failed to create uniform buffer!");
+		if (m_BufferID == 0)
+			TILES_ENGINE_ERROR("UniformBuffer: failed to create the GL buffer.");
 
 		glBindBuffer(GL_UNIFORM_BUFFER, m_BufferID);
 		glBufferData(GL_UNIFORM_BUFFER, size, data, UsageToEnum(m_Usage));

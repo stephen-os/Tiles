@@ -1,5 +1,7 @@
 #include "VertexArray.h"
 
+#include "Core/Logger.h"
+
 #include <glad/gl.h>
 
 namespace Tiles
@@ -14,6 +16,8 @@ namespace Tiles
 	VertexArray::VertexArray()
 	{
 		glGenVertexArrays(1, &m_RendererID);
+		if (m_RendererID == 0)
+			TILES_ENGINE_ERROR("VertexArray: failed to create the GL vertex array.");
 	}
 
 	// Deletes the GL vertex-array handle.

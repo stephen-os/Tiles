@@ -22,13 +22,16 @@ namespace Tiles
 		: m_Width(width), m_Height(height)
 	{
 		glGenFramebuffers(1, &m_BufferID);
-		TILES_ASSERT(m_BufferID != 0, "Failed to generate framebuffer");
+		if (m_BufferID == 0)
+			TILES_ENGINE_ERROR("RenderTarget: failed to generate the framebuffer.");
 
 		glGenTextures(1, &m_ColorAttachment);
-		TILES_ASSERT(m_ColorAttachment != 0, "Failed to generate color attachment texture");
+		if (m_ColorAttachment == 0)
+			TILES_ENGINE_ERROR("RenderTarget: failed to generate the color attachment texture.");
 
 		glGenRenderbuffers(1, &m_DepthAttachment);
-		TILES_ASSERT(m_DepthAttachment != 0, "Failed to generate depth renderbuffer");
+		if (m_DepthAttachment == 0)
+			TILES_ENGINE_ERROR("RenderTarget: failed to generate the depth renderbuffer.");
 
 		AllocateAttachments();
 	}
@@ -96,7 +99,8 @@ namespace Tiles
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_DepthAttachment);
 
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		TILES_ASSERT(status == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+			TILES_ENGINE_ERROR("RenderTarget: framebuffer is incomplete (status 0x{:04X}).", status);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
