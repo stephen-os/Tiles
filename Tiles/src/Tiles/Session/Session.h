@@ -9,7 +9,7 @@
 #include "Core/Error.h"
 #include "Domain/Tile.h"
 #include "Domain/Project.h"
-#include "Domain/ProjectHistory.h"
+#include "Session/ProjectHistory.h"
 #include "Domain/ProjectSerializer.h"
 #include "Graphics/Camera2D.h"
 #include "Session/CommandDispatcher.h"
