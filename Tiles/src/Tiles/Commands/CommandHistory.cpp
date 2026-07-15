@@ -1,61 +1,64 @@
 #include "Commands/CommandHistory.h"
 
-#include "Commands/Command.h"
-
 namespace Tiles
 {
-    void CommandHistory::Execute(std::unique_ptr<Command> command, LayerStack& layerStack)
-    {
-        if (!command)
-            return;
+	// Runs command and pushes it onto the undo stack, dropping it when the last
+	// command coalesces it. A fresh command clears the redo stack.
+	void CommandHistory::Execute(std::unique_ptr<Command> command, LayerStack& layerStack)
+	{
+		if (!command)
+			return;
 
-        if (!m_UndoStack.empty() && m_UndoStack.back()->Validate(*command))
-            return;
+		if (!m_UndoStack.empty() && m_UndoStack.back()->CanCoalesce(*command))
+			return;
 
-        command->Execute(layerStack);
-        m_UndoStack.push_back(std::move(command));
+		command->Execute(layerStack);
+		m_UndoStack.push_back(std::move(command));
 
-        if (m_UndoStack.size() > MAX_UNDO_STACK_SIZE)
-            m_UndoStack.pop_front();
+		if (m_UndoStack.size() > MAX_UNDO_STACK_SIZE)
+			m_UndoStack.pop_front();
 
-        m_RedoStack.clear();
-    }
+		m_RedoStack.clear();
+	}
 
-    void CommandHistory::Undo(LayerStack& layerStack)
-    {
-        if (m_UndoStack.empty())
-            return;
+	// Undoes the most recent command and moves it to the redo stack.
+	void CommandHistory::Undo(LayerStack& layerStack)
+	{
+		if (m_UndoStack.empty())
+			return;
 
-        std::unique_ptr<Command> command = std::move(m_UndoStack.back());
-        m_UndoStack.pop_back();
+		std::unique_ptr<Command> command = std::move(m_UndoStack.back());
+		m_UndoStack.pop_back();
 
-        command->Undo(layerStack);
+		command->Undo(layerStack);
 
-        m_RedoStack.push_back(std::move(command));
+		m_RedoStack.push_back(std::move(command));
 
-        if (m_RedoStack.size() > MAX_UNDO_STACK_SIZE)
-            m_RedoStack.pop_front();
-    }
+		if (m_RedoStack.size() > MAX_UNDO_STACK_SIZE)
+			m_RedoStack.pop_front();
+	}
 
-    void CommandHistory::Redo(LayerStack& layerStack)
-    {
-        if (m_RedoStack.empty())
-            return;
+	// Re-executes the most recently undone command and moves it back to undo.
+	void CommandHistory::Redo(LayerStack& layerStack)
+	{
+		if (m_RedoStack.empty())
+			return;
 
-        std::unique_ptr<Command> command = std::move(m_RedoStack.back());
-        m_RedoStack.pop_back();
+		std::unique_ptr<Command> command = std::move(m_RedoStack.back());
+		m_RedoStack.pop_back();
 
-        command->Execute(layerStack);
+		command->Execute(layerStack);
 
-        m_UndoStack.push_back(std::move(command));
+		m_UndoStack.push_back(std::move(command));
 
-        if (m_UndoStack.size() > MAX_UNDO_STACK_SIZE)
-            m_UndoStack.pop_front();
-    }
+		if (m_UndoStack.size() > MAX_UNDO_STACK_SIZE)
+			m_UndoStack.pop_front();
+	}
 
-    void CommandHistory::Clear()
-    {
-        m_UndoStack.clear();
-        m_RedoStack.clear();
-    }
+	// Empties both stacks.
+	void CommandHistory::Clear()
+	{
+		m_UndoStack.clear();
+		m_RedoStack.clear();
+	}
 }

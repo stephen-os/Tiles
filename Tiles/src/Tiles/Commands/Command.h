@@ -9,13 +9,13 @@ namespace Tiles
 	class Command
 	{
 	public:
-		virtual ~Command() {}
+		virtual ~Command() = default;
 
 		virtual void Execute(LayerStack& layerStack) = 0;
 		virtual void Undo(LayerStack& layerStack) = 0;
 
-		// @return True if other is an equivalent, redundant edit to this one, so
-		//         the history can drop it. Defaults to false (never coalesce).
-		virtual bool Validate(const Command& other) const { return false; }
+		// @return True if other is a redundant repeat of this command, so the
+		//         history can coalesce it (drop the new one). Defaults to false.
+		[[nodiscard]] virtual bool CanCoalesce(const Command& other) const { return false; }
 	};
 }
