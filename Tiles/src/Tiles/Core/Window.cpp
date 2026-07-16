@@ -4,6 +4,11 @@
 
 #include <GLFW/glfw3.h>
 
+// GLFW defines APIENTRY and (in this vendored version) never undefs it; undo it
+// so the <windows.h> pulled in below (glfw3native / dwmapi) redefines it without
+// a C4005 macro-redefinition warning.
+#undef APIENTRY
+
 #ifdef TILES_PLATFORM_WINDOWS
 	#define GLFW_EXPOSE_NATIVE_WIN32
 	#include <GLFW/glfw3native.h>

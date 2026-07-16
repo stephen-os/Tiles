@@ -1,6 +1,11 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
+// GLFW defines APIENTRY and (in this vendored version) never undefs it; undo it
+// so a later <windows.h> (pulled in by spdlog / ImGui) redefines it without a
+// C4005 macro-redefinition warning.
+#undef APIENTRY
+
 #include "Application.h"
 
 #include <vector>

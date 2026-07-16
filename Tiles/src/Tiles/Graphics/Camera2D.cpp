@@ -54,8 +54,10 @@ namespace Tiles
 			return;
 		}
 
-		const float minX = bounds->x, minY = bounds->y;
-		const float maxX = bounds->z, maxY = bounds->w;
+		const float minX = static_cast<float>(bounds->x);
+		const float minY = static_cast<float>(bounds->y);
+		const float maxX = static_cast<float>(bounds->z);
+		const float maxY = static_cast<float>(bounds->w);
 
 		// A tile at coord (cx, cy) fills the cell [cx, cx+1], so the content spans
 		// [minX, maxX+1] in tiles; center on the midpoint in world units.
