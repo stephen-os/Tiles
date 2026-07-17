@@ -234,7 +234,7 @@ public:
 
 	void OnCreate() override
 	{
-		// Install the shared Tiles::UI theme + fonts (supersedes EditorTheme).
+		// Install the shared Tiles::UI theme + fonts.
 		Tiles::UI::InitFonts();
 		Tiles::UI::Apply(Tiles::UI::Theme{});
 		PushLayer<TilesEditorLayer>();

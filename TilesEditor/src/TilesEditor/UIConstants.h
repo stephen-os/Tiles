@@ -6,38 +6,7 @@ namespace Tiles
 {
     namespace UI
     {
-        namespace Color
-        {
-            // Component colors
-            constexpr ImVec4 Red = { 0.8f, 0.2f, 0.2f, 1.0f };
-            constexpr ImVec4 Green = { 0.2f, 0.8f, 0.2f, 1.0f };
-            constexpr ImVec4 Blue = { 0.2f, 0.2f, 0.8f, 1.0f };
-            constexpr ImVec4 Gray = { 0.4f, 0.4f, 0.4f, 1.0f };
-
-            // Text colors
-            constexpr ImVec4 Text = { 1.0f, 1.0f, 1.0f, 1.0f };
-            constexpr ImVec4 TextHint = { 0.7f, 0.7f, 0.7f, 1.0f };
-            constexpr ImVec4 TextError = { 1.0f, 0.3f, 0.3f, 1.0f };
-
-            // Background colors
-            constexpr ImVec4 BackgroundDark = { 0.15f, 0.15f, 0.15f, 1.0f };
-            constexpr ImVec4 BackgroundMedium = { 0.2f, 0.2f, 0.2f, 1.0f };
-
-            // Button colors
-            constexpr ImVec4 Button = { 0.2f, 0.4f, 0.6f, 1.0f };
-            constexpr ImVec4 ButtonHover = { 0.3f, 0.5f, 0.7f, 1.0f };
-            constexpr ImVec4 ButtonActive = { 0.1f, 0.3f, 0.5f, 1.0f };
-
-            // Danger/Reset button colors
-            constexpr ImVec4 Danger = { 0.8f, 0.3f, 0.3f, 1.0f };
-            constexpr ImVec4 DangerHover = { 0.9f, 0.4f, 0.4f, 1.0f };
-            constexpr ImVec4 DangerActive = { 0.7f, 0.2f, 0.2f, 1.0f };
-
-            // Interactive element states
-            constexpr ImVec4 Normal = { 0.15f, 0.15f, 0.15f, 1.0f };
-            constexpr ImVec4 Hover = { 0.2f, 0.2f, 0.2f, 1.0f };
-            constexpr ImVec4 Active = { 0.25f, 0.25f, 0.25f, 1.0f };
-        }
+        // Colors moved to the shared theme -- see Tiles::UI::Theme in UI/Theme.h.
 
         namespace Component
         {
@@ -65,23 +34,9 @@ namespace Tiles
             constexpr float FileDialogHeight = 400.0f;
         }
 
-        namespace Selection
-        {
-            constexpr ImVec4 BorderColor = { 1.0f, 0.647f, 0.0f, 1.0f };
-            constexpr ImVec4 DefaultBorderColor = { 0.2f, 0.2f, 0.2f, 1.0f };
-            constexpr ImVec4 TransparentButton = { 0.0f, 0.0f, 0.0f, 0.0f };
-        }
-
         namespace List
         {
             constexpr float LayerListHeight = 300.0f;
-        }
-
-        namespace Layer
-        {
-            constexpr ImVec4 ItemBackground = { 0.15f, 0.15f, 0.15f, 1.0f };
-            constexpr ImVec4 ItemHover = { 0.25f, 0.25f, 0.25f, 1.0f };
-            constexpr ImVec4 OrangeAccent = { 1.0f, 0.5f, 0.0f, 1.0f };
         }
 
         namespace Window

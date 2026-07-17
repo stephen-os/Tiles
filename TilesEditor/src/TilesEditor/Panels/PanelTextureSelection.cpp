@@ -1,5 +1,6 @@
 #include "PanelTextureSelection.h"
 #include "../UIConstants.h"
+#include "../UI/Theme.h"
 #include "ImGuiFileDialog.h"
 #include "Core/Logger.h"
 #include <filesystem>
@@ -238,9 +239,9 @@ namespace Tiles::Editor
         else
         {
             // Transparent button for empty atlas slots
-            ImGui::PushStyleColor(ImGuiCol_Button, UI::Selection::TransparentButton);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Selection::TransparentButton);
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Selection::TransparentButton);
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 
             std::string buttonId = std::string("##") + id + "_Button";
             ImGui::Button(buttonId.c_str(), buttonSize);
@@ -277,8 +278,8 @@ namespace Tiles::Editor
 
         // Draw appropriate border
         ImU32 borderColor = isSelected ?
-            ImGui::ColorConvertFloat4ToU32(UI::Selection::BorderColor) :
-            ImGui::ColorConvertFloat4ToU32(UI::Selection::DefaultBorderColor);
+            ImGui::ColorConvertFloat4ToU32(UI::GetTheme().Accent) :
+            ImGui::ColorConvertFloat4ToU32(UI::GetTheme().Surface);
         float thickness = isSelected ? borderThickness : TextureConstants::Tile::MinBorderThickness;
 
         ImGui::GetWindowDrawList()->AddRect(itemMin, itemMax, borderColor, 0.0f, 0, thickness);

@@ -1,6 +1,7 @@
 #include "PanelViewport.h"
 
 #include "../UIConstants.h"
+#include "../UI/Theme.h"
 
 #include "Core/Input.h"
 #include "../Rendering/TileSceneRenderer.h"
@@ -24,7 +25,7 @@ namespace Tiles::Editor
 
         if (!Ctx().HasProject())
         {
-            ImGui::TextColored(UI::Color::TextError, "No project loaded");
+            ImGui::TextColored(UI::GetTheme().Danger, "No project loaded");
             ImGui::End();
             return;
         }
