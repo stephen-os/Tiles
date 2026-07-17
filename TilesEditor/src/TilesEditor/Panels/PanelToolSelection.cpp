@@ -14,6 +14,7 @@ namespace Tiles::Editor
         ImGui::Begin("Tools", OpenFlag());
 
         RenderBlockToolButtons();
+        RenderBlockBrushSize();
         ImGui::End();
 
         RenderBlockCustomCursor();
@@ -112,6 +113,17 @@ namespace Tiles::Editor
         {
             ImGui::SetTooltip("%s", tooltip);
         }
+    }
+
+    void PanelToolSelection::RenderBlockBrushSize()
+    {
+        // The brush/eraser footprint is an N x N block of cells.
+        ImGui::Spacing();
+
+        int brushSize = Ctx().GetBrushSize();
+        ImGui::SetNextItemWidth(UI::Tool::ButtonSize * 3.0f + UI::Tool::ButtonSpacing * 2.0f);
+        if (ImGui::SliderInt("Brush Size", &brushSize, 1, 10))
+            Ctx().SetBrushSize(brushSize);
     }
 
     void PanelToolSelection::RenderBlockCustomCursor()

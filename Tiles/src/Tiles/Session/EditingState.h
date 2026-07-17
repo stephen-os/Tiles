@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 #include <glm/glm.hpp>
 
@@ -51,6 +52,12 @@ namespace Tiles
 		// Sets the tile stamped by the brush and fill tools.
 		void SetBrush(const Tile& brush) { m_Brush = brush; }
 
+		// The brush footprint size (N x N cells); always at least 1.
+		[[nodiscard]] int GetBrushSize() const { return m_BrushSize; }
+
+		// Sets the brush footprint size, clamped to at least 1.
+		void SetBrushSize(int size) { m_BrushSize = size < 1 ? 1 : size; }
+
 		// Restores the default selection: layer 0, no mode, a painted brush.
 		void Reset();
 
@@ -67,9 +74,18 @@ namespace Tiles
 		// Builds a flood-fill command bounded by the visible region.
 		[[nodiscard]] std::unique_ptr<Command> BuildFillCommand(size_t layerIndex, int x, int y, const Tile& tile, const glm::ivec4& bounds) const;
 
+		// The cells the brush covers when centered on (cx, cy): an N x N block
+		// for brush size N.
+		[[nodiscard]] std::vector<glm::ivec2> BrushFootprint(int cx, int cy) const;
+
+		// Builds a stroke command that applies the brush (or an erase) to every
+		// cell as one undo step; null for None/Fill or an empty cell set.
+		[[nodiscard]] std::unique_ptr<Command> BuildStrokeCommand(size_t layerIndex, const std::vector<glm::ivec2>& cells) const;
+
 	private:
 		size_t m_WorkingLayer = 0;
 		PaintingMode m_PaintingMode = PaintingMode::None;
 		Tile m_Brush;
+		int m_BrushSize = 1;
 	};
 }

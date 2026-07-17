@@ -75,6 +75,19 @@ namespace Tiles
 			ExecuteCommand(m_EditingState.BuildFillCommand(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush(), bounds));
 	}
 
+	// The cells the brush covers when centered on (cx, cy).
+	std::vector<glm::ivec2> Session::GetBrushFootprint(int cx, int cy) const
+	{
+		return m_EditingState.BrushFootprint(cx, cy);
+	}
+
+	// Paints the given cells as one undoable stroke, using the current mode/brush.
+	void Session::PaintStroke(const std::vector<glm::ivec2>& cells)
+	{
+		if (HasWorkingLayer())
+			ExecuteCommand(m_EditingState.BuildStrokeCommand(m_EditingState.GetWorkingLayer(), cells));
+	}
+
 	// Runs a command through the history against the project's layer stack.
 	void Session::ExecuteCommand(std::unique_ptr<Command> command)
 	{

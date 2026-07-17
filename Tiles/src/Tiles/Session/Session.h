@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "Core/Error.h"
 #include "Domain/Tile.h"
@@ -68,6 +69,12 @@ namespace Tiles
 		[[nodiscard]] const Tile& GetBrush() const { return m_EditingState.GetBrush(); }
 		[[nodiscard]] Tile& GetBrush() { return m_EditingState.GetBrush(); }
 
+		// Sets the brush footprint size (N x N cells); at least 1.
+		void SetBrushSize(int size) { m_EditingState.SetBrushSize(size); }
+
+		// The brush footprint size.
+		[[nodiscard]] int GetBrushSize() const { return m_EditingState.GetBrushSize(); }
+
 		// --- Editing operations ---
 
 		// Applies the current painting mode/brush to the working layer at (x, y).
@@ -82,6 +89,13 @@ namespace Tiles
 
 		// Flood-fills the working layer from (x, y), bounded by the visible view.
 		void FillLayer(int x, int y, const glm::ivec4& bounds);
+
+		// The cells the brush covers when centered on (cx, cy).
+		[[nodiscard]] std::vector<glm::ivec2> GetBrushFootprint(int cx, int cy) const;
+
+		// Paints the given cells as one undoable stroke, using the current mode
+		// and brush. A no-op without a working layer or for a non-stroking mode.
+		void PaintStroke(const std::vector<glm::ivec2>& cells);
 
 		// --- Undo / redo ---
 

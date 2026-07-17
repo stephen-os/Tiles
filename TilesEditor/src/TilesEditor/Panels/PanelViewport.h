@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 
 #include "Panel.h"
 #include "Tiles.h"
@@ -38,20 +39,28 @@ namespace Tiles::Editor
         void RenderExportRegion();
         void RenderLayers();
         void RenderLayer(const TileLayer& layer, size_t layerIndex);
+        // Previews the pending edit: the accumulated stroke while dragging, else
+        // the brush footprint under the cursor.
         void RenderHoverTile();
+        // Draws the current mode's preview quad (brush/eraser/fill) at one cell.
+        void RenderCellPreview(const glm::ivec2& cell);
 
         // ImGui overlay drawn over the blitted viewport: origin/fit buttons and
         // the hovered tile coordinate. Sets m_PointerOverOverlay.
         void RenderOverlay();
-        void RenderBrushPreview(const Tile& brush);
-        void RenderEraserPreview();
-        void RenderFillPreview();
-        void RenderBasicHover();
-
-        void ExecutePaintAction(const glm::ivec2& gridPos);
 
         void HandleInput();
-        void HandleMouseDragging(); 
+        // Paint-stroke lifecycle (Brush/Eraser): begin on press, extend across the
+        // drag, commit one command on release.
+        void BeginStroke(const glm::ivec2& cell);
+        void ExtendStroke(const glm::ivec2& cell);
+        void CommitStroke();
+        // Adds the brush footprint centered on cell to the in-progress stroke.
+        void AddFootprint(const glm::ivec2& cell);
+        // Flood-fills from cell, bounded by the visible view.
+        void FillAt(const glm::ivec2& cell);
+
+        void HandleMouseDragging();
         void HandleCameraMovement();
         void HandleZoom();
 
@@ -69,8 +78,10 @@ namespace Tiles::Editor
         ImVec2 m_ViewportPosition = { 0.0f, 0.0f };
         ImVec2 m_ViewportSize = { 512.0f, 512.0f };
 
-        glm::vec3 m_MouseFollowQuadPosition = { 0.0f, 0.0f, 0.2f };
-        glm::vec2 m_MouseFollowQuadSize = { 32.0f, 32.0f };
-        glm::vec4 m_MouseFollowQuadColor = { 0.0f, 1.0f, 0.0f, 0.6f };
+        // In-progress paint stroke (Brush/Eraser): the cells accumulated while the
+        // mouse is held, committed as one command on release.
+        bool m_Stroking = false;
+        glm::ivec2 m_LastStrokeCell = { 0, 0 };
+        std::vector<glm::ivec2> m_StrokeCells;
     };
 }

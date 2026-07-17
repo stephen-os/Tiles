@@ -4,6 +4,7 @@
 #include "Commands/TilePaintCommand.h"
 #include "Commands/TileEraseCommand.h"
 #include "Commands/LayerFillCommand.h"
+#include "Commands/TileStrokeCommand.h"
 
 namespace Tiles
 {
@@ -51,5 +52,41 @@ namespace Tiles
 	std::unique_ptr<Command> EditingState::BuildFillCommand(size_t layerIndex, int x, int y, const Tile& tile, const glm::ivec4& bounds) const
 	{
 		return std::make_unique<LayerFillCommand>(x, y, layerIndex, tile, bounds);
+	}
+
+	// The N x N block of cells centered on (cx, cy) for the current brush size.
+	std::vector<glm::ivec2> EditingState::BrushFootprint(int cx, int cy) const
+	{
+		std::vector<glm::ivec2> cells;
+		cells.reserve(static_cast<size_t>(m_BrushSize) * m_BrushSize);
+
+		const int half = m_BrushSize / 2;
+		for (int dy = 0; dy < m_BrushSize; ++dy)
+			for (int dx = 0; dx < m_BrushSize; ++dx)
+				cells.push_back({ cx - half + dx, cy - half + dy });
+
+		return cells;
+	}
+
+	// Builds a stroke that paints (or erases) every cell as one undo step.
+	std::unique_ptr<Command> EditingState::BuildStrokeCommand(size_t layerIndex, const std::vector<glm::ivec2>& cells) const
+	{
+		// Brush stamps the brush tile; eraser stamps an empty tile (which clears
+		// the cell). Other modes do not stroke.
+		Tile tile;
+		if (m_PaintingMode == PaintingMode::Brush)
+			tile = m_Brush;
+		else if (m_PaintingMode != PaintingMode::Eraser)
+			return nullptr;
+
+		if (cells.empty())
+			return nullptr;
+
+		std::vector<TileStrokeCommand::Cell> strokeCells;
+		strokeCells.reserve(cells.size());
+		for (const glm::ivec2& coord : cells)
+			strokeCells.push_back({ coord, tile });
+
+		return std::make_unique<TileStrokeCommand>(layerIndex, std::move(strokeCells));
 	}
 }

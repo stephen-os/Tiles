@@ -13,8 +13,6 @@ namespace Tiles::Editor
         : Panel(host), m_TileSize(Viewport::Render::DefaultTileSize)
     {
         m_RenderTarget = Tiles::RenderTarget::Create(512, 512);
-        m_MouseFollowQuadSize = { m_TileSize * 0.5f, m_TileSize * 0.5f };
-        m_MouseFollowQuadColor = Viewport::Grid::HoverColor;
     }
 
     void PanelViewport::Render()
@@ -254,138 +252,163 @@ namespace Tiles::Editor
 
     void PanelViewport::RenderHoverTile()
     {
-        if (!ImGui::IsWindowHovered()) return;
+        PaintingMode mode = Ctx().GetPaintingMode();
+        if (mode == PaintingMode::None)
+            return;
 
-        glm::ivec2 gridPos = GetGridPositionUnderMouse();
+        // While a stroke is in progress, preview every accumulated cell.
+        if (m_Stroking)
+        {
+            for (const glm::ivec2& cell : m_StrokeCells)
+                RenderCellPreview(cell);
+            return;
+        }
 
-        glm::vec2 gridCenter = {
-            (gridPos.x + 0.5f) * m_TileSize,
-            (gridPos.y + 0.5f) * m_TileSize
-        };
+        if (!ImGui::IsWindowHovered())
+            return;
 
-        m_MouseFollowQuadPosition = {
-            gridCenter.x,
-            gridCenter.y,
+        glm::ivec2 cursor = GetGridPositionUnderMouse();
+
+        // Fill acts on a single cell; brush/eraser preview the whole footprint.
+        if (mode == PaintingMode::Fill)
+        {
+            RenderCellPreview(cursor);
+            return;
+        }
+
+        for (const glm::ivec2& cell : Ctx().GetBrushFootprint(cursor.x, cursor.y))
+            RenderCellPreview(cell);
+    }
+
+    void PanelViewport::RenderCellPreview(const glm::ivec2& cell)
+    {
+        glm::vec3 position = {
+            (cell.x + 0.5f) * m_TileSize,
+            (cell.y + 0.5f) * m_TileSize,
             Viewport::Depth::HoverTile
         };
 
-        const Tile& brush = Ctx().GetBrush();
-        PaintingMode mode = Ctx().GetPaintingMode();
+        Tiles::Square params;
+        params.Position = position;
+        params.Size = { m_TileSize, m_TileSize };
 
-        switch (mode)
+        switch (Ctx().GetPaintingMode())
         {
         case PaintingMode::Brush:
-            RenderBrushPreview(brush);
-            break;
-        case PaintingMode::Eraser:
-            RenderEraserPreview();
-            break;
-        case PaintingMode::Fill:
-            RenderFillPreview();
-            break;
-        default:
-            RenderBasicHover();
+        {
+            const Tile& brush = Ctx().GetBrush();
+            params.Rotation = brush.GetRotation();
+            params.Tint = brush.GetTint();
+            params.Size = { m_TileSize * brush.GetSize().x, m_TileSize * brush.GetSize().y };
+
+            const auto& atlases = Ctx().GetProject()->GetTextureAtlases();
+            if (brush.IsTextured() && brush.HasValidAtlas() && brush.GetAtlasIndex() < atlases.size())
+            {
+                auto atlas = atlases[brush.GetAtlasIndex()];
+                if (atlas && atlas->HasImage())
+                {
+                    params.Texture = Host().GetAtlasTexture(*atlas);
+                    params.TexCoords = brush.GetTextureCoords();
+                }
+            }
             break;
         }
-    }
-
-    void PanelViewport::RenderBrushPreview(const Tile& brush)
-    {
-        glm::vec2 brushSize = brush.GetSize();
-
-        Tiles::Square params;
-        params.Position = m_MouseFollowQuadPosition;
-        params.Rotation = brush.GetRotation();
-        params.Tint = brush.GetTint();
-        params.Size = { m_TileSize * brushSize.x, m_TileSize * brushSize.y };
-
-        const auto& textureAtlases = Ctx().GetProject()->GetTextureAtlases();
-        if (brush.IsTextured() && brush.HasValidAtlas() && brush.GetAtlasIndex() < textureAtlases.size())
-        {
-            auto atlas = textureAtlases[brush.GetAtlasIndex()];
-            if (atlas && atlas->HasImage())
-            {
-                params.Texture = Host().GetAtlasTexture(*atlas);
-                params.TexCoords = brush.GetTextureCoords();
-            }
+        case PaintingMode::Eraser:
+            params.Tint = { 1.0f, 0.0f, 0.0f, 0.3f };
+            break;
+        case PaintingMode::Fill:
+            params.Tint = { 0.0f, 0.0f, 1.0f, 0.3f };
+            break;
+        default:
+            return;
         }
 
         Tiles::Renderer2D::DrawSquare(params);
     }
 
-    void PanelViewport::RenderEraserPreview()
-    {
-        Tiles::Renderer2D::DrawSquare({
-            .Position = m_MouseFollowQuadPosition,
-            .Size = { m_TileSize, m_TileSize },
-            .Tint = { 1.0f, 0.0f, 0.0f, 0.3f },
-        });
-    }
-
-    void PanelViewport::RenderFillPreview()
-    {
-        Tiles::Renderer2D::DrawSquare({
-            .Position = m_MouseFollowQuadPosition,
-            .Size = { m_TileSize, m_TileSize },
-            .Tint = { 0.0f, 0.0f, 1.0f, 0.3f },
-        });
-    }
-
-    void PanelViewport::RenderBasicHover()
-    {
-        Tiles::Renderer2D::DrawSquare({
-            .Position = m_MouseFollowQuadPosition,
-            .Size = m_MouseFollowQuadSize,
-            .Tint = m_MouseFollowQuadColor,
-        });
-    }
-
     void PanelViewport::HandleInput()
     {
-        // Don't paint through the overlay controls.
+        PaintingMode mode = Ctx().GetPaintingMode();
+
+        // Always finish an in-progress stroke on release, even if the pointer
+        // ended over the overlay controls.
+        if (m_Stroking && Input::IsMouseButtonReleased(Input::MouseCode::Left))
+        {
+            CommitStroke();
+            return;
+        }
+
+        // Don't start painting through the overlay controls.
         if (m_PointerOverOverlay)
             return;
 
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
 
-        if (Input::IsMouseButtonDown(Input::MouseCode::Left))
+        if (mode == PaintingMode::Fill)
         {
-            ExecutePaintAction(gridPos);
+            if (Input::IsMouseButtonPressed(Input::MouseCode::Left))
+                FillAt(gridPos);
+            return;
         }
+
+        if (mode != PaintingMode::Brush && mode != PaintingMode::Eraser)
+            return;
+
+        if (Input::IsMouseButtonPressed(Input::MouseCode::Left))
+            BeginStroke(gridPos);
+        else if (m_Stroking && Input::IsMouseButtonDown(Input::MouseCode::Left))
+            ExtendStroke(gridPos);
     }
 
-    void PanelViewport::ExecutePaintAction(const glm::ivec2& gridPos)
+    void PanelViewport::BeginStroke(const glm::ivec2& cell)
     {
-        PaintingMode mode = Ctx().GetPaintingMode();
+        m_Stroking = true;
+        m_StrokeCells.clear();
+        m_LastStrokeCell = cell;
+        AddFootprint(cell);
+    }
 
-        // Any signed coord is paintable; it maps directly to a sparse cell.
-        switch (mode)
-        {
-        case PaintingMode::Brush:
-            Ctx().PaintTile(gridPos.x, gridPos.y);
-            break;
-        case PaintingMode::Eraser:
-            Ctx().EraseTile(gridPos.x, gridPos.y);
-            break;
-        case PaintingMode::Fill:
-        {
-            // Bound the flood to the visible tile region, so a fill on the
-            // unbounded board fills what's on screen rather than running away.
-            const Camera2D& camera = Ctx().GetViewportCamera();
-            float halfWidth = m_ViewportSize.x / camera.Zoom * 0.5f;
-            float halfHeight = m_ViewportSize.y / camera.Zoom * 0.5f;
-            glm::ivec4 visibleTiles = {
-                static_cast<int>(std::floor((camera.Center.x - halfWidth) / m_TileSize)),
-                static_cast<int>(std::floor((camera.Center.y - halfHeight) / m_TileSize)),
-                static_cast<int>(std::floor((camera.Center.x + halfWidth) / m_TileSize)),
-                static_cast<int>(std::floor((camera.Center.y + halfHeight) / m_TileSize))
-            };
-            Ctx().FillLayer(gridPos.x, gridPos.y, visibleTiles);
-            break;
-        }
-        default:
-            break;
-        }
+    void PanelViewport::ExtendStroke(const glm::ivec2& cell)
+    {
+        // Only extend when the cursor enters a new cell, so a held mouse doesn't
+        // pile up the same footprint every frame.
+        if (cell == m_LastStrokeCell)
+            return;
+
+        m_LastStrokeCell = cell;
+        AddFootprint(cell);
+    }
+
+    void PanelViewport::AddFootprint(const glm::ivec2& cell)
+    {
+        for (const glm::ivec2& footprintCell : Ctx().GetBrushFootprint(cell.x, cell.y))
+            m_StrokeCells.push_back(footprintCell);
+    }
+
+    void PanelViewport::CommitStroke()
+    {
+        if (!m_Stroking)
+            return;
+
+        Ctx().PaintStroke(m_StrokeCells);
+        m_Stroking = false;
+        m_StrokeCells.clear();
+    }
+
+    void PanelViewport::FillAt(const glm::ivec2& cell)
+    {
+        // Bound the flood to the visible tile region, so a fill on the unbounded
+        // board fills what's on screen rather than running away.
+        const Camera2D& camera = Ctx().GetViewportCamera();
+        float halfWidth = m_ViewportSize.x / camera.Zoom * 0.5f;
+        float halfHeight = m_ViewportSize.y / camera.Zoom * 0.5f;
+        glm::ivec4 visibleTiles = {
+            static_cast<int>(std::floor((camera.Center.x - halfWidth) / m_TileSize)),
+            static_cast<int>(std::floor((camera.Center.y - halfHeight) / m_TileSize)),
+            static_cast<int>(std::floor((camera.Center.x + halfWidth) / m_TileSize)),
+            static_cast<int>(std::floor((camera.Center.y + halfHeight) / m_TileSize))
+        };
+        Ctx().FillLayer(cell.x, cell.y, visibleTiles);
     }
 
     glm::ivec2 PanelViewport::GetGridPositionUnderMouse() const
