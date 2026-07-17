@@ -66,6 +66,11 @@ namespace Tiles
 
 		void AddTextureAtlas(std::shared_ptr<TextureAtlas> atlas);
 		[[nodiscard]] std::shared_ptr<TextureAtlas> GetTextureAtlas(size_t index);
+
+		// The atlas with the given stable id, or null if none matches (including
+		// AtlasId::Invalid). Unlike GetTextureAtlas, this survives reorder/remove.
+		[[nodiscard]] std::shared_ptr<TextureAtlas> GetTextureAtlasById(AtlasId id);
+
 		void RemoveTextureAtlas(size_t index);
 		void ClearTextureAtlases();
 		[[nodiscard]] size_t GetTextureAtlasCount() const { return m_TextureAtlases.size(); }
@@ -77,6 +82,7 @@ namespace Tiles
 		std::chrono::steady_clock::time_point m_LastSaved;
 		bool m_HasUnsavedChanges = false;
 		std::vector<std::shared_ptr<TextureAtlas>> m_TextureAtlases;
+		uint32_t m_NextAtlasId = 1;                     // monotonic; 0 is the invalid id
 		LayerStack m_LayerStack;
 		ExportRegion m_ExportRegion;                    // export/canvas region, tile space
 	};

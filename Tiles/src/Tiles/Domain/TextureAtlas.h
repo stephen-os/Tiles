@@ -1,5 +1,7 @@
 #pragma once
 
+#include "AtlasId.h"
+
 #include <glm/glm.hpp>
 
 #include <cstdint>
@@ -42,6 +44,11 @@ namespace Tiles
 		[[nodiscard]] int GetWidth() const { return m_GridWidth; }
 		[[nodiscard]] int GetHeight() const { return m_GridHeight; }
 
+		// The atlas's stable per-project id. Assigned by Project::AddTextureAtlas;
+		// Invalid until then.
+		[[nodiscard]] AtlasId GetId() const { return m_Id; }
+		void SetId(AtlasId id) { m_Id = id; }
+
 		[[nodiscard]] bool HasImage() const { return !m_ImageBytes.empty(); }
 		// The raw encoded source image bytes (empty when the atlas has no image).
 		[[nodiscard]] const std::vector<uint8_t>& GetImageBytes() const { return m_ImageBytes; }
@@ -68,5 +75,6 @@ namespace Tiles
 		float m_TexHeight = 1.0f;               // one cell's height in UV space
 		std::vector<glm::vec4> m_TexCoords;     // per-cell UV rects, filled by Resize
 		uint64_t m_Version = 0;
+		AtlasId m_Id = AtlasId::Invalid;
 	};
 }

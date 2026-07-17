@@ -44,6 +44,7 @@ namespace Tiles
 			return;
 		}
 
+		atlas->SetId(static_cast<AtlasId>(m_NextAtlasId++));
 		m_TextureAtlases.push_back(std::move(atlas));
 		TILES_ENGINE_INFO("Project::AddTextureAtlas: Added texture atlas (total count: {})", m_TextureAtlases.size());
 		MarkAsModified();
@@ -54,6 +55,19 @@ namespace Tiles
 	{
 		TILES_ASSERT(index < m_TextureAtlases.size(), "Project::GetTextureAtlas: Index {} out of bounds (size: {})", index, m_TextureAtlases.size());
 		return m_TextureAtlases[index];
+	}
+
+	// The atlas with the given stable id, or null if none matches.
+	std::shared_ptr<TextureAtlas> Project::GetTextureAtlasById(AtlasId id)
+	{
+		if (id == AtlasId::Invalid)
+			return nullptr;
+
+		for (const auto& atlas : m_TextureAtlases)
+			if (atlas->GetId() == id)
+				return atlas;
+
+		return nullptr;
 	}
 
 	// Removes the atlas at index; a no-op for an invalid index.
