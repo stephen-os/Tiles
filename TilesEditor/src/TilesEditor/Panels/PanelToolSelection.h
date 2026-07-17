@@ -34,6 +34,7 @@ namespace Tiles::Editor
 
         void RenderBlockToolButtons();
         void RenderBlockBrushSize();
+        void RenderBlockShapeTools();
         void RenderBlockCustomCursor();
         void RenderComponentToolButton(const char* id, ToolType toolType, const std::shared_ptr<Tiles::Texture>& texture, PaintingMode mode, const char* tooltip);
         void RenderComponentCursorForMode(const char* id, PaintingMode mode, const std::shared_ptr<Tiles::Texture>& texture);

@@ -269,8 +269,9 @@ namespace Tiles::Editor
 
         glm::ivec2 cursor = GetGridPositionUnderMouse();
 
-        // Fill acts on a single cell; brush/eraser preview the whole footprint.
-        if (mode == PaintingMode::Fill)
+        // Fill and shapes (before the drag) preview a single cell; brush/eraser
+        // preview the whole footprint.
+        if (mode == PaintingMode::Fill || IsShapeMode(mode))
         {
             RenderCellPreview(cursor);
             return;
@@ -294,6 +295,9 @@ namespace Tiles::Editor
 
         switch (Ctx().GetPaintingMode())
         {
+        case PaintingMode::Line:
+        case PaintingMode::Rectangle:
+        case PaintingMode::Ellipse:
         case PaintingMode::Brush:
         {
             const Tile& brush = Ctx().GetBrush();
@@ -351,6 +355,15 @@ namespace Tiles::Editor
             return;
         }
 
+        if (IsShapeMode(mode))
+        {
+            if (Input::IsMouseButtonPressed(Input::MouseCode::Left))
+                BeginShape(gridPos);
+            else if (m_Stroking && Input::IsMouseButtonDown(Input::MouseCode::Left))
+                UpdateShape(gridPos);
+            return;
+        }
+
         if (mode != PaintingMode::Brush && mode != PaintingMode::Eraser)
             return;
 
@@ -393,6 +406,20 @@ namespace Tiles::Editor
         Ctx().PaintStroke(m_StrokeCells);
         m_Stroking = false;
         m_StrokeCells.clear();
+    }
+
+    void PanelViewport::BeginShape(const glm::ivec2& cell)
+    {
+        m_Stroking = true;
+        m_ShapeAnchor = cell;
+        m_StrokeCells = Ctx().GetShapeCells(cell, cell);
+    }
+
+    void PanelViewport::UpdateShape(const glm::ivec2& cell)
+    {
+        // Recompute the whole shape from the anchor each frame (unlike a freehand
+        // stroke, which accumulates cells).
+        m_StrokeCells = Ctx().GetShapeCells(m_ShapeAnchor, cell);
     }
 
     void PanelViewport::FillAt(const glm::ivec2& cell)

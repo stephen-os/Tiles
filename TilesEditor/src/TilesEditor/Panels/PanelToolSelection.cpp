@@ -16,6 +16,7 @@ namespace Tiles::Editor
 
         RenderBlockToolButtons();
         RenderBlockBrushSize();
+        RenderBlockShapeTools();
         ImGui::End();
 
         RenderBlockCustomCursor();
@@ -84,6 +85,26 @@ namespace Tiles::Editor
         ImGui::SetNextItemWidth(UI::Tool::ButtonSize * 3.0f + UI::Tool::ButtonSpacing * 2.0f);
         if (ImGui::SliderInt("Brush Size", &brushSize, 1, 10))
             Ctx().SetBrushSize(brushSize);
+    }
+
+    void PanelToolSelection::RenderBlockShapeTools()
+    {
+        ImGui::Spacing();
+
+        const ImVec2 size(0.0f, UI::Tool::ButtonSize);
+
+        if (UI::ToggleButton("Line", IsToolSelected(PaintingMode::Line), size))
+            SetToolSelection(PaintingMode::Line);
+        ImGui::SameLine();
+        if (UI::ToggleButton("Rect", IsToolSelected(PaintingMode::Rectangle), size))
+            SetToolSelection(PaintingMode::Rectangle);
+        ImGui::SameLine();
+        if (UI::ToggleButton("Circle", IsToolSelected(PaintingMode::Ellipse), size))
+            SetToolSelection(PaintingMode::Ellipse);
+
+        bool filled = Ctx().GetShapeFilled();
+        if (ImGui::Checkbox("Filled", &filled))
+            Ctx().SetShapeFilled(filled);
     }
 
     void PanelToolSelection::RenderBlockCustomCursor()

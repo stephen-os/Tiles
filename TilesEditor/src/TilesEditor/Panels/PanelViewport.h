@@ -55,6 +55,10 @@ namespace Tiles::Editor
         void BeginStroke(const glm::ivec2& cell);
         void ExtendStroke(const glm::ivec2& cell);
         void CommitStroke();
+        // Shape lifecycle (Line/Rectangle/Ellipse): anchor on press, recompute the
+        // shape out to the cursor each drag frame, commit via CommitStroke on release.
+        void BeginShape(const glm::ivec2& cell);
+        void UpdateShape(const glm::ivec2& cell);
         // Adds the brush footprint centered on cell to the in-progress stroke.
         void AddFootprint(const glm::ivec2& cell);
         // Flood-fills from cell, bounded by the visible view.
@@ -82,6 +86,7 @@ namespace Tiles::Editor
         // mouse is held, committed as one command on release.
         bool m_Stroking = false;
         glm::ivec2 m_LastStrokeCell = { 0, 0 };
+        glm::ivec2 m_ShapeAnchor = { 0, 0 };
         std::vector<glm::ivec2> m_StrokeCells;
     };
 }
