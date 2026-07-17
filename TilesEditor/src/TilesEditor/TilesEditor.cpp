@@ -27,7 +27,8 @@
 #include "Popups/PopupOpenProject.h"
 #include "Popups/PopupRenderMatrix.h"
 
-#include "EditorTheme.h"
+#include "UI/Theme.h"
+#include "UI/Fonts.h"
 
 #include <memory>
 #include <string>
@@ -233,7 +234,9 @@ public:
 
 	void OnCreate() override
 	{
-		Tiles::Editor::ApplyTheme();
+		// Install the shared Tiles::UI theme + fonts (supersedes EditorTheme).
+		Tiles::UI::InitFonts();
+		Tiles::UI::Apply(Tiles::UI::Theme{});
 		PushLayer<TilesEditorLayer>();
 	}
 	void OnDestroy() override
