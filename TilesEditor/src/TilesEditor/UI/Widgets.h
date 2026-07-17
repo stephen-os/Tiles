@@ -69,4 +69,18 @@ namespace Tiles::UI
 
 	// A full-width RGBA color editor (alpha bar + preview). Returns true on change.
 	[[nodiscard]] bool ColorField(const char* id, float* rgba);
+
+	// --- Read-only value displays ---
+
+	// A full-width, non-interactive value box.
+	void ValueField(const char* id, const char* text);
+
+	// A colored-chip + read-only value box per component; chips use the theme axis
+	// colors. For read-only vecN displays.
+	void ValueVec2(const char* id, const float* v, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y");
+	void ValueVec3(const char* id, const float* v, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y", const char* zName = "Z");
+	void ValueVec4(const char* id, const float* v, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y", const char* zName = "Z", const char* wName = "W");
+
+	// A read-only, full-width RGBA color swatch.
+	void ColorSwatch(const char* id, const float* rgba);
 }

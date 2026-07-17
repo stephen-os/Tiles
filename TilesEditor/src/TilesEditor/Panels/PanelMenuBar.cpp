@@ -1,5 +1,5 @@
 #include "PanelMenuBar.h"
-#include "../UIConstants.h"
+#include "../UI/Theme.h"
 
 #include "Core/Application.h"
 
@@ -19,12 +19,12 @@ namespace Tiles::Editor
             if (Ctx().HasProject())
             {
                 ImGui::Separator();
-                ImGui::TextColored(UI::Color::Text, "%s", Ctx().GetProjectDisplayName().c_str());
+                ImGui::TextColored(UI::GetTheme().Text, "%s", Ctx().GetProjectDisplayName().c_str());
 
                 if (Ctx().IsDirty())
                 {
                     ImGui::SameLine();
-                    ImGui::TextColored(UI::Color::TextError, "*");
+                    ImGui::TextColored(UI::GetTheme().Danger, "*");
                 }
             }
 
@@ -155,11 +155,11 @@ namespace Tiles::Editor
 
                     if (project->HasUnsavedChanges())
                     {
-                        ImGui::TextColored(UI::Color::TextError, "Unsaved Changes");
+                        ImGui::TextColored(UI::GetTheme().Danger, "Unsaved Changes");
                     }
                     else
                     {
-                        ImGui::TextColored(UI::Color::Green, "Saved");
+                        ImGui::TextColored(UI::GetTheme().Success, "Saved");
                     }
                 }
                 ImGui::EndMenu();

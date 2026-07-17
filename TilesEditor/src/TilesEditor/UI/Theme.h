@@ -34,6 +34,9 @@ namespace Tiles::UI
 		ImVec4 DangerHovered  { 0.90f, 0.40f, 0.40f, 1.00f };
 		ImVec4 DangerActive   { 0.70f, 0.20f, 0.20f, 1.00f };
 
+		// Positive / success feedback
+		ImVec4 Success        { 0.30f, 0.75f, 0.35f, 1.00f };
+
 		// vecN component chips (X / Y / Z / W)
 		ImVec4 AxisX          { 0.80f, 0.20f, 0.20f, 1.00f };
 		ImVec4 AxisY          { 0.20f, 0.80f, 0.20f, 1.00f };

@@ -33,16 +33,6 @@ namespace Tiles::Editor
         void RenderSectionUVs();
         void RenderSectionAtlas();
 
-        void RenderComponentTitle(const char* title);
-        void RenderComponentVec2Table(const char* id, const glm::vec2& vec, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y");
-        void RenderComponentVec3Table(const char* id, const glm::vec3& vec, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y", const char* zName = "Z");
-        void RenderComponentVec4Table(const char* id, const glm::vec4& vec, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y", const char* zName = "Z", const char* wName = "W");
-        void RenderComponentLabel(const char* id, const char* label, const ImVec4& color);
-        void RenderComponentValue(const char* id, float value, const char* format = "%.3f");
-        void RenderComponentColorSwatch(const char* id, const glm::vec4& color);
-
-        void RenderComponentSpacing();
-
     private:
         std::shared_ptr<Tiles::RenderTarget> m_PreviewRenderTarget;
 

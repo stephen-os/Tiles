@@ -5,6 +5,7 @@
 #include "StyleScope.h"
 
 #include <cfloat>
+#include <cstdio>
 
 namespace Tiles::UI
 {
@@ -265,5 +266,113 @@ namespace Tiles::UI
 		const bool changed = ImGui::ColorEdit4("##color", rgba, flags);
 		ImGui::PopID();
 		return changed;
+	}
+
+	// A full-width, non-interactive value box; see header.
+	void ValueField(const char* id, const char* text)
+	{
+		const Theme& theme = GetTheme();
+
+		ImGui::PushID(id);
+		StyleColorScope color(ImGuiCol_Button, theme.Surface);
+		color.Push(ImGuiCol_ButtonHovered, theme.Surface)
+			.Push(ImGuiCol_ButtonActive, theme.Surface)
+			.Push(ImGuiCol_Text, theme.Text);
+		ImGui::Button(text, ImVec2(ImGui::GetContentRegionAvail().x, 0.0f));
+		ImGui::PopID();
+	}
+
+	// One colored chip + read-only value box for a single vecN component.
+	static void ValueComponent(const char* id, const char* axis, const ImVec4& axisColor, float value, const char* format)
+	{
+		const Theme& theme = GetTheme();
+
+		char buffer[32];
+		std::snprintf(buffer, sizeof(buffer), format, value);
+
+		ImGui::PushID(id);
+
+		const float chip = ImGui::GetFrameHeight();
+		{
+			StyleColorScope color(ImGuiCol_Button, axisColor);
+			color.Push(ImGuiCol_ButtonHovered, axisColor)
+				.Push(ImGuiCol_ButtonActive, axisColor)
+				.Push(ImGuiCol_Text, theme.Text);
+			ImGui::Button(axis, ImVec2(chip, chip));
+		}
+
+		ImGui::SameLine(0.0f, 2.0f);
+		{
+			StyleColorScope color(ImGuiCol_Button, theme.Surface);
+			color.Push(ImGuiCol_ButtonHovered, theme.Surface)
+				.Push(ImGuiCol_ButtonActive, theme.Surface)
+				.Push(ImGuiCol_Text, theme.Text);
+			ImGui::Button(buffer, ImVec2(ImGui::GetContentRegionAvail().x, 0.0f));
+		}
+
+		ImGui::PopID();
+	}
+
+	// A read-only 2-component display; see header.
+	void ValueVec2(const char* id, const float* v, const char* format, const char* xName, const char* yName)
+	{
+		const Theme& theme = GetTheme();
+
+		ImGui::PushID(id);
+		StyleVarScope pad(ImGuiStyleVar_CellPadding, ImVec2(3.0f, 0.0f));
+		if (ImGui::BeginTable("##vv2", 2, ImGuiTableFlags_SizingStretchSame))
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn(); ValueComponent("x", xName, theme.AxisX, v[0], format);
+			ImGui::TableNextColumn(); ValueComponent("y", yName, theme.AxisY, v[1], format);
+			ImGui::EndTable();
+		}
+		ImGui::PopID();
+	}
+
+	// A read-only 3-component display; see header.
+	void ValueVec3(const char* id, const float* v, const char* format, const char* xName, const char* yName, const char* zName)
+	{
+		const Theme& theme = GetTheme();
+
+		ImGui::PushID(id);
+		StyleVarScope pad(ImGuiStyleVar_CellPadding, ImVec2(3.0f, 0.0f));
+		if (ImGui::BeginTable("##vv3", 3, ImGuiTableFlags_SizingStretchSame))
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn(); ValueComponent("x", xName, theme.AxisX, v[0], format);
+			ImGui::TableNextColumn(); ValueComponent("y", yName, theme.AxisY, v[1], format);
+			ImGui::TableNextColumn(); ValueComponent("z", zName, theme.AxisZ, v[2], format);
+			ImGui::EndTable();
+		}
+		ImGui::PopID();
+	}
+
+	// A read-only 4-component display; see header.
+	void ValueVec4(const char* id, const float* v, const char* format, const char* xName, const char* yName, const char* zName, const char* wName)
+	{
+		const Theme& theme = GetTheme();
+
+		ImGui::PushID(id);
+		StyleVarScope pad(ImGuiStyleVar_CellPadding, ImVec2(3.0f, 0.0f));
+		if (ImGui::BeginTable("##vv4", 4, ImGuiTableFlags_SizingStretchSame))
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn(); ValueComponent("x", xName, theme.AxisX, v[0], format);
+			ImGui::TableNextColumn(); ValueComponent("y", yName, theme.AxisY, v[1], format);
+			ImGui::TableNextColumn(); ValueComponent("z", zName, theme.AxisZ, v[2], format);
+			ImGui::TableNextColumn(); ValueComponent("w", wName, theme.AxisW, v[3], format);
+			ImGui::EndTable();
+		}
+		ImGui::PopID();
+	}
+
+	// A read-only full-width color swatch; see header.
+	void ColorSwatch(const char* id, const float* rgba)
+	{
+		ImGui::PushID(id);
+		const ImVec4 color(rgba[0], rgba[1], rgba[2], rgba[3]);
+		ImGui::ColorButton("##swatch", color, ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoTooltip, ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetFrameHeight()));
+		ImGui::PopID();
 	}
 }
