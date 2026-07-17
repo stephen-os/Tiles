@@ -65,6 +65,12 @@ namespace Tiles
 			ExecuteCommand(m_EditingState.BuildStrokeCommand(m_EditingState.GetWorkingLayer(), cells));
 	}
 
+	// The cells of the current shape tool between start and end.
+	std::vector<glm::ivec2> Session::GetShapeCells(const glm::ivec2& start, const glm::ivec2& end) const
+	{
+		return m_EditingState.ShapeCells(start, end);
+	}
+
 	// Runs a command through the history against the project's layer stack.
 	void Session::ExecuteCommand(std::unique_ptr<Command> command)
 	{

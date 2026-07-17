@@ -20,8 +20,17 @@ namespace Tiles
 		None = 0,
 		Brush,
 		Eraser,
-		Fill
+		Fill,
+		Line,
+		Rectangle,
+		Ellipse
 	};
+
+	// True for the drag-out shape tools (Line / Rectangle / Ellipse).
+	[[nodiscard]] constexpr bool IsShapeMode(PaintingMode mode)
+	{
+		return mode == PaintingMode::Line || mode == PaintingMode::Rectangle || mode == PaintingMode::Ellipse;
+	}
 
 	// Holds the transient editing selection - active layer, brush, and painting
 	// mode - and builds the edit commands they imply. It owns no project state;
@@ -76,10 +85,19 @@ namespace Tiles
 		// cell as one undo step; null for None/Fill or an empty cell set.
 		[[nodiscard]] std::unique_ptr<Command> BuildStrokeCommand(size_t layerIndex, const std::vector<glm::ivec2>& cells) const;
 
+		// Whether shape tools (rectangle / ellipse) paint solid or outline.
+		[[nodiscard]] bool GetShapeFilled() const { return m_ShapeFilled; }
+		void SetShapeFilled(bool filled) { m_ShapeFilled = filled; }
+
+		// The cells of the current shape tool spanning start..end (line, rectangle,
+		// or ellipse); empty for a non-shape mode.
+		[[nodiscard]] std::vector<glm::ivec2> ShapeCells(const glm::ivec2& start, const glm::ivec2& end) const;
+
 	private:
 		size_t m_WorkingLayer = 0;
 		PaintingMode m_PaintingMode = PaintingMode::None;
 		Tile m_Brush;
 		int m_BrushSize = 1;
+		bool m_ShapeFilled = false;
 	};
 }

@@ -87,6 +87,13 @@ namespace Tiles
 		// and brush. A no-op without a working layer or for a non-stroking mode.
 		void PaintStroke(const std::vector<glm::ivec2>& cells);
 
+		// Whether shape tools (rectangle / ellipse) paint solid or outline.
+		[[nodiscard]] bool GetShapeFilled() const { return m_EditingState.GetShapeFilled(); }
+		void SetShapeFilled(bool filled) { m_EditingState.SetShapeFilled(filled); }
+
+		// The cells of the current shape tool spanning start..end.
+		[[nodiscard]] std::vector<glm::ivec2> GetShapeCells(const glm::ivec2& start, const glm::ivec2& end) const;
+
 		// --- Undo / redo ---
 
 		// Runs a command through the history (recording it for undo) and marks
