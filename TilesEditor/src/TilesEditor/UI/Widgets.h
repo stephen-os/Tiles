@@ -54,4 +54,19 @@ namespace Tiles::UI
 
 	// Ends a property table opened with BeginPropertyTable.
 	void EndPropertyTable();
+
+	// --- Icon toggle + vector fields ---
+
+	// An icon toggle button (ImageButton) that shows an accent border when active.
+	// Returns true on click. For tool palettes.
+	[[nodiscard]] bool ImageToggleButton(const char* strId, ImTextureID texture, bool active, const ImVec2& size);
+
+	// A colored-chip + drag-float per component, editing the N floats at `v` in
+	// place; chips use the theme axis colors. Return true on any change.
+	[[nodiscard]] bool DragVec2(const char* id, float* v, float speed, float minVal, float maxVal, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y");
+	[[nodiscard]] bool DragVec3(const char* id, float* v, float speed, float minVal, float maxVal, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y", const char* zName = "Z");
+	[[nodiscard]] bool DragVec4(const char* id, float* v, float speed, float minVal, float maxVal, const char* format = "%.3f", const char* xName = "X", const char* yName = "Y", const char* zName = "Z", const char* wName = "W");
+
+	// A full-width RGBA color editor (alpha bar + preview). Returns true on change.
+	[[nodiscard]] bool ColorField(const char* id, float* rgba);
 }

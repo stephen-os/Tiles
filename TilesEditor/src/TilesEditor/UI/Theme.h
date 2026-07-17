@@ -34,6 +34,12 @@ namespace Tiles::UI
 		ImVec4 DangerHovered  { 0.90f, 0.40f, 0.40f, 1.00f };
 		ImVec4 DangerActive   { 0.70f, 0.20f, 0.20f, 1.00f };
 
+		// vecN component chips (X / Y / Z / W)
+		ImVec4 AxisX          { 0.80f, 0.20f, 0.20f, 1.00f };
+		ImVec4 AxisY          { 0.20f, 0.80f, 0.20f, 1.00f };
+		ImVec4 AxisZ          { 0.20f, 0.20f, 0.80f, 1.00f };
+		ImVec4 AxisW          { 0.40f, 0.40f, 0.40f, 1.00f };
+
 		// Lines -- a dark border reads as an inset/sunken frame edge
 		ImVec4 Border         { 0.05f, 0.05f, 0.06f, 1.00f };
 		ImVec4 Separator      { 0.28f, 0.28f, 0.28f, 1.00f };

@@ -1,5 +1,6 @@
 #include "PanelToolSelection.h"
 #include "../UIConstants.h"
+#include "../UI/Widgets.h"
 #include "imgui.h"
 
 namespace Tiles::Editor
@@ -57,62 +58,21 @@ namespace Tiles::Editor
 
     void PanelToolSelection::RenderComponentToolButton(const char* id, ToolType toolType, const std::shared_ptr<Tiles::Texture>& texture, PaintingMode mode, const char* tooltip)
     {
+        const ImVec2 size(UI::Tool::ButtonSize, UI::Tool::ButtonSize);
+
         if (!texture)
         {
-            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-            ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::Hover);
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::Active);
-            ImGui::PushStyleColor(ImGuiCol_Text, UI::Color::TextHint);
-            ImGui::Button("?", ImVec2(UI::Tool::ButtonSize, UI::Tool::ButtonSize));
-            ImGui::PopStyleColor(4);
-            ImGui::PopStyleVar();
+            (void)UI::Button("?", UI::ButtonVariant::Default, size);
             return;
         }
 
         std::string buttonId = std::string("##") + id + "ToolButton";
+        const ImTextureID textureId = static_cast<ImTextureID>(texture->GetID());
 
-        bool isSelected = IsToolSelected(mode);
-
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 2.0f));
-
-        if (isSelected)
-        {
-            ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 2.0f);
-            ImGui::PushStyleColor(ImGuiCol_Border, UI::Selection::BorderColor);
-        }
-
-        ImGui::PushStyleColor(ImGuiCol_Button, UI::Color::BackgroundMedium);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, UI::Color::Hover);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, UI::Color::Active);
-
-        ImVec2 buttonSize(UI::Tool::ButtonSize, UI::Tool::ButtonSize);
-        bool isPressed = ImGui::ImageButton(
-            buttonId.c_str(),
-            reinterpret_cast<void*>(static_cast<uintptr_t>(texture->GetID())),
-            buttonSize
-        );
-
-        ImGui::PopStyleColor(3);
-
-        if (isSelected)
-        {
-            ImGui::PopStyleColor();
-            ImGui::PopStyleVar();
-        }
-
-        ImGui::PopStyleVar(2);
-
-        if (isPressed)
-        {
+        if (UI::ImageToggleButton(buttonId.c_str(), textureId, IsToolSelected(mode), size))
             SetToolSelection(mode);
-        }
 
-        if (ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip("%s", tooltip);
-        }
+        ImGui::SetItemTooltip("%s", tooltip);
     }
 
     void PanelToolSelection::RenderBlockBrushSize()

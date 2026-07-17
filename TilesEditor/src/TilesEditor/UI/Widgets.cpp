@@ -148,4 +148,122 @@ namespace Tiles::UI
 	{
 		ImGui::EndTable();
 	}
+
+	// An icon toggle button; see header.
+	bool ImageToggleButton(const char* strId, ImTextureID texture, bool active, const ImVec2& size)
+	{
+		const Theme& theme = GetTheme();
+
+		StyleColorScope colors(ImGuiCol_Button, theme.Surface);
+		colors.Push(ImGuiCol_ButtonHovered, theme.SurfaceHovered)
+			.Push(ImGuiCol_ButtonActive, theme.SurfaceActive);
+
+		StyleVarScope vars(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 2.0f));
+		if (active)
+		{
+			vars.Push(ImGuiStyleVar_FrameBorderSize, 2.0f);
+			colors.Push(ImGuiCol_Border, theme.Accent);
+		}
+
+		return ImGui::ImageButton(strId, texture, size);
+	}
+
+	// One colored chip + full-width drag float for a single vecN component.
+	static bool DragComponent(const char* id, const char* axis, const ImVec4& axisColor, float* value, float speed, float minVal, float maxVal, const char* format)
+	{
+		const Theme& theme = GetTheme();
+
+		ImGui::PushID(id);
+
+		const float chip = ImGui::GetFrameHeight();
+		{
+			StyleColorScope color(ImGuiCol_Button, axisColor);
+			color.Push(ImGuiCol_ButtonHovered, axisColor)
+				.Push(ImGuiCol_ButtonActive, axisColor)
+				.Push(ImGuiCol_Text, theme.Text);
+			ImGui::Button(axis, ImVec2(chip, chip));
+		}
+
+		ImGui::SameLine(0.0f, 2.0f);
+		ImGui::SetNextItemWidth(-FLT_MIN);
+		const bool changed = ImGui::DragFloat("##value", value, speed, minVal, maxVal, format);
+
+		ImGui::PopID();
+		return changed;
+	}
+
+	// A 2-component drag; see header.
+	bool DragVec2(const char* id, float* v, float speed, float minVal, float maxVal, const char* format, const char* xName, const char* yName)
+	{
+		const Theme& theme = GetTheme();
+		bool changed = false;
+
+		ImGui::PushID(id);
+		StyleVarScope pad(ImGuiStyleVar_CellPadding, ImVec2(3.0f, 0.0f));
+		if (ImGui::BeginTable("##vec2", 2, ImGuiTableFlags_SizingStretchSame))
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn(); changed |= DragComponent("x", xName, theme.AxisX, v + 0, speed, minVal, maxVal, format);
+			ImGui::TableNextColumn(); changed |= DragComponent("y", yName, theme.AxisY, v + 1, speed, minVal, maxVal, format);
+			ImGui::EndTable();
+		}
+		ImGui::PopID();
+		return changed;
+	}
+
+	// A 3-component drag; see header.
+	bool DragVec3(const char* id, float* v, float speed, float minVal, float maxVal, const char* format, const char* xName, const char* yName, const char* zName)
+	{
+		const Theme& theme = GetTheme();
+		bool changed = false;
+
+		ImGui::PushID(id);
+		StyleVarScope pad(ImGuiStyleVar_CellPadding, ImVec2(3.0f, 0.0f));
+		if (ImGui::BeginTable("##vec3", 3, ImGuiTableFlags_SizingStretchSame))
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn(); changed |= DragComponent("x", xName, theme.AxisX, v + 0, speed, minVal, maxVal, format);
+			ImGui::TableNextColumn(); changed |= DragComponent("y", yName, theme.AxisY, v + 1, speed, minVal, maxVal, format);
+			ImGui::TableNextColumn(); changed |= DragComponent("z", zName, theme.AxisZ, v + 2, speed, minVal, maxVal, format);
+			ImGui::EndTable();
+		}
+		ImGui::PopID();
+		return changed;
+	}
+
+	// A 4-component drag; see header.
+	bool DragVec4(const char* id, float* v, float speed, float minVal, float maxVal, const char* format, const char* xName, const char* yName, const char* zName, const char* wName)
+	{
+		const Theme& theme = GetTheme();
+		bool changed = false;
+
+		ImGui::PushID(id);
+		StyleVarScope pad(ImGuiStyleVar_CellPadding, ImVec2(3.0f, 0.0f));
+		if (ImGui::BeginTable("##vec4", 4, ImGuiTableFlags_SizingStretchSame))
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn(); changed |= DragComponent("x", xName, theme.AxisX, v + 0, speed, minVal, maxVal, format);
+			ImGui::TableNextColumn(); changed |= DragComponent("y", yName, theme.AxisY, v + 1, speed, minVal, maxVal, format);
+			ImGui::TableNextColumn(); changed |= DragComponent("z", zName, theme.AxisZ, v + 2, speed, minVal, maxVal, format);
+			ImGui::TableNextColumn(); changed |= DragComponent("w", wName, theme.AxisW, v + 3, speed, minVal, maxVal, format);
+			ImGui::EndTable();
+		}
+		ImGui::PopID();
+		return changed;
+	}
+
+	// A full-width RGBA color editor; see header.
+	bool ColorField(const char* id, float* rgba)
+	{
+		ImGui::PushID(id);
+		ImGui::SetNextItemWidth(-FLT_MIN);
+		const ImGuiColorEditFlags flags =
+			ImGuiColorEditFlags_AlphaBar |
+			ImGuiColorEditFlags_AlphaPreview |
+			ImGuiColorEditFlags_DisplayRGB |
+			ImGuiColorEditFlags_NoLabel;
+		const bool changed = ImGui::ColorEdit4("##color", rgba, flags);
+		ImGui::PopID();
+		return changed;
+	}
 }
