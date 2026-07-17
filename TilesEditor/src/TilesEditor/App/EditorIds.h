@@ -21,6 +21,7 @@ namespace Tiles::Editor
 		BrushPreview,       // The panel that shows a preview of the current brush
 		BrushAttributes,    // The panel that allows the user to adjust brush attributes (size, shape, etc.)
 		MenuBar,            // The top menu bar with File, Edit, View, Help menus
+		RenderPreview,      // A live preview of the export-region render
 		Debug               // The debug panel that shows internal state for development purposes
     };
 

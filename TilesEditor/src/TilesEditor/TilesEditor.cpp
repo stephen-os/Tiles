@@ -15,6 +15,7 @@
 #include "Panels/PanelToolSelection.h"
 #include "Panels/PanelTextureSelection.h"
 #include "Panels/PanelBrushPreview.h"
+#include "Panels/PanelRenderPreview.h"
 #include "Panels/PanelBrushAttributes.h"
 #include "Panels/PanelMenuBar.h"
 #include "Panels/PanelViewport.h"
@@ -144,6 +145,7 @@ private:
 		m_Panels.RegisterPanel<PanelToolSelection>(PanelId::ToolSelection, "Tools");
 		m_Panels.RegisterPanel<PanelTextureSelection>(PanelId::TextureSelection, "Texture Selection");
 		m_Panels.RegisterPanel<PanelBrushPreview>(PanelId::BrushPreview, "Brush Preview");
+		m_Panels.RegisterPanel<PanelRenderPreview>(PanelId::RenderPreview, "Render Preview");
 		m_Panels.RegisterPanel<PanelBrushAttributes>(PanelId::BrushAttributes, "Brush Attributes");
 #ifdef TILES_DEBUG
 		m_Panels.RegisterPanel<PanelDebug>(PanelId::Debug, "Debug Panel");
