@@ -140,7 +140,7 @@ namespace Tiles::Editor
         ImVec2 cursorMax = ImVec2(mousePos.x + halfSize, mousePos.y + halfSize);
 
         ImGui::GetForegroundDrawList()->AddImage(
-            reinterpret_cast<void*>(static_cast<uintptr_t>(texture->GetID())),
+            static_cast<ImTextureID>(texture->GetID()),
             cursorMin,
             cursorMax,
             ImVec2(0, 0),

@@ -200,7 +200,7 @@ namespace Tiles::Editor
 
                 if (m_CheckerboardTexture)
                 {
-                    auto checkerboardID = reinterpret_cast<void*>(static_cast<uintptr_t>(m_CheckerboardTexture->GetID()));
+                    auto checkerboardID = static_cast<ImTextureID>(m_CheckerboardTexture->GetID());
                     ImGui::GetWindowDrawList()->AddImage(checkerboardID, minPos, maxPos, ImVec2(0.0f, 0.0f), ImVec2(1.0f, 1.0f));
                 }
 
@@ -232,7 +232,7 @@ namespace Tiles::Editor
             glm::vec4 texCoords = atlas->GetTextureCoords(index);
             ImVec2 uvMin(texCoords.x, texCoords.y);
             ImVec2 uvMax(texCoords.z, texCoords.w);
-            auto textureID = reinterpret_cast<void*>(static_cast<uintptr_t>(texture->GetID()));
+            auto textureID = static_cast<ImTextureID>(texture->GetID());
 
             ImGui::Image(textureID, buttonSize, uvMin, uvMax, ImVec4(1, 1, 1, 1), ImVec4(0, 0, 0, 0));
         }

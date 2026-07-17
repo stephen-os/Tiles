@@ -51,7 +51,7 @@ namespace Tiles::Editor
         Tiles::Renderer2D::EndFrame();
         Tiles::Renderer2D::SetRenderTarget(nullptr);
 
-        ImGui::Image((void*)m_RenderTarget->GetTexture(), m_ViewportSize);
+        ImGui::Image(static_cast<ImTextureID>(m_RenderTarget->GetTexture()), m_ViewportSize);
 
         RenderOverlay();
 

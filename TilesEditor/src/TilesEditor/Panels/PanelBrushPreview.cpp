@@ -173,7 +173,7 @@ namespace Tiles::Editor
         ImVec2 canvasMax = ImGui::GetItemRectMax();
 
         ImGui::GetWindowDrawList()->AddImage(
-            reinterpret_cast<void*>(static_cast<uintptr_t>(m_PreviewRenderTarget->GetTexture())),
+            static_cast<ImTextureID>(m_PreviewRenderTarget->GetTexture()),
             canvasMin,
             canvasMax
         );
