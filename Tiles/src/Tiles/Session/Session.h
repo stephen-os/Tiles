@@ -77,16 +77,6 @@ namespace Tiles
 
 		// --- Editing operations ---
 
-		// Applies the current painting mode/brush to the working layer at (x, y).
-		void PaintTile(int x, int y);
-
-		// Dispatches the current painting mode (brush/eraser/fill) to the given
-		// layer at (x, y), issuing the matching command. No-op for an invalid layer.
-		void PaintTileOnLayer(size_t layerIndex, int x, int y, const Tile& tile);
-
-		// Erases the tile on the working layer at (x, y).
-		void EraseTile(int x, int y);
-
 		// Flood-fills the working layer from (x, y), bounded by the visible view.
 		void FillLayer(int x, int y, const glm::ivec4& bounds);
 

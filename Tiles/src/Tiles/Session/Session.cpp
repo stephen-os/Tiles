@@ -45,29 +45,6 @@ namespace Tiles
 		return m_Project->GetLayerStack().GetLayer(m_EditingState.GetWorkingLayer());
 	}
 
-	// Applies the current painting mode/brush to the working layer at (x, y).
-	void Session::PaintTile(int x, int y)
-	{
-		if (HasWorkingLayer())
-			PaintTileOnLayer(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush());
-	}
-
-	// Issues the current painting mode's command against the given layer.
-	void Session::PaintTileOnLayer(size_t layerIndex, int x, int y, const Tile& tile)
-	{
-		if (!m_Project->GetLayerStack().IsValidLayerIndex(layerIndex))
-			return;
-
-		ExecuteCommand(m_EditingState.BuildModeCommand(layerIndex, x, y, tile));
-	}
-
-	// Erases the tile on the working layer at (x, y).
-	void Session::EraseTile(int x, int y)
-	{
-		if (HasWorkingLayer())
-			ExecuteCommand(m_EditingState.BuildEraseCommand(m_EditingState.GetWorkingLayer(), x, y));
-	}
-
 	// Flood-fills the working layer from (x, y), bounded by the visible view.
 	void Session::FillLayer(int x, int y, const glm::ivec4& bounds)
 	{

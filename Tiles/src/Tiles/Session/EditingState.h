@@ -65,12 +65,6 @@ namespace Tiles
 		// (e.g. a delete applied via undo/redo).
 		void ValidateWorkingLayer(const LayerStack& layerStack);
 
-		// Builds the command for the current painting mode; null for None.
-		[[nodiscard]] std::unique_ptr<Command> BuildModeCommand(size_t layerIndex, int x, int y, const Tile& tile) const;
-
-		// Builds an erase command for the cell at (x, y).
-		[[nodiscard]] std::unique_ptr<Command> BuildEraseCommand(size_t layerIndex, int x, int y) const;
-
 		// Builds a flood-fill command bounded by the visible region.
 		[[nodiscard]] std::unique_ptr<Command> BuildFillCommand(size_t layerIndex, int x, int y, const Tile& tile, const glm::ivec4& bounds) const;
 

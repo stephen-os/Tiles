@@ -1,8 +1,6 @@
 #include "EditingState.h"
 
 #include "Domain/LayerStack.h"
-#include "Commands/TilePaintCommand.h"
-#include "Commands/TileEraseCommand.h"
 #include "Commands/LayerFillCommand.h"
 #include "Commands/TileStrokeCommand.h"
 
@@ -24,28 +22,6 @@ namespace Tiles
 			m_WorkingLayer = 0;
 		else if (m_WorkingLayer >= layerStack.GetLayerCount())
 			m_WorkingLayer = layerStack.GetLayerCount() - 1;
-	}
-
-	// Builds the command matching the active painting mode; null for None/Fill.
-	std::unique_ptr<Command> EditingState::BuildModeCommand(size_t layerIndex, int x, int y, const Tile& tile) const
-	{
-		switch (m_PaintingMode)
-		{
-		case PaintingMode::Brush:
-			return std::make_unique<TilePaintCommand>(x, y, layerIndex, tile);
-		case PaintingMode::Eraser:
-			return std::make_unique<TileEraseCommand>(x, y, layerIndex);
-		// Fill needs the visible-view bound, so it goes through Session::FillLayer
-		// / BuildFillCommand rather than this per-cell dispatch.
-		default:
-			return nullptr;
-		}
-	}
-
-	// Builds an erase command for the cell at (x, y).
-	std::unique_ptr<Command> EditingState::BuildEraseCommand(size_t layerIndex, int x, int y) const
-	{
-		return std::make_unique<TileEraseCommand>(x, y, layerIndex);
 	}
 
 	// Builds a flood-fill command bounded by the visible region.
