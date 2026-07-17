@@ -1,6 +1,6 @@
 #include "PopupNewProject.h"
 
-#include "../UIConstants.h"
+#include "../UI/Widgets.h"
 
 #include "imgui.h"
 
@@ -26,9 +26,9 @@ namespace Tiles::Editor
             ImGui::Separator();
 
             float buttonWidth = 80.0f;
-            float spacing = ImGui::GetContentRegionAvail().x - (buttonWidth * 2 + UI::Component::SpaceBetween);
+            float spacing = ImGui::GetContentRegionAvail().x - (buttonWidth * 2 + ImGui::GetStyle().ItemSpacing.x);
 
-            if (ImGui::Button("Create", ImVec2(buttonWidth, 0)))
+            if (UI::Button("Create", UI::ButtonVariant::Primary, ImVec2(buttonWidth, 0)))
             {
                 Host().Doc().CreateProject(std::string(m_NameBuffer));
                 Hide();
@@ -36,7 +36,7 @@ namespace Tiles::Editor
 
             ImGui::SameLine(0, spacing);
 
-            if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
+            if (UI::Button("Cancel", UI::ButtonVariant::Default, ImVec2(buttonWidth, 0)))
             {
                 Hide();
             }

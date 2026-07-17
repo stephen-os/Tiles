@@ -1,5 +1,6 @@
 #include "PopupOpenProject.h"
-#include "../UIConstants.h"
+#include "../UI/Theme.h"
+#include "../UI/Widgets.h"
 #include "ImGuiFileDialog.h"
 #include <filesystem>
 #include <cstring>
@@ -34,7 +35,7 @@ namespace Tiles::Editor
             {
                 ImGui::Spacing();
                 ImGui::Text("Full path:");
-                ImGui::TextColored(UI::Color::TextHint, "%s", fullPath.string().c_str());
+                ImGui::TextColored(UI::GetTheme().TextMuted, "%s", fullPath.string().c_str());
             }
 
             if (m_ShowMessage)
@@ -44,13 +45,11 @@ namespace Tiles::Editor
                     m_Message.find("Failed") != std::string::npos ||
                     m_Message.find("not found") != std::string::npos)
                 {
-                    ImGui::TextColored(UI::Color::TextError, "%s", m_Message.c_str());
+                    ImGui::TextColored(UI::GetTheme().Danger, "%s", m_Message.c_str());
                 }
                 else
                 {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-                    ImGui::Text("%s", m_Message.c_str());
-                    ImGui::PopStyleColor();
+                    ImGui::TextColored(UI::GetTheme().Success, "%s", m_Message.c_str());
                 }
             }
 
@@ -122,7 +121,7 @@ namespace Tiles::Editor
         ImGui::AlignTextToFramePadding();
         ImGui::Text("%s", m_Directory.string().c_str());
         ImGui::SameLine();
-        if (ImGui::Button("Browse..."))
+        if (UI::Button("Browse..."))
         {
             IGFD::FileDialogConfig config;
             config.path = m_Directory.empty() ? "." : m_Directory.string().c_str();
@@ -150,17 +149,15 @@ namespace Tiles::Editor
 
         if (m_FileNameBuffer[0] == '\0')
         {
-            ImGui::TextColored(UI::Color::TextHint, "Select a .tiles project file to open");
+            ImGui::TextColored(UI::GetTheme().TextMuted, "Select a .tiles project file to open");
         }
         else if (!m_FilePathValid)
         {
-            ImGui::TextColored(UI::Color::TextError, "File does not exist or is not a valid .tiles file");
+            ImGui::TextColored(UI::GetTheme().Danger, "File does not exist or is not a valid .tiles file");
         }
         else
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-            ImGui::Text("Valid project file");
-            ImGui::PopStyleColor();
+            ImGui::TextColored(UI::GetTheme().Success, "Valid project file");
         }
     }
 
@@ -174,7 +171,7 @@ namespace Tiles::Editor
 
         bool canOpen = m_FilePathValid && m_FileNameBuffer[0] != '\0';
 
-        if (ImGui::Button("Open", ImVec2(buttonWidth, 0)) && canOpen)
+        if (UI::Button("Open", UI::ButtonVariant::Primary, ImVec2(buttonWidth, 0)) && canOpen)
         {
             ExecuteOpen();
         }
@@ -186,7 +183,7 @@ namespace Tiles::Editor
 
         ImGui::SameLine();
 
-        if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
+        if (UI::Button("Cancel", UI::ButtonVariant::Default, ImVec2(buttonWidth, 0)))
         {
             Hide();
         }
@@ -221,19 +218,7 @@ namespace Tiles::Editor
         ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_Always);
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.95f));
-        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.45f, 0.45f, 0.45f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
-
+        // The file dialog inherits the global Tiles::UI theme.
         if (ImGuiFileDialog::Instance()->Display("ChooseProjectFileDlg"))
         {
             if (ImGuiFileDialog::Instance()->IsOk())
@@ -254,8 +239,6 @@ namespace Tiles::Editor
             ImGuiFileDialog::Instance()->Close();
             m_ShowFileSelector = false;
         }
-
-        ImGui::PopStyleColor(12);
     }
 
     std::filesystem::path PopupOpenProject::GetFullFilePath() const

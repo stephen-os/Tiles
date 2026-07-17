@@ -1,5 +1,7 @@
 #include "PopupSaveAs.h"
 #include "../UIConstants.h"
+#include "../UI/Theme.h"
+#include "../UI/Widgets.h"
 #include "ImGuiFileDialog.h"
 #include <filesystem>
 #include <algorithm>
@@ -44,7 +46,7 @@ namespace Tiles::Editor
             ImGui::Spacing();
             ImGui::Text("Full path:");
             std::string fullPath = GetFullFilePath();
-            ImGui::TextColored(UI::Color::TextHint, "%s", fullPath.c_str());
+            ImGui::TextColored(UI::GetTheme().TextMuted, "%s", fullPath.c_str());
 
             if (m_ShowMessage)
             {
@@ -52,13 +54,11 @@ namespace Tiles::Editor
                 if (m_SaveMessage.find("error") != std::string::npos ||
                     m_SaveMessage.find("Failed") != std::string::npos)
                 {
-                    ImGui::TextColored(UI::Color::TextError, "%s", m_SaveMessage.c_str());
+                    ImGui::TextColored(UI::GetTheme().Danger, "%s", m_SaveMessage.c_str());
                 }
                 else
                 {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-                    ImGui::Text("%s", m_SaveMessage.c_str());
-                    ImGui::PopStyleColor();
+                    ImGui::TextColored(UI::GetTheme().Success, "%s", m_SaveMessage.c_str());
                 }
             }
 
@@ -139,7 +139,7 @@ namespace Tiles::Editor
         ImGui::AlignTextToFramePadding();
         ImGui::Text("%s", m_Directory.string().c_str());
         ImGui::SameLine();
-        if (ImGui::Button("Browse..."))
+        if (UI::Button("Browse..."))
         {
             IGFD::FileDialogConfig config;
             config.path = m_Directory.empty() ? "." : m_Directory.string().c_str();
@@ -169,7 +169,7 @@ namespace Tiles::Editor
 
         if (!m_FileNameValid)
         {
-            ImGui::TextColored(UI::Color::TextError, "Invalid file name!");
+            ImGui::TextColored(UI::GetTheme().Danger, "Invalid file name!");
         }
     }
 
@@ -183,7 +183,7 @@ namespace Tiles::Editor
 
         bool canSave = m_FileNameValid && m_FileNameBuffer[0] != '\0';
 
-        if (ImGui::Button("Save", ImVec2(buttonWidth, 0)) && canSave)
+        if (UI::Button("Save", UI::ButtonVariant::Primary, ImVec2(buttonWidth, 0)) && canSave)
         {
             std::filesystem::path fullPath = GetFullFilePath();
             auto result = Ctx().SaveProjectAs(fullPath);
@@ -206,7 +206,7 @@ namespace Tiles::Editor
 
         ImGui::SameLine();
 
-        if (ImGui::Button("Cancel", ImVec2(buttonWidth, 0)))
+        if (UI::Button("Cancel", UI::ButtonVariant::Default, ImVec2(buttonWidth, 0)))
         {
             Hide();
         }
@@ -238,19 +238,7 @@ namespace Tiles::Editor
         ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_Always);
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.1f, 0.1f, 0.1f, 0.95f));
-        ImGui::PushStyleColor(ImGuiCol_TitleBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_TitleBgActive, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25f, 0.25f, 0.25f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.35f, 0.35f, 0.35f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.45f, 0.45f, 0.45f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
-
+        // The file dialog inherits the global Tiles::UI theme.
         if (ImGuiFileDialog::Instance()->Display("ChooseSaveDirectoryDlg"))
         {
             if (ImGuiFileDialog::Instance()->IsOk())
@@ -260,7 +248,5 @@ namespace Tiles::Editor
             ImGuiFileDialog::Instance()->Close();
             m_ShowDirectorySelector = false;
         }
-
-        ImGui::PopStyleColor(12);
     }
 }

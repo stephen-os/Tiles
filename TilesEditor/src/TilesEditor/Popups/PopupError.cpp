@@ -1,6 +1,7 @@
 #include "PopupError.h"
 
-#include "../UIConstants.h"
+#include "../UI/Widgets.h"
+#include "../UI/Theme.h"
 
 #include "imgui.h"
 
@@ -14,9 +15,9 @@ namespace Tiles::Editor
 
         if (ImGui::Begin("Error", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::TextColored(UI::Color::TextError, "%s", m_Message.c_str());
+            ImGui::TextColored(UI::GetTheme().Danger, "%s", m_Message.c_str());
             ImGui::Separator();
-            if (ImGui::Button("OK", ImVec2(UI::Component::ControlButtonWidth, 0)))
+            if (UI::Button("OK", UI::ButtonVariant::Default, ImVec2(80.0f, 0.0f)))
             {
                 Hide();
             }

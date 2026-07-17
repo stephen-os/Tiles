@@ -1,5 +1,7 @@
 #include "PopupAbout.h"
 
+#include "../UI/Widgets.h"
+
 #include "imgui.h"
 
 namespace Tiles::Editor
@@ -13,7 +15,7 @@ namespace Tiles::Editor
 
         if (ImGui::Begin("About Tiles", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize))
         {
-            ImGui::Text("Tiles Editor");
+            UI::TextTitle("Tiles Editor");
             ImGui::Separator();
 
             ImGui::Text("Version: 1.0.0");
@@ -34,7 +36,7 @@ namespace Tiles::Editor
             float spacing = (ImGui::GetContentRegionAvail().x - buttonWidth) * 0.5f;
 
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + spacing);
-            if (ImGui::Button("Close", ImVec2(buttonWidth, 0)))
+            if (UI::Button("Close", UI::ButtonVariant::Default, ImVec2(buttonWidth, 0)))
             {
                 Hide();
             }

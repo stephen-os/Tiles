@@ -1,4 +1,7 @@
 #include "PanelDebug.h"
+
+#include "../UI/Widgets.h"
+
 #include <chrono>
 #include <iomanip>
 #include <sstream>
@@ -181,7 +184,7 @@ namespace Tiles::Editor
         ImGui::Text("Can Undo: %s", Ctx().CanUndo() ? "Yes" : "No");
         ImGui::Text("Can Redo: %s", Ctx().CanRedo() ? "Yes" : "No");
 
-        if (ImGui::Button("Clear History"))
+        if (UI::Button("Clear History"))
         {
             Ctx().ClearHistory();
         }
@@ -252,11 +255,14 @@ namespace Tiles::Editor
     {
         switch (mode)
         {
-        case PaintingMode::None:   return "None";
-        case PaintingMode::Brush:  return "Brush";
-        case PaintingMode::Eraser: return "Eraser";
-        case PaintingMode::Fill:   return "Fill";
-        default:                   return "Unknown";
+        case PaintingMode::None:      return "None";
+        case PaintingMode::Brush:     return "Brush";
+        case PaintingMode::Eraser:    return "Eraser";
+        case PaintingMode::Fill:      return "Fill";
+        case PaintingMode::Line:      return "Line";
+        case PaintingMode::Rectangle: return "Rectangle";
+        case PaintingMode::Ellipse:   return "Ellipse";
+        default:                      return "Unknown";
         }
     }
 }
