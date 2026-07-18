@@ -440,6 +440,23 @@ namespace Tiles::Editor
     {
         auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
 
+        // A blank (imageless) atlas has no per-cell content to sample: any pick just
+        // switches the brush to an untextured solid-color tile, whose color comes from
+        // Brush Attributes. No stamp, and no textured-with-no-image state.
+        if (!atlas->HasImage())
+        {
+            m_HasStampSelection = false;
+            Ctx().ClearStamp();
+
+            Tile newBrush = Ctx().GetBrush();
+            newBrush.SetTextured(false);
+            newBrush.SetAtlasId(AtlasId::Invalid);
+            Ctx().SetBrush(newBrush);
+
+            Ctx().GetProject()->MarkAsModified();
+            return;
+        }
+
         int minX = std::min(m_SelectAnchor.x, m_SelectCurrent.x);
         int maxX = std::max(m_SelectAnchor.x, m_SelectCurrent.x);
         int minY = std::min(m_SelectAnchor.y, m_SelectCurrent.y);
