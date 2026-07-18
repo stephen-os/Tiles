@@ -29,6 +29,7 @@
 #include "Popups/PopupSaveAs.h"
 #include "Popups/PopupOpenProject.h"
 #include "Popups/PopupRenderMatrix.h"
+#include "Popups/PopupConfirmClose.h"
 
 #include "UI/Theme.h"
 #include "UI/Fonts.h"
@@ -68,15 +69,6 @@ public:
 
 	void OnUpdate(float timestep) override
 	{
-		// The atlas texture cache keys on atlas pointers; drop it when the active
-		// project changes so an entry never outlives the atlas it was built from.
-		const Project* project = Doc().HasProject() ? Doc().GetProject().get() : nullptr;
-		if (project != m_LastProject)
-		{
-			m_AtlasTextures.Clear();
-			m_LastProject = project;
-		}
-
 		m_Panels.Update();
 	}
 
@@ -96,6 +88,27 @@ public:
 	Session& Doc() override { return m_Workspace->Active(); }
 
 	Workspace& Space() override { return *m_Workspace; }
+
+	void RequestCloseDocument(size_t index) override
+	{
+		// Show the document being closed, then close it (clean) or prompt (dirty).
+		m_Workspace->SwitchTo(index);
+		if (Doc().IsDirty())
+			OpenPopup(PopupId::ConfirmClose);
+		else
+			CloseActiveConfirmed();
+	}
+
+	void CloseActiveConfirmed() override
+	{
+		// Drop the closing document's atlas textures before it (and they) are freed.
+		if (Doc().HasProject())
+			for (const auto& atlas : Doc().GetProject()->GetTextureAtlases())
+				if (atlas)
+					m_AtlasTextures.Evict(*atlas);
+
+		m_Workspace->CloseDocument(m_Workspace->ActiveIndex());
+	}
 
 	std::shared_ptr<Tiles::Texture> GetAtlasTexture(const Tiles::TextureAtlas& atlas) override { return m_AtlasTextures.Get(atlas); }
 
@@ -163,6 +176,7 @@ private:
 		m_Panels.RegisterPopup<PopupSaveAs>(PopupId::SaveAs);
 		m_Panels.RegisterPopup<PopupOpenProject>(PopupId::OpenProject);
 		m_Panels.RegisterPopup<PopupRenderMatrix>(PopupId::Export);
+		m_Panels.RegisterPopup<PopupConfirmClose>(PopupId::ConfirmClose);
 	}
 
 	void RegisterActions()
@@ -223,10 +237,9 @@ private:
 	PanelManager m_Panels;
 	ActionRegistry m_Actions;
 
-	// GPU textures for the active project's atlases; observing pointer used to
-	// detect a project change and clear the cache.
+	// GPU textures for open documents' atlases; an entry is evicted when its
+	// document closes (see CloseActiveConfirmed).
 	AtlasTextureCache m_AtlasTextures;
-	const Project* m_LastProject = nullptr;
 };
 
 class TilesEditor : public Application

@@ -27,6 +27,14 @@ namespace Tiles::Editor
         // lifecycle (new / open / save) across open documents.
         virtual Workspace& Space() = 0;
 
+        // Closes the document at index: a clean one closes immediately; a dirty one
+        // is switched to and routed through the unsaved-changes prompt.
+        virtual void RequestCloseDocument(size_t index) = 0;
+
+        // Closes the active document without prompting (the prompt already ran or the
+        // document was clean): evicts its atlas textures, then drops it.
+        virtual void CloseActiveConfirmed() = 0;
+
         // The GL texture backing a document atlas, built and cached on demand;
         // null if the atlas has no image. Lets views render atlases without the
         // document (or the atlas) depending on the graphics layer.

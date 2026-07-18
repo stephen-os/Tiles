@@ -77,6 +77,7 @@ namespace Tiles::Editor
 
         // ImGui owns tab selection; whichever tab is selected becomes the active
         // document. New tabs auto-select (AutoSelectNewTabs), so open/new stay in sync.
+        int closeRequest = -1;
         for (size_t i = 0; i < space.DocumentCount(); ++i)
         {
             const Session& document = space.DocumentAt(i);
@@ -86,11 +87,16 @@ namespace Tiles::Editor
                 label += " *";
             label += "###doc" + std::to_string(i);   // stable id; visible name may repeat
 
-            if (ImGui::BeginTabItem(label.c_str()))
+            bool open = true;
+            if (ImGui::BeginTabItem(label.c_str(), &open))
             {
                 space.SwitchTo(i);
                 ImGui::EndTabItem();
             }
+
+            // The tab's x sets open = false; defer the close until the bar is drawn.
+            if (!open)
+                closeRequest = static_cast<int>(i);
         }
 
         // Trailing "+" opens a fresh blank document.
@@ -98,6 +104,10 @@ namespace Tiles::Editor
             space.NewDocument();
 
         ImGui::EndTabBar();
+
+        // Applied after EndTabBar so closing never mutates the document list mid-render.
+        if (closeRequest >= 0)
+            Host().RequestCloseDocument(static_cast<size_t>(closeRequest));
     }
 
     void PanelViewport::Update()

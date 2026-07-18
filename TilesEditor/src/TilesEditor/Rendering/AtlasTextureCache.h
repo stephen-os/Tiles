@@ -21,6 +21,10 @@ namespace Tiles::Editor
 		// Drops all cached textures (e.g. when the active project changes).
 		void Clear();
 
+		// Drops the cached texture for one atlas -- called when its document closes,
+		// so an entry never outlives the atlas it was built from.
+		void Evict(const Tiles::TextureAtlas& atlas) { m_Entries.erase(&atlas); }
+
 	private:
 		struct Entry
 		{

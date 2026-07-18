@@ -36,6 +36,30 @@ namespace Tiles
 		m_Active = m_Sessions.size() - 1;
 	}
 
+	// Closes a document; the last one resets to a fresh "Untitled" so the workspace
+	// is never empty.
+	void Workspace::CloseDocument(size_t index)
+	{
+		if (index >= m_Sessions.size())
+			return;
+
+		if (m_Sessions.size() == 1)
+		{
+			m_Sessions[0] = std::make_unique<Session>();
+			m_Active = 0;
+			return;
+		}
+
+		m_Sessions.erase(m_Sessions.begin() + index);
+
+		// Keep the active index valid: shift down if it was past the removed one, or
+		// clamp to the new last document if the active one was itself the last.
+		if (m_Active > index)
+			--m_Active;
+		else if (m_Active == index && m_Active >= m_Sessions.size())
+			m_Active = m_Sessions.size() - 1;
+	}
+
 	// True when the active document is a never-saved, unmodified "Untitled".
 	bool Workspace::ActiveIsPristine() const
 	{

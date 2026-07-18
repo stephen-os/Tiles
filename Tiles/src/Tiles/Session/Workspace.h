@@ -48,6 +48,11 @@ namespace Tiles
 		// Opens a fresh blank document (an "Untitled" project) as a new active tab.
 		void NewDocument();
 
+		// Closes the document at index and re-points the active index. Closing the
+		// last remaining document resets it to a fresh "Untitled" instead of leaving
+		// the workspace empty (it always has an active document).
+		void CloseDocument(size_t index);
+
 		// --- Project lifecycle (drives the active session + recent list) ---
 
 		// Replaces the active session's project with a fresh one.
