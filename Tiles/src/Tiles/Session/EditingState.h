@@ -23,7 +23,8 @@ namespace Tiles
 		Fill,
 		Line,
 		Rectangle,
-		Ellipse
+		Ellipse,
+		Select
 	};
 
 	// True for the drag-out shape tools (Line / Rectangle / Ellipse).
@@ -99,6 +100,12 @@ namespace Tiles
 		// Builds a command that places the stamp centered on `anchor` as one undo
 		// step, each cell carrying its own atlas tile; null if there is no stamp.
 		[[nodiscard]] std::unique_ptr<Command> BuildStampCommand(size_t layerIndex, const glm::ivec2& anchor) const;
+
+		// Builds a command that moves `cells` (all on layerIndex) by `offset` as one
+		// undo step: each source cell is cleared and its tile placed at the shifted
+		// destination (destinations win where they overlap sources). Reads the source
+		// tiles from `layerStack`; null for an empty selection or a zero offset.
+		[[nodiscard]] std::unique_ptr<Command> BuildMoveCommand(size_t layerIndex, const std::vector<glm::ivec2>& cells, const glm::ivec2& offset, const LayerStack& layerStack) const;
 
 		// Whether shape tools (rectangle / ellipse) paint solid or outline.
 		[[nodiscard]] bool GetShapeFilled() const { return m_ShapeFilled; }

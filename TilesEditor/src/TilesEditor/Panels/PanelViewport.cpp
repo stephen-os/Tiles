@@ -257,6 +257,14 @@ namespace Tiles::Editor
         if (mode == PaintingMode::None)
             return;
 
+        // The Select tool draws its own marquee / selection / move ghost, and does so
+        // whether or not the cursor is over the canvas (the selection persists).
+        if (mode == PaintingMode::Select)
+        {
+            RenderSelection();
+            return;
+        }
+
         // While a stroke is in progress, preview every accumulated cell.
         if (m_Stroking)
         {
@@ -381,9 +389,80 @@ namespace Tiles::Editor
         }
     }
 
+    // Draws the Select tool's feedback: the live marquee, or the selected cells with
+    // a translucent highlight (and, while moving, a ghost of each tile at its offset).
+    void PanelViewport::RenderSelection()
+    {
+        if (m_Marqueeing)
+        {
+            const int minX = std::min(m_MarqueeAnchor.x, m_MarqueeCurrent.x);
+            const int maxX = std::max(m_MarqueeAnchor.x, m_MarqueeCurrent.x);
+            const int minY = std::min(m_MarqueeAnchor.y, m_MarqueeCurrent.y);
+            const int maxY = std::max(m_MarqueeAnchor.y, m_MarqueeCurrent.y);
+
+            const float width = (maxX - minX + 1) * m_TileSize;
+            const float height = (maxY - minY + 1) * m_TileSize;
+
+            Tiles::Square rect;
+            rect.Position = { minX * m_TileSize + width * 0.5f, minY * m_TileSize + height * 0.5f, Viewport::Depth::Overlay };
+            rect.Size = { width, height };
+            rect.Tint = { 0.3f, 0.6f, 1.0f, 0.25f };
+            Tiles::Renderer2D::DrawSquare(rect);
+            return;
+        }
+
+        if (!m_HasSelection || !Ctx().HasWorkingLayer())
+            return;
+
+        const glm::ivec2 offset = m_MovingSelection ? m_MoveOffset : glm::ivec2{ 0, 0 };
+        const TileLayer& layer = Ctx().GetWorkingLayerRef();
+
+        for (const glm::ivec2& src : m_SelectionCells)
+        {
+            const glm::ivec2 dest = src + offset;
+
+            // While moving, ghost the actual tile at its destination.
+            if (m_MovingSelection)
+            {
+                const Tile& tile = layer.GetTile(src.x, src.y);
+
+                Tiles::Square ghost;
+                ghost.Position = { (dest.x + 0.5f) * m_TileSize, (dest.y + 0.5f) * m_TileSize, Viewport::Depth::HoverTile };
+                ghost.Rotation = tile.GetRotation();
+                ghost.Size = { m_TileSize * tile.GetSize().x, m_TileSize * tile.GetSize().y };
+                glm::vec4 tint = tile.GetTint();
+                tint.a *= 0.6f;
+                ghost.Tint = tint;
+
+                if (tile.IsTextured() && tile.HasValidAtlas())
+                {
+                    auto atlas = Ctx().GetProject()->GetTextureAtlasById(tile.GetAtlasId());
+                    if (atlas && atlas->HasImage())
+                    {
+                        ghost.Texture = Host().GetAtlasTexture(*atlas);
+                        ghost.TexCoords = atlas->GetTextureCoords(tile.GetCellIndex());
+                    }
+                }
+
+                Tiles::Renderer2D::DrawSquare(ghost);
+            }
+
+            // Translucent highlight over the (destination) cell.
+            Tiles::Square highlight;
+            highlight.Position = { (dest.x + 0.5f) * m_TileSize, (dest.y + 0.5f) * m_TileSize, Viewport::Depth::Overlay };
+            highlight.Size = { m_TileSize, m_TileSize };
+            highlight.Tint = { 0.3f, 0.6f, 1.0f, 0.3f };
+            Tiles::Renderer2D::DrawSquare(highlight);
+        }
+    }
+
     void PanelViewport::HandleInput()
     {
         PaintingMode mode = Ctx().GetPaintingMode();
+
+        // Leaving the Select tool drops any pending selection.
+        if (mode != PaintingMode::Select)
+            ClearSelection();
 
         // Always finish an in-progress stroke on release, even if the pointer
         // ended over the overlay controls.
@@ -393,11 +472,31 @@ namespace Tiles::Editor
             return;
         }
 
+        // Finish a marquee or move on release too, even over the overlay controls.
+        if (mode == PaintingMode::Select && Input::IsMouseButtonReleased(Input::MouseCode::Left) && (m_MovingSelection || m_Marqueeing))
+        {
+            if (m_MovingSelection)
+                CommitMove();
+            else
+                FinalizeMarquee();
+            return;
+        }
+
         // Don't start painting through the overlay controls.
         if (m_PointerOverOverlay)
             return;
 
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
+
+        if (mode == PaintingMode::Select)
+        {
+            // Escape drops the selection; otherwise run the marquee/move lifecycle.
+            if (Input::IsKeyPressed(Input::KeyCode::Escape))
+                ClearSelection();
+            else
+                HandleSelectInput(gridPos);
+            return;
+        }
 
         if (mode == PaintingMode::Fill)
         {
@@ -465,6 +564,96 @@ namespace Tiles::Editor
         Ctx().PaintStroke(m_StrokeCells);
         m_Stroking = false;
         m_StrokeCells.clear();
+    }
+
+    void PanelViewport::HandleSelectInput(const glm::ivec2& gridPos)
+    {
+        if (Input::IsMouseButtonPressed(Input::MouseCode::Left))
+        {
+            if (m_HasSelection && IsCellInSelection(gridPos))
+            {
+                // Press inside the selection begins a move.
+                m_MovingSelection = true;
+                m_MoveStartCell = gridPos;
+                m_MoveOffset = { 0, 0 };
+            }
+            else
+            {
+                // Press elsewhere begins a fresh marquee.
+                m_Marqueeing = true;
+                m_MarqueeAnchor = gridPos;
+                m_MarqueeCurrent = gridPos;
+                m_HasSelection = false;
+                m_SelectionCells.clear();
+            }
+        }
+        else if (Input::IsMouseButtonDown(Input::MouseCode::Left))
+        {
+            if (m_MovingSelection)
+                m_MoveOffset = gridPos - m_MoveStartCell;
+            else if (m_Marqueeing)
+                m_MarqueeCurrent = gridPos;
+        }
+    }
+
+    void PanelViewport::FinalizeMarquee()
+    {
+        m_Marqueeing = false;
+        m_SelectionCells.clear();
+
+        if (!Ctx().HasWorkingLayer())
+        {
+            m_HasSelection = false;
+            return;
+        }
+
+        const int minX = std::min(m_MarqueeAnchor.x, m_MarqueeCurrent.x);
+        const int maxX = std::max(m_MarqueeAnchor.x, m_MarqueeCurrent.x);
+        const int minY = std::min(m_MarqueeAnchor.y, m_MarqueeCurrent.y);
+        const int maxY = std::max(m_MarqueeAnchor.y, m_MarqueeCurrent.y);
+
+        // Only painted cells inside the rectangle become the selection.
+        const TileLayer& layer = Ctx().GetWorkingLayerRef();
+        for (int y = minY; y <= maxY; ++y)
+            for (int x = minX; x <= maxX; ++x)
+                if (layer.HasTile(x, y))
+                    m_SelectionCells.push_back({ x, y });
+
+        m_HasSelection = !m_SelectionCells.empty();
+    }
+
+    void PanelViewport::CommitMove()
+    {
+        m_MovingSelection = false;
+
+        if (m_MoveOffset.x == 0 && m_MoveOffset.y == 0)
+            return;
+
+        Ctx().MoveSelection(m_SelectionCells, m_MoveOffset);
+
+        // The selection follows the tiles to their new home so it can be nudged again.
+        for (glm::ivec2& cell : m_SelectionCells)
+            cell += m_MoveOffset;
+
+        m_MoveOffset = { 0, 0 };
+    }
+
+    void PanelViewport::ClearSelection()
+    {
+        m_HasSelection = false;
+        m_Marqueeing = false;
+        m_MovingSelection = false;
+        m_MoveOffset = { 0, 0 };
+        m_SelectionCells.clear();
+    }
+
+    bool PanelViewport::IsCellInSelection(const glm::ivec2& cell) const
+    {
+        for (const glm::ivec2& c : m_SelectionCells)
+            if (c == cell)
+                return true;
+
+        return false;
     }
 
     void PanelViewport::BeginShape(const glm::ivec2& cell)

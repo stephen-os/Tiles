@@ -72,6 +72,13 @@ namespace Tiles
 			ExecuteCommand(m_EditingState.BuildStampCommand(m_EditingState.GetWorkingLayer(), anchor));
 	}
 
+	// Moves the given working-layer cells by offset as one undoable step.
+	void Session::MoveSelection(const std::vector<glm::ivec2>& cells, const glm::ivec2& offset)
+	{
+		if (HasWorkingLayer())
+			ExecuteCommand(m_EditingState.BuildMoveCommand(m_EditingState.GetWorkingLayer(), cells, offset, m_Project->GetLayerStack()));
+	}
+
 	// The cells of the current shape tool between start and end.
 	std::vector<glm::ivec2> Session::GetShapeCells(const glm::ivec2& start, const glm::ivec2& end) const
 	{

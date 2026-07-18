@@ -100,6 +100,10 @@ namespace Tiles
 		// A no-op without a working layer or a stamp.
 		void PaintStamp(const glm::ivec2& anchor);
 
+		// Moves the given working-layer cells by `offset` as one undoable step.
+		// A no-op without a working layer, or for an empty selection / zero offset.
+		void MoveSelection(const std::vector<glm::ivec2>& cells, const glm::ivec2& offset);
+
 		// Whether shape tools (rectangle / ellipse) paint solid or outline.
 		[[nodiscard]] bool GetShapeFilled() const { return m_EditingState.GetShapeFilled(); }
 		void SetShapeFilled(bool filled) { m_EditingState.SetShapeFilled(filled); }

@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <map>
+#include <utility>
 
 namespace Tiles
 {
@@ -107,6 +109,30 @@ namespace Tiles
 			}
 
 		return std::make_unique<TileStrokeCommand>(layerIndex, std::move(cells));
+	}
+
+	// Moves a set of cells by offset as one command. The net per-cell result: every
+	// source clears, then every moved tile lands at its destination -- so a cell that
+	// is both a source and a destination keeps the moved tile.
+	std::unique_ptr<Command> EditingState::BuildMoveCommand(size_t layerIndex, const std::vector<glm::ivec2>& cells, const glm::ivec2& offset, const LayerStack& layerStack) const
+	{
+		if (cells.empty() || (offset.x == 0 && offset.y == 0))
+			return nullptr;
+
+		// Ordered by coordinate; erase every source first, then overwrite with the
+		// tiles at their shifted destinations.
+		std::map<std::pair<int, int>, Tile> net;
+		for (const glm::ivec2& c : cells)
+			net[{ c.x, c.y }] = Tile();
+		for (const glm::ivec2& c : cells)
+			net[{ c.x + offset.x, c.y + offset.y }] = layerStack.GetTile(c.x, c.y, layerIndex);
+
+		std::vector<TileStrokeCommand::Cell> strokeCells;
+		strokeCells.reserve(net.size());
+		for (const auto& [coord, tile] : net)
+			strokeCells.push_back({ { coord.first, coord.second }, tile });
+
+		return std::make_unique<TileStrokeCommand>(layerIndex, std::move(strokeCells));
 	}
 
 	// Bresenham line cells from a to b, inclusive.

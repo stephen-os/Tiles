@@ -259,6 +259,7 @@ namespace Tiles::Editor
         case PaintingMode::Line:      return "Line";
         case PaintingMode::Rectangle: return "Rectangle";
         case PaintingMode::Ellipse:   return "Ellipse";
+        case PaintingMode::Select:    return "Select";
         default:                      return "Unknown";
         }
     }

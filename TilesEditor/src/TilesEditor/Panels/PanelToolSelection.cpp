@@ -17,6 +17,7 @@ namespace Tiles::Editor
         RenderBlockToolButtons();
         RenderBlockBrushSize();
         RenderBlockShapeTools();
+        RenderBlockSelectTool();
         ImGui::End();
 
         RenderBlockCustomCursor();
@@ -105,6 +106,17 @@ namespace Tiles::Editor
         bool filled = Ctx().GetShapeFilled();
         if (ImGui::Checkbox("Filled", &filled))
             Ctx().SetShapeFilled(filled);
+    }
+
+    void PanelToolSelection::RenderBlockSelectTool()
+    {
+        ImGui::Spacing();
+
+        // Marquee select + move (works on the active layer).
+        const ImVec2 size(0.0f, UI::Tool::ButtonSize);
+        if (UI::ToggleButton("Select", IsToolSelected(PaintingMode::Select), size))
+            SetToolSelection(PaintingMode::Select);
+        ImGui::SetItemTooltip("Marquee-select tiles on the active layer, then drag to move them");
     }
 
     void PanelToolSelection::RenderBlockCustomCursor()

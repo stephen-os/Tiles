@@ -66,6 +66,19 @@ namespace Tiles::Editor
         // Flood-fills from cell, bounded by the visible view.
         void FillAt(const glm::ivec2& cell);
 
+        // Select tool (PaintingMode::Select): drag a marquee to select painted cells
+        // on the working layer, then drag the selection to move it (one command on
+        // release). Press/drag lifecycle; commit and rendering below.
+        void HandleSelectInput(const glm::ivec2& gridPos);
+        // Collects the painted working-layer cells inside the marquee rectangle.
+        void FinalizeMarquee();
+        // Commits the current move offset as one command and shifts the selection.
+        void CommitMove();
+        void ClearSelection();
+        [[nodiscard]] bool IsCellInSelection(const glm::ivec2& cell) const;
+        // Draws the live marquee, the selection highlight, and the move ghost.
+        void RenderSelection();
+
         void HandleMouseDragging();
         void HandleCameraMovement();
         void HandleZoom();
@@ -90,5 +103,15 @@ namespace Tiles::Editor
         glm::ivec2 m_LastStrokeCell = { 0, 0 };
         glm::ivec2 m_ShapeAnchor = { 0, 0 };
         std::vector<glm::ivec2> m_StrokeCells;
+
+        // Marquee select/move state (Select tool). Cells are working-layer coords.
+        bool m_HasSelection = false;
+        bool m_Marqueeing = false;
+        bool m_MovingSelection = false;
+        glm::ivec2 m_MarqueeAnchor = { 0, 0 };
+        glm::ivec2 m_MarqueeCurrent = { 0, 0 };
+        glm::ivec2 m_MoveStartCell = { 0, 0 };
+        glm::ivec2 m_MoveOffset = { 0, 0 };
+        std::vector<glm::ivec2> m_SelectionCells;
     };
 }
