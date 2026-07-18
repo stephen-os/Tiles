@@ -16,6 +16,9 @@ namespace Tiles::Editor
         : Panel(host), m_TileSize(Viewport::Render::DefaultTileSize)
     {
         m_RenderTarget = Tiles::RenderTarget::Create(512, 512);
+        m_BrushIcon = Tiles::Texture::Create(AssetPath::Brush);
+        m_EraserIcon = Tiles::Texture::Create(AssetPath::Eraser);
+        m_FillIcon = Tiles::Texture::Create(AssetPath::Fill);
     }
 
     void PanelViewport::Render()
@@ -56,10 +59,19 @@ namespace Tiles::Editor
         Tiles::Renderer2D::SetRenderTarget(nullptr);
 
         ImGui::Image(static_cast<ImTextureID>(m_RenderTarget->GetTexture()), m_ViewportSize);
+        ImVec2 canvasMin = ImGui::GetItemRectMin();
+        ImVec2 canvasMax = ImGui::GetItemRectMax();
 
         RenderOverlay();
 
         m_MouseDelta = ImGui::GetIO().MouseWheel;
+
+        // Custom crosshair cursor, only while the pointer is over the canvas itself
+        // (not the tab bar or the overlay controls).
+        bool overCanvas = ImGui::IsWindowHovered()
+            && ImGui::IsMouseHoveringRect(canvasMin, canvasMax)
+            && !m_PointerOverOverlay;
+        RenderCursor(overCanvas);
 
         ImGui::End();
     }
@@ -108,6 +120,56 @@ namespace Tiles::Editor
         // Applied after EndTabBar so closing never mutates the document list mid-render.
         if (closeRequest >= 0)
             Host().RequestCloseDocument(static_cast<size_t>(closeRequest));
+    }
+
+    void PanelViewport::RenderCursor(bool overCanvas)
+    {
+        if (!overCanvas)
+            return;
+
+        // Hide the OS cursor and draw our own on the foreground list, above everything.
+        ImGui::SetMouseCursor(ImGuiMouseCursor_None);
+
+        const ImVec2 mouse = ImGui::GetMousePos();
+        ImDrawList* draw = ImGui::GetForegroundDrawList();
+
+        const float mx = mouse.x;
+        const float my = mouse.y;
+        const float gap = 4.0f;    // clear centre so the target pixel stays visible
+        const float arm = 10.0f;   // length of each crosshair arm
+
+        // Each arm: a dark backing for contrast on any tile, then a bright line.
+        auto drawArm = [&](ImVec2 a, ImVec2 b)
+        {
+            draw->AddLine(a, b, IM_COL32(0, 0, 0, 130), 3.0f);
+            draw->AddLine(a, b, IM_COL32(255, 255, 255, 235), 1.5f);
+        };
+        drawArm({ mx - gap - arm, my }, { mx - gap, my });
+        drawArm({ mx + gap, my }, { mx + gap + arm, my });
+        drawArm({ mx, my - gap - arm }, { mx, my - gap });
+        drawArm({ mx, my + gap }, { mx, my + gap + arm });
+
+        // The active tool's icon, small, in the crosshair's bottom-right quadrant.
+        if (auto icon = ActiveToolIcon())
+        {
+            const float size = 20.0f;
+            const ImVec2 iconMin = { mx + gap + 3.0f, my + gap + 3.0f };
+            const ImVec2 iconMax = { iconMin.x + size, iconMin.y + size };
+            draw->AddImage(static_cast<ImTextureID>(icon->GetID()), iconMin, iconMax,
+                { 0.0f, 0.0f }, { 1.0f, 1.0f }, IM_COL32(255, 255, 255, 235));
+        }
+    }
+
+    // The icon shown beside the crosshair; only brush/eraser/fill have one.
+    std::shared_ptr<Tiles::Texture> PanelViewport::ActiveToolIcon() const
+    {
+        switch (Ctx().GetPaintingMode())
+        {
+        case PaintingMode::Brush:  return m_BrushIcon;
+        case PaintingMode::Eraser: return m_EraserIcon;
+        case PaintingMode::Fill:   return m_FillIcon;
+        default:                   return nullptr;
+        }
     }
 
     void PanelViewport::Update()
@@ -215,7 +277,7 @@ namespace Tiles::Editor
 
         Tiles::Line line;
         line.Color = Viewport::Grid::BoundaryColor;   // red
-        line.Thickness = 2.0f;
+        line.Thickness = 1.0f;   // 1px: core-profile GL deprecates glLineWidth > 1
 
         line.Start = { camera.Center.x - halfWidth, 0.0f, Viewport::Depth::Outline };
         line.End = { camera.Center.x + halfWidth, 0.0f, Viewport::Depth::Outline };
@@ -241,7 +303,7 @@ namespace Tiles::Editor
 
         Tiles::Line line;
         line.Color = { 0.2f, 0.8f, 1.0f, 1.0f };   // cyan, distinct from the red origin axes
-        line.Thickness = 2.0f;
+        line.Thickness = 1.0f;   // 1px: core-profile GL deprecates glLineWidth > 1
 
         auto edge = [&](float ax, float ay, float bx, float by)
         {

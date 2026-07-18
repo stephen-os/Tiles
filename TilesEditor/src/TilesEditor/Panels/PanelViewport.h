@@ -55,6 +55,12 @@ namespace Tiles::Editor
         // trailing "+" opens a fresh blank document.
         void RenderDocumentTabs();
 
+        // The custom canvas cursor: a crosshair at the pointer plus the active tool's
+        // icon, drawn only while `overCanvas` (hides the system cursor then).
+        void RenderCursor(bool overCanvas);
+        // The small icon for the active tool, or null for tools that have none.
+        [[nodiscard]] std::shared_ptr<Tiles::Texture> ActiveToolIcon() const;
+
         void HandleInput();
         // Paint-stroke lifecycle (Brush/Eraser): begin on press, extend across the
         // drag, commit one command on release.
@@ -89,6 +95,11 @@ namespace Tiles::Editor
 
     private:
         std::shared_ptr<RenderTarget> m_RenderTarget;
+
+        // Small tool icons drawn beside the crosshair cursor (brush/eraser/fill).
+        std::shared_ptr<Tiles::Texture> m_BrushIcon;
+        std::shared_ptr<Tiles::Texture> m_EraserIcon;
+        std::shared_ptr<Tiles::Texture> m_FillIcon;
 
         float m_TileSize;
         float m_MouseDelta = 0.0f;

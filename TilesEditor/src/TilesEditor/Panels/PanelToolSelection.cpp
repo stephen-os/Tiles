@@ -19,8 +19,6 @@ namespace Tiles::Editor
         RenderBlockShapeTools();
         RenderBlockSelectTool();
         ImGui::End();
-
-        RenderBlockCustomCursor();
     }
 
     void PanelToolSelection::Update()
@@ -117,48 +115,6 @@ namespace Tiles::Editor
         if (UI::ToggleButton("Select", IsToolSelected(PaintingMode::Select), size))
             SetToolSelection(PaintingMode::Select);
         ImGui::SetItemTooltip("Marquee-select tiles on the active layer, then drag to move them");
-    }
-
-    void PanelToolSelection::RenderBlockCustomCursor()
-    {
-        PaintingMode currentMode = Ctx().GetPaintingMode();
-
-        if (currentMode == PaintingMode::None)
-        {
-            ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
-            return;
-        }
-
-        RenderComponentCursorForMode("BrushCursor", PaintingMode::Brush, m_BrushTexture);
-        RenderComponentCursorForMode("EraserCursor", PaintingMode::Eraser, m_EraserTexture);
-        RenderComponentCursorForMode("FillCursor", PaintingMode::Fill, m_FillTexture);
-    }
-
-    void PanelToolSelection::RenderComponentCursorForMode(const char* id, PaintingMode mode, const std::shared_ptr<Tiles::Texture>& texture)
-    {
-        if (Ctx().GetPaintingMode() != mode || !texture)
-        {
-            return;
-        }
-
-        // Hide the system cursor and draw the tool texture on the foreground draw
-        // list so it appears above every window as the cursor.
-        ImGui::SetMouseCursor(ImGuiMouseCursor_None);
-
-        ImVec2 mousePos = ImGui::GetMousePos();
-
-        float halfSize = UI::Tool::CursorSize * 0.5f;
-        ImVec2 cursorMin = ImVec2(mousePos.x - halfSize, mousePos.y - halfSize);
-        ImVec2 cursorMax = ImVec2(mousePos.x + halfSize, mousePos.y + halfSize);
-
-        ImGui::GetForegroundDrawList()->AddImage(
-            static_cast<ImTextureID>(texture->GetID()),
-            cursorMin,
-            cursorMax,
-            ImVec2(0, 0),
-            ImVec2(1, 1),
-            IM_COL32(255, 255, 255, 200)
-        );
     }
 
     void PanelToolSelection::LoadTextures()
