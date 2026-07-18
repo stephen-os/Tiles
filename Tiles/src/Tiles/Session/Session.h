@@ -10,7 +10,6 @@
 #include "Core/Error.h"
 #include "Domain/Tile.h"
 #include "Domain/Project.h"
-#include "Session/ProjectHistory.h"
 #include "Domain/ProjectSerializer.h"
 #include "Graphics/Camera2D.h"
 #include "Session/CommandDispatcher.h"
@@ -161,20 +160,6 @@ namespace Tiles
 		// The active project.
 		[[nodiscard]] std::shared_ptr<Project> GetProject() const { return m_Project; }
 
-		// --- Recent projects ---
-
-		// The number of tracked recent projects.
-		[[nodiscard]] size_t GetRecentProjectCount() const { return m_History.GetCount(); }
-
-		// True while the recent-projects list is non-empty.
-		[[nodiscard]] bool HasRecentProjects() const { return !m_History.IsEmpty(); }
-
-		// The recent-projects entry at index.
-		[[nodiscard]] const ProjectHistoryEntry& GetRecentProject(size_t index) const { return m_History.GetEntry(index); }
-
-		// Clears the recent-projects list.
-		void ClearRecentProjects() { m_History.Clear(); }
-
 	private:
 		// Clamps the working-layer index back into range after the layer count
 		// changes (e.g. a delete via undo/redo).
@@ -182,7 +167,6 @@ namespace Tiles
 
 	private:
 		std::shared_ptr<Project> m_Project;
-		ProjectHistory m_History;
 		CommandDispatcher m_CommandDispatcher;
 		Camera2D m_Camera;
 		EditingState m_EditingState;

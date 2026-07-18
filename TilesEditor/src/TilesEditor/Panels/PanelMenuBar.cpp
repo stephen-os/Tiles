@@ -2,6 +2,7 @@
 #include "../UI/Theme.h"
 
 #include "Core/Application.h"
+#include "Session/Workspace.h"
 
 namespace Tiles::Editor
 {
@@ -58,16 +59,16 @@ namespace Tiles::Editor
 
             ImGui::Separator();
 
-            bool hasRecentProjects = Ctx().HasRecentProjects();
+            bool hasRecentProjects = Space().HasRecentProjects();
 
             if (ImGui::BeginMenu("Recent Projects", hasRecentProjects))
             {
                 if (hasRecentProjects)
                 {
-                    size_t projectCount = Ctx().GetRecentProjectCount();
+                    size_t projectCount = Space().GetRecentProjectCount();
                     for (size_t i = 0; i < projectCount; ++i)
                     {
-                        const auto& entry = Ctx().GetRecentProject(i);
+                        const auto& entry = Space().GetRecentProject(i);
 
                         std::string menuText = entry.displayName;
                         std::string shortcut = "";
@@ -78,7 +79,7 @@ namespace Tiles::Editor
 
                         if (ImGui::MenuItem(menuText.c_str(), shortcut.empty() ? nullptr : shortcut.c_str()))
                         {
-                            auto result = Ctx().LoadProject(entry.filePath);
+                            auto result = Space().LoadProject(entry.filePath);
                             if (!result)
                                 Host().Notify(result.error().message);
                         }
@@ -92,7 +93,7 @@ namespace Tiles::Editor
                     ImGui::Separator();
                     if (ImGui::MenuItem("Clear Recent Projects"))
                     {
-                        Ctx().ClearRecentProjects();
+                        Space().ClearRecentProjects();
                     }
                 }
                 else

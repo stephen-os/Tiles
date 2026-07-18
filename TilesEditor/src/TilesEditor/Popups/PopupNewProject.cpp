@@ -2,6 +2,8 @@
 
 #include "../UI/Widgets.h"
 
+#include "Session/Workspace.h"
+
 #include "imgui.h"
 
 namespace Tiles::Editor
@@ -30,7 +32,7 @@ namespace Tiles::Editor
 
             if (UI::Button("Create", UI::ButtonVariant::Primary, ImVec2(buttonWidth, 0)))
             {
-                Host().Doc().CreateProject(std::string(m_NameBuffer));
+                Space().CreateProject(std::string(m_NameBuffer));
                 Hide();
             }
 

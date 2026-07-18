@@ -3,6 +3,7 @@
 #include "../UI/Theme.h"
 #include "../UI/Widgets.h"
 #include "ImGuiFileDialog.h"
+#include "Session/Workspace.h"
 #include <filesystem>
 #include <algorithm>
 #include <cstring>
@@ -186,7 +187,7 @@ namespace Tiles::Editor
         if (UI::Button("Save", UI::ButtonVariant::Primary, ImVec2(buttonWidth, 0)) && canSave)
         {
             std::filesystem::path fullPath = GetFullFilePath();
-            auto result = Ctx().SaveProjectAs(fullPath);
+            auto result = Space().SaveProjectAs(fullPath);
 
             m_ProjectSavedSuccessfully = result.has_value();
             m_SaveMessage = result ? "Project saved successfully." : result.error().message;

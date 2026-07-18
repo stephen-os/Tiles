@@ -3,6 +3,8 @@
 #include "Core/Event.h"
 #include "Core/Logger.h"
 
+#include "Session/Workspace.h"
+
 #include "EntryPoint.h"
 
 #include "App/EditorHost.h"
@@ -49,10 +51,9 @@ public:
 
 	void OnAttach() override
 	{
-		// The layer solely owns one Session; every panel and popup borrows it
-		// through EditorHost::Doc(), so they all read and mutate the same project,
-		// brush, working layer, and command history.
-		m_Session = std::make_unique<Session>();
+		// The layer owns the Workspace: the app-level recent list plus the active
+		// editing Session every panel and popup borrows through EditorHost::Doc().
+		m_Workspace = std::make_unique<Workspace>();
 
 		m_Panels.SetHost(*this);
 		RegisterPanels();
@@ -69,7 +70,7 @@ public:
 	{
 		// The atlas texture cache keys on atlas pointers; drop it when the active
 		// project changes so an entry never outlives the atlas it was built from.
-		const Project* project = m_Session->HasProject() ? m_Session->GetProject().get() : nullptr;
+		const Project* project = Doc().HasProject() ? Doc().GetProject().get() : nullptr;
 		if (project != m_LastProject)
 		{
 			m_AtlasTextures.Clear();
@@ -92,7 +93,9 @@ public:
 
 	// --- EditorHost ---------------------------------------------------------
 
-	Session& Doc() override { return *m_Session; }
+	Session& Doc() override { return m_Workspace->Active(); }
+
+	Workspace& Space() override { return *m_Workspace; }
 
 	std::shared_ptr<Tiles::Texture> GetAtlasTexture(const Tiles::TextureAtlas& atlas) override { return m_AtlasTextures.Get(atlas); }
 
@@ -177,46 +180,46 @@ private:
 			{ KeyCode::S, KeyMods::Control });
 
 		m_Actions.Register(ActionId::SaveAs,
-			[this] { if (m_Session->HasProject()) OpenPopup(PopupId::SaveAs); },
+			[this] { if (Doc().HasProject()) OpenPopup(PopupId::SaveAs); },
 			{ KeyCode::S, KeyMods::Control | KeyMods::Shift });
 
 		m_Actions.Register(ActionId::Export,
-			[this] { if (m_Session->HasProject()) OpenPopup(PopupId::Export); },
+			[this] { if (Doc().HasProject()) OpenPopup(PopupId::Export); },
 			{ KeyCode::E, KeyMods::Control });
 
 		m_Actions.Register(ActionId::Undo,
-			[this] { if (m_Session->CanUndo()) m_Session->Undo(); },
+			[this] { if (Doc().CanUndo()) Doc().Undo(); },
 			{ KeyCode::Z, KeyMods::Control });
 
 		m_Actions.Register(ActionId::Redo,
-			[this] { if (m_Session->CanRedo()) m_Session->Redo(); },
+			[this] { if (Doc().CanRedo()) Doc().Redo(); },
 			{ KeyCode::Y, KeyMods::Control });
 
 		m_Actions.Register(ActionId::ClearHistory,
-			[this] { if (m_Session->HasProject()) m_Session->ClearHistory(); });
+			[this] { if (Doc().HasProject()) Doc().ClearHistory(); });
 	}
 
 	// Saves in place, falling back to the Save-As dialog for a never-saved
 	// project; a failed save surfaces through the shared error popup.
 	void SaveProject()
 	{
-		if (!m_Session->HasProject())
+		if (!Doc().HasProject())
 			return;
 
-		auto project = m_Session->GetProject();
+		auto project = Doc().GetProject();
 		if (project->IsNew() && project->HasUnsavedChanges())
 		{
 			OpenPopup(PopupId::SaveAs);
 		}
 		else
 		{
-			auto result = m_Session->SaveProject();
+			auto result = m_Workspace->SaveProject();
 			if (!result)
 				Notify(result.error().message);
 		}
 	}
 
-	std::unique_ptr<Session> m_Session;
+	std::unique_ptr<Workspace> m_Workspace;
 	PanelManager m_Panels;
 	ActionRegistry m_Actions;
 

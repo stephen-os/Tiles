@@ -36,6 +36,8 @@ namespace Tiles
 		// present and trimming the list to MAX_HISTORY_SIZE. Empty paths/names
 		// are ignored.
 		void AddProject(const std::filesystem::path& filePath, const std::string& displayName);
+		// Removes a project from the list by path; a no-op if it is not present.
+		void RemoveProject(const std::filesystem::path& filePath);
 		void Clear();
 
 		[[nodiscard]] size_t GetCount() const { return m_History.size(); }
@@ -50,11 +52,8 @@ namespace Tiles
 		[[nodiscard]] std::filesystem::path GetAppDataPath() const;
 		// Drops entries whose file no longer exists on disk.
 		void RemoveInvalidEntries();
-		void RemoveProject(const std::filesystem::path& filePath);
 
 		std::vector<ProjectHistoryEntry> m_History;
 		bool m_HasChanges = false;
-
-		friend class Session;
 	};
 }

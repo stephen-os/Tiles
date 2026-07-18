@@ -31,8 +31,10 @@ namespace Tiles::Editor
 		virtual void OnUpdate() = 0;
 
 		EditorHost& Host() const { return m_Host; }
-		// Shorthand for the shared document/session state.
+		// Shorthand for the active document's session state.
 		Session& Ctx() const { return m_Host.Doc(); }
+		// Shorthand for the app-level workspace (recent projects, open/save).
+		Workspace& Space() const { return m_Host.Space(); }
 
 	protected:
 		bool m_IsVisible = false;

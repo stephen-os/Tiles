@@ -145,7 +145,6 @@ namespace Tiles
 
 		m_Project->MarkAsSaved();
 		m_Project->UpdateLastAccessed();
-		m_History.AddProject(path, m_Project->GetProjectName());
 
 		TILES_ENGINE_INFO("Session::SaveProject: Successfully saved project '{}'", m_Project->GetProjectName());
 		return {};
@@ -164,23 +163,15 @@ namespace Tiles
 		m_Project->SetFilePath(path.string());
 		m_Project->MarkAsSaved();
 		m_Project->UpdateLastAccessed();
-		m_History.AddProject(path, m_Project->GetProjectName());
 
 		TILES_ENGINE_INFO("Session::SaveProjectAs: Successfully saved project '{}' to '{}'", m_Project->GetProjectName(), path.string());
 		return {};
 	}
 
-	// Loads a project from path, resetting editing/undo/camera around it; a
-	// missing file is dropped from recent projects and reported as a failure.
+	// Loads a project from path into this session, resetting editing/undo/camera
+	// around it. Recent-list bookkeeping is the workspace's job (see Workspace).
 	std::expected<void, Error> Session::LoadProject(const std::filesystem::path& path)
 	{
-		if (!std::filesystem::exists(path))
-		{
-			TILES_ENGINE_INFO("Session::LoadProject: File does not exist: {}", path.string());
-			m_History.RemoveProject(path);
-			return std::unexpected(Error{ ErrorCode::FileNotFound, "File does not exist." });
-		}
-
 		auto result = ProjectSerializer::Load(path);
 		if (!result)
 		{
@@ -192,7 +183,6 @@ namespace Tiles
 		m_Project->SetFilePath(path.string());
 		m_Project->MarkAsSaved();
 		m_Project->UpdateLastAccessed();
-		m_History.AddProject(path, m_Project->GetProjectName());
 
 		// A new project is in place; reset the editing/undo/camera state around it.
 		m_CommandDispatcher.Clear();

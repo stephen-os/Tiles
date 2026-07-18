@@ -2,6 +2,7 @@
 #include "../UI/Theme.h"
 #include "../UI/Widgets.h"
 #include "ImGuiFileDialog.h"
+#include "Session/Workspace.h"
 #include <filesystem>
 #include <cstring>
 #include <algorithm>
@@ -200,7 +201,7 @@ namespace Tiles::Editor
             return;
         }
 
-        auto result = Ctx().LoadProject(GetFullFilePath());
+        auto result = Space().LoadProject(GetFullFilePath());
 
         m_ProjectOpenedSuccessfully = result.has_value();
         m_Message = result ? "Project loaded successfully." : result.error().message;

@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-namespace Tiles { class Session; class Texture; class TextureAtlas; }
+namespace Tiles { class Session; class Workspace; class Texture; class TextureAtlas; }
 
 namespace Tiles::Editor
 {
@@ -20,8 +20,12 @@ namespace Tiles::Editor
     public:
         virtual ~EditorHost() = default;
 
-        // The shared document/session state (project, brush, command history).
+        // The active document's session state (project, brush, command history).
         virtual Session& Doc() = 0;
+
+        // The app-level workspace: the recent-projects list and the project
+        // lifecycle (new / open / save) across open documents.
+        virtual Workspace& Space() = 0;
 
         // The GL texture backing a document atlas, built and cached on demand;
         // null if the atlas has no image. Lets views render atlases without the
