@@ -69,7 +69,7 @@ namespace Tiles::Editor
             {
                 if (atlases[i]->GetId() == toRemove)
                 {
-                    Ctx().GetProject()->RemoveTextureAtlas(i);
+                    Host().RemoveAtlas(i);
                     break;
                 }
             }

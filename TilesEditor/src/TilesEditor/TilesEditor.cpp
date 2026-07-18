@@ -114,6 +114,23 @@ public:
 
 	std::shared_ptr<Tiles::Texture> GetAtlasTexture(const Tiles::TextureAtlas& atlas) override { return m_AtlasTextures.Get(atlas); }
 
+	void RemoveAtlas(size_t index) override
+	{
+		if (!Doc().HasProject())
+			return;
+
+		auto project = Doc().GetProject();
+		if (index >= project->GetTextureAtlasCount())
+			return;
+
+		// Evict the cached texture before the atlas is destroyed, so its raw-pointer
+		// key can't dangle -- or alias a future atlas allocated at the same address.
+		if (auto atlas = project->GetTextureAtlas(index))
+			m_AtlasTextures.Evict(*atlas);
+
+		project->RemoveTextureAtlas(index);
+	}
+
 	void OpenPopup(PopupId id) override { m_Panels.OpenPopup(id); }
 	void ClosePopup(PopupId id) override { m_Panels.ClosePopup(id); }
 

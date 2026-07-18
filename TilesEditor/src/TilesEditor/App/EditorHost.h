@@ -40,6 +40,11 @@ namespace Tiles::Editor
         // document (or the atlas) depending on the graphics layer.
         virtual std::shared_ptr<Tiles::Texture> GetAtlasTexture(const Tiles::TextureAtlas& atlas) = 0;
 
+        // Removes the atlas at index from the active document, dropping its cached
+        // GL texture in the same step so a stale cache entry can't outlive -- or be
+        // reused by a later atlas allocated at -- the removed atlas's address.
+        virtual void RemoveAtlas(size_t index) = 0;
+
         virtual void OpenPopup(PopupId id) = 0;
         virtual void ClosePopup(PopupId id) = 0;
 
