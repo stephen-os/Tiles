@@ -67,6 +67,17 @@ namespace Tiles
 		// Sets the brush footprint size, clamped to at least 1.
 		void SetBrushSize(int size) { m_BrushSize = size < 1 ? 1 : size; }
 
+		// A row-major grid of tiles (GetStampSize().x by .y) the brush tool places
+		// as one centered block; empty means the ordinary single-tile brush.
+		[[nodiscard]] bool HasStamp() const { return !m_StampTiles.empty(); }
+		[[nodiscard]] const std::vector<Tile>& GetStampTiles() const { return m_StampTiles; }
+		[[nodiscard]] glm::ivec2 GetStampSize() const { return m_StampSize; }
+
+		// Sets the stamp grid (row-major, width * height tiles); clears it if the
+		// dimensions are < 1 or the tile count does not match.
+		void SetStamp(std::vector<Tile> tiles, int width, int height);
+		void ClearStamp() { m_StampTiles.clear(); m_StampSize = { 0, 0 }; }
+
 		// Restores the default selection: layer 0, no mode, a painted brush.
 		void Reset();
 
@@ -85,6 +96,10 @@ namespace Tiles
 		// cell as one undo step; null for None/Fill or an empty cell set.
 		[[nodiscard]] std::unique_ptr<Command> BuildStrokeCommand(size_t layerIndex, const std::vector<glm::ivec2>& cells) const;
 
+		// Builds a command that places the stamp centered on `anchor` as one undo
+		// step, each cell carrying its own atlas tile; null if there is no stamp.
+		[[nodiscard]] std::unique_ptr<Command> BuildStampCommand(size_t layerIndex, const glm::ivec2& anchor) const;
+
 		// Whether shape tools (rectangle / ellipse) paint solid or outline.
 		[[nodiscard]] bool GetShapeFilled() const { return m_ShapeFilled; }
 		void SetShapeFilled(bool filled) { m_ShapeFilled = filled; }
@@ -99,5 +114,7 @@ namespace Tiles
 		Tile m_Brush;
 		int m_BrushSize = 1;
 		bool m_ShapeFilled = false;
+		std::vector<Tile> m_StampTiles;         // row-major; empty => single-tile brush
+		glm::ivec2 m_StampSize = { 0, 0 };      // stamp width x height in cells
 	};
 }

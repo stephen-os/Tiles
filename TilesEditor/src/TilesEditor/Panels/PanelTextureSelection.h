@@ -53,6 +53,11 @@ namespace Tiles::Editor
         // Applies the clicked tile to the brush, or clears the brush's texture if
         // that same tile is already selected (click-to-toggle).
         void HandleTextureSelection(int index, size_t atlasIndex);
+
+        // Commits the drag rectangle: a single cell sets the click-to-toggle brush;
+        // a larger rectangle becomes a multi-cell stamp.
+        void FinalizeSelection(size_t atlasIndex);
+
         void OpenFileDialog(size_t atlasIndex);
         void HandleFileDialogResult();
         void AddNewAtlas();
@@ -60,5 +65,13 @@ namespace Tiles::Editor
     private:
         std::shared_ptr<Tiles::Texture> m_CheckerboardTexture = nullptr;
         AtlasId m_DialogAtlasId = AtlasId::Invalid;   // atlas awaiting a Browse... result
+
+        // Drag-to-select state, in atlas grid (col, row). The anchor/current pair
+        // doubles as the committed selection rectangle for highlighting.
+        bool m_Selecting = false;
+        bool m_HasStampSelection = false;
+        AtlasId m_SelectAtlasId = AtlasId::Invalid;
+        glm::ivec2 m_SelectAnchor = { 0, 0 };
+        glm::ivec2 m_SelectCurrent = { 0, 0 };
     };
 }

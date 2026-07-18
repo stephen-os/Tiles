@@ -65,6 +65,13 @@ namespace Tiles
 			ExecuteCommand(m_EditingState.BuildStrokeCommand(m_EditingState.GetWorkingLayer(), cells));
 	}
 
+	// Places the current stamp centered on anchor as one undoable block.
+	void Session::PaintStamp(const glm::ivec2& anchor)
+	{
+		if (HasWorkingLayer())
+			ExecuteCommand(m_EditingState.BuildStampCommand(m_EditingState.GetWorkingLayer(), anchor));
+	}
+
 	// The cells of the current shape tool between start and end.
 	std::vector<glm::ivec2> Session::GetShapeCells(const glm::ivec2& start, const glm::ivec2& end) const
 	{

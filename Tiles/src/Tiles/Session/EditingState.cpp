@@ -16,6 +16,20 @@ namespace Tiles
 		m_PaintingMode = PaintingMode::None;
 		m_Brush = Tile();
 		m_Brush.SetPainted(true);
+		ClearStamp();
+	}
+
+	// Sets the stamp grid, or clears it when the dimensions and tile count disagree.
+	void EditingState::SetStamp(std::vector<Tile> tiles, int width, int height)
+	{
+		if (width < 1 || height < 1 || tiles.size() != static_cast<size_t>(width) * height)
+		{
+			ClearStamp();
+			return;
+		}
+
+		m_StampTiles = std::move(tiles);
+		m_StampSize = { width, height };
 	}
 
 	// Clamps the working layer to the last valid index after the layer count shrinks.
@@ -67,6 +81,32 @@ namespace Tiles
 			strokeCells.push_back({ coord, tile });
 
 		return std::make_unique<TileStrokeCommand>(layerIndex, std::move(strokeCells));
+	}
+
+	// Places the stamp as one block centered on anchor. Row 0 of the stamp (the top
+	// row in the atlas) maps to the highest world row, so the placed block reads the
+	// same way up as it looks in the atlas panel (world +Y is up).
+	std::unique_ptr<Command> EditingState::BuildStampCommand(size_t layerIndex, const glm::ivec2& anchor) const
+	{
+		if (m_StampTiles.empty())
+			return nullptr;
+
+		const int w = m_StampSize.x;
+		const int h = m_StampSize.y;
+
+		const int baseX = anchor.x - w / 2;
+		const int baseY = anchor.y - h / 2;
+
+		std::vector<TileStrokeCommand::Cell> cells;
+		cells.reserve(m_StampTiles.size());
+		for (int r = 0; r < h; ++r)
+			for (int c = 0; c < w; ++c)
+			{
+				glm::ivec2 coord = { baseX + c, baseY + (h - 1 - r) };
+				cells.push_back({ coord, m_StampTiles[r * w + c] });
+			}
+
+		return std::make_unique<TileStrokeCommand>(layerIndex, std::move(cells));
 	}
 
 	// Bresenham line cells from a to b, inclusive.

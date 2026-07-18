@@ -74,6 +74,20 @@ namespace Tiles::Editor
                 }
             }
         }
+
+        // Commit a drag-select on release, wherever the pointer ended up.
+        if (m_Selecting && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+        {
+            for (size_t i = 0; i < atlases.size(); ++i)
+            {
+                if (atlases[i]->GetId() == m_SelectAtlasId)
+                {
+                    FinalizeSelection(i);
+                    break;
+                }
+            }
+            m_Selecting = false;
+        }
     }
 
     // One atlas section: a header (its display name) over rename, image, dimensions,
@@ -229,6 +243,23 @@ namespace Tiles::Editor
                 std::string itemId = "GridItem_" + std::to_string(index);
                 RenderComponentTextureGridItem(itemId.c_str(), index, atlasIndex, tileSize);
 
+                // Drag-to-select: anchor on press over a cell, extend to the hovered
+                // cell while the button is held. Commit happens on release (see list).
+                if (ImGui::IsItemHovered())
+                {
+                    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+                    {
+                        m_Selecting = true;
+                        m_SelectAtlasId = atlas->GetId();
+                        m_SelectAnchor = { x, y };
+                        m_SelectCurrent = { x, y };
+                    }
+                    else if (m_Selecting && m_SelectAtlasId == atlas->GetId() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+                    {
+                        m_SelectCurrent = { x, y };
+                    }
+                }
+
                 // Keep cells on one row until the atlas width wraps.
                 if ((index + 1) % atlas->GetWidth() != 0)
                     ImGui::SameLine();
@@ -267,9 +298,6 @@ namespace Tiles::Editor
             ImGui::PopStyleColor(3);
         }
 
-        if (ImGui::IsItemClicked())
-            HandleTextureSelection(index, atlasIndex);
-
         RenderComponentSelectionBorder(index, atlasIndex, tileSize);
     }
 
@@ -283,9 +311,25 @@ namespace Tiles::Editor
         ImVec2 itemMin = ImGui::GetItemRectMin();
         ImVec2 itemMax = ImGui::GetItemRectMax();
 
-        bool isSelected = (brush.GetAtlasId() == atlas->GetId() &&
-            brush.GetCellIndex() == index &&
-            brush.IsTextured());
+        // While dragging or after committing a stamp, highlight the whole rectangle;
+        // otherwise highlight the single brush cell.
+        bool isSelected;
+        if ((m_Selecting || m_HasStampSelection) && atlas->GetId() == m_SelectAtlasId)
+        {
+            int cx = index % atlas->GetWidth();
+            int cy = index / atlas->GetWidth();
+            int minX = std::min(m_SelectAnchor.x, m_SelectCurrent.x);
+            int maxX = std::max(m_SelectAnchor.x, m_SelectCurrent.x);
+            int minY = std::min(m_SelectAnchor.y, m_SelectCurrent.y);
+            int maxY = std::max(m_SelectAnchor.y, m_SelectCurrent.y);
+            isSelected = (cx >= minX && cx <= maxX && cy >= minY && cy <= maxY);
+        }
+        else
+        {
+            isSelected = (brush.GetAtlasId() == atlas->GetId() &&
+                brush.GetCellIndex() == index &&
+                brush.IsTextured());
+        }
 
         float borderThickness = std::max(TextureConstants::Tile::MinBorderThickness,
             tileSize * TextureConstants::Tile::BorderThicknessRatio);
@@ -389,6 +433,56 @@ namespace Tiles::Editor
             Ctx().SetBrush(newBrush);
         }
 
+        Ctx().GetProject()->MarkAsModified();
+    }
+
+    void PanelTextureSelection::FinalizeSelection(size_t atlasIndex)
+    {
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
+
+        int minX = std::min(m_SelectAnchor.x, m_SelectCurrent.x);
+        int maxX = std::max(m_SelectAnchor.x, m_SelectCurrent.x);
+        int minY = std::min(m_SelectAnchor.y, m_SelectCurrent.y);
+        int maxY = std::max(m_SelectAnchor.y, m_SelectCurrent.y);
+        int width = maxX - minX + 1;
+        int height = maxY - minY + 1;
+
+        // A single cell is the ordinary click-to-toggle brush, not a stamp.
+        if (width == 1 && height == 1)
+        {
+            m_HasStampSelection = false;
+            Ctx().ClearStamp();
+            HandleTextureSelection(minY * atlas->GetWidth() + minX, atlasIndex);
+            return;
+        }
+
+        // Build the M x N stamp from the current brush (transform / tint) plus the
+        // selected atlas cells, row-major with row 0 the top row of the selection.
+        Tile templateTile = Ctx().GetBrush();
+        std::vector<Tile> tiles;
+        tiles.reserve(static_cast<size_t>(width) * height);
+        for (int r = 0; r < height; ++r)
+            for (int c = 0; c < width; ++c)
+            {
+                Tile tile = templateTile;
+                tile.SetPainted(true);
+                tile.SetTextured(true);
+                tile.SetAtlasId(atlas->GetId());
+                tile.SetCellIndex((minY + r) * atlas->GetWidth() + (minX + c));
+                tiles.push_back(tile);
+            }
+
+        Ctx().SetStamp(std::move(tiles), width, height);
+
+        // Point the single brush at the top-left cell so the brush preview / attribute
+        // panels still show a representative tile while a stamp is active.
+        Tile origin = templateTile;
+        origin.SetTextured(true);
+        origin.SetAtlasId(atlas->GetId());
+        origin.SetCellIndex(minY * atlas->GetWidth() + minX);
+        Ctx().SetBrush(origin);
+
+        m_HasStampSelection = true;
         Ctx().GetProject()->MarkAsModified();
     }
 

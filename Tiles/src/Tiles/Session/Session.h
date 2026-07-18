@@ -75,6 +75,15 @@ namespace Tiles
 		// The brush footprint size.
 		[[nodiscard]] int GetBrushSize() const { return m_EditingState.GetBrushSize(); }
 
+		// The multi-cell brush stamp (empty => single-tile brush).
+		[[nodiscard]] bool HasStamp() const { return m_EditingState.HasStamp(); }
+		[[nodiscard]] const std::vector<Tile>& GetStampTiles() const { return m_EditingState.GetStampTiles(); }
+		[[nodiscard]] glm::ivec2 GetStampSize() const { return m_EditingState.GetStampSize(); }
+
+		// Sets / clears the multi-cell brush stamp (row-major, width * height tiles).
+		void SetStamp(std::vector<Tile> tiles, int width, int height) { m_EditingState.SetStamp(std::move(tiles), width, height); }
+		void ClearStamp() { m_EditingState.ClearStamp(); }
+
 		// --- Editing operations ---
 
 		// Flood-fills the working layer from (x, y), bounded by the visible view.
@@ -86,6 +95,10 @@ namespace Tiles
 		// Paints the given cells as one undoable stroke, using the current mode
 		// and brush. A no-op without a working layer or for a non-stroking mode.
 		void PaintStroke(const std::vector<glm::ivec2>& cells);
+
+		// Places the current stamp centered on `anchor` as one undoable block.
+		// A no-op without a working layer or a stamp.
+		void PaintStamp(const glm::ivec2& anchor);
 
 		// Whether shape tools (rectangle / ellipse) paint solid or outline.
 		[[nodiscard]] bool GetShapeFilled() const { return m_EditingState.GetShapeFilled(); }

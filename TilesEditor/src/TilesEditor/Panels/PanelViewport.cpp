@@ -278,6 +278,13 @@ namespace Tiles::Editor
             return;
         }
 
+        // A multi-cell stamp previews its whole block instead of the N x N footprint.
+        if (mode == PaintingMode::Brush && Ctx().HasStamp())
+        {
+            RenderStampPreview(cursor);
+            return;
+        }
+
         for (const glm::ivec2& cell : Ctx().GetBrushFootprint(cursor.x, cursor.y))
             RenderCellPreview(cell);
     }
@@ -330,6 +337,50 @@ namespace Tiles::Editor
         Tiles::Renderer2D::DrawSquare(params);
     }
 
+    // Draws the stamp's tiles as one centered block under the cursor, matching how
+    // BuildStampCommand places them (stamp row 0 = top row, world +Y up).
+    void PanelViewport::RenderStampPreview(const glm::ivec2& cursor)
+    {
+        const std::vector<Tile>& tiles = Ctx().GetStampTiles();
+        glm::ivec2 size = Ctx().GetStampSize();
+        if (tiles.empty() || size.x <= 0 || size.y <= 0)
+            return;
+
+        const int baseX = cursor.x - size.x / 2;
+        const int baseY = cursor.y - size.y / 2;
+
+        for (int r = 0; r < size.y; ++r)
+        {
+            for (int c = 0; c < size.x; ++c)
+            {
+                const Tile& tile = tiles[r * size.x + c];
+                glm::ivec2 cell = { baseX + c, baseY + (size.y - 1 - r) };
+
+                Tiles::Square params;
+                params.Position = {
+                    (cell.x + 0.5f) * m_TileSize,
+                    (cell.y + 0.5f) * m_TileSize,
+                    Viewport::Depth::HoverTile
+                };
+                params.Rotation = tile.GetRotation();
+                params.Tint = tile.GetTint();
+                params.Size = { m_TileSize * tile.GetSize().x, m_TileSize * tile.GetSize().y };
+
+                if (tile.IsTextured() && tile.HasValidAtlas())
+                {
+                    auto atlas = Ctx().GetProject()->GetTextureAtlasById(tile.GetAtlasId());
+                    if (atlas && atlas->HasImage())
+                    {
+                        params.Texture = Host().GetAtlasTexture(*atlas);
+                        params.TexCoords = atlas->GetTextureCoords(tile.GetCellIndex());
+                    }
+                }
+
+                Tiles::Renderer2D::DrawSquare(params);
+            }
+        }
+    }
+
     void PanelViewport::HandleInput()
     {
         PaintingMode mode = Ctx().GetPaintingMode();
@@ -361,6 +412,14 @@ namespace Tiles::Editor
                 BeginShape(gridPos);
             else if (m_Stroking && Input::IsMouseButtonDown(Input::MouseCode::Left))
                 UpdateShape(gridPos);
+            return;
+        }
+
+        // A multi-cell stamp is placed per click (one block, one undo), not dragged.
+        if (mode == PaintingMode::Brush && Ctx().HasStamp())
+        {
+            if (Input::IsMouseButtonPressed(Input::MouseCode::Left))
+                Ctx().PaintStamp(gridPos);
             return;
         }
 

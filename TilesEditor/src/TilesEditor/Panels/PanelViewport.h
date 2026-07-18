@@ -44,6 +44,8 @@ namespace Tiles::Editor
         void RenderHoverTile();
         // Draws the current mode's preview quad (brush/eraser/fill) at one cell.
         void RenderCellPreview(const glm::ivec2& cell);
+        // Draws the multi-cell stamp preview, centered on the cursor cell.
+        void RenderStampPreview(const glm::ivec2& cursor);
 
         // ImGui overlay drawn over the blitted viewport: origin/fit buttons and
         // the hovered tile coordinate. Sets m_PointerOverOverlay.
