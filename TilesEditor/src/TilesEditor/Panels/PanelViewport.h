@@ -51,6 +51,10 @@ namespace Tiles::Editor
         // the hovered tile coordinate. Sets m_PointerOverOverlay.
         void RenderOverlay();
 
+        // A tab per open document across the top of the viewport; click to switch,
+        // trailing "+" opens a fresh blank document.
+        void RenderDocumentTabs();
+
         void HandleInput();
         // Paint-stroke lifecycle (Brush/Eraser): begin on press, extend across the
         // drag, commit one command on release.

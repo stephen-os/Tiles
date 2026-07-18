@@ -4,9 +4,11 @@
 #include "../UI/Theme.h"
 
 #include "Core/Input.h"
+#include "Session/Workspace.h"
 #include "../Rendering/TileSceneRenderer.h"
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 namespace Tiles::Editor
 {
@@ -22,6 +24,8 @@ namespace Tiles::Editor
         ImGui::Begin("Viewport", OpenFlag(), flags);
 
 		m_IsWindowFocused = ImGui::IsWindowFocused();
+
+        RenderDocumentTabs();
 
         if (!Ctx().HasProject())
         {
@@ -58,6 +62,42 @@ namespace Tiles::Editor
         m_MouseDelta = ImGui::GetIO().MouseWheel;
 
         ImGui::End();
+    }
+
+    void PanelViewport::RenderDocumentTabs()
+    {
+        Workspace& space = Space();
+
+        ImGuiTabBarFlags flags = ImGuiTabBarFlags_AutoSelectNewTabs
+            | ImGuiTabBarFlags_FittingPolicyScroll
+            | ImGuiTabBarFlags_TabListPopupButton;
+
+        if (!ImGui::BeginTabBar("##DocumentTabs", flags))
+            return;
+
+        // ImGui owns tab selection; whichever tab is selected becomes the active
+        // document. New tabs auto-select (AutoSelectNewTabs), so open/new stay in sync.
+        for (size_t i = 0; i < space.DocumentCount(); ++i)
+        {
+            const Session& document = space.DocumentAt(i);
+
+            std::string label = document.GetProjectDisplayName();
+            if (document.IsDirty())
+                label += " *";
+            label += "###doc" + std::to_string(i);   // stable id; visible name may repeat
+
+            if (ImGui::BeginTabItem(label.c_str()))
+            {
+                space.SwitchTo(i);
+                ImGui::EndTabItem();
+            }
+        }
+
+        // Trailing "+" opens a fresh blank document.
+        if (ImGui::TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
+            space.NewDocument();
+
+        ImGui::EndTabBar();
     }
 
     void PanelViewport::Update()

@@ -35,6 +35,19 @@ namespace Tiles
 		[[nodiscard]] Session& Active() { return *m_Sessions[m_Active]; }
 		[[nodiscard]] const Session& Active() const { return *m_Sessions[m_Active]; }
 
+		// --- Open documents ---
+
+		[[nodiscard]] size_t DocumentCount() const { return m_Sessions.size(); }
+		[[nodiscard]] size_t ActiveIndex() const { return m_Active; }
+		[[nodiscard]] Session& DocumentAt(size_t index) { return *m_Sessions[index]; }
+		[[nodiscard]] const Session& DocumentAt(size_t index) const { return *m_Sessions[index]; }
+
+		// Makes the document at index active; ignored if out of range.
+		void SwitchTo(size_t index);
+
+		// Opens a fresh blank document (an "Untitled" project) as a new active tab.
+		void NewDocument();
+
 		// --- Project lifecycle (drives the active session + recent list) ---
 
 		// Replaces the active session's project with a fresh one.
@@ -59,6 +72,10 @@ namespace Tiles
 		void ClearRecentProjects() { m_Recent.Clear(); }
 
 	private:
+		// True when the active document is an untouched, never-saved "Untitled"
+		// project -- a New/Open reuses it instead of adding a blank tab.
+		[[nodiscard]] bool ActiveIsPristine() const;
+
 		std::vector<std::unique_ptr<Session>> m_Sessions;
 		size_t m_Active = 0;
 		ProjectHistory m_Recent;

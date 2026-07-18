@@ -10,10 +10,37 @@ namespace Tiles
 		m_Sessions.push_back(std::make_unique<Session>());
 	}
 
-	// Replaces the active session's project with a fresh one.
+	// Opens a named project as a new tab, reusing a pristine active tab when there is one.
 	void Workspace::CreateProject(const std::string& name)
 	{
+		if (!ActiveIsPristine())
+		{
+			m_Sessions.push_back(std::make_unique<Session>());
+			m_Active = m_Sessions.size() - 1;
+		}
+
 		Active().CreateProject(name);
+	}
+
+	// Makes the document at index active.
+	void Workspace::SwitchTo(size_t index)
+	{
+		if (index < m_Sessions.size())
+			m_Active = index;
+	}
+
+	// Opens a fresh blank document ("Untitled") as a new active tab.
+	void Workspace::NewDocument()
+	{
+		m_Sessions.push_back(std::make_unique<Session>());
+		m_Active = m_Sessions.size() - 1;
+	}
+
+	// True when the active document is a never-saved, unmodified "Untitled".
+	bool Workspace::ActiveIsPristine() const
+	{
+		const Project& project = *Active().GetProject();
+		return project.IsNew() && !project.HasUnsavedChanges();
 	}
 
 	// Saves the active project in place, recording it in the recent list on success.
@@ -50,9 +77,25 @@ namespace Tiles
 			return std::unexpected(Error{ ErrorCode::FileNotFound, "File does not exist." });
 		}
 
-		auto result = Active().LoadProject(path);
-		if (!result)
-			return result;
+		if (ActiveIsPristine())
+		{
+			// Reuse the empty active tab.
+			auto result = Active().LoadProject(path);
+			if (!result)
+				return result;
+		}
+		else
+		{
+			// Load into a new session first; only adopt it as a tab on success, so a
+			// bad file never leaves a broken tab behind.
+			auto session = std::make_unique<Session>();
+			auto result = session->LoadProject(path);
+			if (!result)
+				return result;
+
+			m_Sessions.push_back(std::move(session));
+			m_Active = m_Sessions.size() - 1;
+		}
 
 		const Project& project = *Active().GetProject();
 		m_Recent.AddProject(project.GetFilePath(), project.GetProjectName());
