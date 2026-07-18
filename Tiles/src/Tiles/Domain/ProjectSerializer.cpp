@@ -4,6 +4,7 @@
 #include <cstring>
 #include <fstream>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -53,6 +54,15 @@ namespace Tiles
 			file.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(size));
 			return file.good();
 		}
+
+		// Ends a miniz heap writer on every exit path (early return or a thrown
+		// exception), so its internal allocations can't leak. Construct one only
+		// after mz_zip_writer_init_heap has succeeded.
+		struct ZipWriterGuard
+		{
+			mz_zip_archive* Zip;
+			~ZipWriterGuard() { mz_zip_writer_end(Zip); }
+		};
 
 		// Loads the legacy path-referencing JSON format so pre-container projects
 		// still open. Save always writes the self-contained container.
@@ -153,89 +163,114 @@ namespace Tiles
 	std::expected<void, Error> ProjectSerializer::Save(const Project& project, const std::filesystem::path& path)
 	{
 		auto directory = path.parent_path();
-		if (!directory.empty() && !std::filesystem::exists(directory))
-			std::filesystem::create_directories(directory);
+		if (!directory.empty())
+		{
+			std::error_code dirEc;
+			std::filesystem::create_directories(directory, dirEc);
+			if (dirEc)
+				return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to create the project directory: " + dirEc.message() });
+		}
 
 		mz_zip_archive zip;
 		std::memset(&zip, 0, sizeof(zip));
 		if (!mz_zip_writer_init_heap(&zip, 0, 0))
 			return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to initialize the project archive." });
 
-		// Build the manifest as we embed atlas images. One entry per atlas keeps
-		// atlas indices (referenced by tiles) stable; the image is embedded when
-		// the atlas has one.
-		nlohmann::json manifest;
-		manifest[JSON::Project::Name] = project.GetProjectName();
-		manifest[JSON::Project::Version] = 2;
-		manifest[JSON::Project::NextAtlasId] = project.GetNextAtlasId();
-		manifest[JSON::Project::LayerStack] = project.GetLayerStack().ToJSON();
+		// Ends the writer on every path below -- including a json exception thrown
+		// while building or dumping the manifest -- so it can never leak.
+		ZipWriterGuard zipGuard{ &zip };
 
-		const ExportRegion& region = project.GetExportRegion();
-		manifest[JSON::Region::Object] = {
-			{ JSON::Region::X, region.Min.x },
-			{ JSON::Region::Y, region.Min.y },
-			{ JSON::Region::Width, region.Size.x },
-			{ JSON::Region::Height, region.Size.y },
-			{ JSON::Region::Enabled, region.Enabled },
-		};
-
-		nlohmann::json atlasArray = nlohmann::json::array();
-		const auto& atlases = project.GetTextureAtlases();
-		for (size_t i = 0; i < atlases.size(); ++i)
+		try
 		{
-			const auto& atlas = atlases[i];
-			if (!atlas)
-				continue;
+			// Build the manifest as we embed atlas images. One entry per atlas keeps
+			// atlas indices (referenced by tiles) stable; the image is embedded when
+			// the atlas has one.
+			nlohmann::json manifest;
+			manifest[JSON::Project::Name] = project.GetProjectName();
+			manifest[JSON::Project::Version] = 2;
+			manifest[JSON::Project::NextAtlasId] = project.GetNextAtlasId();
+			manifest[JSON::Project::LayerStack] = project.GetLayerStack().ToJSON();
 
-			nlohmann::json jsonAtlas;
-			jsonAtlas[JSON::Atlas::Id] = static_cast<uint32_t>(atlas->GetId());
-			jsonAtlas[JSON::Atlas::Name] = atlas->GetName();
-			jsonAtlas[JSON::Atlas::Width] = atlas->GetWidth();
-			jsonAtlas[JSON::Atlas::Height] = atlas->GetHeight();
+			const ExportRegion& region = project.GetExportRegion();
+			manifest[JSON::Region::Object] = {
+				{ JSON::Region::X, region.Min.x },
+				{ JSON::Region::Y, region.Min.y },
+				{ JSON::Region::Width, region.Size.x },
+				{ JSON::Region::Height, region.Size.y },
+				{ JSON::Region::Enabled, region.Enabled },
+			};
 
-			if (atlas->HasImage())
+			nlohmann::json atlasArray = nlohmann::json::array();
+			const auto& atlases = project.GetTextureAtlases();
+			for (size_t i = 0; i < atlases.size(); ++i)
 			{
-				// Embed the atlas's source image bytes directly -- no GPU readback
-				// or re-encoding -- so the saved file never depends on the original
-				// image's path.
-				const std::vector<uint8_t>& imageBytes = atlas->GetImageBytes();
-				std::string imageName = "atlas" + std::to_string(i) + ".img";
-				if (!mz_zip_writer_add_mem(&zip, imageName.c_str(), imageBytes.data(), imageBytes.size(), MZ_NO_COMPRESSION))
+				const auto& atlas = atlases[i];
+				if (!atlas)
+					continue;
+
+				nlohmann::json jsonAtlas;
+				jsonAtlas[JSON::Atlas::Id] = static_cast<uint32_t>(atlas->GetId());
+				jsonAtlas[JSON::Atlas::Name] = atlas->GetName();
+				jsonAtlas[JSON::Atlas::Width] = atlas->GetWidth();
+				jsonAtlas[JSON::Atlas::Height] = atlas->GetHeight();
+
+				if (atlas->HasImage())
 				{
-					mz_zip_writer_end(&zip);
-					return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to add an atlas image to the archive." });
+					// Embed the atlas's source image bytes directly -- no GPU readback
+					// or re-encoding -- so the saved file never depends on the original
+					// image's path.
+					const std::vector<uint8_t>& imageBytes = atlas->GetImageBytes();
+					std::string imageName = "atlas" + std::to_string(i) + ".img";
+					if (!mz_zip_writer_add_mem(&zip, imageName.c_str(), imageBytes.data(), imageBytes.size(), MZ_NO_COMPRESSION))
+						return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to add an atlas image to the archive." });
+
+					jsonAtlas[JSON::Atlas::Image] = imageName;
 				}
 
-				jsonAtlas[JSON::Atlas::Image] = imageName;
+				atlasArray.push_back(std::move(jsonAtlas));
+			}
+			manifest[JSON::Atlas::Array] = atlasArray;
+
+			std::string manifestStr = manifest.dump(2);
+			if (!mz_zip_writer_add_mem(&zip, ManifestEntry, manifestStr.data(), manifestStr.size(), MZ_DEFAULT_COMPRESSION))
+				return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to add the manifest to the archive." });
+
+			// Finalize into a heap buffer, then write it to a sibling temp file and
+			// rename over the target. rename is atomic on one volume, so a failed or
+			// partial write can never truncate the previous good save.
+			std::filesystem::path tempPath = path;
+			tempPath += ".tmp";
+
+			void* archiveBuffer = nullptr;
+			size_t archiveSize = 0;
+			if (!mz_zip_writer_finalize_heap_archive(&zip, &archiveBuffer, &archiveSize))
+				return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to finalize the project archive." });
+
+			bool wrote = WriteFileBytes(tempPath, archiveBuffer, archiveSize);
+			mz_free(archiveBuffer);
+
+			if (!wrote)
+			{
+				std::error_code removeEc;
+				std::filesystem::remove(tempPath, removeEc);
+				return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to write the project file." });
 			}
 
-			atlasArray.push_back(std::move(jsonAtlas));
-		}
-		manifest[JSON::Atlas::Array] = atlasArray;
+			std::error_code renameEc;
+			std::filesystem::rename(tempPath, path, renameEc);
+			if (renameEc)
+			{
+				std::error_code removeEc;
+				std::filesystem::remove(tempPath, removeEc);
+				return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to replace the project file: " + renameEc.message() });
+			}
 
-		std::string manifestStr = manifest.dump(2);
-		if (!mz_zip_writer_add_mem(&zip, ManifestEntry, manifestStr.data(), manifestStr.size(), MZ_DEFAULT_COMPRESSION))
+			return {};
+		}
+		catch (const std::exception& e)
 		{
-			mz_zip_writer_end(&zip);
-			return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to add the manifest to the archive." });
+			return std::unexpected(Error{ ErrorCode::WriteFailure, std::string("Failed to encode the project file: ") + e.what() });
 		}
-
-		void* archiveBuffer = nullptr;
-		size_t archiveSize = 0;
-		if (!mz_zip_writer_finalize_heap_archive(&zip, &archiveBuffer, &archiveSize))
-		{
-			mz_zip_writer_end(&zip);
-			return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to finalize the project archive." });
-		}
-
-		bool wrote = WriteFileBytes(path, archiveBuffer, archiveSize);
-		mz_free(archiveBuffer);
-		mz_zip_writer_end(&zip);
-
-		if (!wrote)
-			return std::unexpected(Error{ ErrorCode::WriteFailure, "Failed to write the project file." });
-
-		return {};
 	}
 
 	std::expected<std::shared_ptr<Project>, Error> ProjectSerializer::Load(const std::filesystem::path& path)
