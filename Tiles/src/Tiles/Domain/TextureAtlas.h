@@ -49,6 +49,11 @@ namespace Tiles
 		[[nodiscard]] AtlasId GetId() const { return m_Id; }
 		void SetId(AtlasId id) { m_Id = id; }
 
+		// A free-form display label (empty until set; the editor falls back to a
+		// positional "Atlas N"). This is a label, not an identity -- that is GetId().
+		[[nodiscard]] const std::string& GetName() const { return m_Name; }
+		void SetName(const std::string& name) { m_Name = name; }
+
 		[[nodiscard]] bool HasImage() const { return !m_ImageBytes.empty(); }
 		// The raw encoded source image bytes (empty when the atlas has no image).
 		[[nodiscard]] const std::vector<uint8_t>& GetImageBytes() const { return m_ImageBytes; }
@@ -76,5 +81,6 @@ namespace Tiles
 		std::vector<glm::vec4> m_TexCoords;     // per-cell UV rects, filled by Resize
 		uint64_t m_Version = 0;
 		AtlasId m_Id = AtlasId::Invalid;
+		std::string m_Name;                     // display label; empty => positional fallback
 	};
 }

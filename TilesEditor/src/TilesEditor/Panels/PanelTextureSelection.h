@@ -6,9 +6,10 @@
 
 namespace Tiles::Editor
 {
-    // Panel for the project's texture atlases: a tab per atlas, controls to
-    // add/remove atlases and set an atlas image and grid dimensions, and a tile
-    // grid whose cells pick the texture applied to the current brush.
+    // Panel for the project's texture atlases: a collapsible section per atlas
+    // (rename, source image, grid dimensions, remove) whose cells pick the texture
+    // applied to the current brush. Atlases are referenced by stable id, so the
+    // picked tile survives atlas add / remove / reorder.
     class PanelTextureSelection : public Panel
     {
     public:
@@ -19,41 +20,45 @@ namespace Tiles::Editor
         void Update() override;
 
     private:
-        void RenderBlockAtlasTabs();
-        void RenderBlockAtlasControls();
-        void RenderBlockCurrentAtlasContent();
+        void RenderBlockToolbar();
+        void RenderBlockAtlasList();
         void RenderBlockFileDialog();
 
-        void RenderSectionAtlasPath();
-        void RenderSectionAtlasDimensions();
-        void RenderSectionTextureGrid();
+        // One collapsible section for the atlas at atlasIndex. Returns true if its
+        // "Remove Atlas" was clicked this frame; removal is deferred to after the
+        // list loop so the atlas vector is not mutated mid-iteration.
+        bool RenderComponentAtlasHeader(size_t atlasIndex);
 
-        void RenderComponentAtlasTab(const char* id, size_t atlasIndex, const char* tabName);
-        void RenderComponentTextureGridItem(const char* id, int index, int x, int y, size_t atlasIndex, float tileSize);
-        void RenderComponentSelectionBorder(const char* id, int index, size_t atlasIndex, float tileSize);
-        void RenderComponentFilePathDisplay(const char* id, const std::string& path);
-        void RenderComponentDimensionInput(const char* id, const char* label, int* value);
+        void RenderSectionAtlasName(size_t atlasIndex);
+        void RenderSectionAtlasImage(size_t atlasIndex);
+        void RenderSectionAtlasDimensions(size_t atlasIndex);
+        void RenderSectionTextureGrid(size_t atlasIndex, float tileSize);
+
+        void RenderComponentTextureGridItem(const char* id, int index, size_t atlasIndex, float tileSize);
+        void RenderComponentSelectionBorder(int index, size_t atlasIndex, float tileSize);
+        void RenderComponentFilePathDisplay(const std::string& path);
 
         // Chooses a grid cell size that fits atlasWidth cells across availableWidth,
         // clamped to min/max bounds and biased toward larger cells for small atlases.
         float CalculateDynamicTileSize(float availableWidth, int atlasWidth) const;
 
-        // Points the current atlas at newPath, stored relative to the working
-        // directory so saved projects stay portable. No-op if the file is missing.
+        // The label shown for an atlas: its name, or a positional "Atlas N" fallback.
+        std::string AtlasDisplayName(const Tiles::TextureAtlas& atlas, size_t atlasIndex) const;
+
+        // Points the atlas awaiting a file-dialog result at newPath, stored relative
+        // to the working directory so saved projects stay portable. No-op if the
+        // file is missing or that atlas is gone.
         void HandleAtlasFileSelection(const std::string& newPath);
 
         // Applies the clicked tile to the brush, or clears the brush's texture if
         // that same tile is already selected (click-to-toggle).
         void HandleTextureSelection(int index, size_t atlasIndex);
-        void OpenFileDialog();
+        void OpenFileDialog(size_t atlasIndex);
         void HandleFileDialogResult();
         void AddNewAtlas();
-        void RemoveCurrentAtlas();
-        void SetCurrentAtlasIndex(size_t index);
-        bool HasValidCurrentAtlas() const;
 
     private:
         std::shared_ptr<Tiles::Texture> m_CheckerboardTexture = nullptr;
-        size_t m_CurrentAtlasIndex = 0;
+        AtlasId m_DialogAtlasId = AtlasId::Invalid;   // atlas awaiting a Browse... result
     };
 }

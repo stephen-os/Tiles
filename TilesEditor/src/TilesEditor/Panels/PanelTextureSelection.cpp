@@ -1,10 +1,13 @@
 #include "PanelTextureSelection.h"
 #include "../UIConstants.h"
 #include "../UI/Theme.h"
+#include "../UI/Widgets.h"
 #include "ImGuiFileDialog.h"
 #include "Core/Logger.h"
-#include <filesystem>
 #include <algorithm>
+#include <cstdio>
+#include <filesystem>
+#include <string>
 
 namespace Tiles::Editor
 {
@@ -13,121 +16,148 @@ namespace Tiles::Editor
         m_CheckerboardTexture = Tiles::Texture::Create(AssetPath::Checkerboard);
     }
 
+    // Draws the panel: an add-atlas toolbar over a stack of per-atlas sections.
     void PanelTextureSelection::Render()
     {
         ImGui::Begin("Texture Selection", OpenFlag());
-
         ImGui::PushID("TextureSelection");
 
-        RenderBlockAtlasTabs();
+        RenderBlockToolbar();
         ImGui::Separator();
-        RenderBlockAtlasControls();
-        ImGui::Separator();
-        RenderBlockCurrentAtlasContent();
+        RenderBlockAtlasList();
         RenderBlockFileDialog();
 
         ImGui::PopID();
         ImGui::End();
     }
 
+    // No per-frame state to advance.
     void PanelTextureSelection::Update()
     {
-        // No specific update logic required for this panel
     }
 
-    void PanelTextureSelection::RenderBlockAtlasTabs()
+    // The top toolbar: a single control to append a new blank atlas.
+    void PanelTextureSelection::RenderBlockToolbar()
+    {
+        if (UI::Button("Add Atlas", UI::ButtonVariant::Primary))
+            AddNewAtlas();
+    }
+
+    // Renders one collapsible section per atlas, then applies a click-to-remove
+    // after the loop so the atlas vector is never mutated mid-iteration.
+    void PanelTextureSelection::RenderBlockAtlasList()
     {
         auto& atlases = Ctx().GetProject()->GetTextureAtlases();
-
         if (atlases.empty())
         {
-            ImGui::Text("No texture atlases. Click 'Add Atlas' to create one.");
+            UI::TextMuted("No texture atlases. Click 'Add Atlas' to create one.");
             return;
         }
 
-        if (ImGui::BeginTabBar("##AtlasTabBar"))
+        AtlasId toRemove = AtlasId::Invalid;
+        for (size_t i = 0; i < atlases.size(); ++i)
+        {
+            if (RenderComponentAtlasHeader(i))
+                toRemove = atlases[i]->GetId();
+        }
+
+        // Resolve the id back to its current position and remove it. Ids are stable,
+        // so this is unambiguous even though other atlases may have shifted.
+        if (toRemove != AtlasId::Invalid)
         {
             for (size_t i = 0; i < atlases.size(); ++i)
             {
-                std::string tabName = "Atlas " + std::to_string(i + 1);
-                RenderComponentAtlasTab(("AtlasTab_" + std::to_string(i)).c_str(), i, tabName.c_str());
+                if (atlases[i]->GetId() == toRemove)
+                {
+                    Ctx().GetProject()->RemoveTextureAtlas(i);
+                    break;
+                }
             }
-            ImGui::EndTabBar();
         }
     }
 
-    void PanelTextureSelection::RenderComponentAtlasTab(const char* id, size_t atlasIndex, const char* tabName)
+    // One atlas section: a header (its display name) over rename, image, dimensions,
+    // the tile grid, and a remove control. Returns true if remove was requested.
+    bool PanelTextureSelection::RenderComponentAtlasHeader(size_t atlasIndex)
     {
-        if (ImGui::BeginTabItem(tabName))
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
+
+        // Scope every child id to this atlas so identical labels never collide.
+        ImGui::PushID(static_cast<int>(atlas->GetId()));
+
+        // "###" keeps the header's id stable while its visible name changes.
+        std::string header = AtlasDisplayName(*atlas, atlasIndex) + "###AtlasHeader";
+        bool removeRequested = false;
+
+        if (ImGui::CollapsingHeader(header.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::EndTabItem();
+            ImGui::Indent();
+
+            RenderSectionAtlasName(atlasIndex);
+            RenderSectionAtlasImage(atlasIndex);
+            RenderSectionAtlasDimensions(atlasIndex);
+
+            // Bound the grid's height so multiple atlas sections stack instead of one
+            // filling the panel; the child scrolls when the atlas is taller.
+            float tileSize = CalculateDynamicTileSize(ImGui::GetContentRegionAvail().x, atlas->GetWidth());
+            float naturalHeight = atlas->GetHeight() * tileSize;
+            float gridHeight = std::min(naturalHeight, TextureConstants::Panel::MaxGridHeight);
+
+            ImGui::BeginChild("##TextureGrid", ImVec2(0, gridHeight), true, ImGuiWindowFlags_HorizontalScrollbar);
+            RenderSectionTextureGrid(atlasIndex, tileSize);
+            ImGui::EndChild();
+
+            if (UI::Button("Remove Atlas", UI::ButtonVariant::Danger))
+                removeRequested = true;
+
+            ImGui::Unindent();
         }
 
-        if (ImGui::IsItemClicked())
+        ImGui::PopID();
+        return removeRequested;
+    }
+
+    // An inline rename field; an empty name shows the positional fallback as a hint.
+    void PanelTextureSelection::RenderSectionAtlasName(size_t atlasIndex)
+    {
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
+
+        char buffer[TextureConstants::Panel::NameBufferSize];
+        std::snprintf(buffer, sizeof(buffer), "%s", atlas->GetName().c_str());
+
+        std::string hint = "Atlas " + std::to_string(atlasIndex + 1);
+        ImGui::SetNextItemWidth(-1.0f);
+        if (ImGui::InputTextWithHint("##AtlasName", hint.c_str(), buffer, sizeof(buffer)))
         {
-            SetCurrentAtlasIndex(atlasIndex);
+            atlas->SetName(buffer);
+            Ctx().GetProject()->MarkAsModified();
         }
     }
 
-    void PanelTextureSelection::RenderBlockAtlasControls()
+    // The atlas image row: browse when unset, otherwise show the file + a clear button.
+    void PanelTextureSelection::RenderSectionAtlasImage(size_t atlasIndex)
     {
-        if (ImGui::Button("Add Atlas"))
-        {
-            AddNewAtlas();
-        }
-
-        ImGui::SameLine();
-
-        if (ImGui::Button("Remove Atlas"))
-        {
-            RemoveCurrentAtlas();
-        }
-    }
-
-    void PanelTextureSelection::RenderBlockCurrentAtlasContent()
-    {
-        if (!HasValidCurrentAtlas())
-        {
-            ImGui::Text("No atlas selected");
-            return;
-        }
-
-        RenderSectionAtlasPath();
-        ImGui::Separator();
-        RenderSectionAtlasDimensions();
-        ImGui::Separator();
-
-        ImGui::BeginChild("##TextureSelectionChild", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-        RenderSectionTextureGrid();
-        ImGui::EndChild();
-    }
-
-    void PanelTextureSelection::RenderSectionAtlasPath()
-    {
-        auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
 
         ImGui::AlignTextToFramePadding();
-        ImGui::Text("Atlas:");
+        ImGui::Text("Image:");
         ImGui::SameLine();
 
         if (!atlas->HasImage())
         {
             ImGui::AlignTextToFramePadding();
-            ImGui::TextWrapped("[ No file selected ]");
+            ImGui::TextWrapped("[ none ]");
             ImGui::SameLine();
 
-            if (ImGui::Button("Browse..."))
-            {
-                OpenFileDialog();
-            }
+            if (UI::Button("Browse..."))
+                OpenFileDialog(atlasIndex);
         }
         else
         {
-            std::string path = atlas->GetSourcePath();
-            RenderComponentFilePathDisplay("AtlasPath", path);
+            RenderComponentFilePathDisplay(atlas->GetSourcePath());
             ImGui::SameLine();
 
-            if (ImGui::Button("Remove"))
+            if (UI::Button("Clear"))
             {
                 atlas->RemoveImage();
                 Ctx().GetProject()->MarkAsModified();
@@ -135,22 +165,23 @@ namespace Tiles::Editor
         }
     }
 
-    void PanelTextureSelection::RenderComponentFilePathDisplay(const char* id, const std::string& path)
+    // Shows just the file name of a stored atlas path, wrapped in brackets.
+    void PanelTextureSelection::RenderComponentFilePathDisplay(const std::string& path)
     {
         ImGui::AlignTextToFramePadding();
         std::string filename = path.substr(path.find_last_of("/\\") + 1);
         ImGui::TextWrapped("[ %s ]", filename.c_str());
     }
 
-    void PanelTextureSelection::RenderSectionAtlasDimensions()
+    // Width/height cell counts; a change re-slices the atlas's UV grid.
+    void PanelTextureSelection::RenderSectionAtlasDimensions(size_t atlasIndex)
     {
-        auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
 
-        ImGui::Text("Atlas Dimensions");
         ImGui::PushItemWidth(UI::Component::InputWidth);
 
         int width = atlas->GetWidth();
-        RenderComponentDimensionInput("AtlasWidth", "Width", &width);
+        ImGui::InputInt("Width##AtlasWidth", &width);
         if (width != atlas->GetWidth())
         {
             atlas->Resize(std::max(1, width), atlas->GetHeight());
@@ -158,7 +189,7 @@ namespace Tiles::Editor
         }
 
         int height = atlas->GetHeight();
-        RenderComponentDimensionInput("AtlasHeight", "Height", &height);
+        ImGui::InputInt("Height##AtlasHeight", &height);
         if (height != atlas->GetHeight())
         {
             atlas->Resize(atlas->GetWidth(), std::max(1, height));
@@ -168,35 +199,25 @@ namespace Tiles::Editor
         ImGui::PopItemWidth();
     }
 
-    void PanelTextureSelection::RenderComponentDimensionInput(const char* id, const char* label, int* value)
+    // Lays out the atlas's cells as a clickable grid at the given cell size.
+    void PanelTextureSelection::RenderSectionTextureGrid(size_t atlasIndex, float tileSize)
     {
-        std::string inputId = std::string("##") + id + "_Input";
-        ImGui::InputInt(inputId.c_str(), value);
-    }
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
 
-    void PanelTextureSelection::RenderSectionTextureGrid()
-    {
-        auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
-
-        // Set up grid styling for seamless tiles
+        // Seamless tiles: no rounding, no spacing, no frame padding.
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
 
-        // Calculate dynamic tile size based on available width
-        ImVec2 availableSize = ImGui::GetContentRegionAvail();
-        float currentTileSize = CalculateDynamicTileSize(availableSize.x, atlas->GetWidth());
-
-        // Render texture grid with checkerboard backgrounds
         for (int y = 0; y < atlas->GetHeight(); y++)
         {
             for (int x = 0; x < atlas->GetWidth(); x++)
             {
-                // Draw checkerboard background
+                // Checkerboard behind the cell shows transparency.
                 ImVec2 currentPos = ImGui::GetCursorScreenPos();
                 ImVec2 minPos = currentPos;
-                ImVec2 maxPos = ImVec2(currentPos.x + currentTileSize, currentPos.y + currentTileSize);
+                ImVec2 maxPos = ImVec2(currentPos.x + tileSize, currentPos.y + tileSize);
 
                 if (m_CheckerboardTexture)
                 {
@@ -205,27 +226,25 @@ namespace Tiles::Editor
                 }
 
                 int index = y * atlas->GetWidth() + x;
-                std::string itemId = "GridItem_" + std::to_string(x) + "_" + std::to_string(y);
-                RenderComponentTextureGridItem(itemId.c_str(), index, x, y, m_CurrentAtlasIndex, currentTileSize);
+                std::string itemId = "GridItem_" + std::to_string(index);
+                RenderComponentTextureGridItem(itemId.c_str(), index, atlasIndex, tileSize);
 
-                // Handle row wrapping
+                // Keep cells on one row until the atlas width wraps.
                 if ((index + 1) % atlas->GetWidth() != 0)
-                {
                     ImGui::SameLine();
-                }
             }
         }
 
         ImGui::PopStyleVar(4);
     }
 
-    void PanelTextureSelection::RenderComponentTextureGridItem(const char* id, int index, int x, int y, size_t atlasIndex, float tileSize)
+    // One grid cell: the atlas sub-image (or a transparent button for an imageless
+    // atlas), click-to-select, plus its selection border.
+    void PanelTextureSelection::RenderComponentTextureGridItem(const char* id, int index, size_t atlasIndex, float tileSize)
     {
-        auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
-
+        auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
         ImVec2 buttonSize(tileSize, tileSize);
 
-        // Render texture or transparent empty button
         auto texture = Host().GetAtlasTexture(*atlas);
         if (texture)
         {
@@ -238,7 +257,6 @@ namespace Tiles::Editor
         }
         else
         {
-            // Transparent button for empty atlas slots
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -249,17 +267,15 @@ namespace Tiles::Editor
             ImGui::PopStyleColor(3);
         }
 
-        // Handle texture selection
         if (ImGui::IsItemClicked())
-        {
             HandleTextureSelection(index, atlasIndex);
-        }
 
-        // Draw selection border
-        RenderComponentSelectionBorder(id, index, atlasIndex, tileSize);
+        RenderComponentSelectionBorder(index, atlasIndex, tileSize);
     }
 
-    void PanelTextureSelection::RenderComponentSelectionBorder(const char* id, int index, size_t atlasIndex, float tileSize)
+    // Outlines the cell: accent-thick when it is the brush's selected tile, a thin
+    // surface line otherwise.
+    void PanelTextureSelection::RenderComponentSelectionBorder(int index, size_t atlasIndex, float tileSize)
     {
         auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
         auto& brush = Ctx().GetBrush();
@@ -267,16 +283,13 @@ namespace Tiles::Editor
         ImVec2 itemMin = ImGui::GetItemRectMin();
         ImVec2 itemMax = ImGui::GetItemRectMax();
 
-        // Check if this texture is selected
         bool isSelected = (brush.GetAtlasId() == atlas->GetId() &&
             brush.GetCellIndex() == index &&
             brush.IsTextured());
 
-        // Scale border thickness with tile size
         float borderThickness = std::max(TextureConstants::Tile::MinBorderThickness,
             tileSize * TextureConstants::Tile::BorderThicknessRatio);
 
-        // Draw appropriate border
         ImU32 borderColor = isSelected ?
             ImGui::ColorConvertFloat4ToU32(UI::GetTheme().Accent) :
             ImGui::ColorConvertFloat4ToU32(UI::GetTheme().Surface);
@@ -285,6 +298,7 @@ namespace Tiles::Editor
         ImGui::GetWindowDrawList()->AddRect(itemMin, itemMax, borderColor, 0.0f, 0, thickness);
     }
 
+    // Displays the modal atlas-image file dialog and applies its result.
     void PanelTextureSelection::RenderBlockFileDialog()
     {
         ImVec2 dialogSize(UI::Dialog::FileDialogWidth, UI::Dialog::FileDialogHeight);
@@ -324,18 +338,27 @@ namespace Tiles::Editor
         return std::max(clampedSize, TextureConstants::Tile::MinSize);
     }
 
+    // The atlas's name, or a positional "Atlas N" when it has none.
+    std::string PanelTextureSelection::AtlasDisplayName(const Tiles::TextureAtlas& atlas, size_t atlasIndex) const
+    {
+        if (!atlas.GetName().empty())
+            return atlas.GetName();
+
+        return "Atlas " + std::to_string(atlasIndex + 1);
+    }
+
     void PanelTextureSelection::HandleAtlasFileSelection(const std::string& newPath)
     {
-        if (std::filesystem::exists(newPath))
-        {
-            auto atlas = Ctx().GetProject()->GetTextureAtlas(m_CurrentAtlasIndex);
-            if (atlas)
-            {
-                std::filesystem::path relativePath = std::filesystem::relative(newPath, std::filesystem::current_path());
-                atlas->SetImage(relativePath.string());
-                Ctx().GetProject()->MarkAsModified();
-            }
-        }
+        if (!std::filesystem::exists(newPath))
+            return;
+
+        auto atlas = Ctx().GetProject()->GetTextureAtlasById(m_DialogAtlasId);
+        if (!atlas)
+            return;
+
+        std::filesystem::path relativePath = std::filesystem::relative(newPath, std::filesystem::current_path());
+        atlas->SetImage(relativePath.string());
+        Ctx().GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::HandleTextureSelection(int index, size_t atlasIndex)
@@ -369,8 +392,11 @@ namespace Tiles::Editor
         Ctx().GetProject()->MarkAsModified();
     }
 
-    void PanelTextureSelection::OpenFileDialog()
+    void PanelTextureSelection::OpenFileDialog(size_t atlasIndex)
     {
+        // Remember which atlas the browse is for, by stable id, before the dialog opens.
+        m_DialogAtlasId = Ctx().GetProject()->GetTextureAtlas(atlasIndex)->GetId();
+
         IGFD::FileDialogConfig config;
         config.path = TextureConstants::FileDialog::DefaultPath;
         config.flags = ImGuiFileDialogFlags_Modal;
@@ -397,45 +423,5 @@ namespace Tiles::Editor
     {
         auto newAtlas = Tiles::TextureAtlas::Create(TextureConstants::Atlas::DefaultWidth, TextureConstants::Atlas::DefaultHeight);
         Ctx().GetProject()->AddTextureAtlas(newAtlas);
-        SetCurrentAtlasIndex(Ctx().GetProject()->GetTextureAtlasCount() - 1);
-        Ctx().GetProject()->MarkAsModified();
-    }
-
-    void PanelTextureSelection::RemoveCurrentAtlas()
-    {
-        auto& atlases = Ctx().GetProject()->GetTextureAtlases();
-        if (atlases.empty())
-        {
-            return;
-        }
-
-        Ctx().GetProject()->RemoveTextureAtlas(m_CurrentAtlasIndex);
-
-        // Adjust current index if necessary
-        if (m_CurrentAtlasIndex >= atlases.size() && !atlases.empty())
-        {
-            m_CurrentAtlasIndex = atlases.size() - 1;
-        }
-        else if (atlases.empty())
-        {
-            m_CurrentAtlasIndex = 0;
-        }
-
-        Ctx().GetProject()->MarkAsModified();
-    }
-
-    void PanelTextureSelection::SetCurrentAtlasIndex(size_t index)
-    {
-        auto& atlases = Ctx().GetProject()->GetTextureAtlases();
-        if (index < atlases.size())
-        {
-            m_CurrentAtlasIndex = index;
-        }
-    }
-
-    bool PanelTextureSelection::HasValidCurrentAtlas() const
-    {
-        auto& atlases = Ctx().GetProject()->GetTextureAtlases();
-        return m_CurrentAtlasIndex < atlases.size();
     }
 }

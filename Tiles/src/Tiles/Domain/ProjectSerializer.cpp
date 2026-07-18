@@ -189,6 +189,7 @@ namespace Tiles
 
 			nlohmann::json jsonAtlas;
 			jsonAtlas[JSON::Atlas::Id] = static_cast<uint32_t>(atlas->GetId());
+			jsonAtlas[JSON::Atlas::Name] = atlas->GetName();
 			jsonAtlas[JSON::Atlas::Width] = atlas->GetWidth();
 			jsonAtlas[JSON::Atlas::Height] = atlas->GetHeight();
 
@@ -335,6 +336,7 @@ namespace Tiles
 					project->AddTextureAtlas(atlas);
 					if (jsonAtlas.contains(JSON::Atlas::Id))
 						atlas->SetId(static_cast<AtlasId>(jsonAtlas[JSON::Atlas::Id].get<uint32_t>()));
+					atlas->SetName(jsonAtlas.value(JSON::Atlas::Name, ""));
 				}
 
 				// Restore the id allocator past every id just loaded (migrated files

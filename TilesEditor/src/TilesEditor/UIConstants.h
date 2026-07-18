@@ -80,6 +80,12 @@ namespace Tiles
             constexpr const char* FileFilters = ".png,.jpg,.jpeg";
             constexpr const char* DefaultPath = ".";
         }
+
+        namespace Panel
+        {
+            constexpr float MaxGridHeight = 240.0f;   // bounded per-atlas grid so headers stack
+            constexpr int NameBufferSize = 128;       // rename input buffer
+        }
     }
 
     namespace Render2D

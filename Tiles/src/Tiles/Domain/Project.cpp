@@ -139,6 +139,7 @@ namespace Tiles
 
 				auto atlas = TextureAtlas::Create(texturePath, atlasWidth, atlasHeight);
 				atlas->SetId(static_cast<AtlasId>(position));
+				atlas->SetName(jsonAtlas.value(JSON::Atlas::Name, ""));
 				project->m_TextureAtlases.push_back(std::move(atlas));
 				loadedCount++;
 			}

@@ -54,6 +54,7 @@ namespace Tiles
 			constexpr const char* Width = "atlas_width";
 			constexpr const char* Height = "atlas_height";
 			constexpr const char* Id = "atlas_id";           // stable per-project id
+			constexpr const char* Name = "atlas_name";       // display label (optional)
 		}
 
 		namespace Region
