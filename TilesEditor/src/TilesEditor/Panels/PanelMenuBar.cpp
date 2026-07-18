@@ -4,6 +4,8 @@
 #include "Core/Application.h"
 #include "Session/Workspace.h"
 
+#include <optional>
+
 namespace Tiles::Editor
 {
     void PanelMenuBar::Render()
@@ -65,6 +67,12 @@ namespace Tiles::Editor
             {
                 if (hasRecentProjects)
                 {
+                    // Loading a recent project mutates the recent-projects list
+                    // (reorder on success, prune on a missing file), which would
+                    // invalidate the reference and index the loop below iterates.
+                    // Record the click and run the load once the loop has ended.
+                    std::optional<std::filesystem::path> projectToLoad;
+
                     size_t projectCount = Space().GetRecentProjectCount();
                     for (size_t i = 0; i < projectCount; ++i)
                     {
@@ -79,9 +87,7 @@ namespace Tiles::Editor
 
                         if (ImGui::MenuItem(menuText.c_str(), shortcut.empty() ? nullptr : shortcut.c_str()))
                         {
-                            auto result = Space().LoadProject(entry.filePath);
-                            if (!result)
-                                Host().Notify(result.error().message);
+                            projectToLoad = entry.filePath;
                         }
 
                         if (ImGui::IsItemHovered())
@@ -94,6 +100,14 @@ namespace Tiles::Editor
                     if (ImGui::MenuItem("Clear Recent Projects"))
                     {
                         Space().ClearRecentProjects();
+                    }
+
+                    // Deferred: safe to mutate the list now that iteration is done.
+                    if (projectToLoad)
+                    {
+                        auto result = Space().LoadProject(*projectToLoad);
+                        if (!result)
+                            Host().Notify(result.error().message);
                     }
                 }
                 else
