@@ -106,6 +106,7 @@ namespace Tiles::Editor
         bool m_IsDragging = false;
         bool m_IsWindowFocused = false;
         bool m_PointerOverOverlay = false;   // pointer is over the overlay controls; suppresses painting
+        bool m_PointerOverCanvas = false;    // pointer is over the canvas image; a press must land here to start an interaction
 
         ImVec2 m_CurrentMousePosition = { 0.0f, 0.0f };
         ImVec2 m_PreviousMousePosition = { 0, 0 };

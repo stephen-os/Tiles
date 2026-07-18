@@ -66,12 +66,13 @@ namespace Tiles::Editor
 
         m_MouseDelta = ImGui::GetIO().MouseWheel;
 
-        // Custom crosshair cursor, only while the pointer is over the canvas itself
-        // (not the tab bar or the overlay controls).
-        bool overCanvas = ImGui::IsWindowHovered()
+        // Whether the pointer is over the canvas image itself (not the tab bar or
+        // the overlay controls). Drives the crosshair cursor and gates the start of
+        // paint input in HandleInput().
+        m_PointerOverCanvas = ImGui::IsWindowHovered()
             && ImGui::IsMouseHoveringRect(canvasMin, canvasMax)
             && !m_PointerOverOverlay;
-        RenderCursor(overCanvas);
+        RenderCursor(m_PointerOverCanvas);
 
         ImGui::End();
     }
@@ -596,6 +597,13 @@ namespace Tiles::Editor
 
         // Don't start painting through the overlay controls.
         if (m_PointerOverOverlay)
+            return;
+
+        // A fresh press must land on the canvas to BEGIN an interaction, so a click
+        // on the tab bar, the "+" button, or window padding never starts a stroke,
+        // fill, or marquee. An in-progress drag still updates and commits from
+        // anywhere (handled above).
+        if (Input::IsMouseButtonPressed(Input::MouseCode::Left) && !m_PointerOverCanvas)
             return;
 
         glm::ivec2 gridPos = GetGridPositionUnderMouse();
