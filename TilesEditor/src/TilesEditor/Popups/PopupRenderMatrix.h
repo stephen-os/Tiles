@@ -50,8 +50,9 @@ namespace Tiles::Editor
         const char* GetFormatExtension() const;
 
         // Renders the given layers into an offscreen target sized to the project
-        // bounds and writes it to fileName.
-        void ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName);
+        // bounds and writes it to fileName. Returns true only if a file was written
+        // (false on no content to draw or a failed write).
+        [[nodiscard]] bool ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName);
 
         void InitializeDialog();
 

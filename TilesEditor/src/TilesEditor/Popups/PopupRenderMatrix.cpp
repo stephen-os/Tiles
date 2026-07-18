@@ -444,9 +444,14 @@ namespace Tiles::Editor
         auto usedGroups = GetUsedRenderGroups();
 
         if (usedGroups.empty())
+        {
+            Host().Notify("No layers are assigned to a render group; nothing to export.");
             return;
+        }
 
         m_ShowSuccessMessage = false;
+        size_t attempted = 0;
+        size_t exported = 0;
 
         if (usedGroups.size() == 1)
         {
@@ -467,7 +472,9 @@ namespace Tiles::Editor
 
             if (!layerIndices.empty())
             {
-                ExportRenderGroup(layerIndices, GetFullExportPath(GetExportFileName()));
+                ++attempted;
+                if (ExportRenderGroup(layerIndices, GetFullExportPath(GetExportFileName())))
+                    ++exported;
             }
         }
         else
@@ -492,12 +499,24 @@ namespace Tiles::Editor
 
                 if (!layerIndices.empty())
                 {
-                    ExportRenderGroup(layerIndices, GetFullExportPath(GetExportFileName(renderGroup)));
+                    ++attempted;
+                    if (ExportRenderGroup(layerIndices, GetFullExportPath(GetExportFileName(renderGroup))))
+                        ++exported;
                 }
             }
         }
 
-        m_ShowSuccessMessage = true;
+        // Report the real outcome instead of assuming success: green only when every
+        // attempted image was written; otherwise surface why via the notification popup.
+        if (attempted == 0)
+            Host().Notify("No layers matched the export settings; nothing was exported.");
+        else if (exported == attempted)
+            m_ShowSuccessMessage = true;
+        else if (exported == 0)
+            Host().Notify("Export failed: no image files could be written. Check the output folder and format.");
+        else
+            Host().Notify("Export incomplete: only " + std::to_string(exported) + " of "
+                + std::to_string(attempted) + " images were written.");
     }
 
     std::vector<std::string> PopupRenderMatrix::GetUsedRenderGroups() const
@@ -551,10 +570,10 @@ namespace Tiles::Editor
         }
     }
 
-    void PopupRenderMatrix::ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName)
+    bool PopupRenderMatrix::ExportRenderGroup(const std::vector<size_t>& layerIndices, const std::filesystem::path& fileName)
     {
         if (layerIndices.empty() || !Ctx().HasProject())
-            return;
+            return false;
 
         const auto& project = *Ctx().GetProject();
         const auto& layerStack = project.GetLayerStack();
@@ -576,7 +595,7 @@ namespace Tiles::Editor
         {
             auto bounds = layerStack.GetBounds();
             if (!bounds)
-                return;
+                return false;
             minX = bounds->x; minY = bounds->y;
             maxX = bounds->z; maxY = bounds->w;
         }
@@ -614,6 +633,6 @@ namespace Tiles::Editor
         Tiles::Renderer2D::EndFrame();
         Tiles::Renderer2D::SetRenderTarget(nullptr);
 
-        renderTarget->SaveToFile(fileName.string());
+        return renderTarget->SaveToFile(fileName.string());
     }
 }
