@@ -1,9 +1,11 @@
 #include "Domain/ProjectSerializer.h"
 
-#include <fstream>
-#include <vector>
+#include <cmath>
 #include <cstring>
+#include <fstream>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "json.hpp"
 #include <miniz.h>
@@ -18,6 +20,9 @@ namespace Tiles
 	namespace
 	{
 		constexpr const char* ManifestEntry = "manifest.json";
+
+		// Defined below; brings a pre-AtlasId manifest up to the current schema in place.
+		void MigrateLegacyTilesToV2(nlohmann::json& manifest);
 
 		// Reads an entire file into a byte buffer (binary, no newline translation).
 		bool ReadFileBytes(const std::filesystem::path& path, std::vector<uint8_t>& out)
@@ -56,6 +61,12 @@ namespace Tiles
 			try
 			{
 				nlohmann::json jsonProject = nlohmann::json::parse(bytes);
+
+				// Pre-container files predate AtlasId; migrate their tiles before
+				// FromJSON reads them so textures survive the load.
+				if (jsonProject.value(JSON::Project::Version, 1) < 2)
+					MigrateLegacyTilesToV2(jsonProject);
+
 				std::shared_ptr<Project> project = Project::FromJSON(jsonProject);
 				if (!project)
 					return std::unexpected(Error{ ErrorCode::ReadFailure, "Invalid project file format." });
@@ -64,6 +75,77 @@ namespace Tiles
 			catch (const std::exception& e)
 			{
 				return std::unexpected(Error{ ErrorCode::ReadFailure, std::string("Invalid project file format: ") + e.what() });
+			}
+		}
+
+		// Rewrites a pre-AtlasId manifest in place so the loader can read it as the
+		// current schema. Each tile's positional atlas index + cached UV rectangle
+		// becomes a stable atlas id (index + 1, matching the order the loader re-mints
+		// ids) plus a cell index (recovered from the UV via the atlas grid).
+		// Untextured or dangling references collapse to the invalid id.
+		void MigrateLegacyTilesToV2(nlohmann::json& manifest)
+		{
+			// Grid dimensions per atlas, positionally -- the UV->cell inverse needs them.
+			std::vector<std::pair<int, int>> atlasGrids;
+			if (manifest.contains(JSON::Atlas::Array))
+				for (const auto& jsonAtlas : manifest[JSON::Atlas::Array])
+					atlasGrids.emplace_back(
+						jsonAtlas.value(JSON::Atlas::Width, 1),
+						jsonAtlas.value(JSON::Atlas::Height, 1));
+
+			// Converts one tile object's legacy atlas fields to the new id + cell pair.
+			auto migrateTile = [&atlasGrids](nlohmann::json& tile)
+			{
+				if (!tile.contains(JSON::Tile::AtlasIndex))
+					return;
+
+				size_t oldIndex = tile.value(JSON::Tile::AtlasIndex, SIZE_MAX);
+				if (oldIndex >= atlasGrids.size())
+				{
+					tile[JSON::Tile::AtlasId] = 0;   // AtlasId::Invalid
+					tile[JSON::Tile::CellIndex] = 0;
+					return;
+				}
+
+				const auto [gridWidth, gridHeight] = atlasGrids[oldIndex];
+				int cell = 0;
+				if (tile.contains(JSON::Tile::TextureCoords))
+				{
+					const auto& uv = tile[JSON::Tile::TextureCoords];
+					if (uv.size() >= 2)
+					{
+						int col = static_cast<int>(std::lround(uv[0].get<float>() * gridWidth));
+						int row = static_cast<int>(std::lround(uv[1].get<float>() * gridHeight));
+						cell = row * gridWidth + col;
+					}
+				}
+
+				tile[JSON::Tile::AtlasId] = oldIndex + 1;   // positional index -> stable id
+				tile[JSON::Tile::CellIndex] = cell;
+			};
+
+			if (!manifest.contains(JSON::Project::LayerStack))
+				return;
+
+			nlohmann::json& layerStack = manifest[JSON::Project::LayerStack];
+			if (!layerStack.contains(JSON::LayerStack::TileLayers))
+				return;
+
+			for (auto& layer : layerStack[JSON::LayerStack::TileLayers])
+			{
+				if (!layer.contains(JSON::TileLayer::Tiles))
+					continue;
+
+				// The tile list is either sparse entries or legacy dense rows; both
+				// bottom out at the tile objects we migrate.
+				for (auto& element : layer[JSON::TileLayer::Tiles])
+				{
+					if (element.is_array())
+						for (auto& tile : element)
+							migrateTile(tile);
+					else
+						migrateTile(element);
+				}
 			}
 		}
 	}
@@ -84,6 +166,8 @@ namespace Tiles
 		// the atlas has one.
 		nlohmann::json manifest;
 		manifest[JSON::Project::Name] = project.GetProjectName();
+		manifest[JSON::Project::Version] = 2;
+		manifest[JSON::Project::NextAtlasId] = project.GetNextAtlasId();
 		manifest[JSON::Project::LayerStack] = project.GetLayerStack().ToJSON();
 
 		const ExportRegion& region = project.GetExportRegion();
@@ -104,6 +188,7 @@ namespace Tiles
 				continue;
 
 			nlohmann::json jsonAtlas;
+			jsonAtlas[JSON::Atlas::Id] = static_cast<uint32_t>(atlas->GetId());
 			jsonAtlas[JSON::Atlas::Width] = atlas->GetWidth();
 			jsonAtlas[JSON::Atlas::Height] = atlas->GetHeight();
 
@@ -190,6 +275,11 @@ namespace Tiles
 				return std::unexpected(Error{ ErrorCode::ReadFailure, "Invalid project file format." });
 			}
 
+			// Bring a pre-AtlasId manifest up to the current schema before any of
+			// it is read into objects, so the load path below is version-agnostic.
+			if (manifest.value(JSON::Project::Version, 1) < 2)
+				MigrateLegacyTilesToV2(manifest);
+
 			std::string name = manifest.value(JSON::Project::Name, "Untitled Project");
 			project = std::make_shared<Project>(name);
 			project->GetLayerStack() = LayerStack::FromJSON(manifest.at(JSON::Project::LayerStack));
@@ -212,30 +302,44 @@ namespace Tiles
 					if (gridWidth <= 0 || gridHeight <= 0)
 						continue;
 
+					// Rebuild the atlas from its embedded image, falling back to an
+					// imageless slot when the image is absent or fails to extract.
+					std::shared_ptr<TextureAtlas> atlas;
 					std::string imageName = jsonAtlas.value(JSON::Atlas::Image, "");
 					if (imageName.empty())
 					{
-						// Imageless atlas: preserve the slot so indices line up.
-						project->AddTextureAtlas(TextureAtlas::Create(gridWidth, gridHeight));
-						continue;
+						atlas = TextureAtlas::Create(gridWidth, gridHeight);
 					}
-
-					size_t imageSize = 0;
-					void* imageData = mz_zip_reader_extract_file_to_heap(&zip, imageName.c_str(), &imageSize, 0);
-					if (!imageData)
+					else
 					{
-						TILES_ENGINE_WARN("ProjectSerializer::Load: Missing embedded atlas image '{}'", imageName);
-						project->AddTextureAtlas(TextureAtlas::Create(gridWidth, gridHeight));
-						continue;
+						size_t imageSize = 0;
+						void* imageData = mz_zip_reader_extract_file_to_heap(&zip, imageName.c_str(), &imageSize, 0);
+						if (imageData)
+						{
+							std::vector<uint8_t> imageBytes(
+								reinterpret_cast<uint8_t*>(imageData),
+								reinterpret_cast<uint8_t*>(imageData) + imageSize);
+							mz_free(imageData);
+							atlas = TextureAtlas::Create(std::move(imageBytes), gridWidth, gridHeight);
+						}
+						else
+						{
+							TILES_ENGINE_WARN("ProjectSerializer::Load: Missing embedded atlas image '{}'", imageName);
+							atlas = TextureAtlas::Create(gridWidth, gridHeight);
+						}
 					}
 
-					std::vector<uint8_t> imageBytes(
-						reinterpret_cast<uint8_t*>(imageData),
-						reinterpret_cast<uint8_t*>(imageData) + imageSize);
-					mz_free(imageData);
-
-					project->AddTextureAtlas(TextureAtlas::Create(std::move(imageBytes), gridWidth, gridHeight));
+					// AddTextureAtlas mints an id; override it with the saved one so
+					// tile references survive a save/load round-trip. Migrated files
+					// have no saved id and keep the minted 1..N sequence.
+					project->AddTextureAtlas(atlas);
+					if (jsonAtlas.contains(JSON::Atlas::Id))
+						atlas->SetId(static_cast<AtlasId>(jsonAtlas[JSON::Atlas::Id].get<uint32_t>()));
 				}
+
+				// Restore the id allocator past every id just loaded (migrated files
+				// leave it at the minted high-water mark via the default).
+				project->SetNextAtlasId(manifest.value(JSON::Project::NextAtlasId, project->GetNextAtlasId()));
 			}
 		}
 		catch (const std::exception& e)

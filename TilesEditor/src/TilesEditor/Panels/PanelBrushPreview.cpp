@@ -116,12 +116,15 @@ namespace Tiles::Editor
         brushQuad.Size = brush.GetSize();
         brushQuad.Rotation = brush.GetRotation();
         brushQuad.Tint = brush.GetTint();
-        brushQuad.TexCoords = brush.GetTextureCoords();
 
         if (brush.IsTextured() && brush.HasValidAtlas())
         {
-            auto atlas = Ctx().GetProject()->GetTextureAtlas(brush.GetAtlasIndex());
-            brushQuad.Texture = Host().GetAtlasTexture(*atlas);
+            auto atlas = Ctx().GetProject()->GetTextureAtlasById(brush.GetAtlasId());
+            if (atlas)
+            {
+                brushQuad.Texture = Host().GetAtlasTexture(*atlas);
+                brushQuad.TexCoords = atlas->GetTextureCoords(brush.GetCellIndex());
+            }
         }
 
         Tiles::Renderer2D::DrawSquare(brushQuad);
@@ -219,7 +222,13 @@ namespace Tiles::Editor
 
     void PanelBrushPreview::RenderSectionUVs()
     {
-        const glm::vec4 uvs = Ctx().GetBrush().GetTextureCoords();
+        const auto& brush = Ctx().GetBrush();
+
+        // The brush stores a cell, not UVs; resolve the rect from its atlas grid.
+        glm::vec4 uvs(0.0f, 0.0f, 1.0f, 1.0f);
+        if (brush.IsTextured() && brush.HasValidAtlas())
+            if (auto atlas = Ctx().GetProject()->GetTextureAtlasById(brush.GetAtlasId()))
+                uvs = atlas->GetTextureCoords(brush.GetCellIndex());
 
         UI::SectionHeader("UVs");
         UI::ValueVec4("UVs", glm::value_ptr(uvs), "%.1f", "U1", "V1", "U2", "V2");
@@ -234,8 +243,9 @@ namespace Tiles::Editor
 
         UI::SectionHeader("Atlas");
 
-        char atlasText[32];
-        snprintf(atlasText, sizeof(atlasText), "Index: %zu", brush.GetAtlasIndex());
-        UI::ValueField("AtlasIndex", atlasText);
+        char atlasText[48];
+        snprintf(atlasText, sizeof(atlasText), "Id: %u  Cell: %d",
+            static_cast<uint32_t>(brush.GetAtlasId()), brush.GetCellIndex());
+        UI::ValueField("Atlas", atlasText);
     }
 }

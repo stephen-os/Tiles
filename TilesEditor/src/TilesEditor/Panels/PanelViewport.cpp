@@ -306,14 +306,13 @@ namespace Tiles::Editor
             params.Tint = brush.GetTint();
             params.Size = { m_TileSize * brush.GetSize().x, m_TileSize * brush.GetSize().y };
 
-            const auto& atlases = Ctx().GetProject()->GetTextureAtlases();
-            if (brush.IsTextured() && brush.HasValidAtlas() && brush.GetAtlasIndex() < atlases.size())
+            if (brush.IsTextured() && brush.HasValidAtlas())
             {
-                auto atlas = atlases[brush.GetAtlasIndex()];
+                auto atlas = Ctx().GetProject()->GetTextureAtlasById(brush.GetAtlasId());
                 if (atlas && atlas->HasImage())
                 {
                     params.Texture = Host().GetAtlasTexture(*atlas);
-                    params.TexCoords = brush.GetTextureCoords();
+                    params.TexCoords = atlas->GetTextureCoords(brush.GetCellIndex());
                 }
             }
             break;

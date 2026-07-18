@@ -268,8 +268,8 @@ namespace Tiles::Editor
         ImVec2 itemMax = ImGui::GetItemRectMax();
 
         // Check if this texture is selected
-        bool isSelected = (brush.GetAtlasIndex() == atlasIndex &&
-            brush.GetTextureCoords() == atlas->GetTextureCoords(index) &&
+        bool isSelected = (brush.GetAtlasId() == atlas->GetId() &&
+            brush.GetCellIndex() == index &&
             brush.IsTextured());
 
         // Scale border thickness with tile size
@@ -342,11 +342,10 @@ namespace Tiles::Editor
     {
         auto atlas = Ctx().GetProject()->GetTextureAtlas(atlasIndex);
         auto& brush = Ctx().GetBrush();
-        glm::vec4 texCoords = atlas->GetTextureCoords(index);
 
         // Check if this texture is already selected
-        bool isCurrentlySelected = (brush.GetAtlasIndex() == atlasIndex &&
-            brush.GetTextureCoords() == texCoords &&
+        bool isCurrentlySelected = (brush.GetAtlasId() == atlas->GetId() &&
+            brush.GetCellIndex() == index &&
             brush.IsTextured());
 
         if (isCurrentlySelected)
@@ -354,7 +353,7 @@ namespace Tiles::Editor
             // Deselect current texture
             Tile newBrush = brush;
             newBrush.SetTextured(false);
-            newBrush.SetAtlasIndex(Tile::INVALID_ATLAS_INDEX);
+            newBrush.SetAtlasId(AtlasId::Invalid);
             Ctx().SetBrush(newBrush);
         }
         else
@@ -362,8 +361,8 @@ namespace Tiles::Editor
             // Select new texture
             Tile newBrush = brush;
             newBrush.SetTextured(true);
-            newBrush.SetAtlasIndex(atlasIndex);
-            newBrush.SetTextureCoords(texCoords);
+            newBrush.SetAtlasId(atlas->GetId());
+            newBrush.SetCellIndex(index);
             Ctx().SetBrush(newBrush);
         }
 

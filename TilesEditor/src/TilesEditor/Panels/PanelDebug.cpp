@@ -162,7 +162,8 @@ namespace Tiles::Editor
         ImGui::Text("Brush Information:");
         ImGui::Text("  Is Painted: %s", brush.IsPainted() ? "Yes" : "No");
         ImGui::Text("  Is Textured: %s", brush.IsTextured() ? "Yes" : "No");
-        ImGui::Text("  Atlas Index: %zu", brush.GetAtlasIndex());
+        ImGui::Text("  Atlas Id: %u", static_cast<uint32_t>(brush.GetAtlasId()));
+        ImGui::Text("  Cell Index: %d", brush.GetCellIndex());
         ImGui::Text("  Has Valid Atlas: %s", brush.HasValidAtlas() ? "Yes" : "No");
 
         const auto& rotation = brush.GetRotation();
@@ -173,10 +174,6 @@ namespace Tiles::Editor
 
         const auto& tint = brush.GetTint();
         ImGui::Text("  Tint: (%.2f, %.2f, %.2f, %.2f)", tint.r, tint.g, tint.b, tint.a);
-
-        const auto& texCoords = brush.GetTextureCoords();
-        ImGui::Text("  Texture Coords: (%.2f, %.2f, %.2f, %.2f)",
-            texCoords.x, texCoords.y, texCoords.z, texCoords.w);
     }
 
     void PanelDebug::RenderCommandHistoryInfo()

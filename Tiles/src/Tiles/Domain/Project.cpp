@@ -119,8 +119,14 @@ namespace Tiles
 			project->m_TextureAtlases.reserve(atlasesArray.size());
 
 			size_t loadedCount = 0;
+			uint32_t position = 0;
 			for (const auto& jsonAtlas : atlasesArray)
 			{
+				// The 1-based array position is the atlas's stable id: the legacy
+				// migration maps each tile's old positional index to this same id,
+				// so the assignment survives skipped (invalid) entries.
+				++position;
+
 				std::string texturePath = jsonAtlas.value(JSON::Atlas::Path, "");
 				uint32_t atlasWidth = jsonAtlas.value(JSON::Atlas::Width, 0);
 				uint32_t atlasHeight = jsonAtlas.value(JSON::Atlas::Height, 0);
@@ -131,9 +137,12 @@ namespace Tiles
 					continue;
 				}
 
-				project->m_TextureAtlases.push_back(TextureAtlas::Create(texturePath, atlasWidth, atlasHeight));
+				auto atlas = TextureAtlas::Create(texturePath, atlasWidth, atlasHeight);
+				atlas->SetId(static_cast<AtlasId>(position));
+				project->m_TextureAtlases.push_back(std::move(atlas));
 				loadedCount++;
 			}
+			project->m_NextAtlasId = static_cast<uint32_t>(atlasesArray.size()) + 1;
 
 			TILES_ENGINE_INFO("Project::FromJSON: Loaded {} texture atlases (attempted {})", loadedCount, atlasesArray.size());
 		}

@@ -9,6 +9,23 @@
 
 namespace Tiles::Editor
 {
+    namespace
+    {
+        // The atlas in the list carrying the given stable id, or null if none does.
+        std::shared_ptr<Tiles::TextureAtlas> FindAtlasById(
+            const std::vector<std::shared_ptr<Tiles::TextureAtlas>>& atlases, Tiles::AtlasId id)
+        {
+            if (id == Tiles::AtlasId::Invalid)
+                return nullptr;
+
+            for (const auto& atlas : atlases)
+                if (atlas && atlas->GetId() == id)
+                    return atlas;
+
+            return nullptr;
+        }
+    }
+
     void DrawTileLayer(
         const Tiles::TileLayer& layer,
         size_t layerIndex,
@@ -37,13 +54,13 @@ namespace Tiles::Editor
             params.Size = { tileSize * tileSizeMultiplier.x, tileSize * tileSizeMultiplier.y };
 
             // Untextured tiles keep the defaults (no texture, full coords).
-            if (tile.IsTextured() && tile.GetAtlasIndex() < textureAtlases.size())
+            if (tile.IsTextured() && tile.HasValidAtlas())
             {
-                auto atlas = textureAtlases[tile.GetAtlasIndex()];
+                auto atlas = FindAtlasById(textureAtlases, tile.GetAtlasId());
                 if (atlas && atlas->HasImage())
                 {
                     params.Texture = host.GetAtlasTexture(*atlas);
-                    params.TexCoords = tile.GetTextureCoords();
+                    params.TexCoords = atlas->GetTextureCoords(tile.GetCellIndex());
                 }
             }
 

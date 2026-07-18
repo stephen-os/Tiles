@@ -75,6 +75,11 @@ namespace Tiles
 		void ClearTextureAtlases();
 		[[nodiscard]] size_t GetTextureAtlasCount() const { return m_TextureAtlases.size(); }
 
+		// The next id AddTextureAtlas will mint. Persisted so a reloaded project
+		// keeps allocating fresh ids past any that removes have retired.
+		[[nodiscard]] uint32_t GetNextAtlasId() const { return m_NextAtlasId; }
+		void SetNextAtlasId(uint32_t next) { m_NextAtlasId = next; }
+
 	private:
 		std::string m_ProjectName = "New Project";
 		std::filesystem::path m_FilePath;               // empty for a never-saved project

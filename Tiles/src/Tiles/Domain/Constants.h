@@ -9,10 +9,14 @@ namespace Tiles
 			constexpr const char* Rotation = "tile_rotation";
 			constexpr const char* TintColor = "tile_tint_color";
 			constexpr const char* Size = "tile_size";
-			constexpr const char* TextureCoords = "tile_texture_coords";
-			constexpr const char* AtlasIndex = "tile_atlas_index";
+			constexpr const char* AtlasId = "tile_atlas_id";       // stable atlas reference
+			constexpr const char* CellIndex = "tile_cell_index";   // cell within that atlas
 			constexpr const char* Textured = "tile_is_textured";
 			constexpr const char* Painted = "tile_is_painted";
+
+			// Pre-AtlasId keys, read only when migrating a legacy manifest.
+			constexpr const char* TextureCoords = "tile_texture_coords";
+			constexpr const char* AtlasIndex = "tile_atlas_index";
 		}
 
 		namespace TileLayer
@@ -38,6 +42,8 @@ namespace Tiles
 		{
 			constexpr const char* Name = "project_name";
 			constexpr const char* LayerStack = "project_layer_stack";
+			constexpr const char* Version = "manifest_version";   // schema version; absent => legacy
+			constexpr const char* NextAtlasId = "next_atlas_id";  // atlas-id high-water mark
 		}
 
 		namespace Atlas
@@ -47,6 +53,7 @@ namespace Tiles
 			constexpr const char* Image = "atlas_image";     // v2: embedded image entry name
 			constexpr const char* Width = "atlas_width";
 			constexpr const char* Height = "atlas_height";
+			constexpr const char* Id = "atlas_id";           // stable per-project id
 		}
 
 		namespace Region
