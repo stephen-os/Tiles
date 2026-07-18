@@ -137,6 +137,10 @@ namespace Tiles
 
 		// Created hidden; reveal it now that GL and ImGui are initialized.
 		m_Window->Show();
+
+		// Everything the destructor tears down is now live; mark the app valid so
+		// the entry point runs the lifecycle and teardown skips nothing.
+		m_Initialized = true;
 	}
 
 	// Persists window geometry, then tears down the ImGui/GL backends and window.
@@ -144,9 +148,10 @@ namespace Tiles
 	{
 		s_Instance = nullptr;
 
-		// A null window means construction bailed out before the graphics and
-		// ImGui backends were initialized, so their teardown must be skipped.
-		if (m_Window)
+		// Backends and settings are only touched when construction fully succeeded;
+		// a bailed-out init never created them, so tearing them down would operate
+		// on null GL/ImGui state.
+		if (m_Initialized)
 		{
 			SaveSettings();
 
@@ -155,9 +160,11 @@ namespace Tiles
 			ImGui_ImplOpenGL3_Shutdown();
 			ImGui_ImplGlfw_Shutdown();
 			ImGui::DestroyContext();
-
-			m_Window.reset();
 		}
+
+		// The window is created first and cleans up its own GLFW resources, so it
+		// is safe to destroy whether or not the rest of construction finished.
+		m_Window.reset();
 
 		Window::TerminateGLFW();
 

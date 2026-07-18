@@ -53,6 +53,10 @@ namespace Tiles
 		// Requests the run loop to exit at the end of the current frame.
 		void Shutdown() { m_Running = false; }
 
+		// Whether construction fully succeeded (window + GL + ImGui). The entry
+		// point skips the run lifecycle when false, so a failed init exits cleanly.
+		[[nodiscard]] bool IsValid() const { return m_Initialized; }
+
 		// Gets the instance of this application
 		[[nodiscard]] static Application& GetInstance();
 
@@ -101,6 +105,7 @@ namespace Tiles
 		ApplicationSettings m_Settings;
 		float m_TimeStep = 0.0f;
 		Timer m_FrameTimer;
+		bool m_Initialized = false;   // true only after the constructor fully succeeds
 	};
 
 	// Factory implemented by the client to build the concrete Application.
