@@ -275,7 +275,10 @@ namespace Tiles::Editor
         if (Ctx().HasProject())
         {
             Tiles::ExportRegion& region = Ctx().GetProject()->GetExportRegion();
-            ImGui::Checkbox("Use Export Region", &region.Enabled);
+            bool regionChanged = false;
+
+            if (ImGui::Checkbox("Use Export Region", &region.Enabled))
+                regionChanged = true;
 
             if (region.Enabled)
             {
@@ -284,11 +287,17 @@ namespace Tiles::Editor
 
                 ImGui::SetNextItemWidth(160.0f);
                 if (ImGui::InputInt2("Position (tiles)", position))
+                {
                     region.Min = { position[0], position[1] };
+                    regionChanged = true;
+                }
 
                 ImGui::SetNextItemWidth(160.0f);
                 if (ImGui::InputInt2("Size (tiles)", size))
+                {
                     region.Size = { std::max(1, size[0]), std::max(1, size[1]) };
+                    regionChanged = true;
+                }
 
                 if (ImGui::Button("Fit to Content"))
                 {
@@ -296,6 +305,7 @@ namespace Tiles::Editor
                     {
                         region.Min = { bounds->x, bounds->y };
                         region.Size = { bounds->z - bounds->x + 1, bounds->w - bounds->y + 1 };
+                        regionChanged = true;
                     }
                 }
             }
@@ -303,6 +313,11 @@ namespace Tiles::Editor
             {
                 ImGui::TextDisabled("Export uses the painted content's bounds.");
             }
+
+            // Export region is serialized project state; mark the document dirty
+            // on a change so it isn't silently lost when the tab closes.
+            if (regionChanged)
+                Ctx().GetProject()->MarkAsModified();
         }
     }
 
