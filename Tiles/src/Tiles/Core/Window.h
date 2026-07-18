@@ -52,6 +52,10 @@ namespace Tiles
 		// True once the OS has requested the window be closed.
 		[[nodiscard]] bool ShouldClose() const;
 
+		// Clears a pending OS close request, so a close can be vetoed (e.g. after an
+		// unsaved-changes prompt) and the run loop keeps going.
+		void CancelClose();
+
 		// Registers the sink that receives translated window/input Events.
 		void SetEventCallback(const std::function<void(Event&)>& callback) { m_EventCallback = callback; }
 

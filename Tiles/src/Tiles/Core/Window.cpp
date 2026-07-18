@@ -295,6 +295,12 @@ namespace Tiles
 		return glfwWindowShouldClose(m_Window);
 	}
 
+	// Clears a pending OS close request so the run loop continues.
+	void Window::CancelClose()
+	{
+		glfwSetWindowShouldClose(m_Window, GLFW_FALSE);
+	}
+
 	// Enables or disables vertical sync.
 	void Window::SetVSync(bool enabled)
 	{

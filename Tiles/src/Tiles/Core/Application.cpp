@@ -269,11 +269,6 @@ namespace Tiles
 	void Application::OnEvent(Event& event)
 	{
 		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent&)
-		{
-			m_Running = false;
-			return true;
-		});
 
 		// Feed the input state before layers run, and without consuming the event,
 		// so held-state stays correct even if a layer marks the event handled.
@@ -284,13 +279,24 @@ namespace Tiles
 		dispatcher.Dispatch<WindowLostFocusEvent>([this](WindowLostFocusEvent&) { m_InputState.Reset(); return false; });
 
 		// Deliver top-down; a layer that marks the event handled stops it from
-		// reaching layers beneath.
+		// reaching layers beneath -- and, for a window close, vetoes the quit.
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
 		{
 			if (event.IsHandled())
 				break;
 			(*it)->OnEvent(event);
 		}
+
+		// A window close no layer consumed stops the app; a consumed one is a veto,
+		// so clear the native close flag and keep running.
+		dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent& e)
+		{
+			if (e.IsHandled())
+				m_Window->CancelClose();
+			else
+				m_Running = false;
+			return false;
+		});
 	}
 
 	// Applies the current Fullscreen setting to the window.
