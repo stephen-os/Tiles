@@ -39,6 +39,9 @@ namespace Tiles
 
 		[[nodiscard]] size_t DocumentCount() const { return m_Sessions.size(); }
 		[[nodiscard]] size_t ActiveIndex() const { return m_Active; }
+
+		// How many open documents have unsaved changes.
+		[[nodiscard]] size_t UnsavedDocumentCount() const;
 		[[nodiscard]] Session& DocumentAt(size_t index) { return *m_Sessions[index]; }
 		[[nodiscard]] const Session& DocumentAt(size_t index) const { return *m_Sessions[index]; }
 

@@ -34,7 +34,8 @@ namespace Tiles::Editor
 		SaveAs,             // Popup for saving the current project under a new name
 		OpenProject,        // Popup for opening an existing project
 		Export,             // Popup for exporting the current project (e.g., to a render matrix)
-		ConfirmClose        // Popup confirming close of a document with unsaved changes
+		ConfirmClose,       // Popup confirming close of a document with unsaved changes
+		ConfirmQuit         // Popup confirming app quit while documents have unsaved changes
     };
 
 	// Action id's

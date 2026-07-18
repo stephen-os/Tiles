@@ -30,6 +30,7 @@
 #include "Popups/PopupOpenProject.h"
 #include "Popups/PopupRenderMatrix.h"
 #include "Popups/PopupConfirmClose.h"
+#include "Popups/PopupConfirmQuit.h"
 
 #include "UI/Theme.h"
 #include "UI/Fonts.h"
@@ -81,6 +82,7 @@ public:
 	{
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<KeyPressedEvent>([this](KeyPressedEvent& e) { return OnKeyPressed(e); });
+		dispatcher.Dispatch<WindowCloseEvent>([this](WindowCloseEvent&) { return OnWindowClose(); });
 	}
 
 	// --- EditorHost ---------------------------------------------------------
@@ -153,6 +155,19 @@ private:
 		return m_Actions.InvokeFor(shortcut);
 	}
 
+	// Vetoes a window close while any document has unsaved changes, raising the
+	// quit-confirmation popup instead; otherwise lets the app close.
+	bool OnWindowClose()
+	{
+		if (m_Workspace->UnsavedDocumentCount() > 0)
+		{
+			OpenPopup(PopupId::ConfirmQuit);
+			return true;   // handled = veto the quit
+		}
+
+		return false;
+	}
+
 	void RegisterPanels()
 	{
 		m_Panels.RegisterPanel<PanelMenuBar>(PanelId::MenuBar, "Menu Bar");
@@ -177,6 +192,7 @@ private:
 		m_Panels.RegisterPopup<PopupOpenProject>(PopupId::OpenProject);
 		m_Panels.RegisterPopup<PopupRenderMatrix>(PopupId::Export);
 		m_Panels.RegisterPopup<PopupConfirmClose>(PopupId::ConfirmClose);
+		m_Panels.RegisterPopup<PopupConfirmQuit>(PopupId::ConfirmQuit);
 	}
 
 	void RegisterActions()

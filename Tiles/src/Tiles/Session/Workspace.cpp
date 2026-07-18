@@ -22,6 +22,17 @@ namespace Tiles
 		Active().CreateProject(name);
 	}
 
+	// Counts open documents with unsaved changes.
+	size_t Workspace::UnsavedDocumentCount() const
+	{
+		size_t count = 0;
+		for (const auto& session : m_Sessions)
+			if (session->IsDirty())
+				++count;
+
+		return count;
+	}
+
 	// Makes the document at index active.
 	void Workspace::SwitchTo(size_t index)
 	{
