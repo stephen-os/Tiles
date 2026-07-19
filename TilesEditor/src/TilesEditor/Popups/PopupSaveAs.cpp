@@ -52,15 +52,11 @@ namespace Tiles::Editor
             if (m_ShowMessage)
             {
                 ImGui::Spacing();
-                if (m_SaveMessage.find("error") != std::string::npos ||
-                    m_SaveMessage.find("Failed") != std::string::npos)
-                {
+                // Color by the actual outcome, not by words in the message text.
+                if (!m_ProjectSavedSuccessfully)
                     ImGui::TextColored(UI::GetTheme().Danger, "%s", m_SaveMessage.c_str());
-                }
                 else
-                {
                     ImGui::TextColored(UI::GetTheme().Success, "%s", m_SaveMessage.c_str());
-                }
             }
 
             ImGui::Spacing();
