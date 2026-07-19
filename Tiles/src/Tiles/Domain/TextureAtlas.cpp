@@ -71,8 +71,10 @@ namespace Tiles
 	// per-frame lookups are a plain array index.
 	void TextureAtlas::Resize(int width, int height)
 	{
-		m_GridWidth = width;
-		m_GridHeight = height;
+		// A grid must be at least 1x1: a zero or negative dimension would divide by
+		// zero when computing UVs (and in GetOffset).
+		m_GridWidth = width > 0 ? width : 1;
+		m_GridHeight = height > 0 ? height : 1;
 
 		m_TexWidth = 1.0f / static_cast<float>(m_GridWidth);
 		m_TexHeight = 1.0f / static_cast<float>(m_GridHeight);
@@ -140,6 +142,9 @@ namespace Tiles
 	// UV-space offset of a cell's lower-left corner.
 	glm::vec2 TextureAtlas::GetOffset(int index) const
 	{
+		if (index < 0 || m_GridWidth <= 0 || index >= m_GridWidth * m_GridHeight)
+			return glm::vec2(0.0f);
+
 		int row = index / m_GridWidth;
 		int col = index % m_GridWidth;
 
