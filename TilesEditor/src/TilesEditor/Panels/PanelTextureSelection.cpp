@@ -432,8 +432,6 @@ namespace Tiles::Editor
             newBrush.SetCellIndex(index);
             Ctx().SetBrush(newBrush);
         }
-
-        Ctx().GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::FinalizeSelection(size_t atlasIndex)
@@ -452,8 +450,6 @@ namespace Tiles::Editor
             newBrush.SetTextured(false);
             newBrush.SetAtlasId(AtlasId::Invalid);
             Ctx().SetBrush(newBrush);
-
-            Ctx().GetProject()->MarkAsModified();
             return;
         }
 
@@ -500,7 +496,6 @@ namespace Tiles::Editor
         Ctx().SetBrush(origin);
 
         m_HasStampSelection = true;
-        Ctx().GetProject()->MarkAsModified();
     }
 
     void PanelTextureSelection::OpenFileDialog(size_t atlasIndex)
