@@ -16,7 +16,7 @@ namespace Tiles::Editor
         ImGui::SetNextWindowSize(ImVec2(400, 0), ImGuiCond_Appearing);
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-        if (ImGui::Begin("Unsaved Changes", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
+        if (ImGui::Begin("Unsaved Changes###ConfirmQuit", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
         {
             size_t unsaved = Space().UnsavedDocumentCount();
             ImGui::TextWrapped("%zu document(s) have unsaved changes. Quit without saving?", unsaved);

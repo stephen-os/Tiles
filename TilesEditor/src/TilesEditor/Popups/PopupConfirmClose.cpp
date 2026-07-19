@@ -17,7 +17,7 @@ namespace Tiles::Editor
         ImGui::SetNextWindowSize(ImVec2(380, 0), ImGuiCond_Appearing);
         ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-        if (ImGui::Begin("Unsaved Changes", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
+        if (ImGui::Begin("Unsaved Changes###ConfirmClose", &m_IsVisible, ImGuiWindowFlags_Modal | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse))
         {
             // The document being closed is the active one (switched to first).
             Session& document = Ctx();
