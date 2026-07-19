@@ -298,12 +298,15 @@ namespace Tiles
 			return std::unexpected(Error{ ErrorCode::ReadFailure, "Project archive is missing its manifest." });
 		}
 
+		// Copy the manifest bytes out and free the miniz buffer immediately, so a
+		// throw from the parse below can't leak it.
+		std::string manifestStr(reinterpret_cast<const char*>(manifestData), manifestSize);
+		mz_free(manifestData);
+
 		std::shared_ptr<Project> project;
 		try
 		{
-			nlohmann::json manifest = nlohmann::json::parse(
-				std::string(reinterpret_cast<const char*>(manifestData), manifestSize));
-			mz_free(manifestData);
+			nlohmann::json manifest = nlohmann::json::parse(manifestStr);
 
 			if (!manifest.contains(JSON::Project::LayerStack))
 			{
