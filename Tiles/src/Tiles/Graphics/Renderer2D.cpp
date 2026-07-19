@@ -218,6 +218,20 @@ namespace Tiles
 			offset += 4;
 		}
 
+		// Loads and links a shader program from its source files, surfacing a missing
+		// file (e.g. wrong working directory) as an Error instead of throwing.
+		auto loadShader = [](const std::string& vertPath, const std::string& fragPath)
+			-> std::expected<std::shared_ptr<ShaderProgram>, Error>
+		{
+			auto vert = ReadFile(vertPath);
+			if (!vert)
+				return std::unexpected(vert.error());
+			auto frag = ReadFile(fragPath);
+			if (!frag)
+				return std::unexpected(frag.error());
+			return ShaderProgram::Create(*vert, *frag);
+		};
+
 		// Square batch.
 		{
 			SquareData& square = s_Data->Square;
@@ -233,7 +247,13 @@ namespace Tiles
 			square.IBO = IndexBuffer::Create(quadIndices.data(), MaxIndices);
 			square.VAO->SetIndexBuffer(square.IBO);
 			square.Vertices.resize(MaxVertices);
-			square.Shader = ShaderProgram::Create(ReadFile("res/shaders/Quad.vert"), ReadFile("res/shaders/Quad.frag"));
+			auto squareShader = loadShader("res/shaders/Quad.vert", "res/shaders/Quad.frag");
+			if (!squareShader)
+			{
+				s_Data.reset();
+				return std::unexpected(squareShader.error());
+			}
+			square.Shader = *squareShader;
 		}
 
 		// Circle batch.
@@ -254,7 +274,13 @@ namespace Tiles
 			circle.IBO = IndexBuffer::Create(quadIndices.data(), MaxIndices);
 			circle.VAO->SetIndexBuffer(circle.IBO);
 			circle.Vertices.resize(MaxVertices);
-			circle.Shader = ShaderProgram::Create(ReadFile("res/shaders/Circle.vert"), ReadFile("res/shaders/Circle.frag"));
+			auto circleShader = loadShader("res/shaders/Circle.vert", "res/shaders/Circle.frag");
+			if (!circleShader)
+			{
+				s_Data.reset();
+				return std::unexpected(circleShader.error());
+			}
+			circle.Shader = *circleShader;
 		}
 
 		// Line batch.
@@ -268,7 +294,13 @@ namespace Tiles
 				});
 			line.VAO->SetVertexBuffer(line.VBO);
 			line.Vertices.resize(MaxVertices);
-			line.Shader = ShaderProgram::Create(ReadFile("res/shaders/Line.vert"), ReadFile("res/shaders/Line.frag"));
+			auto lineShader = loadShader("res/shaders/Line.vert", "res/shaders/Line.frag");
+			if (!lineShader)
+			{
+				s_Data.reset();
+				return std::unexpected(lineShader.error());
+			}
+			line.Shader = *lineShader;
 		}
 
 		// Grid pass: a fullscreen clip-space quad drawn as a triangle strip.
@@ -286,7 +318,13 @@ namespace Tiles
 			grid.VBO->SetLayout({ { BufferDataType::Float2, "a_NDC" } });
 			grid.VAO->SetVertexBuffer(grid.VBO);
 			grid.VBO->SetData(vertices, sizeof(vertices));
-			grid.Shader = ShaderProgram::Create(ReadFile("res/shaders/Grid.vert"), ReadFile("res/shaders/Grid.frag"));
+			auto gridShader = loadShader("res/shaders/Grid.vert", "res/shaders/Grid.frag");
+			if (!gridShader)
+			{
+				s_Data.reset();
+				return std::unexpected(gridShader.error());
+			}
+			grid.Shader = *gridShader;
 		}
 
 		// Slot 0 is a 1x1 white texture, used for untextured primitives.
