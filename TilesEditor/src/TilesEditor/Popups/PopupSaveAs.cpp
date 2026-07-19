@@ -220,12 +220,12 @@ namespace Tiles::Editor
     std::string PopupSaveAs::GetFullFilePath() const
     {
         std::filesystem::path dir(m_Directory);
-        std::string fileName(m_FileNameBuffer);
+        std::filesystem::path fileName(m_FileNameBuffer);
 
-        if (fileName.find(File::ProjectExtension) == std::string::npos)
-        {
+        // Compare the actual extension, not a substring: "my.tiles.backup" must still
+        // get a real ".tiles" appended.
+        if (fileName.extension() != File::ProjectExtension)
             fileName += File::ProjectExtension;
-        }
 
         return (dir / fileName).string();
     }
