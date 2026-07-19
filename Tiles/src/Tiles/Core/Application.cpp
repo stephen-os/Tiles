@@ -95,9 +95,19 @@ namespace Tiles
 
 		int status = gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress));
 		TILES_ASSERT(status, "[OpenGL Context] Failed to initialize GLAD.");
+		if (!status)
+		{
+			TILES_ENGINE_ERROR("Failed to load OpenGL function pointers (GLAD).");
+			return;
+		}
 
 		const char* version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
 		TILES_ASSERT(version, "[OpenGL Context] Failed to retrieve OpenGL version.");
+		if (!version)
+		{
+			TILES_ENGINE_ERROR("Failed to retrieve the OpenGL version string; the GL context is unusable.");
+			return;
+		}
 		TILES_ENGINE_INFO("OpenGL Version: {}", version);
 
 		// Route driver debug messages to the log instead of polling glGetError
