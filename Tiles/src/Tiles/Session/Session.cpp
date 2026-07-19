@@ -48,8 +48,16 @@ namespace Tiles
 	// Flood-fills the working layer from (x, y), bounded by the visible view.
 	void Session::FillLayer(int x, int y, const glm::ivec4& bounds)
 	{
-		if (HasWorkingLayer())
-			ExecuteCommand(m_EditingState.BuildFillCommand(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush(), bounds));
+		if (!HasWorkingLayer())
+			return;
+
+		// Skip a fill that would change nothing (the clicked cell already holds the
+		// brush tile): dispatching a no-op would clear the redo stack and dirty a
+		// clean document.
+		if (GetWorkingLayerRef().GetTile(x, y) == m_EditingState.GetBrush())
+			return;
+
+		ExecuteCommand(m_EditingState.BuildFillCommand(m_EditingState.GetWorkingLayer(), x, y, m_EditingState.GetBrush(), bounds));
 	}
 
 	// The cells the brush covers when centered on (cx, cy).
