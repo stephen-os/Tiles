@@ -16,7 +16,11 @@ namespace Tiles::Editor
 
     void PanelBrushPreview::Render()
     {
-        ImGui::Begin("Brush Preview", OpenFlag(), ImGuiWindowFlags_MenuBar);
+        if (!ImGui::Begin("Brush Preview", OpenFlag(), ImGuiWindowFlags_MenuBar))
+        {
+            ImGui::End();
+            return;
+        }
 
         // Menu bar controls
         if (ImGui::BeginMenuBar())

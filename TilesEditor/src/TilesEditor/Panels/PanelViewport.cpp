@@ -24,9 +24,17 @@ namespace Tiles::Editor
     void PanelViewport::Render()
     {
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-        ImGui::Begin("Viewport", OpenFlag(), flags);
+        bool visible = ImGui::Begin("Viewport", OpenFlag(), flags);
 
-		m_IsWindowFocused = ImGui::IsWindowFocused();
+        m_IsWindowFocused = visible && ImGui::IsWindowFocused();
+
+        // Collapsed or a background docked tab: skip the whole offscreen scene render
+        // (it targets a texture that isn't shown), keeping Begin/End balanced.
+        if (!visible)
+        {
+            ImGui::End();
+            return;
+        }
 
         RenderDocumentTabs();
 

@@ -17,7 +17,11 @@ namespace Tiles::Editor
 	// to the export region, blitted into the panel.
 	void PanelRenderPreview::Render()
 	{
-		ImGui::Begin("Render Preview", OpenFlag());
+		if (!ImGui::Begin("Render Preview", OpenFlag()))
+		{
+			ImGui::End();
+			return;
+		}
 
 		if (!Ctx().HasProject())
 		{
