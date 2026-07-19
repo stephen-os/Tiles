@@ -500,7 +500,7 @@ namespace Tiles::Editor
                 if (!layerIndices.empty())
                 {
                     ++attempted;
-                    if (ExportRenderGroup(layerIndices, GetFullExportPath(GetExportFileName(renderGroup))))
+                    if (ExportRenderGroup(layerIndices, GetFullExportPath(GetExportFileName(static_cast<int>(groupIdx)))))
                         ++exported;
                 }
             }
