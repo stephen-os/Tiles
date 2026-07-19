@@ -24,7 +24,7 @@ namespace Tiles
 		// Moves the layer back up to its original position.
 		void Undo(LayerStack& layerStack) override
 		{
-			if (m_Index < layerStack.GetLayerCount() - 1)
+			if (m_Index + 1 < layerStack.GetLayerCount())
 				layerStack.MoveLayerUp(m_Index + 1);
 		}
 
