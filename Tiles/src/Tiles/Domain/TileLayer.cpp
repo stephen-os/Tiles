@@ -1,6 +1,7 @@
 #include "Domain/TileLayer.h"
 
 #include "Domain/Constants.h"
+#include "Core/Logger.h"
 
 #include <climits>
 
@@ -128,12 +129,26 @@ namespace Tiles
 		}
 		else
 		{
+			// Skip only the malformed tile, not the whole layer: one bad entry must
+			// not silently discard thousands of good tiles (which the next save would
+			// then make permanent).
+			size_t skipped = 0;
 			for (const auto& entry : tilesArray)
 			{
-				int x = entry.at(JSON::TileLayer::TileX).get<int>();
-				int y = entry.at(JSON::TileLayer::TileY).get<int>();
-				layer.SetTile(x, y, Tile::FromJSON(entry));
+				try
+				{
+					int x = entry.at(JSON::TileLayer::TileX).get<int>();
+					int y = entry.at(JSON::TileLayer::TileY).get<int>();
+					layer.SetTile(x, y, Tile::FromJSON(entry));
+				}
+				catch (const std::exception&)
+				{
+					++skipped;
+				}
 			}
+
+			if (skipped > 0)
+				TILES_ENGINE_WARN("TileLayer::FromJSON: Skipped {} malformed tile entries while loading a layer.", skipped);
 		}
 
 		return layer;
