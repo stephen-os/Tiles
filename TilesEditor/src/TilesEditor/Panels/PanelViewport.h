@@ -129,5 +129,10 @@ namespace Tiles::Editor
         glm::ivec2 m_MoveStartCell = { 0, 0 };
         glm::ivec2 m_MoveOffset = { 0, 0 };
         std::vector<glm::ivec2> m_SelectionCells;
+
+        // The active document seen in the last Render(); when it changes, the
+        // per-document selection/stroke state above is dropped. Compared by
+        // pointer only, never dereferenced.
+        const Session* m_LastDoc = nullptr;
     };
 }

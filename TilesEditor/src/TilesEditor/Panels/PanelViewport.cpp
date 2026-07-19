@@ -30,6 +30,17 @@ namespace Tiles::Editor
 
         RenderDocumentTabs();
 
+        // Selection and stroke state are per-document; drop them when the active
+        // document changes (tab switch / open / close) so a move or stroke can't
+        // apply the previous document's cells to the new one's layer.
+        if (&Ctx() != m_LastDoc)
+        {
+            ClearSelection();
+            m_Stroking = false;
+            m_StrokeCells.clear();
+            m_LastDoc = &Ctx();
+        }
+
         if (!Ctx().HasProject())
         {
             ImGui::TextColored(UI::GetTheme().Danger, "No project loaded");
@@ -64,7 +75,9 @@ namespace Tiles::Editor
 
         RenderOverlay();
 
-        m_MouseDelta = ImGui::GetIO().MouseWheel;
+        // Only take wheel input while the viewport is hovered, so scrolling a list
+        // in another panel doesn't zoom the camera.
+        m_MouseDelta = ImGui::IsWindowHovered() ? ImGui::GetIO().MouseWheel : 0.0f;
 
         // Whether the pointer is over the canvas image itself (not the tab bar or
         // the overlay controls). Drives the crosshair cursor and gates the start of
